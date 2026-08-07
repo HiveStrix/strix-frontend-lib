@@ -1322,3 +1322,189 @@
 
    La regla que faltaba, para cuando esto se reconstruya: **una banda de tono es
    una superficie**, y todo lo que se pinte encima debe medirse contra ella. */
+
+/* ── U · CRISTAL HALO  (I · Cristal + T · Halo claro) ────────────────────
+   El material de Cristal con la regla de Halo: NINGUNA banda de tono en toda
+   la dirección. Lo que urge no se rellena, irradia.
+
+   No es solo otra cosa: arregla el defecto que la verificación encontró en
+   Cristal. Sus bandas eran translúcidas, así que una píldora sobre una fila ya
+   teñida pintaba la misma capa dos y tres veces y el contraste caía a 3.58
+   según cuántas capas hubiera debajo. La luz no se apila: un anillo sobre otro
+   anillo sigue siendo un anillo. */
+[data-d='U'] {
+  --d-ground:
+    radial-gradient(70% 56% at 10% 6%, #C3DAF2 0%, transparent 62%),
+    radial-gradient(62% 62% at 90% 20%, #E2D6EF 0%, transparent 64%),
+    radial-gradient(80% 62% at 48% 98%, #C8E8DF 0%, transparent 66%),
+    #EEF2F6;
+  --d-surface: rgba(255, 255, 255, .58);
+  --d-sunk: rgba(255, 255, 255, .32);
+  --d-ink: #0E1720; --d-ink-2: #2E3B48; --d-ink-3: #495563; --d-ink-on: #ffffff;
+  --d-line: rgba(255, 255, 255, .70); --d-edge: rgba(14, 23, 32, .15); --d-bw: 1px;
+  --d-r: 13px; --d-r-lg: 22px; --d-r-pill: 999px;
+  --d-shadow: 0 8px 28px -10px rgba(18, 38, 66, .22), inset 0 1px 0 rgba(255, 255, 255, .88);
+  --d-shadow-lg: 0 24px 56px -18px rgba(18, 38, 66, .34), inset 0 1px 0 rgba(255, 255, 255, .92);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 520; --d-w-semi: 600; --d-w-bold: 680;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
+  --d-row-h: 46px;
+  --d-accent: #1B4E9E; --d-accent-ink: #ffffff;
+  --d-accent-soft: rgba(27, 78, 158, .12); --d-accent-edge: rgba(27, 78, 158, .34);
+  /* Las bandas son CASI NADA: un velo que no aporta contraste ni lo resta. El
+     trabajo lo hacen el filo y el resplandor, que no se acumulan. */
+  --d-pos: #175534; --d-pos-band: rgba(46, 140, 88, .05); --d-pos-edge: rgba(30, 110, 66, .55);
+  --d-att: #74450A; --d-att-band: rgba(190, 130, 20, .05); --d-att-edge: rgba(160, 110, 12, .55);
+  --d-crit: #931C14; --d-crit-band: rgba(198, 60, 48, .05); --d-crit-edge: rgba(170, 48, 38, .55);
+  --d-info: #26356E; --d-info-band: rgba(64, 84, 180, .05); --d-info-edge: rgba(52, 72, 158, .55);
+  --d-neu: #3B4753; --d-neu-band: rgba(255, 255, 255, .34); --d-neu-edge: rgba(14, 23, 32, .18);
+}
+[data-d='U'] .d-panel {
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border-color: var(--d-line);
+}
+/* El estado, en las tres superficies donde aparece: anillo y halo, nunca fondo. */
+[data-d='U'] .d-panel[data-tone] {
+  box-shadow: 0 0 0 1px var(--tone-edge), 0 10px 34px -12px var(--tone-fg),
+              inset 0 1px 0 rgba(255, 255, 255, .8);
+}
+[data-d='U'] .d-row[data-tone] {
+  box-shadow: 0 0 0 1px var(--tone-edge), 0 6px 20px -10px var(--tone-fg);
+  border-radius: var(--d-r); border-bottom: 0; margin-bottom: var(--d-p1);
+}
+[data-d='U'] .d-pill {
+  background: transparent;
+  border-color: var(--tone-edge);
+  box-shadow: 0 0 14px -6px var(--tone-fg);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+[data-d='U'] .d-panel-head { border-bottom-color: rgba(14, 23, 32, .10); }
+[data-d='U'] .d-panel-foot { background: rgba(255, 255, 255, .22); border-top-color: rgba(255, 255, 255, .5); }
+[data-d='U'] .d-row { border-bottom-color: rgba(14, 23, 32, .08); }
+[data-d='U'] .d-btn {
+  background: rgba(255, 255, 255, .54);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border-color: rgba(255, 255, 255, .74);
+  box-shadow: 0 2px 10px -4px rgba(18, 38, 66, .28), inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+/* El primario TIENE que reponer su fondo acá. `[data-d='U'] .d-btn` pesa (0,2,0)
+   y `.d-btn--primary` pesa (0,1,0): sin esta línea el primario pierde el relleno
+   de acento pero conserva la tinta blanca, y queda texto blanco sobre vidrio
+   blanco. Es la misma trampa que ya se cobró cuatro páginas en Cristal. */
+[data-d='U'] .d-btn--primary {
+  background: var(--d-accent);
+  color: var(--d-accent-ink);
+  border-color: rgba(255, 255, 255, .32);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+[data-d='U'] .d-btn--ghost { background: transparent; box-shadow: none; backdrop-filter: none; }
+[data-d='U'] .d-btn--danger {
+  background: transparent; color: var(--d-crit);
+  border-color: var(--d-crit-edge); box-shadow: 0 0 16px -7px var(--d-crit);
+}
+[data-d='U'] .d-input, [data-d='U'] .d-select, [data-d='U'] .d-textarea {
+  background: rgba(255, 255, 255, .44);
+  border-color: rgba(255, 255, 255, .72);
+  box-shadow: inset 0 1px 3px rgba(18, 38, 66, .10);
+}
+[data-d='U'] .d-input:focus-visible, [data-d='U'] .d-select:focus-visible {
+  outline: 0; border-color: var(--d-accent);
+  box-shadow: 0 0 0 3px rgba(27, 78, 158, .18), inset 0 1px 3px rgba(18, 38, 66, .10);
+}
+
+/* ── V · CRISTAL MACIZO  (I · Cristal + affordance material) ─────────────
+   Misma página de vidrio, pero la capa interactiva es MACIZA. Botones y campos
+   son sólidos, sin desenfoque y sin transparencia.
+
+   La consecuencia es la idea: la opacidad pasa a ser la señal de affordance.
+   Se sabe qué se puede tocar por lo que NO deja pasar el fondo. Lo transparente
+   es página; lo opaco es control. En una interfaz de vidrio, donde todo tiende
+   a verse igual de etéreo, eso resuelve el problema real que tiene el material:
+   que nada parece presionable. */
+[data-d='V'] {
+  --d-ground:
+    radial-gradient(70% 56% at 12% 4%, #C6DCEF 0%, transparent 62%),
+    radial-gradient(60% 60% at 92% 18%, #E4D8EE 0%, transparent 64%),
+    radial-gradient(78% 60% at 50% 100%, #CCE7DE 0%, transparent 66%),
+    #EDF1F5;
+  --d-surface: rgba(255, 255, 255, .54);
+  --d-sunk: rgba(255, 255, 255, .30);
+  --d-ink: #0D1620; --d-ink-2: #2C3946; --d-ink-3: #48545F; --d-ink-on: #ffffff;
+  --d-line: rgba(255, 255, 255, .68); --d-edge: rgba(13, 22, 32, .16); --d-bw: 1px;
+  --d-r: 10px; --d-r-lg: 22px; --d-r-pill: 999px;
+  --d-shadow: 0 8px 28px -10px rgba(16, 36, 62, .22), inset 0 1px 0 rgba(255, 255, 255, .86);
+  --d-shadow-lg: 0 24px 56px -18px rgba(16, 36, 62, .34), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 530; --d-w-semi: 620; --d-w-bold: 700;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
+  --d-row-h: 46px;
+  --d-accent: #10243D; --d-accent-ink: #ffffff;
+  --d-accent-soft: #DDE6EF; --d-accent-edge: #10243D;
+  /* Bandas opacas, por la misma razón que en Cristal: una banda translúcida se
+     apila. Acá además serían incoherentes — la capa de estado es material. */
+  --d-pos: #175534; --d-pos-band: #D8E9DF; --d-pos-edge: #A9CDB8;
+  --d-att: #74450A; --d-att-band: #F0E4CE; --d-att-edge: #DCC08A;
+  --d-crit: #931C14; --d-crit-band: #F3DAD8; --d-crit-edge: #E0AFA9;
+  --d-info: #26356E; --d-info-band: #DFE2F1; --d-info-edge: #B4BBDB;
+  --d-neu: #3E4A55; --d-neu-band: #E4E8EC; --d-neu-edge: #C2C9D0;
+}
+[data-d='V'] .d-panel {
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-color: var(--d-line);
+}
+[data-d='V'] .d-panel-head { border-bottom-color: rgba(13, 22, 32, .10); }
+[data-d='V'] .d-panel-foot { background: rgba(255, 255, 255, .24); border-top-color: rgba(255, 255, 255, .5); }
+[data-d='V'] .d-row { border-bottom-color: rgba(13, 22, 32, .08); }
+
+/* LA CAPA MACIZA. Nada de esto desenfoca el fondo ni lo deja pasar: son
+   objetos apoyados sobre el vidrio, con su propia sombra de contacto. */
+[data-d='V'] .d-btn {
+  background: #FFFFFF;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  border: 1px solid #C7D0D9;
+  border-radius: var(--d-r);
+  font-weight: var(--d-w-semi);
+  box-shadow: 0 1px 0 rgba(13, 22, 32, .10), 0 4px 10px -4px rgba(16, 36, 62, .30);
+}
+[data-d='V'] .d-btn:hover { background: #F4F7FA; }
+[data-d='V'] .d-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0), inset 0 2px 4px rgba(16, 36, 62, .18);
+}
+[data-d='V'] .d-btn--primary {
+  background: var(--d-accent); color: var(--d-accent-ink);
+  border-color: var(--d-accent);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .25), 0 6px 14px -5px rgba(16, 36, 62, .5);
+}
+[data-d='V'] .d-btn--primary:hover { background: #1A3757; }
+[data-d='V'] .d-btn--danger {
+  background: var(--d-crit); color: #ffffff; border-color: var(--d-crit);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, .25), 0 6px 14px -5px rgba(120, 24, 18, .45);
+}
+/* El fantasma es el único control que NO es macizo, y por eso es el único que
+   no se lee como presionable a primera vista. Eso es exactamente su trabajo. */
+[data-d='V'] .d-btn--ghost {
+  background: transparent; border-color: transparent; box-shadow: none;
+  color: var(--d-ink-2); font-weight: var(--d-w-med);
+}
+[data-d='V'] .d-btn--ghost:hover { background: rgba(255, 255, 255, .5); }
+[data-d='V'] .d-input, [data-d='V'] .d-select, [data-d='V'] .d-textarea {
+  background: #FFFFFF;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  border: 1px solid #C7D0D9;
+  box-shadow: inset 0 1px 2px rgba(16, 36, 62, .12);
+}
+[data-d='V'] .d-input:focus-visible, [data-d='V'] .d-select:focus-visible {
+  outline: 0; border-color: var(--d-accent);
+  box-shadow: 0 0 0 3px rgba(16, 36, 62, .16), inset 0 1px 2px rgba(16, 36, 62, .12);
+}
+[data-d='V'] .d-pill { backdrop-filter: none; -webkit-backdrop-filter: none; }

@@ -171,6 +171,24 @@ export const DIRECTIONS = [
     form: 'La regla de Halo se conserva entera: nada tiene borde ni relleno sólido, un elemento existe porque irradia. Lo que cambia es de qué lado está la luz. Sobre papel, el resplandor es un halo de color proyectado hacia afuera más un anillo de 1px del mismo tono. El acento es un color saturado que brilla por sí mismo.',
     hermana: 'K',
     finalista: true
+  },
+  {
+    id: 'U',
+    name: 'Cristal halo',
+    tagline: 'Vidrio, pero el estado es luz y no una banda.',
+    silhouette: 'Paneles translúcidos sobre un campo de color, y lo que urge no se rellena: irradia.',
+    form: 'Toma el material de Cristal y la regla de Halo. Ninguna banda de tono en toda la dirección — el estado es un anillo de 1px en su color más un resplandor hacia afuera. Además de ser otra cosa, arregla el defecto de Cristal: una banda translúcida sobre una fila ya teñida se pintaba dos y tres veces y el contraste dependía de cuántas capas hubiera debajo. La luz no se apila.',
+    mezcla: 'I + T',
+    finalista: true
+  },
+  {
+    id: 'V',
+    name: 'Cristal macizo',
+    tagline: 'Todo es vidrio. Lo único sólido es lo que se puede tocar.',
+    silhouette: 'Superficies translúcidas por todas partes, y encima objetos opacos y compactos: los controles.',
+    form: 'Misma página de vidrio, pero la capa interactiva es maciza. Botones y campos son sólidos, sin desenfoque y sin transparencia, con su propia sombra de contacto. La consecuencia es que la opacidad pasa a ser la señal de affordance: se sabe qué se puede tocar por lo que NO deja pasar el fondo. Lo transparente es página; lo opaco es control.',
+    mezcla: 'I + affordance material',
+    finalista: true
   }
 ];
 
