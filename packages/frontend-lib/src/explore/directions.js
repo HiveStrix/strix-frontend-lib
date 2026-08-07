@@ -166,8 +166,8 @@ export const DIRECTIONS = [
     id: 'W',
     name: 'Cristal templado',
     tagline: 'Vidrio donde sirve. Opaco donde estorba. Halo solo donde urge.',
-    silhouette: 'Paneles translúcidos sobre un campo de color, tablas planas y tranquilas, y una sola fila que irradia: la vencida.',
-    form: 'Cristal con tres correcciones y una regla de reserva. Nada que FLOTE es translúcido: menús, desplegables, diálogos y globos van sólidos, porque un menú translúcido deja que el texto de abajo se cruce con el de arriba y ninguno de los dos se lee. Las filas de tabla vuelven a ser planas, con banda opaca y sin anillo ni margen, porque una tabla de objetos flotantes es engorrosa de leer. Las fichas de filtro son las de Cristal, que ya funcionaban. Y el halo queda reservado a lo crítico: si todo brilla, nada urge.',
+    silhouette: 'Planos translúcidos que flotan a distintas alturas, sin un solo borde. Lo que urge sobresale del margen y respira luz.',
+    form: 'NI UN BORDE en toda la dirección: el vidrio real no tiene un trazo de 1px, tiene un reflejo especular arriba y una refracción oscura abajo. La profundidad reemplaza a la línea, y hay tres alturas que significan algo: base, plano levantado y flotante. Lo que urge no se subraya, sobresale del margen y respira luz. Encima, tres correcciones y una regla de reserva. Nada que FLOTE es translúcido: menús, desplegables, diálogos y globos van sólidos, porque un menú translúcido deja que el texto de abajo se cruce con el de arriba y ninguno de los dos se lee. Las filas de tabla vuelven a ser planas, con banda opaca y sin anillo ni margen, porque una tabla de objetos flotantes es engorrosa de leer. Las fichas de filtro son las de Cristal, que ya funcionaban. Y el halo queda reservado a lo crítico: si todo brilla, nada urge.',
     mezcla: 'I corregido',
     finalista: true
   },
