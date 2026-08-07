@@ -15,6 +15,68 @@
   // 8 + 14 + 62 + 4 — la flota entera sale de los KPIs, no de un número inventado.
   const FLEET = KPIS.reduce((n, k) => n + k.value, 0);
 
+  // ── COTA (X) · DE DÓNDE SALE UN TOPE ───────────────────────────────────
+  // Ninguna cifra de acá abajo es nueva. PLANS ya publica el intervalo de cada
+  // equipo («cada 250 h») y ASSETS ya publica su lectura («312 h»); el tope, el
+  // sobrepaso y lo que falta son esas dos cadenas restadas. Si un equipo no
+  // tiene plan o no tiene lectura, la función lo dice en palabras en vez de
+  // devolver un cero, porque un cero dibujaría un riel vacío y un riel vacío
+  // afirma que se midió.
+  function planOf(code) {
+    return PLANS.find((p) => p.asset === code);
+  }
+  function cifra(txt) {
+    const n = String(txt ?? '').replace(/\D/g, '');
+    return n === '' ? null : Number(n);
+  }
+  function unidad(txt) {
+    const m = String(txt ?? '').match(/[a-z]+$/i);
+    return m ? m[0] : '';
+  }
+  // Los miles se separan como ya lo hace demo.js en «1 840 h», pero con espacio
+  // duro: con el espacio normal, «faltan 2 790 km» partía el número en dos
+  // renglones y la columna mostraba «faltan 2» y debajo «790 km». Un millar
+  // partido es un número distinto durante el medio segundo que tarda el ojo en
+  // juntarlo, y esta columna se lee de reojo.
+  const NBSP = ' ';
+  function miles(n) {
+    const s = String(n);
+    let out = '';
+    for (let i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 === 0) out += NBSP;
+      out += s[i];
+    }
+    return out;
+  }
+  function cant(n, u) {
+    if (n === null) return '';
+    return u ? miles(n) + NBSP + u : miles(n);
+  }
+  function topeDe(code) {
+    const p = planOf(code);
+    return p ? cant(cifra(p.every), unidad(p.every)) : '';
+  }
+  // «tope 250 h · se pasó 62 h». Es la mitad de la cota que hace el trabajo:
+  // sin la nota, el riel es una barra de progreso.
+  function notaCota(a) {
+    const p = planOf(a.code);
+    if (!p) return '';
+    const u = unidad(p.every);
+    const tope = cifra(p.every);
+    const leido = cifra(a.metric);
+    const base = 'tope ' + cant(tope, u);
+    if (tope === null || leido === null) return base + ' · nunca medido';
+    const dif = leido - tope;
+    if (dif > 0) return base + ' · se pasó ' + cant(dif, u);
+    if (dif < 0) return base + ' · faltan ' + cant(-dif, u);
+    return base + ' · justo en el tope';
+  }
+  // En la línea de tiempo la cifra medida es el porcentaje, así que la nota
+  // tiene que decir contra qué. Absorbe lo que antes repetía .tlev.
+  function notaPlan(p) {
+    return 'tope ' + cant(cifra(p.every), unidad(p.every)) + ' · reloj de ' + p.clock;
+  }
+
   // Estado por dirección: filtrar en una celda no debe mover las otras siete.
   let q = Object.fromEntries(DIRECTIONS.map((d) => [d.id, '']));
   let fam = Object.fromEntries(DIRECTIONS.map((d) => [d.id, 'Todas']));
@@ -178,7 +240,11 @@
               <span class="d-cap">Código</span>
               <span class="d-cap">Equipo</span>
               <span class="d-cap">Plan · próximo</span>
-              <span class="d-cap ta-r">Lectura</span>
+              <!-- X · la vertical del plan se rotula una vez, en su cabecera, y
+                   cae exactamente sobre la marca de todos los rieles. Sin este
+                   rótulo la raya se lee como una división de columnas, que es
+                   justo lo que no es. -->
+              <span class="d-cap ta-r">Lectura{#if d.id === 'X'}<i class="xtope">tope</i>{/if}</span>
               <span class="d-cap">Estado</span>
             </div>
 
@@ -205,8 +271,41 @@
                       <span class="sub" title={'próximo ' + a.due}>{a.due}</span>
                     </div>
                     <div class="c-metric">
-                      <span class="mv d-num">{a.metric}</span>
-                      <span class="sub d-num">{a.pct ? a.pct + ' %' : 'sin dato'}</span>
+                      <!-- X · COTA. Aquí es donde la regla 2 se aplica o no se
+                           aplica: «312 h» con «118 %» debajo son dos cifras
+                           sueltas que obligan a restar de memoria. La cota las
+                           reemplaza por la lectura sobre su riel, con la marca
+                           del tope donde cae el plan. Las otras diecinueve
+                           direcciones caen al {:else} y no cambian un píxel. -->
+                      {#if d.id === 'X'}
+                        {#if a.pct}
+                          <div
+                            class="d-cota xcota"
+                            data-tone={a.tone}
+                            data-over={a.pct > 100 ? 'si' : null}
+                            style="--cota:{a.pct}"
+                          >
+                            <div class="d-cota-fig">
+                              <b>{miles(cifra(a.metric))}</b> <span>{unidad(a.metric)}</span>
+                            </div>
+                            <div class="d-cota-rail" aria-hidden="true">
+                              <i class="d-cota-fill"></i><i class="d-cota-tick"></i>
+                            </div>
+                            <div class="d-cota-note">{notaCota(a)}</div>
+                          </div>
+                        {:else}
+                          <!-- sin lectura no hay cota: un riel en cero afirma
+                               que se midió y dio cero. El tope sigue existiendo
+                               y se dice con palabras. -->
+                          <div class="xsin">
+                            <span class="xsin-t">sin lectura</span>
+                            <span class="sub">tope {topeDe(a.code)}</span>
+                          </div>
+                        {/if}
+                      {:else}
+                        <span class="mv d-num">{a.metric}</span>
+                        <span class="sub d-num">{a.pct ? a.pct + ' %' : 'sin dato'}</span>
+                      {/if}
                     </div>
                     <div class="c-state">
                       <span class="d-pill">
@@ -243,7 +342,30 @@
                   <div class="tlm">
                     <span class="tlt">{p.task}</span>
                     <span class="tlbar">
-                      {#if d.id === 'F'}
+                      {#if d.id === 'X'}
+                        <!-- X · el carril de la línea de tiempo YA era una cota
+                             a mano: relleno más una marca de umbral, con una
+                             escala propia (tope al 83 %) que no coincide con la
+                             de la tabla. Dos vocabularios de riel en la misma
+                             pantalla es la clase de incoherencia que se nota
+                             sin poder nombrarla, así que acá va la primitiva. -->
+                        {#if p.at}
+                          <span
+                            class="d-cota xcota xtl"
+                            data-tone={p.tone}
+                            data-over={p.at > 100 ? 'si' : null}
+                            style="--cota:{p.at}"
+                          >
+                            <span class="d-cota-fig"><b>{p.at}</b> <span>%</span></span>
+                            <span class="d-cota-rail" aria-hidden="true">
+                              <i class="d-cota-fill"></i><i class="d-cota-tick"></i>
+                            </span>
+                            <span class="d-cota-note">{notaPlan(p)}</span>
+                          </span>
+                        {:else}
+                          <span class="xsin"><span class="sub">sin lectura · tope {topeDe(p.asset)}</span></span>
+                        {/if}
+                      {:else if d.id === 'F'}
                         <span class="ascii" aria-hidden="true"
                           >[{'#'.repeat(Math.round(Math.min(p.at, 120) / 6))}{'·'.repeat(
                             20 - Math.round(Math.min(p.at, 120) / 6)
@@ -1979,6 +2101,7 @@
   }
   :global([data-d='W']) .verdict[data-tone='critical'] {
     box-shadow: var(--d-shadow), inset var(--pg-canto) 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   :global([data-d='W']) .vk { font-size: 1em; }
   :global([data-d='W']) .vt {
@@ -2015,9 +2138,11 @@
   }
   :global([data-d='W']) .kpi[data-tone='critical'] {
     box-shadow: var(--d-shadow), inset var(--pg-canto) 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   :global([data-d='W']) .kpi[data-tone='critical'][aria-pressed='true'] {
     box-shadow: var(--d-shadow), inset var(--pg-canto) 0 0 var(--d-crit), inset 0 -3px 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
 
   /* las fichas se quedan como en Cristal, que ya funcionaban: pastilla, canto
@@ -2072,6 +2197,7 @@
   :global([data-d='W']) .gc { color: var(--d-ink-2); }
   :global([data-d='W']) .ghead[data-tone='critical'] {
     box-shadow: inset var(--pg-canto) 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   /* la fila no lleva estado de reposo del ratón: no es un objeto que se pueda
      pulsar, y en Cristal ese gris además le borraba la banda del tono. Todo lo
@@ -2102,6 +2228,7 @@
   }
   :global([data-d='W']) .tlr[data-tone='critical'] {
     box-shadow: inset var(--pg-canto) 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   :global([data-d='W']) .track {
     background: var(--d-sunk);
@@ -2406,5 +2533,521 @@
     /* Las fichas de familia son botones propios de esta pantalla y no
        heredan de .d-btn. */
     :global([data-d='W']) .fam { min-height: var(--d-touch); }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     X · COTA — LA PANTALLA ENTERA
+
+     La pregunta que se le hace a esta pantalla es una sola y se contesta de
+     pie, con la máquina enfrente: ¿cuál atiendo? Todo lo de aquí abajo existe
+     para que la respuesta salga antes de leer una palabra.
+
+     LA REGLA 1, APLICADA A LA LETRA. En todo este bloque no hay un color que
+     no venga de --tone-*. Barra, paneles, fichas, botones, rieles en reposo,
+     marca del tope, encabezados y pie salen de --d-ink*, --d-line, --d-edge,
+     --d-sunk y --d-surface, que son grises de esmalte sin temperatura. El
+     acento de X es tinta, así que el botón primario es negro y no un color: se
+     ve que es el primario por su masa, no por su tono.
+     Y hay una vuelta de tuerca más, en el riel: el relleno también es gris
+     mientras no haya pasado el tope. Un riel corto no tiene ningún estado que
+     reportar. Gasta color el que se pasó, y solo él.
+
+     Consecuencia medible: entrecerrando los ojos hasta que el texto sea
+     ilegible quedan visibles cuatro cosas y las cuatro son estado. La banda
+     rosa del veredicto arriba, las cuatro cifras de los KPIs, la banda rosa del
+     grupo «Vencidos» con sus dos filas, y dos barras rojas cruzando la vertical
+     de la columna de lecturas. Nada más tiene color en la celda.
+
+     LA REGLA 2, Y DÓNDE SE APLICA. La cota va en los dos únicos sitios donde
+     hay una medida contra un tope: la columna de lectura de la tabla (312 h
+     contra las 250 h del plan) y el carril de la línea de tiempo (el porcentaje
+     contra el 100 %). NO va en los KPIs: «8 vencidos» es un conteo y no tiene
+     tope publicado; ponerle uno exigiría inventar una meta, y una cota sin
+     marca de tope es una barra de progreso decorativa.
+
+     LO QUE APORTA ESTA PÁGINA SOBRE LA PRIMITIVA: la columna de lecturas está
+     normalizada. Cada riel mide contra el tope de SU máquina —250 h, 2 000 h,
+     90 d, 10 000 km— así que el 100 % cae siempre en el mismo punto del carril
+     y las marcas de todas las filas se apilan en una sola vertical. Esa
+     vertical es el plan, dibujado una vez y para toda la flota: lo que la cruza
+     está pasado. Es la única raya que esta pantalla añade y no es adorno, es la
+     cota del dibujo.
+
+     NO SE REDEFINE .d-btn. directions.css ya le da a X su canto y su sombra de
+     un píxel, y una regla `.d-btn` escrita desde esta página pesaría lo mismo
+     que `[data-d='X'] .d-btn--primary` de allá y llegaría después: «Registrar
+     lectura» quedaría tinta blanca sobre relleno blanco, 1.02:1, sin un error
+     en consola. Lo único que se toca del botón es el tamaño táctil, y por
+     puntero.
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* ── barra del módulo ─────────────────────────────────────────────────
+     La personalidad no puede salir de la fuente: @font-face dentro de un
+     shadow root lo ignoran Chrome y Safari, así que es la pila del sistema en
+     las veinte. Sale del tratamiento: 25px en 700 con -.032em de tracking
+     contra los 13.5px en 400 de todo lo demás. El salto de peso es el que
+     manda, no el de tamaño. */
+  :global([data-d='X']) .topbar {
+    background: var(--d-surface);
+    border-bottom-color: var(--d-line);
+  }
+  :global([data-d='X']) .title {
+    font-size: var(--d-t-xl);
+    font-weight: var(--d-w-bold);
+    letter-spacing: -.032em;
+  }
+
+  /* ── veredicto ────────────────────────────────────────────────────────
+     Es la frase que se lee primero y se queda en 18px. Subirla a 25px la
+     partía en tres renglones y empujaba la primera fila vencida fuera de los
+     620px: la pantalla contestaba «cuántos» y nunca «cuál». Lo que sube es el
+     peso, que no cuesta alto.
+     El canto de 3px en --tone-fg es la misma gramática que directions.css le
+     da a .d-row en X, así que el veredicto y las filas hablan igual. */
+  :global([data-d='X']) .verdict {
+    display: flex;
+    align-items: center;
+    gap: var(--d-p3);
+    background: var(--tone-band);
+    border: var(--d-bw) solid var(--tone-edge);
+    border-left: 3px solid var(--tone-fg);
+    border-radius: var(--d-r);
+  }
+  :global([data-d='X']) .vt {
+    font-size: var(--d-t-lg);
+    font-weight: var(--d-w-semi);
+    letter-spacing: -.015em;
+  }
+
+  /* ── tira de KPIs ─────────────────────────────────────────────────────
+     Cuatro conteos, sin riel: no hay tope contra el que medirlos. La cifra es
+     lo único con color y va en 34px/700 con -.04em; la etiqueta baja a 13.5px
+     en 520. Ese salto es toda la jerarquía que hace falta. */
+  :global([data-d='X']) .kpi {
+    border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='X']) .kv {
+    font-size: var(--d-t-2xl);
+    letter-spacing: -.04em;
+  }
+  /* la moción hace UN trabajo: confirmar el dedo. Es el mismo hundimiento de
+     un píxel que directions.css le da a .d-btn en X, para que un control se
+     comporte igual en toda la pantalla. */
+  :global([data-d='X']) .kpi:active { transform: translateY(1px); }
+  /* (0,3,0) a propósito: la regla de arriba pesa lo mismo que
+     `.kpi[aria-pressed='true']` de la base y va después, así que sin esto el
+     filtro activo quedaría idéntico al inactivo.
+     El marcado NO se pinta del tono: en Cota el color es del dato, y cuál
+     filtro está puesto es cromo. Se hunde el papel y se le pone anillo de
+     tinta, que además sobrevive en escala de grises. La cifra sigue llevando
+     su tono, el aria-pressed lo dice y «Limpiar filtros» lo confirma en
+     palabras: el estado nunca cuelga solo del color. */
+  :global([data-d='X']) .kpi[aria-pressed='true'] {
+    background: var(--d-sunk);
+    border-color: var(--d-ink);
+    box-shadow: inset 0 0 0 1px var(--d-ink);
+  }
+
+  /* ── barra de filtros ─────────────────────────────────────────────────
+     La ficha marcada se llena de tinta. --d-accent-soft con canto de tinta ya
+     funcionaba, pero de lejos una ficha gris clara entre seis grises claras no
+     se encuentra, y encontrar el filtro puesto es la mitad de salir de él.
+     Blanco sobre #16181A: 16.9:1. */
+  :global([data-d='X']) .flab { color: var(--d-ink-2); }
+  :global([data-d='X']) .fam { border-color: var(--d-edge); }
+  :global([data-d='X']) .fam[aria-pressed='true'] {
+    background: var(--d-accent);
+    color: var(--d-accent-ink);
+    border-color: var(--d-accent);
+  }
+  :global([data-d='X']) .fam[aria-pressed='true'] .ct { color: inherit; }
+
+  /* ── tabla ────────────────────────────────────────────────────────────
+     La columna de lectura pasa de 74 a 152px porque ahí ya no hay una cifra:
+     hay una cifra, un riel y su tope. El gap baja a 7px para pagarlo sin
+     estrechar el nombre del equipo, que es la otra respuesta de la fila. */
+  :global([data-d='X']) .sect { border-radius: var(--d-r); }
+  :global([data-d='X']) .cnt { color: var(--d-ink-2); }
+  :global([data-d='X']) .lhead,
+  :global([data-d='X']) .row {
+    grid-template-columns: 66px minmax(0, 1.9fr) minmax(0, 1.1fr) 162px 96px;
+    gap: var(--d-p1);
+  }
+  :global([data-d='X']) .lhead {
+    background: var(--d-sunk);
+    border-bottom-color: var(--d-edge);
+  }
+  /* la lectura deja de ir a la derecha: el riel arranca donde arranca la cifra */
+  :global([data-d='X']) .lhead .ta-r { position: relative; text-align: left; }
+  :global([data-d='X']) .xtope {
+    position: absolute;
+    left: calc(66.67% + 4px);
+    top: 0;
+    font-style: normal;
+    color: var(--d-ink-2);
+  }
+
+  /* el encabezado de grupo repite la gramática de la fila: canto de 3px del
+     tono, y banda solo para lo vencido, que es el único estado que interrumpe.
+     Sin versalitas: --d-label-case ya viene en none y las versalitas sobre
+     cada bloque son el ritmo que delata una plantilla. */
+  :global([data-d='X']) .ghead {
+    position: relative;
+    background: var(--d-sunk);
+    border-top: var(--d-bw) solid var(--d-line);
+    border-bottom-color: var(--d-line);
+    padding-left: calc(var(--d-p3) + 3px);
+    font-size: var(--d-t-sm);
+    font-weight: var(--d-w-semi);
+    letter-spacing: -.01em;
+    color: var(--d-ink);
+  }
+  :global([data-d='X']) .ghead::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: var(--tone-fg);
+  }
+  :global([data-d='X']) .ghead[data-tone='critical'] { background: var(--d-crit-band); }
+  /* el primero cuelga del encabezado de columnas, que ya trae su regla: dos
+     rayas pegadas se leen como un error de impresión */
+  :global([data-d='X']) .rows > .ghead:first-child { border-top: 0; }
+  :global([data-d='X']) .gc { color: var(--d-ink-2); }
+
+  /* la pastilla de estado deja de ser una cápsula y pasa a ser un sello: en
+     una pantalla donde todo canto es de 4px, 999px es la única forma blanda y
+     se lee como de otra familia. */
+  :global([data-d='X']) .c-state .d-pill,
+  :global([data-d='X']) .tlw { border-radius: var(--d-r); }
+
+  /* ── LA COLUMNA DE LECTURAS, QUE ES LA FIRMA ─────────────────────────
+     La vertical del plan. Se dibuja en --d-line, o sea el gris de una línea de
+     construcción, y encima de ella cae la marca de cada riel en tinta llena.
+     La marca sobresale 4px por arriba y por abajo (directions.css), así que se
+     ve incluso cuando el relleno la tapa: a 118 % el rojo pasa por encima del
+     tramo del riel y la marca sigue asomando contra el papel. */
+  /* la celda se estira a la altura de la fila y centra su contenido por dentro.
+     Con la altura automática, la fila «sin lectura» es tres píxeles más baja
+     que sus vecinas y la vertical del plan queda dentada justo donde se la
+     mira de corrido. */
+  :global([data-d='X']) .c-metric {
+    position: relative;
+    /* isolation crea el contexto de apilado que necesita el z-index negativo de
+       la raya. Sin él, la raya se pintaba ENCIMA de la nota y «faltan 160 h» se
+       leía «falta1 160 h»; y con z-index negativo sin contexto se hundiría por
+       debajo del fondo de la fila y desaparecería. Es la misma trampa de
+       pintado que ya está anotada en el bloque de Bruma. */
+    isolation: isolate;
+    align-self: stretch;
+    display: grid;
+    align-content: center;
+    text-align: left;
+  }
+  :global([data-d='X']) .c-metric::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    bottom: 0;
+    left: 66.67%;
+    width: 1.5px;
+    background: var(--d-line);
+    pointer-events: none;
+  }
+  :global([data-d='X']) .xcota { gap: 2px; }
+  /* 25px por cota son 150px de cifras en una tabla de seis filas: la lectura
+     pasaría a pesar más que el nombre del equipo. 18px con -.03em y la unidad
+     a .6em conservan el contraste de peso sin robarle la fila a nadie. */
+  :global([data-d='X']) .xcota .d-cota-fig {
+    font-size: var(--d-t-lg);
+    letter-spacing: -.03em;
+  }
+  /* <b> heredaría «bolder» sobre 620, que el navegador resuelve a 900 y la
+     pila del sistema devuelve como quiera. Se fija en 700. */
+  :global([data-d='X']) .xcota .d-cota-fig b { font-weight: var(--d-w-bold); }
+  /* la nota lleva el tope, que es la mitad del dato: sube de --d-ink-3 a
+     --d-ink-2 porque a 11px sobre la banda de lo vencido el gris terciario
+     cae a 4.9:1, justo en el filo de AA. En --d-ink-2 son 8.7:1. */
+  :global([data-d='X']) .xcota .d-cota-note {
+    font-size: var(--d-t-2xs);
+    color: var(--d-ink-2);
+  }
+  /* EL RELLENO ES GRIS HASTA QUE PASA EL TOPE. Es la regla 1 llevada hasta el
+     final: un riel que no llegó a su marca no reporta ningún estado, así que
+     no gasta color. Y el ojo no tiene que comparar longitudes: busca lo rojo.
+     --d-ink-3 sobre el carril da 4.7:1, muy por encima del 3:1 que pide un
+     objeto gráfico. */
+  :global([data-d='X']) .xcota .d-cota-fill { background: var(--d-ink-3); }
+  :global([data-d='X']) .xcota[data-over] .d-cota-fill { background: var(--tone-fg); }
+
+  /* sin lectura: ni riel ni cifra. Un riel en cero afirmaría que se midió. */
+  :global([data-d='X']) .xsin { display: grid; gap: 2px; min-width: 0; }
+  :global([data-d='X']) .xsin-t {
+    font-size: var(--d-t-sm);
+    font-weight: var(--d-w-med);
+    color: var(--d-ink-3);
+  }
+
+  /* ── línea de tiempo ──────────────────────────────────────────────────
+     .tlm pasa de flex a rejilla con la columna del estado fija en 132px. Con
+     flex, el ancho del carril dependía del largo de «venció hace 12 d» contra
+     «en 47 d» y las marcas de los tres planes caían a x distintas: tres cotas
+     que no se pueden comparar entre sí no son cotas.
+     .tlev se apaga porque su contenido («cada 250 h · reloj de uso») pasó a la
+     nota de la cota, que es donde explica qué significa la marca. */
+  :global([data-d='X']) .tlb {
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+    gap: var(--d-p2);
+  }
+  :global([data-d='X']) .tlr {
+    background: var(--d-sunk);
+    border: var(--d-bw) solid var(--d-line);
+    border-left: 3px solid var(--tone-fg);
+    border-radius: var(--d-r);
+    padding: var(--d-p2) var(--d-p3);
+  }
+  :global([data-d='X']) .tlr[data-tone='critical'] {
+    background: var(--d-crit-band);
+    border-color: var(--d-crit-edge);
+    border-left-color: var(--d-crit);
+  }
+  :global([data-d='X']) .tlid {
+    color: var(--d-ink);
+    font-weight: var(--d-w-semi);
+  }
+  :global([data-d='X']) .tlev { display: none; }
+  :global([data-d='X']) .tlm {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr) 132px;
+    align-items: center;
+    gap: var(--d-p2);
+  }
+  :global([data-d='X']) .tlbar { display: block; min-width: 0; }
+  /* el porcentaje ya es la cifra de la cota: repetirlo al lado del riel es
+     decir dos veces lo mismo y robarle ancho al riel */
+  :global([data-d='X']) .pc { display: none; }
+  :global([data-d='X']) .tlw { justify-self: start; }
+  :global([data-d='X']) .xtl .d-cota-fig { font-size: var(--d-t-lg); }
+
+  /* ── piso de artesanía ────────────────────────────────────────────────
+     directions.css ya cubre .d-row, .d-cota y los botones de X. Lo que sigue
+     es marcado propio de esta página y por lo tanto deuda de esta página. */
+  @media (forced-colors: active) {
+    /* en contraste forzado los fondos se reemplazan y el anillo de tinta se
+       evapora: el filtro puesto quedaría igual al no puesto */
+    :global([data-d='X']) .kpi[aria-pressed='true'],
+    :global([data-d='X']) .fam[aria-pressed='true'] {
+      outline: 2px solid CanvasText;
+      outline-offset: -2px;
+    }
+    :global([data-d='X']) .c-metric::after { background: CanvasText; }
+    :global([data-d='X']) .ghead::before { background: CanvasText; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='X']) .kpi { transition: none; }
+    :global([data-d='X']) .kpi:active { transform: none; }
+  }
+  /* el tamaño de un dedo es un hecho del aparato y no del ancho de la ventana:
+     una tableta de 768px se toca igual que un teléfono. directions.css sube
+     .d-btn, .d-input y .d-select de X; las fichas de familia son botones
+     propios de esta pantalla y no heredan de .d-btn. */
+  @media (pointer: coarse) {
+    :global([data-d='X']) .fam {
+      min-height: var(--d-touch);
+      align-items: center;
+    }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     X · EN ANGOSTO, DECLARADO HASTA 380px
+
+     QUÉ SE APILA
+       ≤760px  La fila deja de ser fila de tabla y pasa a ficha de CUATRO
+               renglones, uno más que la base: código y estado arriba, equipo,
+               plan, y la cota sola a lo ancho abajo. La cota necesita el ancho
+               entero o el riel baja a unos 70px, el 100 % cae en 47px y la
+               marca del tope deja de tener sitio donde caer.
+       ≤560px  La barra de módulo pasa a rejilla de dos columnas y la acción
+               primaria toma el renglón entero. Los KPIs pasan a dos por fila
+               (base). El aire entre bloques y el relleno del marco bajan un
+               escalón. «Agrupar por» se sienta al lado de su campo. La tira de
+               familias pasa a arrastre horizontal dentro de su propia caja.
+       ≤420px  El KPI deja de apilarse: cifra y etiqueta comparten renglón y la
+               nota baja. La cifra de la cota baja un escalón; su nota no. La
+               tira de familias sube al renglón del selector, así que la barra
+               de filtros entera cuesta 44px en vez de 96.
+
+     A 380px, QUE ES DONDE SE VA A ABRIR DE VERDAD
+       Entran los tres bloques. Medido en la celda de 380 × 620 con puntero
+       grueso: barra de módulo 110px, veredicto 62 (dos renglones), KPIs 130
+       (dos por fila), filtros 44, cabecera del bloque 40. La tabla arranca a
+       los 512px, o sea que dentro de la ventana entran el encabezado del grupo
+       «Vencidos» con su conteo y la primera ficha vencida completa hasta su
+       nombre y su ubicación: sin tocar nada ya se sabe QUÉ máquina atender, que
+       es lo único que se le pregunta a esta pantalla. La cota de esa ficha cae
+       unos 40px por debajo del corte, que es la manera honesta de decir que hay
+       más abajo.
+       Antes de apretar la pila, la tabla arrancaba a los 570 y lo único visible
+       era la cabecera del bloque: la pantalla contestaba «cuántos» y para
+       llegar a «cuál» había que desplazar. Los 58px salieron del aire entre
+       bloques, del renglón propio de «Agrupar por» y del renglón propio de la
+       tira de familias, y ni un dato se escondió para conseguirlos.
+       La ficha de un equipo mide unos 150px: identificación, plan, y la cota
+       con su cifra de 14.5px, su riel a 330px de ancho y su nota completa. La
+       vertical del plan NO se dibuja a este ancho: sin columna no hay nada que
+       alinear, y la marca de cada riel se basta sola.
+       Todos los objetivos táctiles quedan en 44px por (pointer: coarse), que
+       es el hecho que importa, no el ancho. Medido: cero controles por debajo
+       de 44px, y .scroll sin un píxel de desplazamiento lateral.
+
+     QUÉ COLUMNA SE CAE
+       Ninguna. Las cinco celdas siguen presentes en la ficha porque las cinco
+       son la respuesta a «qué máquina atender»: código, equipo, plan, lectura
+       y estado. Esconder la lectura en un teléfono es esconder justo el dato
+       que se consulta parado frente al horómetro. Lo que se cae es el
+       encabezado de columna, que con una ficha por renglón ya no rotula nada.
+
+     QUÉ SE VUELVE DESPLAZAMIENTO HORIZONTAL
+       Solo la tira de fichas de familia, y contenida en su propia caja: nunca
+       mueve la página. La tabla se reordena en vez de desplazarse. El
+       desplazamiento lateral ACCIDENTAL —el que .scroll produce porque declara
+       overflow-y y por lo tanto calcula overflow-x en auto— tiene dos culpables
+       reales en este marcado y los dos están anotados abajo.
+     ══════════════════════════════════════════════════════════════════════ */
+  @media (max-width: 760px) {
+    :global([data-d='X']) .row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      padding-block: var(--d-p2);
+      row-gap: 5px;
+    }
+    :global([data-d='X']) .c-eq { grid-area: 2 / 1 / 3 / 3; }
+    :global([data-d='X']) .c-plan { grid-area: 3 / 1 / 4 / 3; }
+    :global([data-d='X']) .c-metric { grid-area: 4 / 1 / 5 / 3; }
+    :global([data-d='X']) .c-metric::after { content: none; }
+    /* CULPABLE 1 de desplazamiento lateral: .cnt va en nowrap y con el título
+       al lado no entra en el ancho del panel. Empuja .d-panel y la pantalla
+       entera se mueve de lado. Envuelve. */
+    :global([data-d='X']) .d-panel-head { flex-wrap: wrap; row-gap: 2px; }
+    :global([data-d='X']) .d-panel-title { min-width: 0; }
+    :global([data-d='X']) .cnt { white-space: normal; }
+    /* la fila deja de recortar y empieza a envolver. En rejilla de cinco
+       columnas los puntos suspensivos son correctos porque la columna de al
+       lado da contexto; en ficha, «Batidora Imer Syntesi 250» se convertía en
+       «Batidora Ime…», que es exactamente la respuesta que se vino a buscar. */
+    :global([data-d='X']) .nm,
+    :global([data-d='X']) .pl,
+    :global([data-d='X']) .sub {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    /* la línea del plan se apila; la columna de estado fija ya no cabe */
+    :global([data-d='X']) .tlm { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    /* DENSIDAD, Y NO ES COSMÉTICA. Medido a 380px con el alto de 620 de la
+       celda: la pila de arriba —barra, veredicto, KPIs, filtros— se comía casi
+       todo y la tabla asomaba por el borde. Una pantalla que contesta «cuántos»
+       y hay que desplazar para llegar a «cuál» está contestando la pregunta
+       equivocada. Se aprieta un escalón el aire entre bloques y el relleno del
+       marco, que a este ancho no separa nada que no separe ya el canto. */
+    :global([data-d='X']) .scroll {
+      gap: var(--d-p2);
+      padding: var(--d-p2);
+    }
+    /* «Agrupar por» se sienta al lado de su campo en vez de encima: es una
+       etiqueta de formulario de dos palabras y su propio renglón costaba 22px
+       de tabla. El envoltorio .fbody pasa a display:contents para que la
+       etiqueta y el campo caigan en la MISMA línea de flex; envolviéndolo como
+       una caja más, la etiqueta se centraba contra los dos renglones enteros de
+       .fbody y quedaba flotando a media altura, al lado de nada. */
+    :global([data-d='X']) .filters {
+      display: flex;
+      align-items: center;
+      gap: var(--d-p2);
+      flex-wrap: wrap;
+    }
+    :global([data-d='X']) .fbody { display: contents; }
+    :global([data-d='X']) .flab { flex: none; }
+    /* orden visual = orden del tabulador. La base mueve el buscador con
+       order:3 y deja el foco saltando del segundo renglón al primero. En
+       rejilla cada cosa cae donde el DOM la puso, y la acción primaria toma el
+       renglón de abajo, que es donde llega el pulgar. */
+    :global([data-d='X']) .topbar {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+    }
+    :global([data-d='X']) .search { order: 0; }
+    :global([data-d='X']) .act {
+      grid-column: 1 / -1;
+      width: 100%;
+      margin-left: 0;
+    }
+    /* siete fichas de familia a 44px de alto son cuatro renglones, o sea unos
+       190px de una ventana de 620 para un filtro que casi no se usa. En una
+       tira que se arrastra cuestan 52 y la tabla recupera el resto. «Todas» va
+       primera y siempre visible, así que el estado de reposo se lee sin
+       arrastrar nada. El relleno vertical no es decorativo: overflow-x auto
+       obliga al eje vertical a calcularse como auto, y sin esos 4px el anillo
+       de foco de una ficha quedaría recortado por su propio contenedor. */
+    :global([data-d='X']) .fams {
+      flex: 1 1 100%;
+      min-width: 0;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      padding-block: 4px;
+      scrollbar-width: thin;
+    }
+  }
+  @media (max-width: 420px) {
+    /* CULPABLE 2 de desplazamiento lateral: a 380px cada KPI mide unos 176px y
+       le quedan 150 de contenido, pero .kl viene con nowrap y SIN recorte, así
+       que «Por vencer» apilado bajo una cifra de 34px se sale de su casilla y
+       empuja la pantalla.
+       El KPI apilado además costaba unos 130px de alto cada uno: entre el
+       veredicto y los cuatro no quedaba un píxel de tabla dentro de los 620 y
+       la pantalla contestaba «cuántos» sin llegar nunca a «cuál». Cifra y
+       etiqueta comparten renglón, la nota baja al segundo. Ni un dato se
+       esconde y se recuperan unos 150px, o sea el grupo vencido con su primera
+       ficha. */
+    :global([data-d='X']) .kpi {
+      flex-direction: row;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0 var(--d-p1);
+      padding: var(--d-p1) var(--d-p2);
+    }
+    :global([data-d='X']) .kpis { gap: var(--d-p2); }
+    :global([data-d='X']) .kv { font-size: var(--d-t-xl); }
+    :global([data-d='X']) .kl {
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: normal;
+      font-size: var(--d-t-xs);
+    }
+    :global([data-d='X']) .kn {
+      flex: 1 1 100%;
+      white-space: normal;
+      text-overflow: clip;
+    }
+    /* el veredicto cede relleno, no cuerpo: bajarle el cuerpo sería cambiar la
+       respuesta por el envase */
+    :global([data-d='X']) .verdict { padding: var(--d-p2); gap: var(--d-p2); }
+    /* LA BARRA DE FILTROS SE REDUCE A UN SOLO RENGLÓN. Medido: con la tira de
+       familias en su propia línea, el pliegue de 620px caía dentro de la
+       primera ficha vencida y había que desplazar para leer la máquina que la
+       pantalla acababa de anunciar. La tira sube al renglón del selector y se
+       arrastra desde ahí. Es el control que menos se usa de la pantalla y el
+       único que se puede pedir que cueste un gesto: para buscar UN equipo ya
+       está el campo de arriba. */
+    :global([data-d='X']) .gsel { min-width: 106px; }
+    :global([data-d='X']) .fams { flex: 1 1 106px; }
+    /* la cifra de la cota baja un escalón; la nota se queda donde está, porque
+       el tope es la mitad del dato y ya está en el cuerpo más chico del bloque */
+    :global([data-d='X']) .xcota .d-cota-fig { font-size: var(--d-t-md); }
   }
 </style>

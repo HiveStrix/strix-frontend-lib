@@ -15,7 +15,7 @@
   import { onDestroy, tick } from 'svelte';
   import Grid from '../Grid.svelte';
   import Direction from '../Direction.svelte';
-  import { ASSETS, markOf } from '../demo.js';
+  import { ASSETS, PLANS, markOf } from '../demo.js';
 
   export let directions = [];
 
@@ -23,6 +23,17 @@
   const asset = ASSETS[0];        // BAT-014 · Batidora Imer Syntesi 250
   /** El que no deja marcar hecho: nunca se le tomó lectura. */
   const noRead = ASSETS[4];       // COM-07 · Compactadora Wacker DPU-6555
+
+  // La cota de X necesita la lectura y el tope como NÚMEROS, porque separa la
+  // cifra de su unidad y resta el sobrepaso. Los dos salen del mismo contenido
+  // que ve el resto de las direcciones —asset.metric y plan.every— en vez de
+  // escribirse a mano, para que nadie tenga que confiar en dos cifras sueltas.
+  /** El plan que mide a BAT-014: cambio de aceite cada 250 h. */
+  const plan = PLANS[0];
+  /** 312 — el horómetro, de asset.metric ('312 h'). */
+  const read = Number(asset.metric.replace(/\D/g, ''));
+  /** 250 — el tope del plan, de plan.every ('cada 250 h'). */
+  const cap = Number(plan.every.replace(/\D/g, ''));
 
   const ICONS = {
     gauge:
@@ -139,6 +150,24 @@
                 {asset.state} · {asset.due}
               </span>
             </p>
+
+            <!-- LA COTA, Y SÓLO EN X.
+                 Es la única cifra medida contra un tope que existe en esta
+                 pantalla: el horómetro de BAT-014 contra las 250 h de su plan.
+                 Va acá porque es lo que explica la barra de abajo — la primaria
+                 dice «Registrar lectura» justamente porque el contador pasó su
+                 tope hace 62 h. El orden de lectura queda: qué máquina, cuánto
+                 se pasó, qué se puede hacer.
+                 Las otras diecinueve direcciones no la llevan: la primitiva es
+                 la firma de Cota, y meterla en las demás les cambiaría la
+                 página en vez de dejarlas como están. -->
+            {#if d.id === 'X'}
+              <div class="cota d-cota" data-tone={asset.tone} style="--cota:{asset.pct}">
+                <div class="d-cota-fig"><b>{read}</b> <span>h</span></div>
+                <div class="d-cota-rail"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                <div class="d-cota-note">horómetro · tope {cap} h · se pasó {read - cap} h</div>
+              </div>
+            {/if}
 
             <div class="bar" role="group" aria-label="Acciones de {asset.name}">
               <button type="button" class="d-btn d-btn--primary">
@@ -1853,6 +1882,7 @@
       inset 3px 0 0 var(--d-crit),
       0 4px 18px -8px color-mix(in srgb, var(--d-crit) 55%, transparent),
       var(--d-shadow);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
 
   /* LA BARRA TIENE DOS PISOS, EN CUALQUIER ANCHO.
@@ -2020,7 +2050,8 @@
     :global([data-d='W']) .sec::after { display: none; }
     :global([data-d='W']) .sec[data-tone='critical'] {
       box-shadow: inset 5px 0 0 var(--d-crit), var(--d-shadow);
-    }
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
 
     :global([data-d='W']) .bar {
       display: grid; grid-auto-flow: row; justify-items: stretch;
@@ -2115,6 +2146,357 @@
       backdrop-filter: none; -webkit-backdrop-filter: none;
     }
     :global([data-d='W']) .sec::after { display: none; }
+  }
+
+  /* ======================================================================
+     X · COTA — papel mate y tinta, y la jerarquía tiene que leerse en gris.
+
+     Esta es la página donde la primera regla de la dirección se cobra: si el
+     color está RESERVADO al estado, entonces la escalera de acción no puede
+     apoyarse en él ni un poco. Tapando mentalmente el rojo, esto queda, de más
+     masa a menos:
+
+       primaria       bloque macizo de tinta con el texto en papel
+       secundaria     papel con un canto de tinta de 1px
+       fantasma       ni canto ni relleno hasta que la tocás
+       destructiva    papel con el canto DOBLE, y aparte de las demás
+       deshabilitada  banda neutra opaca, sin canto de contacto
+
+     El destructivo es el que obliga a inventar algo. En escala de grises el
+     canto de --d-crit (L .095) y el de --d-ink-3 (L .126) caen casi encima uno
+     del otro, así que dejarlo en «tinta roja» sería dejar que el color haga
+     todo el trabajo, que es exactamente lo que esta dirección no permite. Lo
+     que lo separa es la REGLA DOBLE: dos filos con un pelo de papel entre
+     ellos, que en un formulario impreso es lo que se le hace a la casilla que
+     no se puede deshacer. Es el único control de la celda con dos rayas, y eso
+     se ve sin distinguir un solo color.
+
+     Lo que NO se hace acá, aunque diecisiete direcciones de arriba lo hagan:
+     ni bandeja, ni marco continuo, ni pastilla alrededor de los botones. Un
+     agrupador con relleno es un material elegido por cómo se ve. Lo que agrupa
+     en Cota es el rango de la tinta, la alineación y una regla.
+     ====================================================================== */
+  :global([data-d='X']) .spec {
+    /* El umbral se mide contra el ancho REAL de la celda y no contra el de la
+       ventana: la rejilla del catálogo va de una a tres columnas, así que el
+       viewport miente en los dos extremos. Medido: con la ventana en 380px
+       .spec da 275px si el navegador reserva la barra de desplazamiento y 290px
+       si la superpone, que es lo que hace un teléfono. Los dos números están
+       muy por debajo del umbral, así que a 380px corre la rama angosta entera
+       y no hay un borde donde el resultado dependa del navegador. */
+    container-type: inline-size;
+    container-name: acc-x;
+    gap: var(--d-p3);
+  }
+
+  /* LA HOJA. Línea, canto de 4px y un pixel de sombra sin desenfoque: la misma
+     receta que .d-panel en esta dirección, para que el bloque no sea una forma
+     nueva que haya que aprender. La profundidad la da la línea, no la sombra. */
+  :global([data-d='X']) .sec {
+    background: var(--d-surface);
+    border: max(var(--d-bw), 1px) solid var(--d-line);
+    border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='X']) .sec-cap {
+    margin: 0;
+    padding: var(--d-p2) var(--d-p3);
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
+  }
+  :global([data-d='X']) .sec-body { padding: var(--d-p3); gap: var(--d-p3); }
+
+  /* El estado de la hoja es el filo de 3px del canto izquierdo, que es la misma
+     marca que directions.css le pone a .d-row en X: se aprende una vez y sirve
+     en toda la dirección. Va como sombra interior de cero desenfoque en vez de
+     un ::before porque así sigue el radio de la hoja sin recortar nada, y
+     porque el ::before de .sec ya está tomado por otras direcciones.
+     Se pinta UNA sola vez por celda, en la hoja del equipo vencido. */
+  :global([data-d='X']) .sec[data-tone] {
+    box-shadow: inset 3px 0 0 var(--tone-fg), var(--d-shadow);
+  }
+
+  /* La tipografía carga la personalidad y acá no hay fuente que elegir, así que
+     sale del tratamiento: el nombre de la máquina es lo más grande de la hoja
+     —es lo que se busca con el equipo enfrente— con tracking negativo, y todo
+     lo que sea lectura va en figuras tabulares para que dos lecturas se
+     comparen sin leerlas. */
+  :global([data-d='X']) .ctx-name {
+    font-size: var(--d-t-lg); letter-spacing: -.018em;
+  }
+  :global([data-d='X']) .ctx-code,
+  :global([data-d='X']) .hint,
+  :global([data-d='X']) .sub { font-variant-numeric: var(--d-num); }
+  :global([data-d='X']) .ctx-name,
+  :global([data-d='X']) .hint,
+  :global([data-d='X']) .sub { overflow-wrap: break-word; }
+
+  /* LA COTA. El riel se corta a 30ch: llega hasta donde el ojo abarca la marca
+     del tope y la punta del relleno de una sola mirada. Estirado a los 640px de
+     una celda ancha, el riel deja de ser una cota y pasa a ser una barra
+     decorativa, que es justo lo que la primitiva existe para no ser.
+     La lectura vuelve a nombrarse más abajo («Lectura anterior: 312 h») y ahí
+     NO lleva riel: es la misma medida ya acotada en esta pantalla, y repetir la
+     marca la convertiría en adorno. Lo que le toca ahí es la figura tabular. */
+  :global([data-d='X']) .cota { max-width: min(100%, 30ch); }
+
+  /* LA BARRA TIENE DOS PISOS, EN CUALQUIER ANCHO.
+     La botonera de este equipo pide unos 760px y la celda del catálogo da 640
+     en el mejor caso, así que envuelve siempre; y con `margin-left: auto`,
+     envolver dejaba «Eliminar equipo» solo en el segundo renglón, pegado al
+     canto y con aspecto de ser lo más importante de la barra por estar aparte.
+     El separador ocupa su propio renglón y ordena los dos pisos: arriba las
+     tres órdenes que operan la máquina, abajo lo que no la opera —el menú de
+     más acciones y el destructivo—. Así el corte deja de ser un accidente del
+     ancho y dice algo. Es el mismo separador de siempre, girado de eje: una
+     regla trazada de margen a margen, que es lo que un formulario hace. */
+  :global([data-d='X']) .bar { gap: var(--d-p2); }
+  :global([data-d='X']) .bar-sep {
+    flex: 1 0 100%;
+    width: auto; height: 0; min-height: 0;
+    margin: 0;
+    border-left: 0;
+    border-top: max(var(--d-bw), 1px) solid var(--d-line);
+  }
+
+  /* HALLAZGO, y es de token: --d-edge (#C4C7C5) da 1.70:1 contra el papel, muy
+     por debajo del 3:1 que WCAG 1.4.11 pide para el canto de un control, y en
+     esta página el canto ES lo que dice que algo se puede apretar. X necesita
+     un --d-control-edge propio; mientras no exista, el canto toma --d-ink-3,
+     que es el único token de la familia que llega (5.98:1) y que además le da a
+     la dirección lo que le corresponde: una caja DIBUJADA con tinta, no
+     insinuada con un gris de 3 %.
+     El deshabilitado, más abajo, es el único que se queda con --d-edge, y ahí
+     está bien: 1.4.11 exime a los controles inactivos. */
+  :global([data-d='X']) .d-btn { border-color: var(--d-ink-3); }
+
+  /* Y ACTO SEGUIDO LAS CUATRO VARIANTES, porque redefinir .d-btn en una
+     dirección pesa (0,3,0) con la clase de alcance de Svelte y cada variante
+     pesa (0,1,0): sin estas líneas el primario se quedaría con el canto gris
+     del secundario y el destructivo perdería el suyo. Es el choque que ya se
+     cobró seis páginas en este archivo. */
+  :global([data-d='X']) .d-btn--primary {
+    background: var(--d-accent); color: var(--d-accent-ink);
+    border-color: var(--d-accent);
+  }
+  /* `[data-d='X'] .d-btn:hover { background: var(--d-sunk) }` pesa (0,3,0) y
+     `.d-btn--primary:hover` pesa (0,2,0): HOY, al pasarle el ratón, el primario
+     de Cota se vuelve papel casi blanco y conserva la tinta blanca. Texto
+     blanco sobre blanco, sin un error en consola. Se repone acá, y con el gesto
+     que corresponde a un bloque de tinta sobre papel: la tinta sube un escalón
+     de valor. El brightness heredado no se veía sobre #16181A. */
+  :global([data-d='X']) .d-btn--primary:hover {
+    background: var(--d-ink-2); filter: none;
+  }
+
+  /* EL DESTRUCTIVO: tinta roja y regla doble, sin un pixel de relleno.
+     La banda --d-crit-band que trae la primitiva es color puesto en un control,
+     y en Cota el color es del estado. Acá el rojo está en la tinta del rótulo y
+     en los dos filos; el relleno sigue siendo papel, igual que el secundario.
+     La regla doble se dibuja con dos sombras interiores de cero desenfoque —un
+     pelo de papel y después el segundo filo—, así que no mueve nada de sitio:
+     con box-sizing en border-box el botón conserva sus 36px y su línea de base.
+     Al pasar por encima las dos reglas se CIERRAN en una sola de 2px, que es un
+     gesto que hace trabajo: dice «esto se compromete» y usa la transición de
+     120ms que .d-btn ya tenía declarada, sin agregar moción nueva a la página. */
+  :global([data-d='X']) .d-btn--danger {
+    background: var(--d-surface);
+    color: var(--d-crit);
+    border-color: var(--d-crit);
+    box-shadow:
+      inset 0 0 0 max(var(--d-bw), 1px) var(--d-surface),
+      inset 0 0 0 calc(max(var(--d-bw), 1px) * 2) var(--d-crit),
+      var(--d-shadow);
+  }
+  :global([data-d='X']) .d-btn--danger:hover {
+    background: var(--d-surface);
+    box-shadow:
+      inset 0 0 0 calc(max(var(--d-bw), 1px) * 2) var(--d-crit),
+      var(--d-shadow);
+  }
+  /* Al presionar, la hoja pierde su pixel de sombra igual que todos los demás
+     botones de la dirección: `[data-d='X'] .d-btn:active { box-shadow: none }`
+     pesa (0,3,0) y la regla doble pesa (0,4,0), así que sin esta línea el
+     destructivo sería el único que no se hunde. */
+  :global([data-d='X']) .d-btn--danger:active {
+    box-shadow: inset 0 0 0 calc(max(var(--d-bw), 1px) * 2) var(--d-crit);
+  }
+
+  :global([data-d='X']) .d-btn--ghost { border-color: transparent; }
+  /* Excepción con motivo: «Más acciones» no tiene rótulo del que agarrarse. En
+     una dirección donde el canto es lo que dice «esto es un control», el botón
+     de sólo icono necesita el suyo desde el principio y no al pasar el ratón. */
+  :global([data-d='X']) .d-btn--ghost.only { border-color: var(--d-ink-3); }
+
+  /* El hover heredado es --d-sunk (#F4F5F4), que contra el papel blanco de la
+     hoja da 1.05:1: no es un hover tenue, es ningún hover. En la página de los
+     controles eso no se puede dejar. Pasa a --d-accent-soft, que sigue siendo
+     acromático porque el acento de Cota es tinta. Primario y destructivo quedan
+     fuera porque ya tienen el suyo, y el deshabilitado también: un control
+     apagado no responde al ratón. */
+  :global([data-d='X']) .d-btn:not(.d-btn--primary):not(.d-btn--danger):not([disabled]):hover {
+    background: var(--d-accent-soft);
+  }
+
+  /* El deshabilitado. `.d-btn[disabled] { opacity: .45 }` deja la tinta en
+     2.7:1 contra el papel, y además el hover de la dirección le repinta el
+     fondo al pasar por encima, que es lo contrario de lo que un control apagado
+     tiene que hacer. Acá se apaga con la banda neutra OPACA: --d-ink-3 sobre
+     --d-neu-band da 5.14:1, o sea que el rótulo se puede LEER apagado, que es
+     lo que hace falta para entender por qué no se puede apretar. Y lo que dice
+     «no se puede» no es el color: es que perdió el canto de tinta y la sombra
+     de contacto, o sea que dejó de ser una casilla dibujada. */
+  :global([data-d='X']) .d-btn[disabled],
+  :global([data-d='X']) .d-btn[disabled]:hover {
+    opacity: 1;
+    background: var(--d-neu-band);
+    color: var(--d-ink-3);
+    border-color: var(--d-neu-edge);
+    box-shadow: none;
+    transform: none;
+  }
+  /* Consecuencia declarada, la misma que en W: con puntero grueso
+     directions.css sube TODO .d-btn de X a 44px y `.d-btn--sm` pesa menos, así
+     que con el dedo no hay botón pequeño. La diferencia de la fila de planes
+     sobrevive en la tipografía y en el ancho; 27px de alto en una fila que se
+     toca con el pulgar no es una variante de tamaño, es un fallo. */
+
+  /* El grupo comparte canto porque las tres acciones caen sobre la MISMA
+     selección: son una decisión con tres salidas y no tres decisiones. Sólo
+     desde 26rem, que es donde las tres entran en un renglón; por debajo se
+     apilan y el canto compartido cambia de eje. */
+  @container acc-x (min-width: 26rem) {
+    :global([data-d='X']) .grp { gap: 0; }
+    :global([data-d='X']) .grp > .d-btn:not(:first-child) {
+      margin-left: calc(-1 * max(var(--d-bw), 1px));
+      border-start-start-radius: 0; border-end-start-radius: 0;
+    }
+    :global([data-d='X']) .grp > .d-btn:not(:last-child) {
+      border-start-end-radius: 0; border-end-end-radius: 0;
+    }
+  }
+  /* El anillo de foco sale 2px hacia afuera. Donde los cantos se tocan —el
+     grupo y el dividido— sin esto quedaría por debajo del vecino. */
+  :global([data-d='X']) .d-btn:focus-visible { position: relative; z-index: 2; }
+
+  /* El menú flota, así que va sobre papel opaco con el canto de un borde real y
+     no con la línea interior de la hoja. El renglón activo se marca con el
+     mismo --d-accent-soft que los botones, y el teclado lo tiñe igual que el
+     ratón, porque en este menú el foco se pasea con las flechas. */
+  :global([data-d='X']) .menu { border-color: var(--d-edge); }
+  :global([data-d='X']) .menu-item:hover,
+  :global([data-d='X']) .menu-item:focus-visible { background: var(--d-accent-soft); }
+  :global([data-d='X']) .link { text-underline-offset: 3px; }
+
+  @media (pointer: coarse) {
+    :global([data-d='X']) .d-btn.split-toggle { min-width: var(--d-touch); }
+    /* El enlace mide 170 × 20 y está solo en su renglón, así que no lo cubre la
+       excepción de «destino dentro de un bloque de texto». Se le da caja de 44
+       sin tocar el cuerpo de la letra: el relleno agranda el área y el margen
+       negativo devuelve el renglón a donde estaba. */
+    :global([data-d='X']) .link {
+      display: inline-flex; align-items: center;
+      min-height: var(--d-touch);
+      padding-block: calc((var(--d-touch) - 1.5em) / 2);
+      margin-block: calc((1.5em - var(--d-touch)) / 2);
+    }
+  }
+
+  /* En colores forzados las sombras interiores se descartan, y con ellas la
+     regla doble. El canto vuelve a 2px para que lo irreversible siga siendo el
+     único control con el filo grueso; border-box lo absorbe sin mover nada. */
+  @media (forced-colors: active) {
+    :global([data-d='X']) .d-btn--danger { border-width: 2px; }
+  }
+
+  /* ── X · PANTALLA ANGOSTA, DECLARADA ───────────────────────────────────
+     Con la ventana en 380px la celda mide 275px, así que lo que corre a esa
+     altura es esta rama entera. Lo que hace, en orden:
+
+     1. La barra pasa a UNA orden por renglón, a lo ancho y con el rótulo a la
+        izquierda: una columna de comandos se barre con el pulgar, cuatro fichas
+        de anchos distintos no. El menú de más acciones se queda en su cuadrado
+        de 44 porque un botón sin rótulo estirado no gana nada y pierde su forma.
+     2. El destructivo deja de irse a la derecha: en una pila no hay derecha. Lo
+        sigue separando la regla, que ya era horizontal en todos los anchos.
+     3. El grupo se apila y las costuras cambian de eje. Sigue siendo una sola
+        pieza, con las esquinas arriba y abajo.
+     4. El dividido NO se parte: partirlo lo volvería dos controles y se perdería
+        lo único que dice que la flecha pertenece al botón. La mitad principal se
+        estira y la flecha se queda en un cuadrado de 44.
+     5. El filo del estado engorda de 3px a 5px: al borde de la pantalla, 3px se
+        pierden contra el marco del teléfono.
+     6. La cota suelta su tope de 30ch y toma el ancho entero. El riel es lo
+        único que no puede encogerse por debajo de su marca, y la marca vive en
+        el 66,67 % del riel, así que a 290px sigue cayendo a 193px del origen:
+        se ve dónde estaba el tope y cuánto lo pasó.
+
+     LO QUE NO PASA: nada se vuelve scroll horizontal. Una botonera que hay que
+     arrastrar esconde comandos, y ésta es la página de los comandos. El menú se
+     limita al 100 % porque la celda del catálogo recorta lo que se le salga.
+
+     LO QUE NO CAMBIA, a propósito: la fila de especímenes de «La escala de
+     acción» sigue envolviendo con cada botón en su ancho natural, en vez de
+     estirarse como la barra. Estirar los dos tamaños al 100 % los volvería
+     idénticos y esa fila existe para que se vea la diferencia de 9px. El ancho
+     natural más grande de la fila es «Subir salida en PDF», 186px, que entra
+     con holgura en los 245px de contenido que quedan a 380px de ventana.
+     Medido en el navegador a 380px: scrollWidth = clientWidth y ningún
+     descendiente de la celda pasa del canto derecho. */
+  @container acc-x (max-width: 26rem) {
+    :global([data-d='X']) .sec-body { padding: var(--d-p2); }
+    :global([data-d='X']) .sec[data-tone] {
+      box-shadow: inset 5px 0 0 var(--tone-fg), var(--d-shadow);
+    }
+    :global([data-d='X']) .cota { max-width: 100%; }
+
+    :global([data-d='X']) .bar {
+      display: grid; grid-auto-flow: row; justify-items: stretch;
+      gap: var(--d-p1);
+    }
+    :global([data-d='X']) .bar > .d-btn {
+      width: 100%; justify-content: flex-start; min-height: var(--d-touch);
+    }
+    :global([data-d='X']) .d-btn.only { min-width: var(--d-touch); }
+    :global([data-d='X']) .bar > .d-btn.only {
+      width: var(--d-touch);
+      justify-self: start; justify-content: center;
+    }
+    :global([data-d='X']) .bar-push { margin-left: 0; }
+    :global([data-d='X']) .bar-sep { margin-block: calc(var(--d-p1) / 2); }
+
+    /* `gap: 0` va también acá y no sólo en la rama ancha: .d-btn-group trae
+       gap: var(--d-p1) de la librería, y sin apagarlo las tres órdenes se
+       apilan separadas por 7px con el canto compartido sin llegar a tocarse,
+       o sea tres decisiones en vez de una con tres salidas. */
+    :global([data-d='X']) .grp {
+      display: grid; grid-auto-flow: row; width: 100%; gap: 0;
+    }
+    :global([data-d='X']) .grp > .d-btn {
+      width: 100%; justify-content: flex-start;
+      min-height: var(--d-touch); border-radius: 0;
+    }
+    :global([data-d='X']) .grp > .d-btn:not(:first-child) {
+      margin-top: calc(-1 * max(var(--d-bw), 1px));
+    }
+    :global([data-d='X']) .grp > .d-btn:first-child {
+      border-start-start-radius: var(--d-r); border-start-end-radius: var(--d-r);
+    }
+    :global([data-d='X']) .grp > .d-btn:last-child {
+      border-end-start-radius: var(--d-r); border-end-end-radius: var(--d-r);
+    }
+
+    :global([data-d='X']) .split-wrap { width: 100%; align-items: stretch; }
+    :global([data-d='X']) .split { width: 100%; }
+    :global([data-d='X']) .d-btn.split-main {
+      flex: 1 1 auto; min-width: 0;
+      justify-content: flex-start; min-height: var(--d-touch);
+    }
+    :global([data-d='X']) .d-btn.split-toggle {
+      flex: 0 0 var(--d-touch);
+      min-width: var(--d-touch); min-height: var(--d-touch);
+      padding-inline: 0;
+    }
+    :global([data-d='X']) .menu { max-width: 100%; }
   }
 
   /* Al final del todo, para ganarle en orden a las variaciones por dirección. */

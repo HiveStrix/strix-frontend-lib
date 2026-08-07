@@ -7,11 +7,56 @@
   // el teclado nunca pierde. Se muestran tres especímenes por dirección: la tabla
   // con su cabecera ordenada y su pie paginado, la misma información sin tabla, y
   // el estado vacío dentro del mismo contenedor.
-  import { ASSETS, COPY, markOf } from '../demo.js';
+  import { ASSETS, COPY, PLANS, markOf } from '../demo.js';
   import Grid from '../Grid.svelte';
   import Direction from '../Direction.svelte';
 
   export let directions = [];
+
+  // ── LA COTA · el tope de cada cifra ──────────────────────────────────────
+  // Una cota necesita DOS números y ASSETS trae uno solo, la lectura. El tope
+  // vive en PLANS ("cada 250 h"), que es el mismo dato con el que se arma el
+  // plan, así que se lee de ahí y no se escribe a mano en ninguna parte.
+  //
+  // El riel se dibuja con la razón entre las dos cifras que quedan escritas al
+  // lado, no con el porcentaje declarado aparte en ASSETS.pct. En un sistema
+  // que se llama Cota, un dibujo de medida que no coincide con su propio pie es
+  // lo único que no se puede permitir: 312 sobre 250 son 125 y el riel tiene que
+  // decir 125. Las demás direcciones siguen usando pct y no se tocan.
+  function cifra(txt) {
+    const digitos = String(txt).replace(/[^\d]/g, '');
+    return digitos ? Number(digitos) : null;
+  }
+  function unidad(txt) {
+    const m = String(txt).match(/[a-zA-Z]+$/);
+    return m ? m[0] : '';
+  }
+  // Mismo separador de miles que el contenido: espacio, no coma.
+  function miles(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  const TOPES = {};
+  for (const p of PLANS) TOPES[p.asset] = p.every.replace(/^cada\s+/, '');
+
+  const COTA = {};
+  for (const a of ASSETS) {
+    const leida = cifra(a.metric);
+    const tope = TOPES[a.code] ? cifra(TOPES[a.code]) : null;
+    // Sin lectura no hay cota. Un riel vacío con una marca es una promesa de
+    // medida que nadie tomó, y eso miente más que no dibujar nada.
+    if (leida === null || !tope) continue;
+    const u = unidad(a.metric);
+    const dif = Math.abs(leida - tope);
+    COTA[a.code] = {
+      n: miles(leida),
+      u,
+      tope: miles(tope) + ' ' + u,
+      pct: Math.round((leida / tope) * 100),
+      holgura: (leida > tope ? 'se pasó ' : 'faltan ') + miles(dif) + ' ' + u,
+      fuente: a.source
+    };
+  }
 
   // Estado compartido por las ocho celdas: ordenar en una ordena en todas, que es
   // exactamente lo que hace falta para compararlas.
@@ -185,12 +230,33 @@
 
                       <td class="c-name">
                         <span class="nm">{a.name}</span>
-                        <span class="sub">{a.family} · {a.location} · {a.reading}</span>
+                        <!-- El renglón de contexto se parte en dos para que una
+                             dirección pueda quedarse con la mitad. El texto
+                             renderizado es idéntico al de antes: el espacio que
+                             abre el tramo va como expresión porque un espacio
+                             suelto contra el borde de una etiqueta lo recorta el
+                             compilador y las otras diecinueve perderían uno. -->
+                        <span class="sub">{a.family} · {a.location}<span class="subread">{' '}· {a.reading}</span></span>
                       </td>
 
                       <td class="c-fam">{a.family}</td>
                       <td class="c-loc">{a.location}</td>
-                      <td class="c-read figs">{a.reading}</td>
+
+                      <!-- La lectura, en texto y en cota. Las diecinueve
+                           direcciones muestran el texto y la cota va oculta;
+                           Cota hace lo contrario, porque en ella una cifra
+                           medida nunca aparece sola. -->
+                      <td class="c-read figs">
+                        <span class="readtxt" class:solo={!COTA[a.code]}>{a.reading}</span>
+                        {#if COTA[a.code]}
+                          {@const c = COTA[a.code]}
+                          <span class="cota d-cota" data-tone={a.tone} style="--cota:{c.pct}">
+                            <span class="d-cota-fig"><b>{c.n}</b> <span>{c.u}</span></span>
+                            <span class="d-cota-rail" aria-hidden="true"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></span>
+                            <span class="d-cota-note">tope {c.tope}<span class="ct-slack">{' '}· {c.holgura}</span></span>
+                          </span>
+                        {/if}
+                      </td>
 
                       <!-- «Vencido» no dice cuánto. En las filas que urgen el
                            retraso viaja pegado a la píldora: es el dato que
@@ -260,7 +326,7 @@
                   <div class="cibody">
                     <span class="cinm">{a.name}</span>
                     <span class="cimeta">{a.family} · {a.location}</span>
-                    <span class="ciread figs">{a.reading}</span>
+                    <span class="ciread readtxt figs" class:solo={!COTA[a.code]}>{a.reading}</span>
                     <span class="d-pill">
                       <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf(a.tone)}</svg>
                       {a.state}
@@ -269,6 +335,17 @@
                     <span class="ciact d-btn-group">
                       <button class="d-btn d-btn--sm d-btn--ghost" type="button" aria-label="Registrar lectura de {a.code}">Lectura</button>
                     </span>
+                    <!-- La misma cota, sin comprimir: acá hay renglón entero, así
+                         que la cifra va grande y el pie dice el tope, cuánto falta
+                         o cuánto se pasó, y de dónde salió el número. -->
+                    {#if COTA[a.code]}
+                      {@const c = COTA[a.code]}
+                      <span class="cota citcota d-cota" data-tone={a.tone} style="--cota:{c.pct}">
+                        <span class="d-cota-fig"><b>{c.n}</b> <span>{c.u}</span></span>
+                        <span class="d-cota-rail" aria-hidden="true"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></span>
+                        <span class="d-cota-note">tope {c.tope} · {c.holgura} · {c.fuente}</span>
+                      </span>
+                    {/if}
                   </div>
                 </li>
               {/each}
@@ -347,6 +424,10 @@
   /* Cifras. Numeración tabular en las diecinueve; la monoespaciada la agregan
      sólo las direcciones que la ganan por densidad, mucho más abajo. */
   .figs { font-variant-numeric: var(--d-num); }
+  /* La cota está en el marcado de las veinte y apagada por defecto: es la firma
+     de una sola dirección y encenderla en las otras diecinueve sería mudarlas.
+     La enciende X, y sólo X, mucho más abajo. */
+  .cota { display: none; }
 
   /* ── Tabla ─────────────────────────────────────────────────────────────── */
   .tblwrap { overflow-x: auto; overscroll-behavior-x: contain; }
@@ -1485,7 +1566,9 @@
   :global([data-d='W']) .tbl tbody tr.on td.c-act { box-shadow: inset -3px 0 0 var(--d-accent); }
   :global([data-d='W']) .tbl tbody tr.alert.on td { background: var(--tone-band); }
   :global([data-d='W']) .tbl tbody tr.alert td.c-sel,
-  :global([data-d='W']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-crit); }
+  :global([data-d='W']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
 
   /* EL ÚNICO HALO DE LA PÁGINA, en tabla y en lista. Dos píldoras encendidas
      entre diez es una pantalla que dice algo; diez encendidas no dicen nada. */
@@ -1525,6 +1608,7 @@
   :global([data-d='W']) ul.clist > li.citem.alert {
     background: var(--tone-band);
     box-shadow: inset 3px 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   :global([data-d='W']) ul.clist > li.citem.on {
     background: var(--d-accent-soft);
@@ -1533,11 +1617,176 @@
   :global([data-d='W']) ul.clist > li.citem.alert.on {
     background: var(--tone-band);
     box-shadow: inset 3px 0 0 var(--d-crit), inset -3px 0 0 var(--d-accent);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   :global([data-d='W']) .empty { padding-block: var(--d-p3); }
   /* NO se toca .d-btn en W. directions.css ya repara ahí el primario, y una
      regla de página sobre .d-btn pesaría más que esa reparación y devolvería el
      botón blanco con tinta blanca. El primario de W da 8.0:1 tal como está. */
+
+  /* ══ X · COTA · un libro de bodega, no una pantalla de software ════════════
+
+     Dos reglas gobiernan todo lo que sigue y las dos son duras.
+
+     1 · EL COLOR ESTÁ RESERVADO AL ESTADO. Cabecera, reglas, casillas, riel,
+         acento y botones van en acromático. La consecuencia es funcional y no
+         estética: como no hay ningún otro color en pantalla, el ojo encuentra la
+         fila vencida antes de leer una palabra.
+
+     2 · NINGUNA CIFRA MEDIDA APARECE SOLA. La columna de lectura deja de ser
+         texto y pasa a ser cota. «312 h» no significa nada; «312 h con la marca
+         de 250 h atrás» significa que se pasó, y como el riel se dibuja hasta el
+         150 % del tope, también se ve cuánto.
+
+     DÓNDE NO VA LA COTA, que importa lo mismo. El conteo de la cabecera (88 en
+     la flota), el rango del pie (1 a 4 de 6) y el estado vacío no se miden
+     contra ningún tope: son cardinales, no lecturas. Una cota sin marca es una
+     barra de progreso y una barra de progreso decorativa es ruido. Ahí quedan
+     cifras tabulares y nada más.
+     ═════════════════════════════════════════════════════════════════════════ */
+
+  :global([data-d='X']) .cota { display: grid; }
+
+  /* La lectura en texto se retira: su cifra ES la de la cota y ponerlas a diez
+     píxeles una de otra sería decir dos veces lo mismo. Se queda sólo donde no
+     hay cota que poner, que es el equipo que nunca se midió, y ahí baja a gris
+     porque lo que informa es la ausencia. */
+  :global([data-d='X']) .readtxt:not(.solo) { display: none; }
+  :global([data-d='X']) .readtxt.solo { color: var(--d-ink-3); }
+  /* Y no vuelve por la puerta de atrás: el renglón de contexto que aparece en
+     celda angosta llevaba la lectura otra vez. */
+  :global([data-d='X']) .subread { display: none; }
+
+  /* EL RIEL SE DIBUJA EN TINTA. Teñirlo del tono de cada fila habría puesto
+     verde, ámbar y rojo en las seis a la vez, y entonces el rojo de la que se
+     pasó tendría con qué competir: exactamente lo que la regla 1 existe para
+     impedir. El riel MIDE; el color aparece cuando la medida cruza la marca. */
+  :global([data-d='X']) .d-cota-fill { background: var(--d-ink-2); }
+  :global([data-d='X']) .d-cota[data-tone='critical'] .d-cota-fill { background: var(--d-crit); }
+
+  /* LA COTA COMPRIMIDA, en la columna de lectura de la tabla.
+     La fila mide 38 px, así que la cifra y el pie comparten renglón y el riel
+     corre debajo de los dos a lo ancho de la columna entera. Que el riel sea una
+     columna de tabla es lo que hace el truco: todas las filas miden con la misma
+     regla, la marca del tope cae en el mismo píxel en las seis, y esa marca
+     alineada verticalmente es una línea de cota de plano bajando por la pantalla.
+     Se compara sin leer. */
+  :global([data-d='X']) .c-read .d-cota {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--d-p2);
+    row-gap: 3px;
+    align-items: baseline;
+  }
+  /* Fila y columna EXPLÍCITAS en las tres piezas. Con la colocación automática,
+     el riel ocupa las dos columnas del segundo renglón y empuja el pie a un
+     tercero: la cota crece a 39 px y la fila de 38 px deja de ser de 38 px. */
+  :global([data-d='X']) .c-read .d-cota-fig {
+    grid-area: 1 / 1;
+    font-size: var(--d-t-sm);
+    letter-spacing: -.015em;
+  }
+  :global([data-d='X']) .c-read .d-cota-note {
+    grid-area: 1 / 2;
+    font-size: var(--d-t-2xs);
+  }
+  :global([data-d='X']) .c-read .d-cota-rail { grid-area: 2 / 1 / 3 / -1; align-self: center; }
+
+  /* LA COTA ENTERA, en la lista. Acá hay renglón propio, así que la cifra sube a
+     --d-t-xl con el tracking negativo que ya trae la primitiva: peso contra peso,
+     que es de donde sale la personalidad cuando no hay fuente que elegir.
+     La caja pide renglón entero y no se le pone tope de ancho: al recortarla, el
+     navegador usa el ancho ya recortado para decidir el salto de línea y la cota
+     se le sube al costado del botón de la fila. Se acota el RIEL, que es lo que
+     de verdad sobra.
+     HALLAZGO: X no expone un ancho de riel (--d-cota-w). Un riel de 900 px para
+     una lectura de tres dígitos no mide mejor, mide peor, así que queda escrito
+     en una medida relativa a la tipografía y no en un pixel suelto. */
+  :global([data-d='X']) .citcota {
+    flex-basis: 100%;
+    margin-top: var(--d-p1);
+  }
+  :global([data-d='X']) .citcota .d-cota-rail { max-width: min(100%, 40ch); }
+  /* La acción deja de irse al canto derecho. Con la cota ocupando su propio
+     renglón, un botón anclado a 700 px del último dato con el que tiene algo que
+     ver deja de leerse como parte del renglón y pasa a leerse como otra cosa. En
+     un libro los asientos corren hacia la izquierda y lo que sigue viene después. */
+  :global([data-d='X']) .ciact { margin-left: 0; }
+
+  /* La cabecera es la regla gruesa del libro. La columna ordenada se marca con
+     MASA y no con color: canto de tinta de 2 px y la etiqueta sube de --d-ink-3
+     a tinta llena. Un bloque de acento acá sería el único color de la pantalla
+     que no significa un estado. */
+  :global([data-d='X']) .tbl thead th { border-bottom-color: var(--d-edge); }
+  :global([data-d='X']) .tbl thead th[aria-sort]:not([aria-sort='none']) {
+    box-shadow: inset 0 -2px 0 var(--d-ink);
+  }
+  :global([data-d='X']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap {
+    color: var(--d-ink);
+    font-weight: var(--d-w-semi);
+  }
+
+  /* EL ESTADO ES UN FILO DE 3 px EN EL CANTO y no tiñe una sola letra. Rellenar
+     la fila obliga a re-verificar contraste en cinco tonos y ensucia la lectura;
+     el filo no toca nada y se ve igual de lejos. Sólo lo vencido lleva además
+     una banda, y apenas: es el único estado que interrumpe una jornada. */
+  :global([data-d='X']) .tbl tbody tr[data-tone] td.c-sel { box-shadow: inset 3px 0 0 var(--tone-fg); }
+
+  /* Estado por la izquierda, selección por la derecha. La fila 1 está vencida Y
+     marcada, que es el caso normal porque uno marca justo lo que va a atender:
+     así se ven las dos y ninguna tapa a la otra. Las otras señales de selección
+     siguen donde estaban: la casilla, el peso del código y el conteo del pie. */
+  :global([data-d='X']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--tone-fg); }
+  :global([data-d='X']) .tbl tbody tr.on td.c-act { box-shadow: inset -3px 0 0 var(--d-accent); }
+
+  /* El cursor encima no le quita la banda a la fila vencida. El estado es DATO y
+     el cursor es un accidente; en la base ganaba el cursor y la fila más urgente
+     perdía su marca justo cuando alguien la estaba apuntando. */
+  :global([data-d='X']) .tbl tbody tr.alert:hover td,
+  :global([data-d='X']) .tbl tbody tr.alert.is-hover td,
+  :global([data-d='X']) .tbl tbody tr.alert.on td { background: var(--tone-band); }
+
+  /* La casilla vacía traía el anillo en --d-edge (#C4C7C5), que sobre el papel
+     blanco de X da 1.7:1 y no llega al 3:1 que pide un control. Sube a --d-ink-3,
+     6.0:1, y el relleno de marcada hay que reponerlo porque esta regla y la
+     `.pick:checked` de la base pesan igual y gana la última. */
+  :global([data-d='X']) .pick { border-color: var(--d-ink-3); }
+  :global([data-d='X']) .pick:checked,
+  :global([data-d='X']) .pick:indeterminate {
+    background: var(--d-accent);
+    border-color: var(--d-accent);
+  }
+
+  /* HALLAZGO, y no se repara acá a propósito: [data-d='X'] .d-btn deja el borde
+     en --d-edge, 1.7:1 contra la superficie, por debajo del 3:1 de un control.
+     Una regla de página sobre .d-btn pesaría (0,2,0) contra el (0,1,0) de
+     .d-btn--primary y devolvería el primario blanco sobre blanco, que es la
+     trampa que ya se cobró seis páginas en este proyecto. El arreglo va en el
+     bloque de tokens de X, subiendo el borde del botón a --d-ink-3. */
+
+  /* LA LISTA · el mismo libro sin columnas. Renglón reglado, filo de estado en el
+     canto y la cota entera abajo. Se escriben los cuatro estados al mismo peso
+     que la base de la dirección porque `ul.clist > li.citem` gana por
+     especificidad a `.citem.alert`, que es como esta página perdió el estado en
+     siete direcciones antes de que alguien lo notara. */
+  :global([data-d='X']) ul.clist > li.citem {
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
+    box-shadow: inset 3px 0 0 var(--tone-fg);
+    padding-left: calc(var(--d-p3) + 3px);
+  }
+  :global([data-d='X']) ul.clist > li.citem:last-child { border-bottom: 0; }
+  :global([data-d='X']) ul.clist > li.citem.alert { background: var(--tone-band); }
+  :global([data-d='X']) ul.clist > li.citem.on {
+    background: var(--d-accent-soft);
+    box-shadow: inset 3px 0 0 var(--tone-fg), inset -3px 0 0 var(--d-accent);
+  }
+  :global([data-d='X']) ul.clist > li.citem.alert.on {
+    background: var(--tone-band);
+    box-shadow: inset 3px 0 0 var(--tone-fg), inset -3px 0 0 var(--d-accent);
+  }
+
+  /* El estado vacío es la misma hoja con nada escrito. */
+  :global([data-d='X']) .empty { padding-block: var(--d-p3) var(--d-p4); }
+  :global([data-d='X']) .etitle { letter-spacing: -.015em; }
 
   /* ==========================================================================
      RESPONSIVE — la celda manda, no la ventana. Familia, ubicación y lectura se
@@ -1745,13 +1994,18 @@
      columnas de arriba es al revés, y por eso va por contenedor. */
   @media (max-width: 560px) {
     :global([data-d='W']) .tbl tbody tr.alert td.c-sel,
-    :global([data-d='W']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 5px 0 0 var(--d-crit); }
+    :global([data-d='W']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 5px 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
     :global([data-d='W']) .tbl tbody tr.on td.c-act { box-shadow: inset -5px 0 0 var(--d-accent); }
-    :global([data-d='W']) ul.clist > li.citem.alert { box-shadow: inset 5px 0 0 var(--d-crit); }
+    :global([data-d='W']) ul.clist > li.citem.alert { box-shadow: inset 5px 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
     :global([data-d='W']) ul.clist > li.citem.on { box-shadow: inset -5px 0 0 var(--d-accent); }
     :global([data-d='W']) ul.clist > li.citem.alert.on {
       box-shadow: inset 5px 0 0 var(--d-crit), inset -5px 0 0 var(--d-accent);
-    }
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
   }
 
   /* TRANSPARENCIA REDUCIDA Y CONTRASTE ALTO. Los dos ajustes de directions.css
@@ -1800,5 +2054,126 @@
        más arriba, y tocarle top/bottom rompería el centrado por transform. */
     /* Paginación: los números caían en 32px de ancho. */
     :global([data-d='W']) .pager .d-btn { min-width: var(--d-touch); }
+  }
+
+  /* ══ X · COTA · pantalla angosta y piso de artesanía ═══════════════════════
+     Separado del bloque de material por la misma razón que directions.css parte
+     a W en dos: el material es una cosa y las condiciones en las que se usa son
+     otra. Ninguna de estas reglas cambia la dirección; la sostienen cuando el
+     aparato, la preferencia o el ancho la aprietan.
+
+     QUÉ HACE X A 380 px, DECLARADO Y NO SUPUESTO.
+
+     La tabla NO se vuelve tarjetas. El espécimen 2 de esta misma página ya es la
+     respuesta en tarjetas, y convertir la tabla en lo mismo dejaría dos
+     especímenes idénticos y borraría la comparación que la página existe para
+     hacer. Sigue siendo una tabla y el ancho que le sobra se paga con scroll
+     horizontal contenido dentro de .tblwrap, que ya trae
+     overscroll-behavior-x: contain. El panel recorta, .spec y .stack llevan
+     min-width: 0 y el documento no desborda nunca: lo que se mueve es la tabla,
+     no la pantalla.
+
+     El orden en que se caen las cosas:
+       1º · celda ≤ 720 px. Familia y ubicación salen de la tabla y bajan enteras
+            al renglón de contexto debajo del nombre, donde ya estaban escritas.
+            Son contexto, no identidad. Eso lo hace la base.
+       2º · celda ≤ 720 px. LA LECTURA NO CAE, y acá X se separa de las
+            diecinueve. La base la esconde junto con las otras dos; en Cota la
+            lectura contra su tope es la razón por la que la fila existe, y un
+            técnico con la máquina enfrente y el teléfono en la mano abre esta
+            pantalla para ver exactamente eso. Se repone.
+       3º · celda ≤ 720 px. Como la lectura se queda, la copia de la lectura que
+            la base mete en el renglón de contexto se apaga (.subread): nada se
+            dice dos veces en 300 px.
+       4º · celda ≤ 520 px. Del pie de la cota se cae la holgura («se pasó 62 h»)
+            y queda el tope, que es contra qué se mide. Cuánto se pasó lo sigue
+            diciendo el riel al cruzar la marca, que es para lo que se dibujó.
+       5º · celda ≤ 420 px. El aire lateral de las celdas baja de 11 px a 7 px, el
+            retraso se despega de la píldora y baja a su propio renglón, y las
+            acciones se quedan en un renglón en vez de plegarse: apilarlas
+            duplicaría el alto de la fila a cambio de un ancho que igual no
+            alcanza, y el alto de fila es lo que hace escaneable una lista.
+     No se cae ninguna más. El código no se cae nunca: es lo primero que busca
+     alguien parado frente a la máquina. Las acciones tampoco, porque esconder un
+     control no es plegar, es quitar.
+     ═════════════════════════════════════════════════════════════════════════ */
+  @container spec (max-width: 720px) {
+    :global([data-d='X']) .c-read { display: table-cell; }
+  }
+  /* La base pliega dos veces, por contenedor y por viewport, con dos reglas
+     distintas. La reposición tiene que contestarle a las dos. */
+  @media (max-width: 420px) {
+    :global([data-d='X']) .c-read { display: table-cell; }
+  }
+  @container spec (max-width: 520px) {
+    :global([data-d='X']) .c-read .ct-slack { display: none; }
+  }
+  @container spec (max-width: 420px) {
+    :global([data-d='X']) .tbl th,
+    :global([data-d='X']) .tbl td { padding-inline: var(--d-p1); }
+    :global([data-d='X']) .c-state { white-space: normal; }
+    :global([data-d='X']) .c-state .due { display: block; margin-left: 0; }
+    :global([data-d='X']) .acts { flex-wrap: nowrap; }
+  }
+
+  /* Nombres largos de verdad. «Compactadora Wacker DPU-6555» en una columna de
+     130 px necesita permiso para partirse; sin él empuja la tabla entera y el
+     scroll se va varios cientos de píxeles más lejos. */
+  :global([data-d='X']) .nm,
+  :global([data-d='X']) .cinm { overflow-wrap: break-word; }
+
+  /* EL FILO, LA PARTE FÍSICA. directions.css engorda el filo crítico de 3 px a
+     5 px en pantalla angosta, pero lo hace sobre .d-row y esta página no usa
+     .d-row: usa <tr> y <li>. Sin esto la firma de X no llega a su propia tabla.
+     Va por viewport y no por contenedor a propósito: el grosor mínimo de un filo
+     es un hecho del aparato y de la mano, no del ancho de la celda. El plegado de
+     columnas de arriba es al revés, y por eso va por contenedor. */
+  @media (max-width: 560px) {
+    :global([data-d='X']) .tbl tbody tr[data-tone] td.c-sel,
+    :global([data-d='X']) .tbl tbody tr.on td.c-sel { box-shadow: inset 5px 0 0 var(--tone-fg); }
+    :global([data-d='X']) .tbl tbody tr.on td.c-act { box-shadow: inset -5px 0 0 var(--d-accent); }
+    :global([data-d='X']) ul.clist > li.citem {
+      box-shadow: inset 5px 0 0 var(--tone-fg);
+      padding-left: calc(var(--d-p3) + 5px);
+    }
+    :global([data-d='X']) ul.clist > li.citem.on,
+    :global([data-d='X']) ul.clist > li.citem.alert.on {
+      box-shadow: inset 5px 0 0 var(--tone-fg), inset -5px 0 0 var(--d-accent);
+    }
+  }
+
+  /* OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO. El tamaño de un dedo es un
+     hecho del aparato: una tableta de 768 px se toca con el pulgar igual que un
+     teléfono. Los .d-btn ya los sube directions.css dentro del bloque de X; lo
+     que faltaba era el botón de ordenar, que es una cabecera de 15 px de alto, y
+     los números del paginador, que caían en 32 px de ancho. */
+  @media (pointer: coarse) {
+    :global([data-d='X']) .sortbtn {
+      min-height: var(--d-touch);
+      padding-block: calc((var(--d-touch) - 1.2em) / 2);
+      margin-block: calc((1.2em - var(--d-touch)) / 2);
+    }
+    :global([data-d='X']) .pager .d-btn { min-width: var(--d-touch); }
+    /* La casilla dibujada mide 15 px y su área de clic la pone .pick::before, que
+       quedaba en 35 × 44. Con dedo se lleva a 45 × 44. Sólo con puntero grueso:
+       con un ratón, 45 px de área invisible se comerían el clic de la celda de al
+       lado sin ganar nada. */
+    :global([data-d='X']) .pick::before { left: -15px; right: -15px; }
+  }
+
+  /* CONTRASTE FORZADO. El filo de estado es un box-shadow y el sistema los
+     descarta, así que la fila vencida se quedaría sin marca de canto. La recupera
+     un contorno, que es lo mismo que hace el bloque de X para .d-row. El riel y
+     la marca del tope ya los repone directions.css. */
+  @media (forced-colors: active) {
+    :global([data-d='X']) .tbl tbody tr.alert { outline: 2px solid CanvasText; outline-offset: -2px; }
+    :global([data-d='X']) ul.clist > li.citem.alert { outline: 2px solid CanvasText; outline-offset: -2px; }
+  }
+
+  /* MOCIÓN. Lo único que se mueve en X es la aparición de las acciones de fila,
+     que es respuesta a una acción y no ambiente. Con moción reducida aparecen
+     igual, de golpe: se conserva la función y se tira el gesto. */
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='X']) .acts { transition: none; }
   }
 </style>

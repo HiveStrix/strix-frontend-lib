@@ -22,6 +22,25 @@
   ];
 
   const stop = (e) => e.preventDefault();
+
+  // ── X · COTA. La lectura que se escribe, contra el tope de su plan.
+  //
+  // BAT-014 lleva «Cambio de aceite · cada 250 h» (demo.js). El campo Valor es
+  // la ÚNICA cifra medida contra un tope que hay en este formulario, así que es
+  // la única que monta riel. Las otras diecinueve direcciones no montan la
+  // cota, y este manejador sale por la puerta en cuanto el campo no es el de X:
+  // escribir en cualquiera de ellas no mueve un pixel en ninguna parte.
+  const TOPE_H = 250;
+  let lectura = 312;
+  const leerLectura = (e) => {
+    if (e.currentTarget.id !== 'fm-val-X') return;
+    const n = Number(String(e.currentTarget.value).replace(/[^\d.,]/g, '').replace(',', '.'));
+    lectura = Number.isFinite(n) ? Math.max(0, n) : 0;
+  };
+  $: cotaFig = Math.round(lectura);
+  $: cotaPct = Math.round((cotaFig / TOPE_H) * 100);
+  $: cotaDelta = cotaFig - TOPE_H;
+  $: cotaTono = cotaDelta >= 0 ? 'critical' : 'neutral';
 </script>
 
 <Grid min="440px">
@@ -102,9 +121,30 @@
                     <div class="fm-unit">
                       <input
                         class="d-input fm-inp d-num" id="fm-val-{d.id}" name="valor" type="text"
-                        inputmode="decimal" value="312" required aria-describedby="fm-valh-{d.id}" />
+                        inputmode="decimal" value="312" required aria-describedby="fm-valh-{d.id}"
+                        on:input={leerLectura} />
                       <span class="fm-u">h</span>
                     </div>
+
+                    <!-- LA COTA, y solo la monta X.
+                         Es la única medida contra un tope de todo el formulario:
+                         BAT-014 tiene el aceite planificado cada 250 h. El riel
+                         corre pegado al canto de abajo del campo, la marca queda
+                         fija en el tope y el relleno se mueve mientras se
+                         escribe, así que «312» deja de ser un número y pasa a
+                         ser «62 h pasado». La cifra grande no repite el campo
+                         por repetir: es lo que el sistema ENTENDIÓ de lo que se
+                         tecleó, y es la que se lee de un vistazo con la máquina
+                         enfrente. El riel va oculto para el lector de pantalla,
+                         que recibe la cifra y la nota en texto. -->
+                    {#if d.id === 'X'}
+                      <div class="d-cota fm-cota" data-tone={cotaTono} style="--cota:{cotaPct}">
+                        <div class="d-cota-fig"><b>{cotaFig}</b> <span>h</span></div>
+                        <div class="d-cota-rail" aria-hidden="true"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                        <div class="d-cota-note" aria-live="polite">{#if cotaDelta >= 0}tope {TOPE_H} h · se pasó {cotaDelta} h{:else}tope {TOPE_H} h · faltan {-cotaDelta} h{/if}</div>
+                      </div>
+                    {/if}
+
                     <p class="d-hint fm-hint" id="fm-valh-{d.id}">
                       Horómetro. Última registrada: 312 h · 2 ago (devolución 8631).
                     </p>
@@ -2038,6 +2078,7 @@
     border-radius: var(--d-r);
     padding: var(--d-p2);
     box-shadow: inset 3px 0 0 var(--d-crit), 0 4px 18px -8px var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
 
   /* Bloqueado es opaco como todo lo demás: si lo dejo en --d-sunk, el campo
@@ -2123,7 +2164,9 @@
     :global([data-d='W']) .fm-seek {
       backdrop-filter: none; -webkit-backdrop-filter: none;
     }
-    :global([data-d='W']) .fm-f--bad { box-shadow: inset 5px 0 0 var(--d-crit); }
+    :global([data-d='W']) .fm-f--bad { box-shadow: inset 5px 0 0 var(--d-crit);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
   }
   @container fm (max-width: 430px) {
     :global([data-d='W']) .fm-grid { grid-template-columns: minmax(0, 1fr); }
@@ -2237,5 +2280,298 @@
     /* La tarjeta de opción es el objetivo real: el radio y la casilla viven
        en .d-sr y quien toca, toca la tarjeta. */
     :global([data-d='W']) .fm-opt { min-height: var(--d-touch); }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     X · COTA. Papel mate y tinta, y una sola cifra con riel.
+
+     LA ESCENA, que es de donde sale todo lo de abajo. Un técnico con la
+     batidora enfrente, un guante puesto y el teléfono en la otra mano,
+     anotando el horómetro antes de devolver el equipo a la bodega de San
+     José. Tiene una sola pregunta y tiene que resolverla en tres segundos:
+     el número que acabo de escribir, ¿ya pasó el tope del plan?
+
+     REGLA 1 · EL COLOR ES ESTADO, HASTA EL FINAL.
+     Contá el color de una celda de X en reposo. La píldora «Vencido» de la
+     cabecera. La cifra y el relleno de la cota. El campo roto del bloque de
+     estados. Tres cosas, las tres rojas, las tres hablando del mismo equipo.
+     Nada más tiene un pixel de color: ni el buscador, ni las etiquetas, ni el
+     selector de métrica, ni la casilla, ni el interruptor, ni el botón
+     primario, que es tinta negra porque --d-accent de X es tinta.
+
+     Por eso el asterisco de obligatorio SALE del rojo. «Obligatorio» no es un
+     estado sino una propiedad del campo: está igual de rojo cuando el
+     formulario está impecable. Con el asterisco teñido, la celda arranca con
+     dos manchas de color que no informan de nada y el ojo deja de creerle al
+     rojo justo cuando el rojo importa. Pasa a tinta; la obligatoriedad la
+     sostienen la palabra escondida para lector de pantalla y la línea del pie.
+
+     REGLA 2 · LA COTA VA UNA VEZ, DEBAJO DEL CAMPO DE LECTURA, y no está en
+     los otros dos sitios donde hay cifras, a propósito:
+       · el campo del bloque de errores (180 h) no lleva riel porque no es una
+         lectura, es un valor RECHAZADO; y su referencia no es un tope sino un
+         piso, la última registrada de 312 h. La marca de la primitiva es un
+         tope y ponerla de piso miente al revés: el relleno corto leería
+         «todavía te falta» cuando lo que pasa es «esto no puede bajar».
+       · «78 equipos en la flota» y la nota del pie no tienen tope contra el
+         que medirse, y un riel sin marca es una barra de progreso.
+
+     LA COTA VIVE, y esa es la única moción de la celda que hace un trabajo:
+     el relleno corre mientras se teclea y la nota se recalcula. Escribir 240
+     lo deja corto de la marca y todo queda en gris; escribir 312 la pasa y la
+     cifra, el relleno y la nota se ponen rojos a la vez. Eso es el producto.
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* El buscador es una tira de papel: una línea, el canto de 4px y el único
+     pixel de sombra que trae el token. El campo y su botón comparten costura,
+     así que se leen como UN control con su acción y no como dos objetos
+     sueltos sobre la tira. */
+  :global([data-d='X']) .fm-seek-ctl { gap: 0; flex-wrap: nowrap; }
+  :global([data-d='X']) .fm-q { border-start-end-radius: 0; border-end-end-radius: 0; }
+  :global([data-d='X']) .fm-seek-btn {
+    border-start-start-radius: 0; border-end-start-radius: 0;
+    margin-left: calc(-1 * max(var(--d-bw), 1px));
+  }
+
+  /* TRES ESCALONES DE TINTA Y NI UNO MÁS: encabezado de sección en tinta
+     plena, etiqueta de campo un escalón abajo, ayuda en el tercero. La
+     etiqueta sube de --d-ink-3 (5,7:1) a --d-ink-2 (9,4:1): es el rótulo que
+     se busca primero con el equipo enfrente y no puede estar en el mismo gris
+     que la letra chica que lo acompaña. */
+  :global([data-d='X']) .fm-lab { color: var(--d-ink-2); }
+  /* Figuras tabulares en todo lo que trae cifras, también en la letra chica:
+     «312 h · 2 ago» sobre «180 h» tiene que alinear por dígito para que se
+     comparen sin leerlas. */
+  :global([data-d='X']) .fm-hint,
+  :global([data-d='X']) .fm-msg,
+  :global([data-d='X']) .fm-head .d-panel-title { font-variant-numeric: var(--d-num); }
+  :global([data-d='X']) .fm-req { color: var(--d-ink); }
+
+  /* Cada sección se abre con un renglón de la boleta: el nombre en tinta y una
+     regla de un pixel que cruza la hoja de canto a canto. Es la única
+     estructura que separa los tres bloques del cuerpo, y separa de verdad: no
+     hay bandeja, ni relleno, ni caja dentro de la caja. */
+  :global([data-d='X']) .fm-body { gap: var(--d-p4); }
+  :global([data-d='X']) .fm-leg,
+  :global([data-d='X']) .fm-cap {
+    margin: 0 calc(-1 * var(--d-p3)) var(--d-p3);
+    padding: 0 var(--d-p3) var(--d-p1);
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
+  }
+  :global([data-d='X']) .fm-grid { gap: var(--d-p3) var(--d-p2); }
+
+  /* LA COTA. Va pegada al canto de abajo del campo y ocupa su mismo ancho,
+     así que se lee como la acotación de ese control y no como un gráfico
+     suelto. Tamaño, peso, tracking y figuras tabulares ya vienen de la
+     primitiva en directions.css; acá solo se ajusta el aire. */
+  :global([data-d='X']) .fm-cota { margin-top: var(--d-p1); gap: 4px; }
+  :global([data-d='X']) .fm-cota .d-cota-fig { line-height: 1; }
+  :global([data-d='X']) .fm-cota .d-cota-note { line-height: 1.35; }
+  :global([data-d='X']) .fm-cota .d-cota-fill { transition: width 140ms ease; }
+
+  /* LA MÉTRICA ES UN SELECTOR DE TRES POSICIONES, NO TRES CASILLAS SUELTAS.
+     Horas, kilómetros y días son excluyentes y cortas: en una máquina eso es
+     una perilla con tres topes, no tres botones repartidos por la mesa. El
+     segmentado dice cuál está puesta sin leer nada, porque la posición activa
+     se rellena de tinta, y de paso saca de X la única forma redonda que
+     quedaba (el punto del radio), que era una segunda escala de radio en una
+     dirección que tiene una sola. El control sigue siendo un radio nativo:
+     cambia el dibujo, no el elemento. */
+  :global([data-d='X']) .fm-radios {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0;
+    background: var(--d-surface);
+    border: max(var(--d-bw), 1px) solid var(--d-edge);
+    border-radius: var(--d-r);
+    overflow: hidden;
+  }
+  :global([data-d='X']) .fm-radios .fm-opt {
+    justify-content: center; text-align: center; gap: 0;
+    min-height: var(--d-row-h);
+    padding: var(--d-p1) var(--d-p2);
+  }
+  :global([data-d='X']) .fm-radios .fm-opt + .fm-opt {
+    border-left: max(var(--d-bw), 1px) solid var(--d-line);
+  }
+  :global([data-d='X']) .fm-radios .fm-mark { display: none; }
+  :global([data-d='X']) .fm-radios .fm-opt-txt {
+    flex: 0 1 auto; font-size: var(--d-t-xs); line-height: 1.25;
+  }
+  :global([data-d='X']) .fm-radios .fm-opt:has(.fm-in:checked) { background: var(--d-accent); }
+  /* La unidad entre paréntesis vivía en --d-ink-3: sobre la posición puesta
+     eso es gris medio sobre tinta y no se lee. Las dos piezas del segmento
+     activo pasan a --d-accent-ink, que da 17:1. */
+  :global([data-d='X']) .fm-radios .fm-opt:has(.fm-in:checked) .fm-opt-txt,
+  :global([data-d='X']) .fm-radios .fm-opt:has(.fm-in:checked) .fm-opt-u {
+    color: var(--d-accent-ink); font-weight: var(--d-w-semi);
+  }
+  /* El foco vivía en el punto del radio y el punto ya no está: pasa al
+     segmento, que es lo que se ve y lo que se toca. */
+  :global([data-d='X']) .fm-radios .fm-opt:has(.fm-in:focus-visible) {
+    outline: 2px solid var(--d-focus); outline-offset: -2px;
+  }
+
+  /* Una sola escala de radio en toda la dirección. El interruptor deja la
+     píldora y se vuelve un seccionador de tablero, que es la pieza que el
+     técnico ya tiene en la mano todos los días. La casilla ya estaba en 4px. */
+  :global([data-d='X']) .fm-sw { border-radius: var(--d-r); }
+  :global([data-d='X']) .fm-sw::after { border-radius: calc(var(--d-r) / 2); }
+  /* Las dos opciones de «Al guardar» son renglones de la boleta, con la misma
+     línea de un pixel que separa las filas de una tabla en X. */
+  :global([data-d='X']) .fm-choices { gap: 0; }
+  :global([data-d='X']) .fm-choices .fm-opt {
+    padding-block: var(--d-p1);
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
+  }
+  :global([data-d='X']) .fm-choices .fm-opt:last-child { border-bottom: 0; }
+
+  /* EL CAMPO ROTO SE ANUNCIA IGUAL QUE UNA FILA VENCIDA. directions.css le da
+     a X un filo de 3px en el canto izquierdo más un lavado apenas para la fila
+     crítica; el campo con error usa esa misma gramática, así que quien aprendió
+     a leer «vencido» en la tabla ya sabe leerlo en el formulario. Eso es lo que
+     evita tener que aprender dos vocabularios para el mismo hecho. */
+  :global([data-d='X']) .fm-f--bad {
+    position: relative;
+    background: var(--d-crit-band);
+    border-radius: var(--d-r);
+    padding: var(--d-p2) var(--d-p2) var(--d-p2) calc(var(--d-p2) + 3px);
+  }
+  :global([data-d='X']) .fm-f--bad::before {
+    content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
+    border-radius: var(--d-r) 0 0 var(--d-r);
+    background: var(--tone-fg);
+  }
+
+  /* FOCO EN TINTA, Y QUE SE VEA. directions.css le pone al campo de X un halo
+     de negro al 22 %, que sobre papel blanco da 1,6:1: a esa altura el foco es
+     el cambio de borde y nada más. Acá el canto pasa a tinta plena y el halo a
+     --d-ink-3, que da 5,7:1 y se ve con el teléfono al sol. Va a (0,3,0) para
+     no depender del orden en que se carguen las dos hojas, y el área de texto
+     entra por la misma puerta: un solo foco en todo el formulario.
+
+     HALLAZGO DE TOKEN: a X le falta un --d-focus-ring. El anillo quiere ser
+     más tenue que --d-ink-3 y más firme que --d-edge, y hoy eso solo se
+     escribe con un rgba a mano, que es exactamente lo que no se puede hacer
+     desde una página. Con --d-ink-3 el anillo queda un punto más duro de lo
+     ideal; es el precio de no inventar un hex acá. */
+  :global([data-d='X']) .fm .fm-inp:focus-visible {
+    outline: 0;
+    position: relative; z-index: 1;
+    border-color: var(--d-ink);
+    box-shadow: 0 0 0 2px var(--d-ink-3);
+  }
+  /* El par valor + unidad es UN control, así que el anillo lo abraza entero.
+     Sin esto el sufijo tapa el anillo del lado de la costura y el foco parece
+     dibujado a medias. (0,4,0) y (0,5,0) para ganarle a la regla de arriba. */
+  :global([data-d='X']) .fm .fm-unit:has(.fm-inp:focus-visible) {
+    border-radius: var(--d-r);
+    box-shadow: 0 0 0 2px var(--d-ink-3);
+  }
+  :global([data-d='X']) .fm .fm-unit:has(.fm-inp:focus-visible) .fm-inp { box-shadow: none; }
+  :global([data-d='X']) .fm .fm-unit:has(.fm-inp:focus-visible) .fm-u { border-color: var(--d-ink); }
+  /* Y el campo roto sigue rojo mientras se corrige. Si al enfocarlo el canto
+     se volviera tinta, el error se apagaría justo cuando se está trabajando
+     en él, que es el único momento en que hace falta. */
+  :global([data-d='X']) .fm .fm-f--bad .fm-inp:focus-visible { border-color: var(--d-crit); }
+  :global([data-d='X']) .fm .fm-f--bad .fm-unit:has(.fm-inp:focus-visible) {
+    box-shadow: 0 0 0 2px var(--d-crit-edge);
+  }
+  :global([data-d='X']) .fm .fm-f--bad .fm-unit:has(.fm-inp:focus-visible) .fm-u {
+    border-color: var(--d-crit);
+  }
+
+  /* BLOQUEADO ES LO ÚNICO QUE NO TIENE LABIO. Todo lo que se opera en X trae
+     un pelo de sombra interior arriba, como papel prensado bajo el punzón; el
+     campo que no se puede tocar lo pierde y queda plano contra la hoja. La
+     señal de affordance es esa, no el gris, y se sigue leyendo: --d-ink-2
+     sobre --d-sunk da 8,9:1, porque «Salida/devolución» es la respuesta a
+     «¿de dónde salió este número?». */
+  :global([data-d='X']) .fm-f--off .fm-inp[disabled] {
+    background: var(--d-sunk); box-shadow: none;
+  }
+
+  /* El pie: banda hundida y una línea. Acá NO se le toca ni el fondo ni la
+     tinta a .d-btn. Una regla con [data-d='X'] al frente pesa (0,2,0) o más y
+     le gana a .d-btn--primary, que pesa (0,1,0): el primario se quedaría con
+     el texto blanco sobre blanco y sin un error en consola. */
+  :global([data-d='X']) .fm-foot { gap: var(--d-p2); }
+  :global([data-d='X']) .fm-acts { gap: var(--d-p1); }
+
+  /* ── X · PANTALLA ANGOSTA, DECLARADA A 380px ─────────────────────────────
+     A 380px de ventana la celda entrega 340px de formulario (380 menos los
+     20px de relleno de cada lado del escenario de Direction.svelte). Esto es
+     lo que pasa exactamente a esa medida, escrito y no supuesto. La frontera
+     es de CONTENEDOR, 430px, la misma con la que G, R y W apilan sus raíles,
+     porque una celda de 380px dentro de una ventana de 1400 tiene el mismo
+     problema de ancho que un teléfono y acá las veinte se ven en paralelo.
+
+     QUÉ SE APILA, EN ORDEN:
+       1 · La rejilla de campos cae a una columna. Valor y Fecha todavía
+           entraban de a dos con el mínimo de 168px, y a ese ancho el campo de
+           fecha nativo deja de mostrar el año.
+       2 · El selector de métrica pasa de tres columnas a tres renglones de
+           44px y las divisorias se acuestan. En 340px un tercio son 113px, y
+           «Días de calendario (d)» se parte en tres líneas.
+       3 · El botón Buscar baja a su propio renglón, a lo ancho y con 44px, y
+           recupera sus cuatro cantos: ya no comparte costura con nada.
+       4 · El pie se vuelve columna sin reordenar nada: Cancelar arriba y el
+           primario abajo, que es donde llega el pulgar, así que el orden de
+           tabulador sigue siendo el orden visual.
+
+     QUÉ NO SE APILA: el par valor + unidad, que es un control y no dos (el
+     valor se encoge con min-width 0 y el sufijo se queda en sus 34px), y la
+     cota, que mide ese par y tiene que conservar su ancho exacto.
+
+     QUÉ NO SE TRUNCA: nada. Etiquetas, nota de la cota y mensaje de error
+     envuelven; no hay un solo ellipsis en la celda.
+
+     QUÉ SE VUELVE SCROLL HORIZONTAL: nada. Ningún bloque de X tiene ancho
+     mínimo propio, así que la celda no empuja hacia los lados. Lo único que
+     recorta es el texto del select nativo («BAT-014 · Batidora Imer Syntesi
+     250»), que lo recorta el navegador dentro del campo sin ensanchar nada.
+     ──────────────────────────────────────────────────────────────────────── */
+  @container fm (max-width: 430px) {
+    :global([data-d='X']) .fm-grid { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='X']) .fm-lab { overflow-wrap: break-word; }
+    :global([data-d='X']) .fm-radios { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='X']) .fm-radios .fm-opt { min-height: var(--d-touch); }
+    :global([data-d='X']) .fm-radios .fm-opt + .fm-opt {
+      border-left: 0;
+      border-top: max(var(--d-bw), 1px) solid var(--d-line);
+    }
+    :global([data-d='X']) .fm-seek-ctl { flex-wrap: wrap; }
+    :global([data-d='X']) .fm-q { border-radius: var(--d-r); }
+    :global([data-d='X']) .fm-seek-btn {
+      flex: 1 1 100%; margin-left: 0;
+      border-radius: var(--d-r); min-height: var(--d-touch);
+    }
+    /* Solo disposición y alto. Tocarle el fondo a .d-btn desde acá pesaría
+       (0,3,0) y le arrancaría el relleno al primario. */
+    :global([data-d='X']) .fm-foot { flex-direction: column; align-items: stretch; }
+    :global([data-d='X']) .fm-acts { flex-direction: column; align-items: stretch; width: 100%; }
+    :global([data-d='X']) .fm-foot .d-btn { width: 100%; min-height: var(--d-touch); }
+  }
+
+  /* Objetivos táctiles por PUNTERO y no por ancho: el tamaño de un dedo es un
+     hecho del aparato, no de la ventana. directions.css ya sube .d-btn,
+     .d-input y .d-select de X con (pointer: coarse); faltaban la fila de
+     opción y los segmentos del selector, que es lo que de verdad se toca,
+     porque el radio y la casilla viven en .d-sr. */
+  @media (pointer: coarse) {
+    :global([data-d='X']) .fm-opt { min-height: var(--d-touch); }
+  }
+
+  /* Piso de artesanía, no parche. En contraste forzado el relleno de tinta del
+     segmento activo lo pisa el sistema y la posición puesta dejaría de
+     distinguirse, así que la marca la lleva un contorno; y el filo del campo
+     roto vuelve a tinta del sistema, igual que hace directions.css con el filo
+     de la fila crítica. */
+  @media (forced-colors: active) {
+    :global([data-d='X']) .fm-radios .fm-opt:has(.fm-in:checked) {
+      outline: 2px solid CanvasText; outline-offset: -2px;
+    }
+    :global([data-d='X']) .fm-f--bad::before { background: CanvasText; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='X']) .fm-cota .d-cota-fill { transition: none; }
   }
 </style>

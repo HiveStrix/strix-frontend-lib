@@ -1860,8 +1860,12 @@
    solo — un halo sin cambio de forma se pierde para quien no distingue el rojo.
 
    Ese es el motivo real de resolverlo con silueta y no con color o borde. */
-[data-d='W'] .d-row[data-tone='critical'],
-[data-d='W'] .d-panel[data-tone='critical'] {
+/* SOLO EN FILAS. La cuña se diseñó para una fila de 38px, donde el corte
+   diagonal se lee como un corte. Aplicada a un bloque alto —la barra del
+   veredicto, una tarjeta de KPI— el mismo trapecio de 10px con las esquinas
+   derechas redondeadas se lee como un paréntesis suelto flotando al costado.
+   Que es exactamente lo que se reportó, y con razón. */
+[data-d='W'] .d-row[data-tone='critical'] {
   position: relative; z-index: 1;
   margin-left: -10px;
   padding-left: calc(var(--d-p3) + 10px);
@@ -1874,11 +1878,21 @@
 }
 /* La cuña: el canto izquierdo no es recto, es un bisel. Una forma que ninguna
    otra fila tiene, legible aunque el color desaparezca. */
-[data-d='W'] .d-row[data-tone='critical']::before,
-[data-d='W'] .d-panel[data-tone='critical']::before {
+[data-d='W'] .d-row[data-tone='critical']::before {
   content: ''; position: absolute; inset: 0 auto 0 0; width: 10px;
   background: var(--d-crit);
   clip-path: polygon(0 0, 100% 14%, 100% 86%, 0 100%);
+}
+
+/* Un BLOQUE crítico se distingue de otra forma: no sobresale ni se recorta,
+   se levanta más que sus vecinos y respira su color. La jerarquía por altura
+   es legible en un bloque grande y no deja formas raras al costado. */
+[data-d='W'] .d-panel[data-tone='critical'] {
+  position: relative;
+  box-shadow:
+    var(--d-lift-3),
+    0 10px 32px -10px rgba(147, 28, 20, .45),
+    var(--d-bevel);
 }
 
 /* ── Los controles: planos que se levantan y se hunden ──────────────────── */
@@ -1970,21 +1984,18 @@
   [data-d='W'] .d-panel[data-tone='critical'] {
     outline: 3px solid CanvasText; outline-offset: -3px; margin-left: 0;
   }
-  [data-d='W'] .d-row[data-tone='critical']::before,
-  [data-d='W'] .d-panel[data-tone='critical']::before { display: none; }
+  [data-d='W'] .d-row[data-tone='critical']::before { display: none; }
 }
 
 /* A 380px la fila crítica no puede sobresalir hacia afuera: no hay margen del
    que salir, se cortaría contra el canto de la pantalla. La cuña se queda y se
    ensancha, que es la parte que de verdad hace el trabajo. */
 @media (max-width: 560px) {
-  [data-d='W'] .d-row[data-tone='critical'],
-  [data-d='W'] .d-panel[data-tone='critical'] {
+  [data-d='W'] .d-row[data-tone='critical'] {
     margin-left: 0;
     padding-left: calc(var(--d-p3) + 12px);
   }
-  [data-d='W'] .d-row[data-tone='critical']::before,
-  [data-d='W'] .d-panel[data-tone='critical']::before { width: 12px; }
+  [data-d='W'] .d-row[data-tone='critical']::before { width: 12px; }
 }
 
 /* ── W · LA LEY, APLICADA A TODA LA DIRECCIÓN ────────────────────────────

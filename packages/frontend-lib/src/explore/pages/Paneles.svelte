@@ -20,6 +20,7 @@
   // Contenido fijo, no reactivo: sale entero de demo.js.
   const BAT = ASSETS[0]; // Batidora Imer Syntesi 250 — vencida hace 12 d
   const HRN = ASSETS[1]; // Horno rotativo Salva KX-8 — sin lectura, se estima
+  const CAM = ASSETS[2]; // Camión Hino 300 — corriendo hacia los 10 000 km
   const COM = ASSETS[4]; // Compactadora Wacker DPU-6555 — nunca medida
   const GEN = ASSETS[5]; // Generador Kohler 60REOZK
   const TAREAS = PLANS.slice(0, 3);
@@ -32,6 +33,25 @@
   // Una sola selección compartida por las ocho celdas: al elegir un KPI se ve
   // de un golpe cómo dibuja cada dirección el estado "seleccionado".
   let foco = KPIS[0].label;
+
+  // X · COTA. Las dos lecturas de la flota que corren hacia su tope y todavía
+  // no lo alcanzaron. La cifra y el porcentaje salen de demo.js, el tope sale
+  // del plan del equipo, y la resta está hecha una sola vez acá para que nadie
+  // tenga que hacerla en la cabeza con la máquina enfrente:
+  //   GEN-02  2 430 de 3 000 h  ->  faltan 570 h    (2 430 / 3 000 = 81 %)
+  //   CAM-03  7 210 de 10 000 km -> faltan 2 790 km (7 210 / 10 000 = 72 %)
+  // La tercera medida de la celda, la única que se pasó, vive en la ficha de
+  // BAT-014, que es de quién habla esta pantalla.
+  const COTAS = [
+    {
+      code: GEN.code, task: PLANS[4].task, fig: '2 430', unit: 'h',
+      pct: GEN.pct, tone: GEN.tone, note: 'tope 3 000 h · faltan 570 h'
+    },
+    {
+      code: CAM.code, task: PLANS[2].task, fig: '7 210', unit: 'km',
+      pct: CAM.pct, tone: CAM.tone, note: 'tope 10 000 km · faltan 2 790 km'
+    }
+  ];
 </script>
 
 <Grid>
@@ -112,6 +132,39 @@
               </span>
             </button>
           </div>
+
+          <!-- X · LA COTA: AVANCE CONTRA TOPE -----------------------------
+               Solo X. Las otras diecinueve direcciones se quedan exactamente
+               con el contenido que ya tenían, así que la comparación entre
+               ellas sigue siendo la misma de siempre.
+
+               Va acá y no en la tira de recuentos de arriba porque acá hay
+               tope: 2 430 h corriendo hacia las 3 000 del refrigerante y
+               7 210 km corriendo hacia los 10 000 del servicio.
+
+               Las dos tiras de arriba no la llevan, y por dos razones
+               distintas. "8 vencidos" es un censo: no corre hacia ningún tope,
+               y una cota sin marca es una barra de progreso. COM-07 sí tiene
+               tope, cada 200 h, pero nunca se midió: un riel vacío no es una
+               medida, es una casilla sin llenar, y la palabra "nunca" en el
+               sitio de la cifra contesta mejor. -->
+          {#if d.id === 'X'}
+            <div class="cotas">
+              {#each COTAS as c (c.code)}
+                <div class="cota-kpi">
+                  <p class="cota-lab">
+                    <span class="d-id">{c.code}</span>
+                    <span class="cota-task">{c.task}</span>
+                  </p>
+                  <div class="d-cota" data-tone={c.tone} style="--cota:{c.pct}">
+                    <div class="d-cota-fig"><b>{c.fig}</b> <span>{c.unit}</span></div>
+                    <div class="d-cota-rail"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                    <div class="d-cota-note">{c.note}</div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/if}
         </section>
 
         <div class="aside-row">
@@ -138,7 +191,22 @@
                 </div>
                 <div class="d-rail">
                   <dt class="d-cap">Última lectura</dt>
-                  <dd class="d-num">{BAT.reading}</dd>
+                  <!-- X · LA COTA, DONDE LA MEDIDA SE PASÓ DEL TOPE.
+                       "312 h" solo no dice nada. Con la marca de las 250 h del
+                       plan atrás, dice que se pasó, y el riel sigue hasta el
+                       150 % para que las 62 h de sobrepaso tengan dónde verse.
+                       Es la única cifra roja de la celda. -->
+                  {#if d.id === 'X'}
+                    <dd>
+                      <div class="d-cota" data-tone={BAT.tone} style="--cota:{BAT.pct}">
+                        <div class="d-cota-fig"><b>312</b> <span>h</span></div>
+                        <div class="d-cota-rail"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                        <div class="d-cota-note">tope 250 h · se pasó 62 h · leída 2 ago</div>
+                      </div>
+                    </dd>
+                  {:else}
+                    <dd class="d-num">{BAT.reading}</dd>
+                  {/if}
                 </div>
                 <div class="d-rail">
                   <dt class="d-cap">Origen del dato</dt>
@@ -1550,6 +1618,7 @@
     border-radius: 0;
     box-shadow: inset var(--d-bw) 0 0 var(--d-edge),
                 inset 0 var(--d-bw) 0 var(--d-edge);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   /* La cifra respira. A 35px sobre vidrio, pegada al rótulo, el bloque entero
      se lee como una mancha oscura antes que como un número. */
@@ -1594,6 +1663,7 @@
     box-shadow: inset calc(var(--d-bw) * 3) 0 0 var(--d-crit),
                 inset var(--d-bw) 0 0 var(--d-edge),
                 inset 0 var(--d-bw) 0 var(--d-edge);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
   /* Elegida Y vencida. Las dos reglas de arriba pesan igual, así que sin esta
      la última escrita se comería a la otra y la celda perdería un estado. El
@@ -1677,6 +1747,259 @@
      por debajo de unos 270px de columna se salen de la ficha. Envuelven, y
      siguen alineados a la derecha. */
   :global([data-d='W']) .d-panel-foot { flex-wrap: wrap; }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     X · COTA. Papel mate y tinta, y el color reservado al estado.
+
+     Esta familia es donde la dirección se juega entera, por dos razones.
+
+     LA PRIMERA es la cifra grande. En las diecinueve anteriores la tira de
+     recuentos sale a pantalla con cuatro cifras de cuatro colores: roja,
+     ámbar, verde y gris. Ahí el color dejó de ser información y pasó a ser
+     el modo normal de dibujar un número, así que cuando de verdad urge algo
+     tiene que urgir contra otros tres colores que también gritan. En X la
+     cifra es TINTA, y toma color en un solo sitio de toda la celda: los ocho
+     vencidos, que es la única de las cuatro que ES un estado y no un
+     recuento. Los 62 al día en verde y los 4 sin lectura en gris eran cromo
+     disfrazado de dato.
+
+     LA SEGUNDA es que acá hay medidas de verdad, y una medida sin su tope no
+     se puede leer. La cota entra en dos sitios y en ninguno más: el par de
+     lecturas que corren hacia su plan y la lectura de BAT-014, que se pasó.
+     Los recuentos NO la llevan, porque un censo de máquinas no corre hacia
+     ningún tope: pintarles un riel sería una barra de progreso decorativa,
+     que es exactamente el ruido que esta dirección vino a sacar.
+
+     Y como el cromo es acromático de punta a punta, todo el color de esta
+     celda cabe en una lista corta: el filo y la cifra de lo vencido, el
+     relleno de cada riel, las marcas de estado y las píldoras. Nada más.
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* La cabecera es el cajetín de un plano: título, recuento y regla debajo.
+     La regla no decora, cierra el bloque. */
+  :global([data-d='X']) .sec-head {
+    padding-bottom: var(--d-p2);
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-edge);
+  }
+  :global([data-d='X']) .sec-title {
+    font-variant-numeric: var(--d-num);
+    letter-spacing: -.02em;
+  }
+
+  /* ── LA CELDA DE RECUENTO ────────────────────────────────────────────── */
+  /* Una hoja: papel, línea de un pixel y un pixel de sombra sin desenfoque. La
+     profundidad la da la línea, nunca una nube. Conserva el canto de .d-panel
+     y no baja a 4px: la celda de recuento, la hoja de cotas, la ficha y el
+     aviso son todos la misma clase de objeto y tienen que tener el mismo
+     canto. Los 4px quedan para lo que va DENTRO de una hoja, que es como se
+     reconoce un anidado. */
+  :global([data-d='X']) .kpi {
+    border-color: var(--d-line);
+    box-shadow: var(--d-shadow);
+    transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
+  }
+  :global([data-d='X']) .kpi:hover { background: var(--d-sunk); }
+  /* La única moción de la celda, y hace un trabajo: la hoja se hunde un pixel
+     bajo el dedo, igual que el botón del contrato. Es acuse de recibo, no
+     animación. */
+  :global([data-d='X']) .kpi:active { transform: translateY(1px); box-shadow: none; }
+  /* ELEGIDA: DOS FILOS DE TINTA Y NADA MÁS. El estado de un control no puede
+     gastar color, porque el color acá ya está comprometido con el estado del
+     equipo. Si la celda elegida se rellenara de tono no habría manera de saber
+     si el rojo dice "vencidos" o dice "este es el filtro puesto". Tinta para
+     el control, tono para el dato, y no se cruzan. */
+  :global([data-d='X']) .kpi.on {
+    background: var(--d-surface);
+    border-color: var(--d-ink);
+    box-shadow: inset 0 0 0 max(var(--d-bw), 1px) var(--d-ink);
+  }
+  :global([data-d='X']) .kpi.on .kpi-lab { color: var(--d-ink); font-weight: var(--d-w-bold); }
+  /* Solo lo vencido lleva filo, que es la regla que el contrato ya aplica a la
+     fila. Si las seis celdas llevaran su franja de tono, el rojo volvería a ser
+     uno de cuatro colores en fila en vez de lo primero que encuentra el ojo.
+     El filo va en el borde y no en una sombra interior: así nunca queda tapado
+     por el fondo de un hijo, y el relleno de la izquierda se descuenta para que
+     el texto no se corra dos pixeles respecto de las otras cinco celdas. */
+  :global([data-d='X']) .kpi[data-tone='critical'] {
+    border-left: calc(var(--d-bw) * 3) solid var(--d-crit);
+    padding-left: calc(var(--d-p3) - var(--d-bw) * 2);
+  }
+
+  /* El rótulo es una palabra, no una versalita: X trae --d-label-case: none
+     justamente porque la línea de mayúsculas espaciadas sobre cada bloque es
+     el ritmo que delata una plantilla. Sube a 13,5px y a tinta secundaria, y
+     la personalidad sale del contraste contra la cifra: 520 contra 700, gris
+     contra tinta, 13,5 contra 34. */
+  :global([data-d='X']) .kpi-lab {
+    font-size: var(--d-t-sm);
+    font-weight: var(--d-w-med);
+    color: var(--d-ink-2);
+  }
+  /* LA CIFRA GRANDE, SIN COLOR DE CROMO. Tabular siempre, para que 8, 14, 62
+     y 4 caigan sobre la misma vertical al comparar cuatro celdas en fila, y
+     con tracking negativo, que a 34px es lo que separa una cifra dibujada de
+     una cifra por defecto. */
+  :global([data-d='X']) .kpi-fig {
+    color: var(--d-ink);
+    font-weight: var(--d-w-bold);
+    letter-spacing: -.03em;
+    font-variant-numeric: var(--d-num);
+  }
+  /* El número toma el tono solo cuando ES el estado. Pasa una vez. */
+  :global([data-d='X']) .kpi[data-tone='critical'] .kpi-fig { color: var(--d-crit); }
+  :global([data-d='X']) .kpi-note { font-variant-numeric: var(--d-num); }
+
+  /* ── LA COTA, LA FIRMA DEL SISTEMA ──────────────────────────────────────
+     Las dos lecturas son UNA hoja partida por un pelo de línea, no dos
+     tarjetas puestas al lado: son la misma pregunta hecha sobre dos máquinas.
+     La junta es el hueco de la rejilla sobre el fondo de la hoja, así que al
+     plegarse a una columna pasa sola de dividir columnas a dividir filas, sin
+     una regla por punto de quiebre. */
+  :global([data-d='X']) .cotas {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--d-bw);
+    min-width: 0;
+    background: var(--d-line);
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+    overflow: hidden;
+  }
+  :global([data-d='X']) .cota-kpi {
+    min-width: 0;
+    padding: var(--d-p3);
+    background: var(--d-surface);
+  }
+  /* Quién y qué se mide, en una línea. El código de equipo en mono y tinta
+     llena, la tarea en gris: se busca por placa, se confirma por tarea. */
+  :global([data-d='X']) .cota-lab {
+    display: flex; align-items: baseline; flex-wrap: wrap;
+    /* Si la tarea se va a un segundo renglón, no queda pegada a la placa. */
+    gap: 2px calc(var(--d-p1) * .8);
+    margin: 0 0 var(--d-p2);
+    min-width: 0;
+    font-size: var(--d-t-sm);
+  }
+  :global([data-d='X']) .cota-lab .d-id { color: var(--d-ink); font-weight: var(--d-w-semi); }
+  :global([data-d='X']) .cota-task { color: var(--d-ink-3); overflow-wrap: anywhere; }
+  /* La cifra de la cota iguala a la del recuento: 34px, 700, mismo tracking.
+     Son la misma clase de dato leído de dos maneras y tienen que pesar igual
+     en la página. El contrato la deja en 25px, que es el tamaño de cuando la
+     cota va dentro de una corrida de ficha, y ahí abajo se queda en 25. */
+  :global([data-d='X']) .cota-kpi .d-cota-fig {
+    font-size: var(--d-t-2xl);
+    font-weight: var(--d-w-bold);
+    letter-spacing: -.03em;
+  }
+
+  /* ── LA FICHA ES UNA BOLETA ──────────────────────────────────────────────
+     Rótulo y valor comparten columna en las tres corridas, así que los tres
+     valores arrancan sobre la misma vertical y el ojo baja por una sola línea
+     en vez de buscar cada dato donde termine su rótulo. `display: contents`
+     disuelve cada .d-rail para que las seis celdas caigan en la MISMA rejilla:
+     una rejilla por corrida alinearía cada fila consigo misma, que es no
+     alinear nada. */
+  :global([data-d='X']) .ficha-meta {
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: var(--d-p3);
+    row-gap: 0;
+  }
+  :global([data-d='X']) .ficha-meta > .d-rail { display: contents; }
+  :global([data-d='X']) .ficha-meta dt,
+  :global([data-d='X']) .ficha-meta dd {
+    padding-block: var(--d-p2);
+    border-top: max(var(--d-bw), 1px) solid var(--d-line);
+  }
+  /* La primera corrida no abre con una línea: ya tiene el estado del equipo
+     encima y dos reglas a un pelo una de otra son un error de dibujo. */
+  :global([data-d='X']) .ficha-meta > .d-rail:first-child dt,
+  :global([data-d='X']) .ficha-meta > .d-rail:first-child dd {
+    border-top: 0;
+    padding-top: 0;
+  }
+  /* La ficha lleva el equipo vencido y toma el mismo filo de 3px que la fila y
+     que la celda de recuento: una sola manera de dibujar "vencido" en toda la
+     pantalla, reconocible sin distinguir el rojo. En el borde y no en una
+     sombra interior, porque el pie de la ficha tiene fondo propio y taparía
+     una sombra justo en su tramo. */
+  :global([data-d='X']) .ficha[data-tone='critical'] {
+    border-left: calc(var(--d-bw) * 3) solid var(--d-crit);
+  }
+  :global([data-d='X']) .ficha-name { letter-spacing: -.015em; }
+  /* Los dos botones del pie llevan white-space: nowrap y el pie no envuelve:
+     por debajo de unos 280px de columna se salen de la hoja. Envuelven, y
+     siguen alineados a la derecha. */
+  :global([data-d='X']) .d-panel-foot { flex-wrap: wrap; }
+
+  /* EL AVISO NO ES UNA ALARMA, ES UN SUPUESTO. Deja de ser una banda de color
+     y pasa a ser papel con el filo de su tono: la misma gramática que el
+     contrato le da a la fila, donde el relleno queda reservado a lo vencido.
+     La palabra "Estimado" baja a tinta secundaria y el tono se queda en la
+     marca y en el filo, que es donde informa sin competir con el rojo. */
+  :global([data-d='X']) .callout {
+    background: var(--d-surface);
+    border-color: var(--d-line);
+    border-left: calc(var(--d-bw) * 3) solid var(--tone-fg);
+  }
+  :global([data-d='X']) .callout-kicker { color: var(--d-ink-2); }
+
+  /* ANIDADO: papel sobre papel. Un escalón menos de canto, sin sombra y sobre
+     el fondo hundido. Lo que lo separa de su contenedor es la línea, no la
+     altura, que es la regla de material de toda la dirección. */
+  :global([data-d='X']) .nest {
+    background: var(--d-sunk);
+    border-color: var(--d-line);
+    border-radius: var(--d-r);
+    box-shadow: none;
+  }
+  :global([data-d='X']) .nest > .d-panel-head { background: transparent; }
+  :global([data-d='X']) .plan-src { font-variant-numeric: var(--d-num); }
+
+  /* ── X · PANTALLA ANGOSTA, DECLARADA HASTA 380px ─────────────────────────
+     Manda la CELDA, no la ventana: el contenedor es .root, así que una celda
+     angosta se comporta igual sola que dentro de una rejilla de veinte.
+
+       520c  el mosaico de recuentos pasa a cuatro columnas y la hoja de cotas
+             a dos, por la regla compartida de más abajo y por la de acá.
+             También es donde el aviso se pone al lado de la ficha.
+       440c  la boleta se deshace: la columna de rótulos deja de caber sin
+             ahogar el dato, así que rótulo y valor vuelven a apilarse. Y los
+             botones del pie toman 44px, porque una celda de este ancho ya
+             tiene forma de teléfono aunque la ventana sea ancha.
+       360c  el mosaico y la hoja de cotas se pliegan a una columna. La hoja no
+             se rompe: las dos cotas quedan apiladas dentro de la misma pieza y
+             la junta pasa a ser horizontal.
+
+     A 380px de ventana la celda queda alrededor de 320c, o sea que rigen las
+     tres. Lo más ancho que existe acá es la cifra de la cota, "7 210 km" a
+     34px con tracking negativo, que mide unos 140px: le sobra sitio.
+
+     QUÉ SE VUELVE SCROLL HORIZONTAL: nada, y es una respuesta y no un olvido.
+     Esta familia no tiene tabla. Las píldoras con white-space: nowrap viven en
+     filas con flex-wrap, los nombres de equipo parten con overflow-wrap:
+     anywhere, y el riel de la cota es un bloque con min-width: 0 que se encoge
+     con su columna en vez de empujarla. Si algún día entra una tabla, el
+     scroll va contenido en su propio envoltorio y nunca en el body. */
+  @container (min-width: 520px) {
+    :global([data-d='X']) .cotas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @container (max-width: 439px) {
+    :global([data-d='X']) .ficha-meta { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='X']) .ficha-meta > .d-rail { display: grid; }
+    :global([data-d='X']) .ficha-meta dt { padding-block: var(--d-p2) 2px; }
+    :global([data-d='X']) .ficha-meta dd { padding-block: 0; border-top: 0; }
+    /* Solo min-height. Tocar .d-btn entero acá le ganaría el fondo a
+       .d-btn--primary del contrato y dejaría tinta blanca sobre blanco. */
+    :global([data-d='X']) .d-panel-foot .d-btn { min-height: var(--d-touch); }
+  }
+
+  /* Piso de artesanía, igual que el que el contrato le pone a la fila y al
+     riel: en alto contraste forzado la sombra interior de tinta desaparece y
+     la celda elegida perdería su único distintivo. Pasa a contorno. */
+  @media (forced-colors: active) {
+    :global([data-d='X']) .kpi.on { outline: 2px solid CanvasText; outline-offset: -2px; }
+  }
 
   /* ======================================================================
      RESPONSIVE — hasta 380px. La celda manda, no la ventana: el contenedor
@@ -1811,7 +2134,8 @@
       box-shadow: inset calc(var(--d-bw) * 5) 0 0 var(--d-crit),
                   inset var(--d-bw) 0 0 var(--d-edge),
                   inset 0 var(--d-bw) 0 var(--d-edge);
-    }
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
     :global([data-d='W']) .kpi[data-tone='critical'].on {
       box-shadow: inset calc(var(--d-bw) * 5) 0 0 var(--d-crit),
                   inset 0 0 0 max(var(--d-bw), 2px) var(--d-accent);
@@ -1850,6 +2174,9 @@
     :global([data-d='S']) .kpi.on { transform: none; }
     :global([data-d='M']) .kpi::before,
     :global([data-d='Q']) .kpi::after { transition: none; }
+    /* En X el hundimiento de la hoja se retira igual que el del botón en el
+       contrato. Lo elegido no depende de él: depende del filo de tinta. */
+    :global([data-d='X']) .kpi:active { transform: none; }
   }
 
   /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════

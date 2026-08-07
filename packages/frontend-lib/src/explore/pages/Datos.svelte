@@ -49,7 +49,13 @@
   const isMono = (id) => id === 'F' || id === 'R';
   const isDial = (id) =>
     id === 'A' || id === 'C' || id === 'E' || id === 'H' || id === 'K' || id === 'T';
-  const isBarChart = (id) => id === 'D' || id === 'Q';
+  /* X entra en las barras macizas por una razón de dato y no de material: doce
+     totales semanales son doce medidas discretas, no una serie continua. La
+     curva dibuja horas entre semana y semana que nadie trabajó, y encima
+     esconde la semana en cero dentro de una diagonal. Una columna por semana
+     dice exactamente lo que se midió, y la semana en cero se reconoce porque
+     no hay columna. */
+  const isBarChart = (id) => id === 'D' || id === 'Q' || id === 'X';
 
   /* ── Eje de días ─────────────────────────────────────────────────────── */
   const BACK = 20; // días de historia siempre visibles a la izquierda
@@ -209,6 +215,62 @@
   const calLab = (c) =>
     c.full + (c.hoy ? ', hoy' : '') + ', ' +
     (c.count ? c.count + (c.count === 1 ? ' vencimiento' : ' vencimientos') : 'sin vencimientos');
+
+  /* ── X · COTA · las cifras ────────────────────────────────────────────────
+     Cota lee la MEDIDA contra su tope y no el porcentaje. «118 %» obliga a
+     reconstruir de qué; «312 h con la marca de 250 h atrás» ya dijo que se
+     pasó 62 h y nadie restó. Por eso los dos primeros paneles se rearman acá
+     con las tres cifras que el papel de bodega ya tiene: la lectura, la
+     unidad y el «cada N» del plan, que ES el tope.
+
+     EL RECORRIDO SE CALCULA DE ESAS DOS CIFRAS y no se escribe a mano, así el
+     dibujo y los dos números impresos no pueden discrepar. Es la única razón
+     por la que 312 h contra 250 h da 125 y no el 118 que trae la ficha: 312
+     menos 250 son 62 h, o sea un 25 % de sobrepaso, y el relleno tiene que
+     pasarse ese 25 % y no otro.
+
+     Las tres cifras derivadas son restas de las que ya están: 10 000 menos
+     7 210, 2 000 menos 1 840, 250 menos 312. La única reconstruida es el tope
+     del reloj de calendario de GEN-02, que la ficha no nombra: con 64 % del
+     intervalo recorrido y 131 d por delante, el único tope compatible es el
+     año, 365 d, y quedan 234 d corridos. */
+  const xat = (leido, tope) => Math.round((leido / tope) * 100);
+
+  const XPLAN = [
+    { asset: 'CAM-03', task: 'Servicio 10 000 km', tone: 'positive',
+      fig: '7 210', unit: 'km', at: xat(7210, 10000),
+      note: 'tope 10 000 km · faltan 2 790 km',
+      due: 'en 47 d', src: 'lectura manual del 4 ago' },
+    { asset: 'HRN001', task: 'Revisión de quemador', tone: 'attention',
+      fig: '1 840', unit: 'h', at: xat(1840, 2000),
+      note: 'tope 2 000 h · faltan 160 h',
+      due: 'en 5 d', src: 'sin lectura de horómetro; 14 h por día declaradas' },
+    { asset: 'BAT-014', task: 'Cambio de aceite', tone: 'critical',
+      fig: '312', unit: 'h', at: xat(312, 250),
+      note: 'tope 250 h · se pasó 62 h',
+      due: 'venció hace 12 d', src: 'lectura del 2 ago, tomada en la devolución' }
+  ];
+
+  /* Los dos relojes de cada máquina, cada uno contra SU tope. Van en el mismo
+     orden que la ficha (calendario y después uso) para que la columna del tope
+     se lea de arriba abajo y el que llega primero sea el riel más largo.
+     MEZ-021 por uso no lleva cota: no hay lectura, y una cota sin medida sería
+     un riel vacío diciendo cero, que es exactamente lo contrario de lo que
+     pasa. Se dice con palabras. */
+  const XCLK = {
+    'GEN-02': [
+      { label: 'Calendario', tone: 'positive', at: xat(234, 365),
+        fig: '234', unit: 'd', note: 'tope 365 d · faltan 131 d' },
+      { label: 'Uso', tone: 'attention', at: xat(2430, 3000),
+        fig: '2 430', unit: 'h', note: 'tope 3 000 h · faltan 570 h' }
+    ],
+    'MEZ-021': [
+      { label: 'Calendario', tone: 'critical', at: xat(93, 90),
+        fig: '93', unit: 'd', note: 'tope 90 d · se pasó 3 d' },
+      { label: 'Uso', tone: 'neutral', at: null,
+        none: 'Sin horómetro: este plan no corre por uso.' }
+    ]
+  };
 </script>
 
 <Grid min="440px">
@@ -258,7 +320,42 @@
             <h4 class="d-panel-title">Consumo del plan</h4>
           </header>
           <div class="d-panel-body dv-body dv-stack dv-bleed">
-            {#if isMono(d.id)}
+            <!-- X · el panel donde la firma del sistema hace su trabajo. Tres
+                 planes, tres medidas, tres topes, y las tres marcas de tope
+                 caen en la MISMA columna porque el riel de .d-cota normaliza:
+                 leyendo para abajo, «cuál se pasó» es una sola mirada y no una
+                 resta. Por eso el orden ascendente se queda: los rieles arman
+                 una escalera y el último cruza la marca. -->
+            {#if d.id === 'X'}
+              <div class="xp-list">
+                <p class="xt" aria-hidden="true"><span class="xt-lab">tope</span></p>
+                {#each XPLAN as g}
+                  <div class="xp">
+                    <div class="xp-head">
+                      <span class="xp-name"><b class="d-id">{g.asset}</b> {g.task}</span>
+                      <!-- Plazo y estado viajan juntos: son la misma respuesta
+                           partida en cuánto y en qué, y si se separan al
+                           envolverse quedan uno a cada lado de la fila. -->
+                      <span class="xp-flag">
+                        <span class="xp-due">{g.due}</span>
+                        <span class="d-pill" data-tone={g.tone}
+                          ><svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false"
+                            >{@html markOf(g.tone)}</svg
+                          >{WORD[g.tone]}</span
+                        >
+                      </span>
+                    </div>
+                    <div class="d-cota" data-tone={g.tone} style="--cota:{g.at}">
+                      <div class="d-cota-fig"><b>{g.fig}</b> <span>{g.unit}</span></div>
+                      <div class="d-cota-rail"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                      <div class="d-cota-note">{g.note}</div>
+                    </div>
+                    <p class="xp-src">{g.src}</p>
+                  </div>
+                {/each}
+              </div>
+              <p class="dv-foot">El riel llega al 150 % del tope, así que un sobrepaso tiene dónde dibujarse.</p>
+            {:else if isMono(d.id)}
               {#each BARS as g}
                 <div class="mrow" data-tone={g.tone}>
                   <span class="mlab d-id">{g.asset}</span>
@@ -326,7 +423,32 @@
                   <span class="ck-task">{c.task} · {c.every}</span>
                 </p>
 
-                {#if isMono(d.id)}
+                <!-- X · dos cotas, una sobre la otra, con la marca del tope en
+                     la misma columna. Con eso «cuál llega primero» deja de ser
+                     una comparación de dos porcentajes y pasa a ser cuál de los
+                     dos rieles está más cerca de la línea. El reloj sin lectura
+                     no dibuja riel: dice por qué no lo hay. -->
+                {#if d.id === 'X'}
+                  <div class="xk">
+                    <p class="xt" aria-hidden="true"><span class="xt-lab">tope</span></p>
+                    {#each XCLK[c.asset] as k}
+                      <span class="xk-lab">{k.label}</span>
+                      {#if k.at === null}
+                        <p class="xk-none" data-tone={k.tone}>
+                          <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false"
+                            >{@html markOf(k.tone)}</svg
+                          >{k.none}
+                        </p>
+                      {:else}
+                        <div class="d-cota" data-tone={k.tone} style="--cota:{k.at}">
+                          <div class="d-cota-fig"><b>{k.fig}</b> <span>{k.unit}</span></div>
+                          <div class="d-cota-rail"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                          <div class="d-cota-note">{k.note}</div>
+                        </div>
+                      {/if}
+                    {/each}
+                  </div>
+                {:else if isMono(d.id)}
                   {#each [c.cal, c.use] as k}
                     <div class="mrow" data-tone={k.tone}>
                       <span class="mlab">{k.key}</span>
@@ -2305,6 +2427,277 @@
       background: var(--d-overlay);
     }
     :global([data-d='W']) .dv-bar::after { display: none; }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     X · COTA. El color es solo estado; la estructura es la medida.
+
+     Acá no hay una traducción de material, porque esta familia ES la
+     dirección: hay dos reglas y las dos se pagan en marcado, no en CSS de
+     superficie.
+
+     REGLA 1 · EL COLOR ESTÁ RESERVADO AL ESTADO. Lo que esta página pintaba
+     de color sin que fuera estado se apaga. El minigráfico venía con relleno
+     en --d-info-band y curva en --d-info: un azul que no informa nada y que
+     compite por atención con los cuatro tonos que sí informan. En Cota el
+     consumo semanal es tinta sobre papel. Y las tres zonas del eje se
+     reducen a UNA: solo lo vencido se tiñe, que es palabra por palabra la
+     ley que directions.css ya le aplica a .d-row en esta dirección y por la
+     misma razón, porque es el único estado que interrumpe. Con dieciocho
+     bandas de color menos en la celda, el rojo de una fila vencida se
+     encuentra antes de leer una palabra, que es el punto entero.
+
+     REGLA 2 · NINGUNA CIFRA MEDIDA APARECE SOLA. La cota entra donde hay un
+     tope de verdad y no entra en ningún otro lado:
+       · panel 1, tres planes contra el «cada N» que los define;
+       · panel 2, cada reloj contra su propio tope.
+     No entra en la línea de tiempo, porque una fecha es una POSICIÓN sobre
+     un eje compartido y no un recorrido hacia un tope: su marca es «hoy» y
+     ya está dibujada. Tampoco en el consumo semanal, que no tiene tope
+     semanal declarado; ni en el reparto de la flota, que es una composición
+     de cuatro partes de un total; ni en la tira de catorce días. Una cota
+     sin marca es una barra de progreso, y una barra de progreso decorativa
+     es ruido.
+
+     LA MARCA ES UNA SOLA MARCA. La regla de «hoy» en la línea de tiempo se
+     dibuja con la geometría exacta de .d-cota-tick en esta dirección (1.5px,
+     saliendo 4px por arriba y por abajo), porque son la misma cosa: el punto
+     contra el que se mide lo demás.
+
+     CANTO. Lo que MIDE tiene canto recto, igual que .d-cota-rail, que
+     directions.css ya deja en radio 0. Lo que CONTIENE o se TOCA lleva los
+     4px de la dirección. Es una sola escala y una sola frase.
+
+     MOCIÓN. X no agrega ninguna. La única de la página sigue siendo el
+     deslizamiento de la línea de tiempo al cambiar el eje, que ya se gana su
+     lugar más arriba.
+
+     HALLAZGO · falta un token de relleno de riel. directions.css pinta
+     .d-cota-rail de X con un gris escrito a mano que el contrato no nombra,
+     así que los rieles de esta página usan --d-accent-soft, que es el token
+     más cercano y el único gris claro de la paleta que no es --d-sunk (que
+     sobre blanco queda en 1.05:1 y hace desaparecer el tramo vacío). El día
+     que exista un --d-rail-fill, estas dos líneas apuntan a él.
+     ══════════════════════════════════════════════════════════════════════ */
+  :global([data-d='X']) .dv {
+    /* Un solo alto de riel en toda la celda, el mismo de .d-cota-rail. El de
+       la flota sale a 7px por el factor 1.4 de la base, y está bien: es el
+       único riel que reparte cuatro cosas en vez de medir una. */
+    --dv-h: 5px;
+    /* Dónde empieza la columna del riel dentro del bloque que lleva el
+       rótulo «tope». Cero por defecto (panel 1, el riel va a todo el ancho);
+       .xk lo corre por su columna de etiquetas. */
+    --xt-off: 0px;
+  }
+
+  /* La cifra que contesta la cabecera es un dato duro, no un pie: va en tinta
+     y con el peso de un titular chico. */
+  :global([data-d='X']) .dv-fig { color: var(--d-ink); font-weight: var(--d-w-semi); }
+  /* «7 210 km» no se parte entre la cifra y la unidad. */
+  :global([data-d='X']) .d-cota-fig { white-space: nowrap; }
+
+  /* ── El rótulo del tope ────────────────────────────────────────────────
+     Una sola vez por bloque de rieles, centrado exactamente sobre la columna
+     donde caen todas las marcas, con la línea de referencia que baja hacia
+     ellas. Es la anotación de un plano, no un epígrafe: no nombra la sección,
+     nombra una posición del eje, igual que el «100» que B pone sobre su
+     umbral. El 0.3333 es el complemento del 66.67 % en que .d-cota-tick fija
+     la marca, medido desde el canto derecho porque ese canto es común a la
+     anotación y al riel. */
+  :global([data-d='X']) .xt {
+    grid-column: 1 / -1;
+    position: relative; margin: 0;
+    height: calc(1.25em + var(--d-p2));
+    font-size: var(--d-t-2xs);
+  }
+  :global([data-d='X']) .xt-lab {
+    position: absolute; top: 0;
+    right: calc((100% - var(--xt-off)) * 0.3333);
+    transform: translateX(50%);
+    color: var(--d-ink-3); white-space: nowrap;
+  }
+  :global([data-d='X']) .xt-lab::after {
+    content: ''; position: absolute; left: 50%; top: 100%;
+    width: var(--d-bw); height: var(--d-p2);
+    background: var(--d-edge);
+  }
+
+  /* ── 1 · Consumo del plan ──────────────────────────────────────────────
+     El bloque de un plan no se tiñe ni lleva filo de tono: el relleno de la
+     cota ya carga el estado y la píldora ya carga la palabra y la forma.
+     Un tercero sería repetir. Lo que separa un plan del siguiente es una
+     regla de un píxel, que es lo que separa dos renglones en una boleta. */
+  :global([data-d='X']) .xp-list { display: grid; gap: var(--d-p3); min-width: 0; }
+  :global([data-d='X']) .xp { display: grid; gap: var(--d-p1); min-width: 0; }
+  :global([data-d='X']) .xp + .xp {
+    border-top: var(--d-bw) solid var(--d-line);
+    padding-top: var(--d-p3);
+  }
+  :global([data-d='X']) .xp-head {
+    display: flex; align-items: baseline; flex-wrap: wrap;
+    gap: var(--d-p1) var(--d-p2); min-width: 0;
+  }
+  :global([data-d='X']) .xp-name {
+    flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere;
+    font-size: var(--d-t-sm); color: var(--d-ink-2);
+  }
+  :global([data-d='X']) .xp-name b { color: var(--d-ink); font-weight: var(--d-w-semi); }
+  /* El plazo es la respuesta de los tres segundos, así que va arriba y en
+     tinta de lectura, no abajo en gris de nota. Va pegado a la píldora en un
+     solo grupo: cuando la fila no entra, los dos bajan juntos y anclados a la
+     derecha, en vez de quedar uno arriba a la derecha y otro abajo a la
+     izquierda. */
+  :global([data-d='X']) .xp-flag {
+    flex: none; margin-left: auto;
+    display: flex; align-items: baseline; gap: var(--d-p2);
+  }
+  :global([data-d='X']) .xp-due {
+    white-space: nowrap;
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-2);
+  }
+  :global([data-d='X']) .xp-flag .d-pill { flex: none; }
+  /* De dónde salió la lectura. Es lo que un técnico pregunta cuando la cifra
+     no le cierra, y es lo único de la ficha que puede bajar a nota. */
+  :global([data-d='X']) .xp-src {
+    margin: 0; font-size: var(--d-t-2xs); color: var(--d-ink-3);
+    min-width: 0; overflow-wrap: anywhere;
+  }
+
+  /* ── 2 · Dos relojes ───────────────────────────────────────────────────
+     Rótulo a la izquierda, cota a la derecha, y las líneas base del rótulo y
+     de la cifra grande alineadas: es lo que hace que «Calendario 234 d» se
+     lea como una frase y no como dos objetos apilados. */
+  :global([data-d='X']) .xk {
+    --xt-off: calc(var(--dv-lane) + var(--d-p2));
+    display: grid; grid-template-columns: var(--dv-lane) minmax(0, 1fr);
+    column-gap: var(--d-p2); row-gap: var(--d-p2);
+    align-items: baseline; min-width: 0;
+  }
+  :global([data-d='X']) .xk-lab {
+    grid-column: 1; min-width: 0; overflow-wrap: anywhere;
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-2);
+  }
+  :global([data-d='X']) .xk-none {
+    margin: 0; display: flex; align-items: center; gap: var(--d-p1);
+    font-size: var(--d-t-xs); color: var(--tone-fg);
+    min-width: 0; overflow-wrap: anywhere;
+  }
+  :global([data-d='X']) .ck { gap: var(--d-p2); }
+  :global([data-d='X']) .ck + .ck {
+    margin-top: var(--d-p3); padding-top: var(--d-p3);
+    border-top: var(--d-bw) solid var(--d-line);
+  }
+  /* El veredicto es la frase que el técnico se lleva, así que sube de gris de
+     nota a tinta de lectura. */
+  :global([data-d='X']) .ck-say {
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-2);
+  }
+
+  /* ── 3 · Línea de tiempo ───────────────────────────────────────────────
+     Sin cota: acá no hay recorrido hacia un tope, hay posiciones sobre un eje
+     compartido. Lo que sí comparte con la cota es la MARCA. */
+  :global([data-d='X']) .tl-track { border-radius: 0; background: var(--d-accent-soft); }
+  /* Solo lo vencido se tiñe. Las otras dos zonas se apagan: en una celda sin
+     ningún otro color, tres franjas por fila por seis filas eran dieciocho
+     manchas compitiendo con las tres marcas que sí urgen. */
+  :global([data-d='X']) .tl-zone[data-tone='positive'],
+  :global([data-d='X']) .tl-zone[data-tone='attention'] { background: none; }
+  :global([data-d='X']) .tl-elapsed { inset-block: 0; opacity: .45; border-radius: 0; }
+  /* «Hoy» ES la marca de tope de este eje, así que se dibuja con la geometría
+     exacta de .d-cota-tick en X: 1.5px, saliendo 4px por arriba y por abajo.
+     El contrato no tiene tokens para ninguna de las dos medidas; están
+     escritas igual acá y en directions.css a propósito, y el día que exista
+     un --d-tick se cambian juntas. */
+  :global([data-d='X']) .tl-now { background: var(--d-ink); width: 1.5px; inset-block: -4px; }
+  :global([data-d='X']) .tl-key-rule { width: 1.5px; height: 12px; }
+  /* La chapa del vencimiento comparte el canto recto del riel. */
+  :global([data-d='X']) .tl-dot { border-radius: 0; }
+  /* El rayado es la convención de dibujo para «sin dato», no un degradado de
+     material: paradas duras, sin transición y en gris de línea, que sobre el
+     papel de X se ve y sobre --d-neu-band no se veía. */
+  :global([data-d='X']) .tl-hatch {
+    background: repeating-linear-gradient(45deg, var(--d-line) 0 var(--d-p1), transparent var(--d-p1) var(--d-p2));
+  }
+
+  /* ── 4 · Consumo semanal ───────────────────────────────────────────────
+     Columnas de tinta sobre una base de canto. Ni un color: doce semanas de
+     horas no son un estado, y en Cota lo que no es estado no se pinta. */
+  :global([data-d='X']) .sp-base { stroke: var(--d-edge); }
+
+  /* ── 5 · Flota por estado ──────────────────────────────────────────────
+     El riel se queda con los cuatro tonos, que acá sí son estado, y la
+     leyenda pasa a ser lo que es: una tabla de cuatro filas con conteo y
+     porcentaje alineados a la derecha. Se baja por la columna en vez de leer
+     cuatro frases. */
+  :global([data-d='X']) .ds-bar { border-radius: 0; background: var(--d-accent-soft); }
+  :global([data-d='X']) .ds-key { gap: 0; margin-top: var(--d-p2); }
+  :global([data-d='X']) .ds-key li {
+    display: grid;
+    grid-template-columns: 9px minmax(0, 1fr) 3ch 4ch minmax(0, 1.1fr);
+    align-items: center; gap: var(--d-p2);
+    min-height: 26px;
+    border-top: var(--d-bw) solid var(--d-line);
+  }
+  :global([data-d='X']) .ds-v, :global([data-d='X']) .ds-pc { text-align: right; }
+  :global([data-d='X']) .ds-note { margin-left: 0; text-align: right; }
+
+  /* ── 6 · Próximos 14 días ──────────────────────────────────────────────
+     La tecla no lleva box-shadow propio: el anillo de «hoy» vive ahí y una
+     regla prefijada con [data-d] se lo comería sin avisar. Al pasar por
+     encima se hunde al mismo gris con el que directions.css hunde un .d-btn
+     de esta dirección, en vez del filtro de brillo de la base, que sobre una
+     tecla ya teñida cambia el tono del estado. */
+  :global([data-d='X']) .cal-day:not([data-tone]):hover { filter: none; background: var(--d-sunk); }
+  :global([data-d='X']) .cal-detail {
+    margin-top: var(--d-p2); padding-top: var(--d-p2);
+    border-top: var(--d-bw) solid var(--d-line);
+  }
+  /* La tira se parte en dos semanas de siete mucho antes de lo que manda la
+     base. Medido: con catorce columnas la tecla baja de 44px en cuanto el
+     cuerpo del panel cae de 640px, o sea casi siempre, y a 470px de celda
+     queda en 29px. Partida en dos semanas la misma tecla mide el doble, las
+     columnas quedan alineadas por día (jueves sobre jueves) y las dos semanas
+     siguen viéndose enteras, que es lo único que una regla tiene que hacer. */
+  @container (max-width: 660px) {
+    :global([data-d='X']) .cal-strip { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+  }
+
+  /* ── X · PANTALLA ANGOSTA, DECLARADA ───────────────────────────────────
+     Medido y no supuesto: a 380px de ventana el main deja 332px, la celda
+     290px y el cuerpo de un panel 258px, así que los DOS cortes de esta
+     página disparan a la vez. Lo que X declara para esa medida:
+
+     1 · LOS RÓTULOS DE LOS RELOJES SE PONEN ARRIBA. La columna de 88px
+         dejaba «Calendario» en dos líneas y el riel en 150px. Apilado, el
+         riel recupera el ancho completo y la columna del tope sigue cayendo
+         donde cae: --xt-off vuelve a cero y la anotación se recentra sola.
+         El rótulo se pega a SU cota con un margen negativo, porque con
+         separaciones iguales arriba y abajo no se sabría de cuál de los dos
+         relojes es.
+     2 · LA LEYENDA DE FLOTA PIERDE UNA COLUMNA. La base esconde la nota a
+         430px; si la plantilla siguiera declarando cinco columnas, la quinta
+         se quedaría con su 1.1fr de ancho vacío y los conteos flotarían en
+         el medio.
+     3 · LA HORA DE CORTE DEJA DE ANCLARSE A LA DERECHA. Sola y alineada a la
+         derecha debajo de dos controles alineados a la izquierda se lee como
+         un resto; en su propia línea y a la izquierda se lee como el tercer
+         dato del grupo.
+     4 · LA TIRA DE DÍAS NO SE VUELVE UN CARRIL QUE SE DESPLAZA. Es la única
+         decisión discutible del bloque y va escrita: a 258px las catorce
+         teclas quedan de 35px de ancho por 44 de alto, o sea por encima del
+         piso AA de 24px pero por debajo de los 44 que pide la guía de
+         plataforma. Se prefiere eso a un riel horizontal porque la tira ES
+         una regla de dos semanas: si hay que desplazarla para ver el jueves
+         que viene, dejó de ser una regla. La separación baja a un píxel para
+         devolverle ancho a la tecla. */
+  @container (max-width: 430px) {
+    :global([data-d='X']) .ds-key li { grid-template-columns: 9px minmax(0, 1fr) 3ch 4ch; }
+  }
+  @container (max-width: 330px) {
+    :global([data-d='X']) .xk { grid-template-columns: minmax(0, 1fr); --xt-off: 0px; }
+    :global([data-d='X']) .xk-lab { margin-bottom: calc(-1 * var(--d-p1)); }
+    :global([data-d='X']) .dv-note { margin-left: 0; flex-basis: 100%; }
+    :global([data-d='X']) .cal-strip { gap: var(--d-bw); }
   }
 
   /* ══════════════════════════════════════════════════════════════════════

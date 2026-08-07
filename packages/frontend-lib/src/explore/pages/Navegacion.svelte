@@ -18,7 +18,7 @@
   // :global([data-d='X']) .clase — el atributo vive en Direction.svelte.
   import Grid from '../Grid.svelte';
   import Direction from '../Direction.svelte';
-  import { FAMILIES, LOCATIONS, ASSETS, KPIS, markOf } from '../demo.js';
+  import { FAMILIES, LOCATIONS, ASSETS, KPIS, PLANS, markOf } from '../demo.js';
 
   export let directions = [];
 
@@ -35,6 +35,23 @@
   // exactamente lo que esta página tiene que dejar comparar.
   const BAT = ASSETS.find((a) => a.code === 'BAT-014');
   const OVER = KPIS.find((k) => k.tone === 'critical');
+
+  // LA COTA DE LA RUTA (solo X). El rastro no termina en un título limpio:
+  // termina en una máquina, y una máquina en Cota es una lectura corriendo
+  // hacia un tope. Los cuatro datos salen de demo.js y ninguno se escribe a
+  // mano acá: la lectura la trae ASSETS (312 h), el tope y el vencimiento los
+  // trae PLANS (cada 250 h, venció hace 12 d) y el recorrido es el pct del
+  // propio equipo, para que el riel de BAT-014 sea el mismo en las veinte
+  // direcciones y en las siete familias.
+  //
+  // No hay una sola resta en pantalla, y es a propósito: el sobrepaso lo dice
+  // el riel, que llega al 150 % justamente para eso. Restar acá obligaría a
+  // elegir entre 312 menos 250 y el 118 % que declara demo.js, que no dan lo
+  // mismo, y la pantalla terminaría discutiendo consigo misma.
+  const BAT_PLAN = PLANS.find((p) => p.asset === BAT.code);
+  const COTA_FIG = BAT.metric.replace(/[^\d\s]/g, '').trim();
+  const COTA_UNIT = BAT.metric.replace(/[\d\s]/g, '');
+  const COTA_TOPE = BAT_PLAN.every.replace(/[^\d\s]/g, '').trim();
 
   // Conteos de familia. Suman 88, que es la flota que describen los KPIs
   // (62 al día = 71 %), y Batidoras trae los 14 equipos que menciona COPY.
@@ -215,6 +232,23 @@
                     {BAT.state}
                   </span>
                 </div>
+
+                <!-- LA COTA, y solo en X. Va dentro del {#if} y no oculta con
+                     CSS, para que las otras diecinueve rendericen exactamente
+                     el mismo árbol que ayer: una pieza escondida sigue estando
+                     en el DOM, en el árbol de accesibilidad y en la cuenta de
+                     alto de la fila. Cota es la única dirección que tiene una
+                     primitiva para esto y es la única que la muestra. -->
+                {#if d.id === 'X'}
+                  <div class="cota-here">
+                    <p class="cota-plan">{BAT.plan}</p>
+                    <div class="d-cota" data-tone={BAT.tone} style="--cota:{BAT.pct}">
+                      <div class="d-cota-fig"><b>{COTA_FIG}</b> <span>{COTA_UNIT}</span></div>
+                      <div class="d-cota-rail"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                      <div class="d-cota-note">tope {COTA_TOPE} {COTA_UNIT} · {BAT_PLAN.when}</div>
+                    </div>
+                  </div>
+                {/if}
               </div>
 
               <!-- Control segmentado -->
@@ -2110,7 +2144,9 @@
   /* El filo va inset, no fuera: así sobrevive al recorte del carril de
      pestañas cuando abajo de 470px se vuelve deslizable. */
   :global([data-d='W']) .tab.on { box-shadow: inset 0 -2px 0 var(--d-accent); }
-  :global([data-d='W']) .side-item.on { box-shadow: inset 2px 0 0 var(--d-accent); }
+  :global([data-d='W']) .side-item.on { box-shadow: inset 2px 0 0 var(--d-accent);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
   /* La miga final es la única pieza de la celda con tono propio, así que su
      filo es el del estado y no el del acento: el mismo gesto, el color que
      le toca. #931C14 sobre blanco da 8,7:1. */
@@ -2118,6 +2154,7 @@
     padding-inline: var(--d-p2);
     color: var(--tone-fg);
     box-shadow: inset 2px 0 0 var(--tone-fg);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
 
   /* SELECCIÓN. Vidrio teñido y anillo entero. Contra la pieza cuajada de
@@ -2136,7 +2173,9 @@
   :global([data-d='W']) .pager-n { color: var(--d-ink-2); }
 
   /* El estado de la ruta, al canto de la fila. */
-  :global([data-d='W']) .row--crumbs { box-shadow: inset 3px 0 0 var(--tone-fg); }
+  :global([data-d='W']) .row--crumbs { box-shadow: inset 3px 0 0 var(--tone-fg);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
 
   /* La moción dura lo que dura la de un botón de W en directions.css, y con
      la misma curva. Es el tiempo del cuajado: sin él, cambiar de pestaña es
@@ -2265,9 +2304,15 @@
      engorda el filo crítico en directions.css, y con los mismos números. */
   @media (max-width: 560px) {
     :global([data-d='W']) .tab.on { box-shadow: inset 0 -3px 0 var(--d-accent); }
-    :global([data-d='W']) .side-item.on { box-shadow: inset 3px 0 0 var(--d-accent); }
-    :global([data-d='W']) .crumb-now { box-shadow: inset 3px 0 0 var(--tone-fg); }
-    :global([data-d='W']) .row--crumbs { box-shadow: inset 5px 0 0 var(--tone-fg); }
+    :global([data-d='W']) .side-item.on { box-shadow: inset 3px 0 0 var(--d-accent);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
+    :global([data-d='W']) .crumb-now { box-shadow: inset 3px 0 0 var(--tone-fg);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
+    :global([data-d='W']) .row--crumbs { box-shadow: inset 5px 0 0 var(--tone-fg);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
   }
 
   /* Objetivos táctiles. El tamaño de un dedo no depende del ancho de la
@@ -2301,5 +2346,360 @@
        con ratón está bien, con pulgar no. Los números de página además caían
        en 32px de ancho. */
     :global([data-d='W']) .pg { min-width: var(--d-touch); }
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
+     X · COTA. Papel mate y tinta, y una sola cifra medida en la pantalla.
+
+     ESTA PÁGINA NO ESCRIBE UN SOLO COLOR. Fondos, reglas, tipografía,
+     botones, fichas, migas, avatar y el bloque de ubicación salen de los
+     siete grises de la dirección: --d-ink, --d-ink-2, --d-ink-3, --d-line,
+     --d-edge, --d-sunk y --d-surface. Lo único en color son tres piezas y
+     las tres son estado: la píldora de la barra (8 vencidos), la píldora de
+     la ruta (Vencido) y la cota de BAT-014, que se pone roja porque pasó su
+     tope. Como no compiten contra nada, se encuentran antes de leer.
+
+     EL INDICADOR DE ACTIVO, QUE ES DONDE SE JUEGA ESTA FAMILIA. No puede ser
+     color, porque el color ya está ocupado. Sale de tres pesos del mismo
+     material, y la escalera se lee sin leer:
+
+       REPOSO      caja dibujada con una línea de --d-ink-3.
+       SELECCIÓN   ficha de filtro, segmento, página. LA LÍNEA SE ENDURECE:
+                   pasa a tinta y se dobla con un aro interior de 1px. Misma
+                   caja, otro peso de lápiz. Es una elección del usuario.
+       UBICACIÓN   pestaña, ítem de lateral, miga final. TINTA LLENA: bloque
+                   macizo con el texto en papel. Es el único gesto de la
+                   pantalla que invierte, y las tres piezas que dicen dónde
+                   estás lo comparten, así que la respuesta a «dónde estoy»
+                   se ve igual desde tres sitios.
+
+     Y DOS MATERIALES QUE NO SE MEZCLAN: la navegación es texto sobre papel
+     (pestañas y lateral no tienen caja), los controles son cajas dibujadas
+     (fichas, segmentos, páginas, campo). No es decoración: un sitio al que
+     se va y una cosa que se aprieta no son lo mismo y no deberían verse
+     igual.
+
+     EL ÚNICO CHOQUE, ANOTADO. El primario de X es negro por definición de la
+     dirección («un primario negro es un primario de verdad»), así que
+     «Nuevo equipo» y una pestaña activa comparten relleno. Se separan por lo
+     demás: el primario tiene borde, canto de 4px, el pelo de sombra de X y
+     un verbo; los bloques de ubicación son planos, sin sombra y dicen
+     sustantivos. Y el avatar, que también venía relleno de tinta, acá pasa a
+     caja dibujada para no gastar un tercer negro en algo que no es ni acción
+     ni ubicación.
+
+     FALTA UN TOKEN, y es de contraste: --d-edge (#C4C7C5) da 1,7:1 contra el
+     papel y no llega al 3:1 que pide un borde que ES la única señal de que
+     algo es un control. Mientras no exista un --d-edge-aa (algo por el
+     #949896), esta página dibuja sus cajas con --d-ink-3, que da 5,7:1.
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* ── La hoja y el peso de sus reglas ───────────────────────────────────
+     Una sola hoja dividida por reglas de 1px, con dos pesos, y el peso
+     significa algo: --d-edge cierra la cabecera y la tira de secciones, que
+     es la parte fija del módulo; --d-line divide lo que cambia adentro. Es
+     la jerarquía de una boleta impresa, no un adorno. */
+  :global([data-d='X']) .bar { border-bottom-color: var(--d-edge); }
+  :global([data-d='X']) .bar-mod {
+    font-weight: var(--d-w-semi);
+    letter-spacing: -.012em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* El subtítulo es un dato, no un epígrafe: caja normal, cifras tabulares. */
+  :global([data-d='X']) .bar-sub {
+    font-weight: var(--d-w);
+    color: var(--d-ink-3);
+    font-variant-numeric: var(--d-num);
+  }
+  /* Bloqueo de forma: X tiene una sola escala de canto, 4 y 6. El avatar
+     venía en 999 y relleno de tinta; acá es una caja dibujada con las
+     iniciales en tinta, que además libera el relleno para la ubicación. */
+  :global([data-d='X']) .ava {
+    border-radius: var(--d-r);
+    background: transparent;
+    color: var(--d-ink);
+    border: var(--d-bw) solid var(--d-ink-3);
+  }
+  :global([data-d='X']) .user:hover { background: var(--d-sunk); }
+
+  /* La tira de secciones se apoya en la regla pesada, como la pestaña de un
+     libro de actas: por eso el carril pierde el aire de abajo y la pestaña
+     activa lleva las dos esquinas de abajo a escuadra. */
+  :global([data-d='X']) .row--tabs {
+    padding-bottom: 0;
+    border-bottom-color: var(--d-edge);
+  }
+  :global([data-d='X']) .tab { border-radius: var(--d-r) var(--d-r) 0 0; }
+
+  /* ── UBICACIÓN · tinta llena ───────────────────────────────────────────
+     La miga final lleva data-tone crítico y aun así se rellena de tinta y no
+     de rojo: lo que esa pieza contesta es «estás en BAT-014», no «BAT-014
+     está vencido». El estado de la máquina lo dicen la píldora de al lado y
+     la cota de abajo, que es donde el rojo hace un trabajo que ninguna otra
+     cosa hace. */
+  :global([data-d='X']) .tab.on,
+  :global([data-d='X']) .side-item.on,
+  :global([data-d='X']) .crumb-now {
+    background: var(--d-ink);
+    color: var(--d-ink-on);
+    font-weight: var(--d-w-semi);
+    box-shadow: none;
+  }
+  :global([data-d='X']) .crumb-now {
+    padding-inline: var(--d-p2);
+    border-radius: var(--d-r);
+  }
+  :global([data-d='X']) .tab.on .tab-n,
+  :global([data-d='X']) .side-item.on .side-n {
+    color: var(--d-ink-on);
+    opacity: .75;
+  }
+
+  /* ── SELECCIÓN · el filo se endurece ───────────────────────────────────
+     Sin relleno y sin sombra: en Cota una ficha de filtro es una casilla
+     dibujada en un formulario, no una tecla. El aro interior de 1px sube la
+     línea a dos sin mover un pixel de la caja, que es lo que pasaría
+     engordando el borde. */
+  :global([data-d='X']) .chip,
+  :global([data-d='X']) .seg-b,
+  :global([data-d='X']) .pg,
+  :global([data-d='X']) .find {
+    border-color: var(--d-ink-3);
+    box-shadow: none;
+  }
+  :global([data-d='X']) .chip.on,
+  :global([data-d='X']) .seg-b.on,
+  :global([data-d='X']) .pg.on {
+    background: var(--d-surface);
+    color: var(--d-ink);
+    border-color: var(--d-ink);
+    box-shadow: inset 0 0 0 var(--d-bw) var(--d-ink);
+    font-weight: var(--d-w-semi);
+  }
+  :global([data-d='X']) .chip.on:hover,
+  :global([data-d='X']) .seg-b.on:hover,
+  :global([data-d='X']) .pg.on:hover { background: var(--d-sunk); }
+
+  /* ── Las cifras, que en esta dirección son la mitad del contenido ──────
+     Tabulares siempre, y en columna donde hay más de una. Los conteos de la
+     lateral y de las fichas se alinean a la derecha con ancho fijo, así que
+     14, 22 y 9 se comparan de un vistazo en vez de leerse uno por uno: es
+     la diferencia entre una lista y una hoja de inventario.
+
+     LOS CONTEOS DE LAS FICHAS SON SOBRE LA FLOTA COMPLETA, no sobre lo
+     filtrado: 14 + 22 + 9 + 18 + 12 + 13 = 88, que es el total que dice la
+     paginación. Por eso elegir Batidoras no los mueve. */
+  /* PALABRAS PARTIDAS, MEDIDO EN LA CELDA ANGOSTA. La base parte por donde
+     sea (overflow-wrap: anywhere) y con la lateral en 155px eso dejaba
+     «Planes de mantenimient / o». Se arregla por los dos lados: la columna de
+     conteos baja a 2ch, que es lo que de verdad ocupa el número más grande de
+     la lateral (88), y le devuelve 7px al texto; y si aun así una palabra no
+     entra, se parte con guion en vez de a machetazos. El documento declara
+     lang="es", así que la separación es la del idioma. */
+  :global([data-d='X']) .side-t,
+  :global([data-d='X']) .chip-t {
+    overflow-wrap: break-word;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+  :global([data-d='X']) .side-n { min-width: 2ch; text-align: right; }
+  :global([data-d='X']) .chip-n {
+    min-width: 2ch; text-align: right;
+    color: var(--d-ink-3);
+  }
+  :global([data-d='X']) .chip.on .chip-n { color: var(--d-ink-2); }
+  /* Las teclas de página son cuadradas y del mismo ancho: una numeración que
+     cambia de tamaño entre el 9 y el 10 se lee dos veces. */
+  :global([data-d='X']) .pg { min-width: calc(var(--d-p4) + var(--d-p1)); }
+  :global([data-d='X']) .pager-n { color: var(--d-ink-2); }
+
+  /* UNA COLUMNA DE NAVEGACIÓN NO ES UN PORCENTAJE. La base le da el 36 % del
+     módulo y en una celda de 1000px eso son 385px, con «Flota» pegado a la
+     izquierda y su 88 a cuarenta caracteres de distancia: el ojo hace el
+     viaje una vez por fila. Una columna de etiquetas mide lo que mide su
+     etiqueta más larga, así que acá se congela en 30ch, que es «Planes de
+     mantenimiento» más su conteo y sus aires. Debajo de 603px de contenedor
+     el 36 % es lo más chico de los dos y manda el porcentaje, así que en
+     angosto no cambia nada.
+     FALTA UN TOKEN: no hay un ancho de columna de navegación. --d-rail son
+     148px y es otra cosa (el canal de etiquetas de G y P), y ahí «Planes de
+     mantenimiento» no entra. */
+  @container navmod (min-width: 400px) {
+    :global([data-d='X']) .body {
+      grid-template-columns: minmax(0, min(36%, 30ch)) minmax(0, 1fr);
+    }
+  }
+
+  /* Cabecera de grupo de la lateral: encabezado, no epígrafe. Caja normal
+     (X ya trae --d-label-case: none) sobre una regla que cierra la columna,
+     como la cabecera de una columna de un parte de bodega. */
+  :global([data-d='X']) .side-cap {
+    font-size: var(--d-t-xs);
+    font-weight: var(--d-w-semi);
+    letter-spacing: 0;
+    color: var(--d-ink-2);
+    padding: 0 var(--d-p1) var(--d-p1);
+    border-bottom: var(--d-bw) solid var(--d-line);
+    margin-bottom: var(--d-p1);
+  }
+
+  /* ── Epígrafes: uno, en siete secciones ────────────────────────────────
+     La celda trae nueve etiquetas de sección y en X sobran ocho por el mismo
+     motivo que en las otras finalistas: unas pestañas se leen como pestañas y
+     un rastro se lee como un rastro. Queda «Agrupar por», porque Familia /
+     Categoría / Ubicación sin etiqueta puede ser un filtro o una agrupación y
+     la diferencia cambia lo que el técnico cree estar viendo. Las tres de la
+     lateral no cuentan: son encabezados de grupo de navegación, no epígrafes,
+     y el subtítulo de la barra es un dato.
+     Ninguna es una versalita, porque X trae --d-label-case: none y el ritmo
+     de mayúsculas pequeñas repetido bloque a bloque es justo lo que delata
+     una pantalla generada.
+     Se ocultan a la vista y no del marcado: la de las fichas es el
+     aria-labelledby de su grupo, y G y P las usan como raíl. */
+  :global([data-d='X']) .cap-mute {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+
+  /* ── LA COTA DE LA RUTA ────────────────────────────────────────────────
+     Va acá y en ningún otro sitio de la página, porque acá y en ningún otro
+     sitio hay una medida contra un tope. El rastro termina en BAT-014, y una
+     máquina en Cota es una lectura corriendo hacia su plan: 312 h con la
+     marca de las 250 h atrás. La fila ya trae data-tone crítico por esa
+     misma razón, así que la firma del sistema y el estado de la ruta son el
+     mismo hecho dicho una vez.
+
+     DÓNDE NO VA, QUE ES LA MITAD DE LA REGLA:
+       · Paginación. «1 a 24 de 88» es una posición en un conjunto, no una
+         medida contra un tope: la marca caería en el final y no se podría
+         cruzar nunca. Eso ya no es una cota, es una barra de progreso, y una
+         barra de progreso decorativa es ruido.
+       · Conteos de familia, de pestañas y de lateral. Son cuentas de
+         registros, no cantidades medidas. 22 hornos no van hacia ningún
+         tope.
+     La regla dice que ninguna cifra MEDIDA aparece sola. Un conteo no es una
+     medida, y confundirlos llenaría la pantalla de rieles falsos.
+
+     La primitiva se usa tal cual sale de directions.css, sin retocarle
+     cuerpo, canto ni color: es la firma del sistema y tiene que verse igual
+     acá que en la tabla de equipos. Esta página solo la coloca. */
+  :global([data-d='X']) .cota-here {
+    margin-top: var(--d-p2);
+    max-width: min(100%, 34ch);
+  }
+  :global([data-d='X']) .cota-plan {
+    margin: 0 0 var(--d-p1);
+    font-size: var(--d-t-xs);
+    font-weight: var(--d-w-med);
+    color: var(--d-ink-2);
+  }
+
+  /* ══ X · ANGOSTO, DECLARADO Y NO SUPUESTO ═══════════════════════════════
+     LA BARRA ES UNA LÍNEA SIEMPRE, y son 51px: 36 de control más 7 de aire
+     arriba y abajo más la regla. Con puntero grueso los controles suben a 44
+     y la barra queda en 59. Nunca llega a los 80, y nunca se parte en dos:
+     una barra que envuelve se come 120px de la pantalla que el técnico
+     necesita para la lista, así que lo que no entra se RETIRA, por prioridad
+     y por pasos medidos.
+
+     LA CUENTA A 380px DE VENTANA. La rejilla deja una sola columna, la celda
+     descuenta 24px de margen a cada lado (332), el marco del escenario 1px y
+     su aire 20px a cada lado (290), y la hoja 1px de canto (288) y 15px de
+     aire a cada lado. A la barra le quedan 258px de contenido. Adentro
+     tienen que entrar el nombre del módulo (165), la píldora de vencidos
+     (96), el buscador (110 para ser un buscador), «Nuevo equipo» (114), la
+     cuenta (40) y cuatro separaciones de 11. Son 569 contra 258.
+
+     EL ORDEN DE RETIRADA, escrito como decisión de producto:
+       1 · la cuenta, bajo 600px de celda. Quien tiene el teléfono en la mano
+           sabe quién es. Se va con display:none, así que tampoco queda en el
+           árbol de accesibilidad prometiendo algo que no está.
+       2 · «Nuevo equipo», bajo 500px. Dar de alta una máquina es una tarea
+           de escritorio; entre eso y el buscador, el patio necesita el
+           buscador. Vuelve entero a partir de 500.
+       3 · el nombre del módulo, bajo 370px, que es el ancho al que su
+           columna caería por debajo de 110px y quedaría en «Mante…». Un
+           título truncado a tres sílabas no orienta a nadie, y abajo la tira
+           de secciones y el rastro dicen los dos «Flota».
+     Lo que NUNCA se retira es la píldora de vencidos, que es el único dato
+     de la barra que cambia solo y obliga a actuar, y el buscador, que a
+     380px se queda con 151px y es la manera de llegar a la máquina que se
+     tiene enfrente.
+
+     QUÉ SE VERIFICÓ CON LOS OJOS Y QUÉ CON LA CUENTA, para que el que venga
+     detrás no crea que está todo mirado. Chrome sin cabeza en macOS no abre
+     una ventana de menos de unos 500px, así que los pasos de 600, 500 y 470
+     se vieron renderizados (celda de 415 y de 430: barra en una línea, sin
+     cuenta y sin «Nuevo equipo», pestañas en dos renglones apoyadas en su
+     propio aire). El paso de 370 y el apilado de la lateral por debajo de
+     400 están calculados, no fotografiados. Si algún día hay un navegador
+     que baje de ahí, ese es el primer sitio para mirar.
+     ══════════════════════════════════════════════════════════════════════ */
+  @container navmod (max-width: 599px) {
+    :global([data-d='X']) .user { display: none; }
+  }
+  @container navmod (max-width: 499px) {
+    :global([data-d='X']) .bar-do { display: none; }
+  }
+  @container navmod (max-width: 369px) {
+    :global([data-d='X']) .bar-id { display: none; }
+    :global([data-d='X']) .bar-find { flex: 1 1 auto; }
+  }
+
+  /* LAS PESTAÑAS ENVUELVEN, NO SE DESLIZAN. Las cinco suman 442px y a 380px
+     de ventana tienen 258, así que caen en dos renglones y la fila pasa de
+     49px a 94. Se paga y se dice por qué: un conjunto de cinco secciones que
+     se desliza esconde tres, y esconder secciones a alguien que está
+     buscando una sección es el peor negocio de la pantalla. Cuando envuelven
+     dejan de apoyarse en la regla pesada, así que el carril recupera su aire
+     de abajo y la pestaña activa recupera sus cuatro cantos: un bloque de
+     tinta flotando a media altura sobre una regla se lee como un error. */
+  @container navmod (max-width: 469px) {
+    :global([data-d='X']) .row--tabs { padding-bottom: var(--d-p2); }
+    :global([data-d='X']) .tab { border-radius: var(--d-r); }
+  }
+
+  /* Bajo 400px la lateral se apila sobre el contenido, que es lo que ya hace
+     la base, y se queda vertical. El costo está aceptado y es real: ocho
+     ítems por delante del rastro y de la cota. La alternativa sería un cajón
+     que se abre por encima, y eso son marcado y estado compartidos con otras
+     diecinueve direcciones, no una decisión de esta página. La cota, que es
+     lo que el técnico vino a ver, entra completa en 258px: cifra de 25px,
+     riel a todo el ancho y la nota en una línea. */
+
+  /* Objetivos táctiles. El tamaño de un dedo es del aparato y no del ancho,
+     así que va por puntero. directions.css ya sube .d-btn y .d-input de X a
+     --d-touch; lo que falta son las tres piezas que esta página dibuja a
+     mano, que se quedaban en 38px, y el ancho de las teclas de página. */
+  @media (pointer: coarse) {
+    :global([data-d='X']) .tab,
+    :global([data-d='X']) .side-item,
+    :global([data-d='X']) .crumb-b,
+    :global([data-d='X']) .user { min-height: var(--d-touch); }
+    :global([data-d='X']) .pg { min-width: var(--d-touch); }
+  }
+
+  /* Piso de artesanía. En colores forzados el relleno de tinta desaparece,
+     así que la ubicación pasa a la pareja del sistema para «esto es lo
+     seleccionado» y la selección se queda con su línea doble, ahora dibujada
+     con un aro interior que el modo sí respeta. */
+  @media (forced-colors: active) {
+    :global([data-d='X']) .tab.on,
+    :global([data-d='X']) .side-item.on,
+    :global([data-d='X']) .crumb-now {
+      background: Highlight;
+      color: HighlightText;
+    }
+    :global([data-d='X']) .tab.on .tab-n,
+    :global([data-d='X']) .side-item.on .side-n {
+      color: HighlightText;
+      opacity: 1;
+    }
+    :global([data-d='X']) .chip.on,
+    :global([data-d='X']) .seg-b.on,
+    :global([data-d='X']) .pg.on {
+      outline: 2px solid CanvasText;
+      outline-offset: -3px;
+    }
   }
 </style>

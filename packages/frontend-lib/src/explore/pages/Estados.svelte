@@ -106,7 +106,15 @@
               </p>
             {:else if (toast[d.id] ?? 'on') === 'undone'}
               <div class="blk blk--toast d-rail" data-tone="neutral" role="status">
-                <p class="blk-title">Se descartó la lectura de 312 h en BAT-014</p>
+                {#if d.id === 'X'}
+                  <!-- En Cota ninguna cifra medida aparece sola, y acá ya no hay
+                       medida: la lectura se retiró. Así que se va la cifra del
+                       texto en vez de dibujarle un riel vacío, que sería una
+                       cota sin nada que medir. -->
+                  <p class="blk-title">Se descartó la última lectura de BAT-014</p>
+                {:else}
+                  <p class="blk-title">Se descartó la lectura de 312 h en BAT-014</p>
+                {/if}
                 <div class="blk-acts">
                   <button type="button" class="d-btn d-btn--sm" on:click={() => setToast(d.id, 'on')}>Rehacer</button>
                   <button type="button" class="d-btn d-btn--ghost d-btn--sm" aria-label="Descartar este aviso"
@@ -118,7 +126,22 @@
                 <p class="blk-kind d-cap">
                   <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('positive')}</svg>Listo
                 </p>
-                <p class="blk-title">Lectura registrada · 312 h en BAT-014</p>
+                {#if d.id === 'X'}
+                  <!-- LA COTA. La única cifra medida contra un tope que existe en
+                       toda esta familia, y este es el momento en que llega: el
+                       técnico acaba de anotar el horómetro. «312 h» solo no dice
+                       nada; 312 h con la marca de las 250 h del plan detrás dice
+                       que se pasó, y cuánto. La cifra sale del titular para no
+                       quedar escrita dos veces. -->
+                  <p class="blk-title">Lectura registrada en BAT-014</p>
+                  <div class="d-cota" data-tone="critical" style="--cota:118">
+                    <div class="d-cota-fig"><b>312</b> <span>h</span></div>
+                    <div class="d-cota-rail" aria-hidden="true"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+                    <div class="d-cota-note">tope 250 h · se pasó 62 h</div>
+                  </div>
+                {:else}
+                  <p class="blk-title">Lectura registrada · 312 h en BAT-014</p>
+                {/if}
                 <div class="blk-acts">
                   <button type="button" class="d-btn d-btn--sm" on:click={() => setToast(d.id, 'undone')}>Deshacer</button>
                   <button type="button" class="d-btn d-btn--ghost d-btn--sm" aria-label="Descartar este aviso"
@@ -1643,6 +1666,7 @@
     box-shadow: inset 3px 0 0 var(--d-crit),
                 inset 0 1px 0 var(--d-line),
                 0 4px 18px -8px color-mix(in srgb, var(--d-crit) 55%, transparent);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
 
   /* LO QUE FLOTA VA SÓLIDO. En el producto el toast es fixed y el diálogo
@@ -1734,6 +1758,7 @@
      resplandor del error y quedarían dos cosas irradiando. */
   :global([data-d='W']) .dlg[data-tone='critical'] {
     box-shadow: inset 3px 0 0 var(--d-crit), var(--d-overlay-shadow);
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
   }
 
   /* EL VELO. El único desenfoque de la página que se gana el costo: no lleva
@@ -1877,10 +1902,12 @@
 
     :global([data-d='W']) .blk[data-tone='critical']:not(.dlg) {
       box-shadow: inset 5px 0 0 var(--d-crit), inset 0 1px 0 var(--d-line);
-    }
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
     :global([data-d='W']) .dlg[data-tone='critical'] {
       box-shadow: inset 5px 0 0 var(--d-crit), var(--d-overlay-shadow);
-    }
+    border-top-left-radius: 0; border-bottom-left-radius: 0;
+  }
     :global([data-d='W']) .dlg { margin: var(--d-p1); padding: var(--d-p3); }
 
     /* La fila se parte: código y estado arriba, nombre entero abajo. */
@@ -1917,6 +1944,350 @@
     :global([data-d='W']) .blk-acts .d-btn--ghost {
       flex: 0 0 auto; min-width: var(--d-touch); padding-inline: 0;
     }
+  }
+
+  /* ======================================================================
+     X · COTA. Papel mate y tinta. Nada más.
+
+     LA REGLA QUE ORDENA ESTA CELDA, y es la de la dirección: el color está
+     reservado al estado. Todo el cromo de la página, el papel, las hojas, los
+     bordes, la tipografía, los botones, el esqueleto, la barra de proceso y el
+     velo, es acromático. La consecuencia se ve mejor acá que en ninguna otra
+     página del catálogo, porque esta familia es justamente la de los estados:
+     lo único de color que hay en pantalla es lo que informa, y por eso el ojo
+     encuentra el error antes de leer una palabra.
+
+     De ahí salen las tres decisiones de esta celda, y ninguna es de gusto:
+
+     1 · CADA BLOQUE QUE INTERRUMPE LLEVA UN FILO DE 3px DE SU TONO en el canto
+         izquierdo, que es el mismo recurso que la dirección le da a la fila.
+         El filo está siempre; lo único que cambia es su color. Así el estado
+         queda dicho por una sola cosa y esa cosa es la que lleva el color.
+
+     2 · SOLO EL ERROR SE TIÑE. El aviso informativo se queda en papel blanco
+         con su filo y nada más, que es exactamente lo que pide el sujeto: un
+         parte de flota no urge. El error lleva banda y canto de su tono porque
+         es lo único que interrumpe de verdad. Rellenar los cinco tonos obliga
+         a re-verificar contraste cinco veces y no informa nada que el filo no
+         diga ya.
+
+     3 · EL DIÁLOGO ES PAPEL SOBRE PAPEL. Ni sombra difusa ni desenfoque: una
+         hoja opaca con canto duro, apoyada sobre un velo que es otra hoja. La
+         profundidad la da la línea, no la luz. Y el velo hace un trabajo que
+         se ve: al cerrarse, el color se le va a la lista de abajo, y el rojo
+         del diálogo queda como el único de la pantalla.
+     ====================================================================== */
+  :global([data-d='X']) .page {
+    /* Qué se está cargando se lee antes que su forma, y el esqueleto se mide
+       con el dato real: siete caracteres de código y una píldora de estado. */
+    --load-order: -1;
+    --skel-id: 4.6em;
+    --skel-pill: 7em;
+    /* El titular le gana al cuerpo de lejos y el cuerpo se lee con el teléfono
+       en la mano. Es el mismo ajuste de contenido que ya comparten las siete
+       finalistas; acá va en su propio bloque porque X no está en esa lista. */
+    --blk-title-size: var(--d-t-md);
+    --blk-body-size: var(--d-t-sm);
+    /* Sin versalitas: X ya trae --d-label-case: none en su bloque de tokens,
+       así que acá solo hace falta que el encabezado de sección pese como un
+       encabezado y no como una etiqueta gris. La palabra de estado se queda un
+       escalón por debajo, que es el que le corresponde. */
+    --cap-size: var(--d-t-sm); --cap-weight: var(--d-w-semi); --cap-color: var(--d-ink);
+    --kind-size: var(--d-t-xs); --kind-weight: var(--d-w-semi);
+  }
+
+  /* La hoja va rayada. Cada sección arranca en una línea, que es la única
+     separación que hay: ni tarjetas sueltas ni aire de más. */
+  :global([data-d='X']) .sec + .sec {
+    border-top: var(--d-bw) solid var(--d-line);
+    padding-top: var(--d-p3);
+  }
+  :global([data-d='X']) .sec-cap { letter-spacing: -.01em; }
+
+  /* LA PERSONALIDAD SALE DEL TRATAMIENTO, no de la fuente: no hay fuente que
+     elegir porque un @font-face dentro de un shadow root lo ignoran Chrome y
+     Safari. Contraste de peso, tracking negativo y figuras tabulares en todo
+     lo que lleva un número, que en esta página es casi todo: horas, códigos de
+     equipo, números de devolución, plazos. Una columna de cifras que baila de
+     ancho es la firma de un formulario mal hecho. */
+  :global([data-d='X']) .blk-title { letter-spacing: -.014em; }
+  :global([data-d='X']) .blk-title,
+  :global([data-d='X']) .blk-body,
+  :global([data-d='X']) .scene-name,
+  :global([data-d='X']) .proc-lbl,
+  :global([data-d='X']) .reopen { font-variant-numeric: var(--d-num); }
+
+  /* EL BLOQUE QUE INTERRUMPE. Hoja blanca, canto de 4px, un píxel de sombra
+     sin desenfoque, y el filo de 3px de su tono pegado al borde izquierdo. El
+     relleno de la izquierda le hace sitio al filo igual que en la fila. */
+  :global([data-d='X']) .blk {
+    --blk-bg: var(--d-surface);
+    border-color: var(--d-line);
+    border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3) calc(var(--d-p3) + 3px);
+  }
+  :global([data-d='X']) .blk::before {
+    content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
+    background: var(--tone-fg);
+    border-radius: calc(var(--d-r) - var(--d-bw)) 0 0 calc(var(--d-r) - var(--d-bw));
+  }
+  /* Lo único que se tiñe en toda la celda. El error es el único bloque que
+     interrumpe de verdad, así que es el único que se pinta. */
+  :global([data-d='X']) .blk[data-tone='critical'] {
+    --blk-bg: var(--d-crit-band);
+    border-color: var(--d-crit-edge);
+  }
+  /* Lo que está SOBRE la página lleva canto duro y lo que está EN la página
+     lleva canto claro. La dureza del borde dice de qué capa es la hoja, que es
+     la única manera de decirlo sin sombra difusa. */
+  :global([data-d='X']) .blk--toast { border-color: var(--d-edge); }
+
+  /* EL DIÁLOGO: papel sobre papel. Se queda blanco aunque su tono sea crítico,
+     porque lo que bloquea la pantalla tiene que leerse como una hoja aparte y
+     no como un bloque teñido más. Lo crítico lo dice su filo y lo dice el
+     botón que borra. Va DESPUÉS de .blk[data-tone='critical'] a propósito: los
+     dos selectores pesan (0,2,0) contando el atributo, así que acá el orden es
+     lo único que decide, y al revés el diálogo saldría con la banda del error. */
+  :global([data-d='X']) .dlg {
+    --blk-bg: var(--d-surface);
+    border-color: var(--d-edge);
+    border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p3) var(--d-p3) var(--d-p3) calc(var(--d-p3) + 3px);
+  }
+  :global([data-d='X']) .dlg[data-tone='critical'] {
+    --blk-bg: var(--d-surface);
+    border-color: var(--d-edge);
+  }
+  :global([data-d='X']) .dlg-acts { padding-top: var(--d-p2); }
+  /* El velo es una hoja mate apoyada encima, sin desenfoque. Al 88 % la flota
+     se sigue reconociendo como flota, que es el dato (sigue ahí y vuelve al
+     cerrar), pero pierde el color: las filas vencidas se van a gris y el rojo
+     del diálogo queda solo en pantalla. */
+  :global([data-d='X']) .veil {
+    background: color-mix(in srgb, var(--d-ground) 88%, transparent);
+  }
+
+  /* LO QUE CARGA Y LO QUE PROCESA también son hojas. Eran los dos únicos
+     bloques de la celda apoyados directo sobre el papel de fondo. */
+  :global([data-d='X']) .load,
+  :global([data-d='X']) .proc {
+    background: var(--d-surface);
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+  }
+  /* El esqueleto tiene la forma de la fila que falta: la misma altura de fila
+     de la dirección y la misma regla corrida de canto a canto de la hoja. Es
+     el hueco exacto que va a ocupar el equipo cuando llegue, así que la lista
+     no da un salto al cargar. */
+  :global([data-d='X']) .skel { margin-inline: calc(-1 * var(--d-p3)); }
+  :global([data-d='X']) .skel-row {
+    min-height: var(--d-row-h);
+    padding-inline: var(--d-p3);
+    border-bottom: var(--d-bw) solid var(--d-line);
+  }
+  :global([data-d='X']) .skel-row:last-child { border-bottom: 0; }
+  /* --d-sunk sobre blanco no se ve. El bloque sale del gris de acento, que en
+     esta dirección es neutro porque el acento es tinta. */
+  :global([data-d='X']) .skel-b { background: var(--d-accent-soft); height: .82em; }
+
+  /* LA BARRA DE PROCESO NO ES UNA COTA, y no tiene que parecerlo. Acá no hay
+     tope que pasarse: hay 12 líneas en la devolución y se leen de a una, así
+     que el riel se dibuja partido en esas 12 líneas en vez de correr liso y se
+     pueden contar las tres que ya pasaron. Los cortes son duros, sin ninguna
+     interpolación de color: es una regla graduada, no un degradado. Un riel
+     liso sin marca sería una cota a la que le falta el tope, que es justo lo
+     que la dirección prohíbe. */
+  :global([data-d='X']) .proc-track {
+    height: var(--d-p2);
+    border-radius: 0;
+    background: var(--d-surface);
+    border: var(--d-bw) solid var(--d-edge);
+  }
+  :global([data-d='X']) .proc-track::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(90deg,
+                transparent 0 calc(100% / 12 - 1px),
+                var(--d-edge) calc(100% / 12 - 1px) calc(100% / 12));
+  }
+  /* Una espera indeterminada no tiene líneas que contar: no se sabe dónde
+     está. Ahí el riel se queda liso y lo que informa es que algo se mueve. */
+  :global([data-d='X']) .proc-track--wait::after { content: none; }
+  :global([data-d='X']) .proc-fill { background: var(--d-ink); border-radius: 0; }
+
+  /* LA COTA. Vive en el aviso de lectura registrada y en ningún otro lado de
+     esta página, porque en toda la familia hay exactamente una cifra medida
+     contra un tope: las 312 h de BAT-014 contra las 250 h de su plan. Los
+     otros números de la celda son cuentas (8 equipos, 14 equipos, 3 tareas,
+     línea 3 de 12) y una cuenta no tiene tope que pasarse. Meterle un riel a
+     una cuenta es exactamente el error que la dirección nombra: una cota sin
+     marca es una barra de progreso, y una barra de progreso decorativa es
+     ruido.
+
+     El aviso es positivo (la lectura se guardó) y la cifra es crítica (con esa
+     lectura la máquina se pasó). Son dos hechos distintos y por eso llevan dos
+     tonos: el filo verde del bloque dice que se guardó, el rojo de la cifra
+     dice que hay que ir a cambiar el aceite. Ese es el trabajo que ahorra el
+     riel: el técnico no vuelve a la lista a averiguar qué significa 312. */
+  :global([data-d='X']) .d-cota { padding-top: calc(var(--d-p1) * .5); }
+  /* La única moción que agrega Cota, y se gana el lugar: el relleno arranca en
+     cero y corre hasta pasar la marca, que es literalmente lo que acaba de
+     pasar con la máquina. Sin ella la barra ya está pasada cuando aparece y no
+     se ve el cruce, que es el dato. */
+  :global([data-d='X']) .d-cota-fill { animation: cota-run 560ms cubic-bezier(.22, .75, .2, 1); }
+  @keyframes cota-run { from { width: 0 } }
+
+  /* HALLAZGO de contraste, y es la trampa de especificidad que este proyecto
+     persiguió toda la semana, viva dentro del propio bloque de X: en
+     directions.css `[data-d='X'] .d-btn:hover` pesa (0,3,0) contando el
+     atributo y `.d-btn--primary` pesa (0,2,0), así que al pasar el puntero por
+     encima el primario pierde el relleno negro y conserva la tinta blanca:
+     blanco sobre #F4F5F4, 1,05:1, sin un solo error en consola. Cae sobre
+     «Agregar equipo» y sobre «Reintentar», que son las dos salidas del estado
+     vacío y del estado sin conexión. El arreglo de raíz va en directions.css;
+     mientras tanto esta página lo repone y de paso le da al primario negro un
+     hover que se vea, porque el brightness(1.12) de la base sobre tinta casi
+     no mueve nada. */
+  :global([data-d='X']) .d-btn--primary:hover {
+    background: color-mix(in srgb, var(--d-accent) 86%, var(--d-surface));
+    color: var(--d-accent-ink);
+    filter: none;
+  }
+  /* Y al destructivo lo alcanzan las dos: `[data-d='X'] .d-btn` le pisa el
+     canto rojo en reposo y `:hover` le pisa la banda, así que «Eliminar la
+     familia» quedaba idéntico a «Cancelar» salvo por la tinta, que es estado
+     dicho solo por color en el peor sitio posible. Tinta #A82118 sobre banda
+     #FAE4E0 da 5,95:1, y sobre la banda del hover 5,2:1. */
+  :global([data-d='X']) .d-btn--danger { border-color: var(--d-crit-edge); }
+  :global([data-d='X']) .d-btn--danger:hover {
+    background: color-mix(in srgb, var(--d-crit-band) 88%, var(--d-crit));
+  }
+  /* Un control ocupado se tiene que seguir leyendo. La base baja el botón
+     entero al 45 % de opacidad, y sobre el primario negro eso deja el rótulo
+     blanco contra un gris de 2,9:1 justo cuando «Reintentando…» es lo único
+     que explica por qué la pantalla no responde. Al 62 % da 5,0:1. */
+  :global([data-d='X']) .d-btn[disabled] { opacity: .62; }
+
+  /* CONTRASTE ALTO. Cota se apoya entera en una línea de un píxel, así que
+     cuando alguien pide más contraste lo que hay que endurecer es la línea:
+     el canto de las hojas sube al tono de borde y el filo de estado engorda,
+     porque es el que carga el dato. */
+  @media (prefers-contrast: more) {
+    :global([data-d='X']) .blk,
+    :global([data-d='X']) .load,
+    :global([data-d='X']) .proc,
+    :global([data-d='X']) .scene { border-color: var(--d-edge); }
+    :global([data-d='X']) .blk::before { width: 4px; }
+    :global([data-d='X']) .blk,
+    :global([data-d='X']) .dlg { padding-left: calc(var(--d-p3) + 4px); }
+  }
+
+  /* Piso de artesanía. En contraste forzado el velo no puede ser una capa
+     translúcida: color-mix se pierde y el diálogo quedaría leyéndose encima de
+     la lista. Ahí el velo pasa a ser una placa opaca, que es lo mismo que
+     dice, y el filo de tono pasa a tinta del sistema. */
+  @media (forced-colors: active) {
+    :global([data-d='X']) .veil { background: Canvas; }
+    :global([data-d='X']) .blk::before { background: CanvasText; }
+    :global([data-d='X']) .dlg { outline: 1px solid CanvasText; outline-offset: -1px; }
+    :global([data-d='X']) .skel-b { background: GrayText; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='X']) .d-cota-fill { animation: none; }
+  }
+  /* El tamaño de un dedo es un hecho del aparato y no del ancho de la ventana.
+     directions.css ya sube los botones y los campos de X a --d-touch con
+     puntero grueso; lo que le falta es lo que esta página agrega por su
+     cuenta: la × de descartar, que mide 32px de ancho, y la casilla del
+     diálogo, cuyo objetivo real es la etiqueta entera y medía 19px de alto. */
+  @media (pointer: coarse) {
+    :global([data-d='X']) .blk-acts .d-btn--ghost { min-width: var(--d-touch); }
+    :global([data-d='X']) .dlg-check { min-height: var(--d-touch); align-items: center; }
+    :global([data-d='X']) .dlg-box { inline-size: 1.25em; block-size: 1.25em; }
+  }
+
+  /* ══ X · PANTALLA ANGOSTA, DECLARADA ═════════════════════════════════════
+     La medida, para no suponer: a 380px de viewport la celda deja 290px
+     útiles. Son 380 menos los 24px de relleno del harness a cada lado, menos
+     el borde del escenario, menos los 20px de relleno interno de la celda a
+     cada lado. Todo lo de abajo está pensado contra esos 290px, y el umbral va
+     en 420px porque es el que ya usa esta página y no hace falta inventar otra
+     escala de cortes.
+
+     1 · SE PARTE LA FILA de la lista que hay detrás del diálogo. Con 290px la
+         fila deja 260 de contenido, y el código (58px), la píldora de estado
+         (82px) y los dos huecos de 11px se comen 162: quedan 98px para
+         «Compactadora Wacker DPU-6555», que se apila en cuatro renglones y
+         convierte cada fila en un párrafo. Arriba quedan el código y el
+         estado, que son los dos datos que se buscan, y el nombre baja entero a
+         la segunda línea. La fila crece por encima de sus 38px en vez de
+         recortar.
+
+     2 · EL ESQUELETO SE PARTE IGUAL, porque es el hueco de la fila que todavía
+         no llegó. Si la fila se pliega en dos líneas y él no, la lista da un
+         salto al cargar.
+
+     3 · NADA SE VUELVE SCROLL HORIZONTAL, y es decisión y no olvido. Lo único
+         tabular de esta página es una lista de tres campos, y una lista de
+         tres campos que se desplaza de lado esconde justo la píldora de
+         estado, que es lo único que se mira. Reflujo antes que desplazamiento,
+         y nunca recorte con puntos suspensivos: en un parte de taller el
+         nombre completo del equipo es lo que se compara contra la chapa.
+
+     4 · LA COTA NO SE ENCOGE. Es la carga útil del aviso, así que la cifra se
+         queda en --d-t-xl y lo que se acomoda es el resto. El riel es fluido y
+         la marca del tope cae siempre en el mismo sitio, a dos tercios, así
+         que a 258px de ancho la marca queda en 172 y el sobrepaso sigue
+         teniendo dónde verse. La nota parte de línea si hace falta.
+
+     5 · EL RIEL DE 12 LÍNEAS DE LA BARRA DE PROCESO SE QUEDA EN 12. A 258px
+         cada línea mide 21px, que se sigue contando. Bajarlas a seis sería
+         mentir sobre el documento.
+
+     6 · EL FILO DE TONO SIGUE EN 3px. No engorda en angosto: acá el bloque no
+         llega nunca al canto del aparato porque la celda tiene 20px de aire
+         alrededor, así que los 3px no compiten contra ningún marco.
+
+     7 · LOS BOTONES parten el rótulo antes que desbordar. «Asignar el equipo a
+         mano» mide 165px y a 290 entra, pero a 320 de viewport ya no, y el
+         alto mínimo de 44px que pone la dirección con puntero grueso absorbe
+         la segunda línea sin que el botón crezca.
+     ════════════════════════════════════════════════════════════════════════ */
+  @media (max-width: 420px) {
+    :global([data-d='X']) .scene-list .d-row {
+      flex-wrap: wrap; row-gap: 2px; padding-block: var(--d-p1);
+    }
+    :global([data-d='X']) .scene-list .d-row .d-pill { margin-left: auto; }
+    :global([data-d='X']) .scene-name { order: 1; flex: 1 0 100%; }
+    :global([data-d='X']) .skel-row { flex-wrap: wrap; row-gap: var(--d-p1); padding-block: var(--d-p1); }
+    :global([data-d='X']) .skel-b--pill { margin-left: auto; }
+    :global([data-d='X']) .skel-b--name { order: 1; flex: 1 0 100%; }
+
+    :global([data-d='X']) .blk-acts .d-btn,
+    :global([data-d='X']) .dlg-acts .d-btn {
+      white-space: normal; text-align: center; line-height: 1.3;
+      padding-block: var(--d-p1);
+    }
+    /* El descarte no se estira con los demás: un botón de ancho completo con
+       una × sola adentro se lee como una acción principal vacía, que es lo
+       contrario de lo que es. Se queda cuadrado al final de la fila. */
+    :global([data-d='X']) .blk-acts .d-btn--ghost {
+      flex: 0 0 auto; min-width: var(--d-touch); padding-inline: 0;
+    }
+    :global([data-d='X']) .dlg {
+      margin: var(--d-p2);
+      padding: var(--d-p2) var(--d-p2) var(--d-p2) calc(var(--d-p2) + 3px);
+    }
+    :global([data-d='X']) .dlg-check { min-height: var(--d-touch); }
+    /* Un código pegado a mano o un nombre de equipo sin espacios no rompen la
+       caja: parten donde tengan que partir. */
+    :global([data-d='X']) .blk-title,
+    :global([data-d='X']) .blk-body,
+    :global([data-d='X']) .scene-name,
+    :global([data-d='X']) .d-cota-note { overflow-wrap: break-word; }
   }
 
   /* ======================================================================
