@@ -131,53 +131,6 @@
   --d-neu: #000000; --d-neu-band: #dcdcd5; --d-neu-edge: #000000;
 }
 
-/* ── E · AIRE ───────────────────────────────────────────────────────────── */
-[data-d='E'] {
-  --d-ground: #fbfaf9; --d-surface: #ffffff; --d-sunk: #f4f2f0;
-  --d-ink: #221f1d; --d-ink-2: #504b46; --d-ink-3: #706B67; --d-ink-on: #ffffff;
-  --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
-  --d-r: 18px; --d-r-lg: 28px; --d-r-pill: 999px;
-  --d-shadow: 0 2px 20px -8px rgba(34,31,29,.10);
-  --d-shadow-lg: 0 18px 50px -20px rgba(34,31,29,.20);
-  --d-p1: 14px; --d-p2: 20px; --d-p3: 28px; --d-p4: 36px; --d-gap: 24px;
-  --d-t-2xs: 12px; --d-t-xs: 13.5px; --d-t-sm: 15px; --d-t-md: 16px;
-  --d-t-lg: 21px; --d-t-xl: 28px; --d-t-2xl: 38px;
-  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 650;
-  --d-label-size: 13px; --d-label-case: none; --d-label-track: 0;
-  --d-label-weight: 500; --d-label-color: var(--d-ink-3);
-  --d-row-h: 56px;
-  --d-accent: #221f1d; --d-accent-ink: #ffffff; --d-accent-soft: #f0ede9; --d-accent-edge: transparent;
-  --d-pos: #38664a; --d-pos-band: #e9f1eb; --d-pos-edge: transparent;
-  --d-att: #8a6224; --d-att-band: #f7efe2; --d-att-edge: transparent;
-  --d-crit: #a63d34; --d-crit-band: #f8e8e5; --d-crit-edge: transparent;
-  --d-info: #4c5075; --d-info-band: #ecedf3; --d-info-edge: transparent;
-  --d-neu: #706B67; --d-neu-band: #f4f2f0; --d-neu-edge: transparent;
-}
-
-/* ── F · TERMINAL ───────────────────────────────────────────────────────── */
-[data-d='F'] {
-  --d-ground: #0f1213; --d-surface: #161a1b; --d-sunk: #0a0d0e;
-  --d-ink: #d7dedc; --d-ink-2: #a6afad; --d-ink-3: #7A8684; --d-ink-on: #0f1213;
-  --d-line: #2a3132; --d-edge: #39423f; --d-bw: 1px;
-  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
-  --d-shadow: none; --d-shadow-lg: none;
-  --d-p1: 4px; --d-p2: 7px; --d-p3: 10px; --d-p4: 13px; --d-gap: 10px;
-  --d-t-2xs: 10px; --d-t-xs: 11px; --d-t-sm: 12px; --d-t-md: 13px;
-  --d-t-lg: 15px; --d-t-xl: 19px; --d-t-2xl: 26px;
-  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 700;
-  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
-  --d-label-weight: 500; --d-label-color: var(--d-ink-3);
-  --d-row-h: 24px;
-  --d-font: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  --d-accent: #7fd1b9; --d-accent-ink: #0a1512; --d-accent-soft: #16302a; --d-accent-edge: #2c5a4f;
-  --d-pos: #7fd1a0; --d-pos-band: #14291c; --d-pos-edge: #24462e;
-  --d-att: #e2bd6f; --d-att-band: #2b2314; --d-att-edge: #4a3a1d;
-  --d-crit: #ef9d92; --d-crit-band: #2f1a17; --d-crit-edge: #4f2822;
-  --d-info: #9aa6e8; --d-info-band: #1a1c2c; --d-info-edge: #303352;
-  --d-neu: #7F8B89; --d-neu-band: #1c2122; --d-neu-edge: #39423f;
-  --d-focus: #7fd1b9;
-}
-
 /* ── G · BANDA ──────────────────────────────────────────────────────────── */
 [data-d='G'] {
   --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #fafaf8;
@@ -199,30 +152,6 @@
   --d-crit: #ab2a20; --d-crit-band: #fbe9e6; --d-crit-edge: #ab2a20;
   --d-info: #464a72; --d-info-band: #eeeef4; --d-info-edge: #464a72;
   --d-neu: #6F6D67; --d-neu-band: #f4f2ee; --d-neu-edge: #d3d0c9;
-}
-
-/* ── H · FICHA ──────────────────────────────────────────────────────────── */
-[data-d='H'] {
-  --d-ground: #e3dfd6; --d-surface: #ffffff; --d-sunk: #f4f1e9;
-  --d-ink: #221f19; --d-ink-2: #4b463c; --d-ink-3: #666156; --d-ink-on: #ffffff;
-  --d-line: #d8d2c4; --d-edge: #bdb5a2; --d-bw: 1px;
-  --d-r: 2px; --d-r-lg: 3px; --d-r-pill: 999px;
-  --d-shadow: 0 1px 0 var(--d-edge), 0 3px 0 #ffffff, 0 4px 0 var(--d-edge);
-  --d-shadow-lg: 0 1px 0 var(--d-edge), 0 3px 0 #ffffff, 0 4px 0 var(--d-edge),
-                 0 18px 34px -18px rgba(34,31,25,.4);
-  --d-p1: 8px; --d-p2: 12px; --d-p3: 16px; --d-p4: 20px; --d-gap: 20px;
-  --d-t-2xs: 10.5px; --d-t-xs: 12px; --d-t-sm: 13px; --d-t-md: 14.5px;
-  --d-t-lg: 18px; --d-t-xl: 24px; --d-t-2xl: 32px;
-  --d-w: 400; --d-w-med: 540; --d-w-semi: 620; --d-w-bold: 700;
-  --d-label-size: 10.5px; --d-label-case: uppercase; --d-label-track: .08em;
-  --d-label-weight: 620; --d-label-color: var(--d-ink-3);
-  --d-row-h: 38px;
-  --d-accent: #6d3a1f; --d-accent-ink: #ffffff; --d-accent-soft: #f0e5da; --d-accent-edge: #c8ab92;
-  --d-pos: #2e6237; --d-pos-band: #e8f0e3; --d-pos-edge: #b9cfb4;
-  --d-att: #8a5807; --d-att-band: #f8eed8; --d-att-edge: #ddc699;
-  --d-crit: #a72d1e; --d-crit-band: #f8e2dc; --d-crit-edge: #e2b7ab;
-  --d-info: #414a6b; --d-info-band: #e8eaf1; --d-info-edge: #bcc1d4;
-  --d-neu: #6E685C; --d-neu-band: #efebe1; --d-neu-edge: #bdb5a2;
 }
 
 /* ==========================================================================
@@ -297,19 +226,8 @@
 [data-d='D'] .d-panel-foot { border-top-color: var(--d-ink); }
 
 /* E — no border anywhere; separation is space and a whisper of shadow. */
-[data-d='E'] .d-panel { border: 0; }
-[data-d='E'] .d-panel-head { border-bottom: 0; padding-bottom: var(--d-p1); }
-[data-d='E'] .d-panel-title { font-size: var(--d-t-lg); font-weight: var(--d-w-semi); letter-spacing: -.015em; }
-[data-d='E'] .d-panel-foot { border-top: 0; background: transparent; }
 
 /* F — the head is a rule of dashes, the way a TUI draws a box. */
-[data-d='F'] .d-panel-head {
-  border-bottom: 0; padding: var(--d-p1) var(--d-p2);
-  background: var(--d-sunk);
-}
-[data-d='F'] .d-panel-title { font-size: var(--d-t-xs); text-transform: uppercase; letter-spacing: .1em; color: var(--d-accent); }
-[data-d='F'] .d-panel-title::before { content: '── '; color: var(--d-line); }
-[data-d='F'] .d-panel-title::after { content: ' ─────'; color: var(--d-line); }
 
 /* G — there is no panel. A "panel" is a full-bleed band with a label rail. */
 [data-d='G'] .d-panel {
@@ -346,19 +264,7 @@
 }
 
 /* H — the tab is the head; the card carries a stacked edge below it. */
-[data-d='H'] .d-panel { margin-top: 26px; margin-bottom: 5px; border-color: var(--d-edge); }
-[data-d='H'] .d-panel-head {
-  position: absolute; top: -25px; left: -1px;
-  padding: 5px var(--d-p3) 6px;
-  background: var(--d-sunk);
-  border: 1px solid var(--d-edge); border-bottom: 0;
-  border-radius: 4px 4px 0 0;
-  max-width: calc(100% + 2px);
-}
-[data-d='H'] .d-panel-title { font-size: var(--d-t-xs); font-weight: var(--d-w-semi); letter-spacing: .02em; }
 /* The double rule under a card's first block — the ruled-card tell. */
-[data-d='H'] .d-panel-body { border-top: 1px solid var(--d-line); box-shadow: inset 0 2px 0 -1px var(--d-surface), inset 0 3px 0 -1px var(--d-line); }
-[data-d='H'] .d-panel-foot { background: var(--d-sunk); }
 
 /* ── Row: the unit of a list or table. ──────────────────────────────────── */
 .d-row {
@@ -369,13 +275,11 @@
 }
 .d-row:last-child { border-bottom: 0; }
 [data-d='D'] .d-row { border-bottom-color: var(--d-ink); border-bottom-width: 1px; }
-[data-d='E'] .d-row { border-bottom: 1px solid #f0edea; }
 [data-d='G'] .d-row { padding-inline: var(--d-p3); position: relative; }
 [data-d='G'] .d-row[data-tone]::before {
   content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--tone-fg);
 }
-[data-d='F'] .d-row:hover { background: var(--d-sunk); }
-[data-d='A'] .d-row:hover, [data-d='C'] .d-row:hover, [data-d='H'] .d-row:hover { background: var(--d-sunk); }
+[data-d='A'] .d-row:hover, [data-d='C'] .d-row:hover{ background: var(--d-sunk); }
 
 /* ── Button ─────────────────────────────────────────────────────────────── */
 .d-btn {
@@ -406,22 +310,14 @@
 [data-d='B'] .d-btn { min-height: 27px; }
 [data-d='D'] .d-btn { font-weight: var(--d-w-bold); text-transform: uppercase; letter-spacing: .02em; }
 [data-d='D'] .d-btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--d-ink); }
-[data-d='E'] .d-btn { border-radius: var(--d-r-pill); min-height: 46px; padding: 0 var(--d-p3); }
-[data-d='E'] .d-btn--ghost { box-shadow: none; }
-[data-d='F'] .d-btn { min-height: 22px; padding: 0 var(--d-p2); font-size: var(--d-t-xs); }
-[data-d='F'] .d-btn::before { content: '['; color: var(--d-ink-3); }
-[data-d='F'] .d-btn::after { content: ']'; color: var(--d-ink-3); }
 [data-d='G'] .d-btn { border-color: transparent; border-bottom: 2px solid var(--d-edge); background: transparent; box-shadow: none; }
 [data-d='G'] .d-btn--primary { background: var(--d-accent); border-bottom-color: var(--d-accent); }
-[data-d='H'] .d-btn { box-shadow: 0 1px 0 var(--d-edge); }
-[data-d='H'] .d-btn:active { transform: translateY(1px); box-shadow: none; }
 
 /* A button GROUP. In B and F the buttons share edges instead of sitting apart. */
 .d-btn-group { display: inline-flex; gap: var(--d-p1); }
-[data-d='B'] .d-btn-group, [data-d='F'] .d-btn-group, [data-d='D'] .d-btn-group { gap: 0; }
+[data-d='B'] .d-btn-group, [data-d='D'] .d-btn-group { gap: 0; }
 [data-d='B'] .d-btn-group > .d-btn + .d-btn,
 [data-d='D'] .d-btn-group > .d-btn + .d-btn { margin-left: calc(-1 * max(var(--d-bw), 1px)); }
-[data-d='F'] .d-btn-group > .d-btn + .d-btn { margin-left: 2px; }
 
 /* ── Field ──────────────────────────────────────────────────────────────── */
 .d-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
@@ -446,16 +342,7 @@
 [data-d='B'] .d-label { font-size: var(--d-label-size); text-transform: uppercase; letter-spacing: var(--d-label-track); color: var(--d-ink-3); font-weight: 600; }
 [data-d='C'] .d-input:focus-visible, [data-d='C'] .d-select:focus-visible { border-color: var(--d-brand); }
 /* E — the field is a filled well with no border at all. */
-[data-d='E'] .d-input, [data-d='E'] .d-select, [data-d='E'] .d-textarea {
-  background: var(--d-sunk); border: 0; border-radius: 14px; min-height: 50px; padding-inline: var(--d-p2);
-}
-[data-d='E'] .d-textarea { border-radius: 18px; padding: var(--d-p2); }
 /* F — the field is a prompt line: underline only, with a caret marker. */
-[data-d='F'] .d-input, [data-d='F'] .d-select, [data-d='F'] .d-textarea {
-  background: var(--d-sunk); border: 1px solid var(--d-line); min-height: 22px; padding-inline: var(--d-p1);
-}
-[data-d='F'] .d-label { color: var(--d-ink-3); }
-[data-d='F'] .d-label::before { content: '$ '; color: var(--d-accent); }
 /* G — the field is a baseline, not a box. */
 [data-d='G'] .d-input, [data-d='G'] .d-select, [data-d='G'] .d-textarea {
   border: 0; border-bottom: 1px solid var(--d-edge); border-radius: 0;
@@ -464,7 +351,6 @@
 [data-d='G'] .d-input:focus-visible, [data-d='G'] .d-select:focus-visible {
   outline: 0; border-bottom-color: var(--d-ink); border-bottom-width: 2px;
 }
-[data-d='H'] .d-input, [data-d='H'] .d-select, [data-d='H'] .d-textarea { background: #fffef9; }
 
 /* ── Pill: tone + mark + word. The one rule that survives every direction. ─ */
 .d-pill {
@@ -479,8 +365,6 @@
 }
 .d-pill svg { flex: none; width: 9px; height: 9px; }
 [data-d='D'] .d-pill { border-width: 2px; color: var(--d-ink); font-weight: var(--d-w-bold); text-transform: uppercase; }
-[data-d='E'] .d-pill { padding: 5px var(--d-p2); font-size: var(--d-t-xs); border: 0; }
-[data-d='F'] .d-pill { padding: 0 5px; border-radius: 0; }
 [data-d='G'] .d-pill { background: transparent; border: 0; padding-inline: 0; }
 [data-d='G'] .d-pill::after { content: ''; }
 
@@ -562,64 +446,9 @@
 }
 [data-d='I'] .d-pill { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
 
-/* ── J · LACA ────────────────────────────────────────────────────────────
-   Ninguna superficie es un color plano: todas son un degradado vertical con
-   realce duro arriba y sombra larga abajo. Es lo que separa el esmalte del
-   papel pintado. */
-[data-d='J'] {
-  --d-ground: #E6E1DA;
-  --d-surface: #FBF8F4;
-  --d-surface-fill: linear-gradient(180deg, #FFFFFF 0%, #F2EEE9 100%);
-  --d-sunk: #EAE4DC;
-  --d-sunk-fill: linear-gradient(180deg, #EFEAE4 0%, #E4DED6 100%);
-  --d-ink: #191512; --d-ink-2: #3F3831; --d-ink-3: #5F564C; --d-ink-on: #ffffff;
-  --d-line: rgba(25, 21, 18, .10); --d-edge: rgba(25, 21, 18, .16); --d-bw: 1px;
-  --d-r: 13px; --d-r-lg: 21px; --d-r-pill: 999px;
-  --d-shadow: 0 10px 20px -8px rgba(50, 38, 26, .30), inset 0 1px 0 rgba(255, 255, 255, .95);
-  --d-shadow-lg: 0 26px 46px -16px rgba(50, 38, 26, .42), inset 0 1px 0 rgba(255, 255, 255, .95);
-  --d-p1: 9px; --d-p2: 13px; --d-p3: 18px; --d-p4: 24px; --d-gap: 18px;
-  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 14px; --d-t-md: 15px;
-  --d-t-lg: 20px; --d-t-xl: 27px; --d-t-2xl: 36px;
-  --d-w: 450; --d-w-med: 560; --d-w-semi: 640; --d-w-bold: 720;
-  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .07em;
-  --d-label-weight: 640; --d-label-color: var(--d-ink-3);
-  --d-row-h: 46px;
-  --d-accent: #9C2A1D;
-  --d-accent-fill: linear-gradient(180deg, #C03A2C 0%, #8E2418 100%);
-  --d-accent-ink: #ffffff; --d-accent-soft: #F7E4E0; --d-accent-edge: #8E2418;
-  --d-pos: #1E5A34; --d-pos-band: #DDEEE0; --d-pos-edge: #A9CDB2;
-  --d-att: #7C4A02; --d-att-band: #F8E9CE; --d-att-edge: #DDBE86;
-  --d-crit: #9A2317; --d-crit-band: #F8DED9; --d-crit-edge: #E0AFA6;
-  --d-info: #2F3C74; --d-info-band: #E1E3F1; --d-info-edge: #B3B8D6;
-  --d-neu: #5F564C; --d-neu-band: #EAE4DC; --d-neu-edge: #C9C0B4;
-}
 /* El barrido de brillo vive en el tercio superior y no se mueve con el scroll:
    es esmalte, no un reflejo animado. */
-[data-d='J'] .d-panel::after {
-  content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
-  border-radius: var(--d-r-lg) var(--d-r-lg) 40% 40% / var(--d-r-lg) var(--d-r-lg) 100% 100%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0));
-  pointer-events: none;
-}
-[data-d='J'] .d-panel { overflow: hidden; }
-[data-d='J'] .d-btn {
-  background: linear-gradient(180deg, #FFFFFF 0%, #EDE8E2 100%);
-  border-color: rgba(25, 21, 18, .18);
-  box-shadow: 0 3px 6px -2px rgba(50, 38, 26, .28), inset 0 1px 0 rgba(255, 255, 255, .95);
-  font-weight: var(--d-w-semi);
-}
 /* Al presionar, el brillo se apaga y la placa se hunde: el gesto físico. */
-[data-d='J'] .d-btn:active {
-  transform: translateY(1px);
-  box-shadow: inset 0 2px 5px rgba(50, 38, 26, .30);
-}
-[data-d='J'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
-[data-d='J'] .d-input, [data-d='J'] .d-select, [data-d='J'] .d-textarea {
-  background: linear-gradient(180deg, #F4F1EC 0%, #FFFFFF 60%);
-  box-shadow: inset 0 2px 4px rgba(50, 38, 26, .14);
-  border-color: rgba(25, 21, 18, .18);
-}
-[data-d='J'] .d-pill { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7); }
 
 /* ── K · HALO ────────────────────────────────────────────────────────────
    Cero bordes en toda la dirección. Un elemento existe porque irradia. El
@@ -905,10 +734,6 @@
    fondos; --d-accent y --d-surface siguen siendo colores en las catorce
    direcciones, que es lo que permite escribir `color: var(--d-accent)` sin
    preguntarse en cuál estás. */
-[data-d='J'] .d-panel, [data-d='J'] .d-btn { background: var(--d-surface-fill); }
-[data-d='J'] .d-panel-foot { background: var(--d-sunk-fill); }
-[data-d='J'] .d-btn--primary { background: var(--d-accent-fill); }
-[data-d='J'] .d-btn--ghost { background: transparent; }
 [data-d='N'] .d-panel, [data-d='N'] .d-row, [data-d='N'] .d-btn { background: var(--d-surface-fill); }
 [data-d='N'] .d-panel-head, [data-d='N'] .d-input, [data-d='N'] .d-select,
 [data-d='N'] .d-textarea { background: var(--d-sunk-fill); }
@@ -1508,3 +1333,133 @@
   box-shadow: 0 0 0 3px rgba(16, 36, 62, .16), inset 0 1px 2px rgba(16, 36, 62, .12);
 }
 [data-d='V'] .d-pill { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* ── W · CRISTAL TEMPLADO  (Cristal, corregido) ──────────────────────────
+   Vidrio templado es el vidrio que pasó por el horno para poder usarse en una
+   puerta. Esto es lo mismo: Cristal con las tres cosas que lo hacían incómodo,
+   resueltas, y una regla de reserva.
+
+   1 · NADA QUE FLOTE ES TRANSLÚCIDO. Un menú, un desplegable, un diálogo o un
+       globo dejan pasar el texto de abajo y se cruzan con el de arriba: dos
+       textos superpuestos y ninguno legible. El desenfoque no arregla eso, lo
+       disimula. Todo lo que flota usa --d-overlay, que es sólido.
+
+   2 · LAS FILAS VUELVEN A SER PLANAS. En Cristal halo cada fila con estado se
+       convertía en un objeto flotante con anillo, margen y resplandor propio.
+       Una tabla de treinta objetos flotantes es engorrosa de leer. Acá la fila
+       es una fila: banda opaca, sin anillo, sin margen.
+
+   3 · EL HALO SE GANA. Solo lo crítico irradia. Si todo brilla, nada urge —
+       que es lo que pasaba cuando el resplandor era el tratamiento de estado
+       por defecto.
+
+   Las fichas de filtro se quedan como en Cristal, que ya funcionaban. */
+[data-d='W'] {
+  --d-ground:
+    radial-gradient(70% 56% at 12% 6%, #C5DBF1 0%, transparent 62%),
+    radial-gradient(60% 60% at 90% 18%, #E2D7EE 0%, transparent 64%),
+    radial-gradient(78% 60% at 50% 99%, #CAE7DE 0%, transparent 66%),
+    #EEF2F6;
+  --d-surface: rgba(255, 255, 255, .60);
+  --d-sunk: rgba(255, 255, 255, .34);
+  /* LA PIEZA NUEVA. Todo lo que se despega de la página se pinta con esto y
+     nunca con --d-surface. Sólido, con sombra larga para separarse del fondo
+     sin necesitar desenfoque. */
+  --d-overlay: #FFFFFF;
+  --d-overlay-ink: #0E1720;
+  --d-overlay-edge: rgba(14, 23, 32, .12);
+  --d-overlay-shadow: 0 18px 44px -14px rgba(18, 38, 66, .38), 0 3px 10px -4px rgba(18, 38, 66, .22);
+  --d-ink: #0E1720; --d-ink-2: #2E3B48; --d-ink-3: #4A5665; --d-ink-on: #ffffff;
+  --d-line: rgba(255, 255, 255, .70); --d-edge: rgba(14, 23, 32, .16); --d-bw: 1px;
+  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
+  --d-shadow: 0 8px 28px -10px rgba(18, 38, 66, .20), inset 0 1px 0 rgba(255, 255, 255, .88);
+  --d-shadow-lg: 0 24px 56px -18px rgba(18, 38, 66, .32), inset 0 1px 0 rgba(255, 255, 255, .92);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 520; --d-w-semi: 600; --d-w-bold: 680;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
+  --d-row-h: 44px;
+  --d-accent: #1B4E9E; --d-accent-ink: #ffffff;
+  --d-accent-soft: rgba(27, 78, 158, .12); --d-accent-edge: rgba(27, 78, 158, .32);
+  /* Bandas OPACAS: una translúcida se apila cuando hay una píldora sobre una
+     fila teñida, y el contraste pasa a depender de cuántas capas haya debajo. */
+  --d-pos: #175534; --d-pos-band: #D8E9DF; --d-pos-edge: #A9CDB8;
+  --d-att: #74450A; --d-att-band: #F0E4CE; --d-att-edge: #DCC08A;
+  --d-crit: #931C14; --d-crit-band: #F3DAD8; --d-crit-edge: #E0AFA9;
+  --d-info: #26356E; --d-info-band: #DFE2F1; --d-info-edge: #B4BBDB;
+  --d-neu: #3E4A55; --d-neu-band: #E6EAEE; --d-neu-edge: #C4CBD2;
+}
+/* El vidrio vive SOLO en el panel, que es la superficie que se queda quieta. */
+[data-d='W'] .d-panel {
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-color: var(--d-line);
+}
+[data-d='W'] .d-panel-head { border-bottom-color: rgba(14, 23, 32, .10); }
+[data-d='W'] .d-panel-foot { background: rgba(255, 255, 255, .24); border-top-color: rgba(255, 255, 255, .5); }
+
+/* Filas planas. Sin anillo, sin margen, sin resplandor: una fila es una fila. */
+[data-d='W'] .d-row { border-bottom-color: rgba(14, 23, 32, .09); }
+[data-d='W'] .d-row[data-tone] { background: var(--tone-band); }
+
+/* LA EXCEPCIÓN, Y LA ÚNICA. Lo crítico irradia, y por eso se ve desde el otro
+   lado del cuarto. El filo de 3px a la izquierda hace el trabajo cuando alguien
+   no distingue el rojo. */
+[data-d='W'] .d-row[data-tone='critical'],
+[data-d='W'] .d-panel[data-tone='critical'] {
+  box-shadow: inset 3px 0 0 var(--d-crit), 0 4px 18px -8px rgba(147, 28, 20, .55);
+}
+[data-d='W'] .d-pill[data-tone='critical'] { box-shadow: 0 0 12px -5px var(--d-crit); }
+
+/* Los controles: opacos y sin desenfoque. El desenfoque en una caja de 27px no
+   se aprecia y sí cuesta repintados. */
+[data-d='W'] .d-btn {
+  background: rgba(255, 255, 255, .82);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  border-color: rgba(14, 23, 32, .14);
+  box-shadow: 0 1px 2px rgba(18, 38, 66, .14), inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+[data-d='W'] .d-btn:hover { background: #FFFFFF; }
+[data-d='W'] .d-btn--primary {
+  background: var(--d-accent); color: var(--d-accent-ink);
+  border-color: var(--d-accent);
+}
+[data-d='W'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
+[data-d='W'] .d-input, [data-d='W'] .d-select, [data-d='W'] .d-textarea {
+  background: #FFFFFF;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+  border-color: rgba(14, 23, 32, .18);
+  box-shadow: inset 0 1px 2px rgba(18, 38, 66, .08);
+}
+[data-d='W'] .d-input:focus-visible, [data-d='W'] .d-select:focus-visible {
+  outline: 0; border-color: var(--d-accent);
+  box-shadow: 0 0 0 3px rgba(27, 78, 158, .16);
+}
+[data-d='W'] .d-pill { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* RED DE SEGURIDAD PARA LO QUE FLOTA.
+   Las páginas nombran sus menús y globos con clases propias, así que la regla
+   no puede depender de una primitiva compartida. Esto la aplica por POSICIÓN:
+   cualquier cosa absoluta o fija dentro de W deja de desenfocar y se pinta
+   sólida. Es tosco a propósito — la legibilidad de un menú no puede depender de
+   que alguien se acuerde de usar el token correcto. */
+[data-d='W'] [class*='menu'],
+[data-d='W'] [class*='drop'],
+[data-d='W'] [class*='pop'],
+[data-d='W'] [class*='overlay'],
+[data-d='W'] [class*='sheet'],
+[data-d='W'] [class*='dialog'],
+[data-d='W'] [class*='tip'],
+[data-d='W'] [role='menu'],
+[data-d='W'] [role='listbox'],
+[data-d='W'] [role='dialog'],
+[data-d='W'] [role='tooltip'] {
+  background: var(--d-overlay);
+  color: var(--d-overlay-ink);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-color: var(--d-overlay-edge);
+  box-shadow: var(--d-overlay-shadow);
+}

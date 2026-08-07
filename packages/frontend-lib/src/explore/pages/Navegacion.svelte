@@ -839,87 +839,14 @@
      E · AIRE — ni un borde. Radios grandes, aire enorme, el segmentado se
      rompe en pastillas sueltas. Activo = fondo suave, sin línea ninguna.
      ====================================================================== */
-  :global([data-d='E']) .bar { padding: var(--d-p4) var(--d-p4) var(--d-p3); gap: var(--d-p3); }
-  :global([data-d='E']) .bar-mod { font-size: var(--d-t-lg); }
-  :global([data-d='E']) .row { padding: var(--d-p2) var(--d-p4); }
-  :global([data-d='E']) .side { padding: var(--d-p2); }
-  :global([data-d='E']) .body { gap: var(--d-p3); }
-  :global([data-d='E']) .side-item { font-size: var(--d-t-sm); }
   /* El texto a 16px necesita más columna: el aire cuesta ancho. */
-  @container navmod (min-width: 400px) {
-    :global([data-d='E']) .body { grid-template-columns: minmax(0, 38%) minmax(0, 1fr); }
-  }
-  :global([data-d='E']) .d-rail { gap: var(--d-p1); }
-  :global([data-d='E']) .tabs { gap: var(--d-p2); }
-  :global([data-d='E']) .tab { border-radius: var(--d-r-pill); padding: 0 var(--d-p3); }
-  :global([data-d='E']) .tab.on,
-  :global([data-d='E']) .side-item.on,
-  :global([data-d='E']) .chip.on,
-  :global([data-d='E']) .seg-b.on,
-  :global([data-d='E']) .pg.on,
-  :global([data-d='E']) .crumb-now {
-    background: var(--d-accent-soft); color: var(--d-ink);
-    border: 0; border-radius: var(--d-r-pill);
-  }
-  :global([data-d='E']) .tab.on::before {
-    content: ''; width: 6px; height: 6px; border-radius: var(--d-r-pill);
-    background: var(--d-ink); flex: none;
-  }
   /* Pastillas sueltas y muy separadas: en E una botonera no es una botonera. */
-  :global([data-d='E']) .seg { gap: var(--d-p2); }
-  :global([data-d='E']) .chips { gap: var(--d-p2); }
-  :global([data-d='E']) .side-item { border-radius: var(--d-r-lg); padding: var(--d-p1) var(--d-p3); }
-  :global([data-d='E']) .crumb-now { padding-inline: var(--d-p3); }
-  :global([data-d='E']) .crumb + .crumb::before { padding-inline: var(--d-p2); }
-  :global([data-d='E']) .pg-group { gap: var(--d-p1); }
-  :global([data-d='E']) .pg { border-radius: var(--d-r-pill); padding-inline: var(--d-p1); }
 
   /* ======================================================================
      F · TERMINAL — pantalla de texto. Prompt en la barra, árbol ASCII en la
      lateral, densidad máxima. Activo = texto invertido con «».
      ====================================================================== */
-  :global([data-d='F']) .bar { padding: var(--d-p1) var(--d-p2); background: var(--d-sunk); gap: var(--d-p2); }
-  :global([data-d='F']) .bar-mod::before { content: 'strix:'; color: var(--d-ink-3); }
-  :global([data-d='F']) .bar-sub::before { content: '~/'; color: var(--d-accent); }
-  :global([data-d='F']) .bar-find::before { content: '$'; color: var(--d-accent); font-weight: var(--d-w-bold); }
-  :global([data-d='F']) .bar-find::after { content: '▌'; color: var(--d-accent); }
-  :global([data-d='F']) .ava {
-    display: inline-flex; background: transparent; color: var(--d-accent);
-    width: auto; height: auto;
-  }
-  :global([data-d='F']) .ava::before { content: '['; color: var(--d-ink-3); }
-  :global([data-d='F']) .ava::after { content: ']'; color: var(--d-ink-3); }
-  :global([data-d='F']) .row { padding: var(--d-p1) var(--d-p2); }
-  :global([data-d='F']) .side { padding: var(--d-p1) var(--d-p2); }
-  :global([data-d='F']) .tabs { gap: 0; }
-  :global([data-d='F']) .tab { padding: 0 var(--d-p1); text-transform: lowercase; }
-  :global([data-d='F']) .tab-n::before { content: ':'; color: var(--d-ink-3); }
-  :global([data-d='F']) .tab.on,
-  :global([data-d='F']) .side-item.on,
-  :global([data-d='F']) .chip.on,
-  :global([data-d='F']) .seg-b.on,
-  :global([data-d='F']) .pg.on,
-  :global([data-d='F']) .crumb-now {
-    background: var(--d-accent); color: var(--d-accent-ink); border-color: var(--d-accent);
-  }
-  :global([data-d='F']) .tab.on .tab-n,
-  :global([data-d='F']) .tab.on .tab-n::before,
-  :global([data-d='F']) .side-item.on .side-n,
-  :global([data-d='F']) .chip.on .chip-n { color: var(--d-accent-ink); }
-  :global([data-d='F']) .tab.on::before { content: '»'; color: var(--d-accent-ink); }
   /* El árbol: la lateral es un ls -R, no una lista de botones. */
-  :global([data-d='F']) .side-item { padding: 0 var(--d-p1); border-radius: 0; justify-content: flex-start; }
-  :global([data-d='F']) .side-n { margin-inline-start: auto; }
-  :global([data-d='F']) .side-item::before { content: '├─'; color: var(--d-ink-3); margin-inline-end: var(--d-p1); }
-  :global([data-d='F']) .side-list li:last-child .side-item::before { content: '└─'; }
-  :global([data-d='F']) .side-item.on::before { color: var(--d-accent-ink); }
-  :global([data-d='F']) .side-cap::before { content: '~/'; color: var(--d-accent); }
-  :global([data-d='F']) .chip-n::before { content: ':'; color: var(--d-ink-3); }
-  :global([data-d='F']) .chip.on .chip-n::before { color: var(--d-accent-ink); }
-  :global([data-d='F']) .chips { gap: var(--d-p1) var(--d-p2); }
-  :global([data-d='F']) .crumb + .crumb::before { content: '/'; padding-inline: 0; color: var(--d-ink-3); }
-  :global([data-d='F']) .crumb-b { padding-inline: 2px; }
-  :global([data-d='F']) .crumb-now { padding-inline: var(--d-p1); }
 
   /* ======================================================================
      G · BANDA — ninguna caja. Estratos a sangre, raíl de etiquetas a la
@@ -963,60 +890,7 @@
      H · FICHA — el nombre del módulo sale por arriba como pestaña, y lo
      activo es la pestaña levantada sobre la regla.
      ====================================================================== */
-  :global([data-d='H']) .bar-id {
-    position: absolute; top: calc(-1 * var(--d-p4) - 5px); left: calc(-1 * var(--d-bw));
-    flex-direction: row; align-items: baseline; gap: var(--d-p1);
-    max-width: calc(100% + 2px); white-space: nowrap; overflow: hidden;
-    padding: 5px var(--d-p3) 6px;
-    background: var(--d-sunk);
-    border: var(--d-bw) solid var(--d-edge); border-bottom: 0;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
-  }
-  :global([data-d='H']) .bar-mod { font-size: var(--d-t-sm); }
-  :global([data-d='H']) .bar-sub { font-size: var(--d-t-2xs); }
-  :global([data-d='H']) .bar { background: var(--d-sunk); border-bottom-color: var(--d-edge); }
-  :global([data-d='H']) .ava { border-radius: var(--d-r); background: var(--d-accent); }
   /* La regla doble bajo la fila de pestañas: el tic de la ficha rayada. */
-  :global([data-d='H']) .row--tabs {
-    padding-bottom: 0; border-bottom: var(--d-bw) solid var(--d-edge);
-    box-shadow: 0 3px 0 -1px var(--d-line);
-  }
-  :global([data-d='H']) .tabs { gap: 0; align-items: flex-end; }
-  :global([data-d='H']) .tab {
-    background: var(--d-sunk);
-    border: var(--d-bw) solid var(--d-edge); border-bottom: 0;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
-    margin-inline-start: calc(-1 * var(--d-bw));
-    min-height: calc(var(--d-row-h) - var(--d-p1));
-  }
-  :global([data-d='H']) .tab.on,
-  :global([data-d='H']) .side-item.on,
-  :global([data-d='H']) .chip.on,
-  :global([data-d='H']) .seg-b.on,
-  :global([data-d='H']) .pg.on,
-  :global([data-d='H']) .crumb-now {
-    background: var(--d-surface);
-    border: var(--d-bw) solid var(--d-edge);
-    border-top: 3px solid var(--d-accent);
-    box-shadow: 0 -1px 0 var(--d-surface);
-  }
-  :global([data-d='H']) .tab.on {
-    min-height: var(--d-row-h); border-bottom: 0;
-    margin-bottom: calc(-1 * var(--d-bw)); z-index: 1;
-  }
-  :global([data-d='H']) .side-item.on {
-    margin-inline-start: calc(-1 * var(--d-p2));
-    border-radius: 0 var(--d-r) var(--d-r) 0;
-  }
-  :global([data-d='H']) .side-cap {
-    border-bottom: var(--d-bw) solid var(--d-edge);
-    box-shadow: 0 3px 0 -1px var(--d-line);
-    padding-bottom: var(--d-p1); margin-bottom: var(--d-p2);
-  }
-  :global([data-d='H']) .chips { gap: var(--d-p1) var(--d-p2); }
-  :global([data-d='H']) .chip { box-shadow: 0 1px 0 var(--d-edge); }
-  :global([data-d='H']) .crumb-now { padding-inline: var(--d-p2); }
-  :global([data-d='H']) .side { border-inline-end-color: var(--d-edge); }
 
   /* ======================================================================
      I · CRISTAL — UNA sola lámina. Todo el módulo vive dentro del mismo
@@ -1139,89 +1013,16 @@
      la escribe a mano en directions.css); acá se arma con --d-line, que es
      la tinta al 10 %, para no meter un rgba propio.
      ====================================================================== */
-  :global([data-d='J']) .shell { overflow: hidden; }
-  :global([data-d='J']) .bar {
-    position: relative; z-index: 1;
-    background: var(--d-sunk-fill);
-    border-bottom-color: var(--d-line);
-  }
-  :global([data-d='J']) .bar::after {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
-    background: linear-gradient(180deg,
-      color-mix(in srgb, var(--d-surface) 62%, transparent), transparent);
-    pointer-events: none; z-index: 0;
-  }
-  :global([data-d='J']) .bar-id,
-  :global([data-d='J']) .bar-flag,
-  :global([data-d='J']) .user,
-  :global([data-d='J']) .bar-find,
-  :global([data-d='J']) .bar-do { position: relative; z-index: 1; }
   /* El barrido del panel cubre el 38 % de arriba, que acá es exactamente
      donde viven las pestañas. Se manda detrás de todo: el esmalte lo cargan
      las piezas, una por una, y ninguna queda leyéndose bajo un velo blanco. */
-  :global([data-d='J']) .row--tabs,
-  :global([data-d='J']) .body { position: relative; z-index: 1; }
-  :global([data-d='J']) .ava {
-    background: var(--d-accent-fill);
-    box-shadow: var(--d-shadow);
-  }
 
   /* Teclas de esmalte, muy separadas: cada una es una placa entera. */
-  :global([data-d='J']) .tabs,
-  :global([data-d='J']) .seg,
-  :global([data-d='J']) .chips,
-  :global([data-d='J']) .pg-group { gap: var(--d-p1); }
-  :global([data-d='J']) .tab,
-  :global([data-d='J']) .side-item {
-    background: var(--d-surface-fill);
-    border-radius: var(--d-r);
-    box-shadow: var(--d-shadow);
-    overflow: hidden;
-  }
-  :global([data-d='J']) .side-item { margin-bottom: var(--d-p1); }
   /* El realce mojado es una banda corta arriba: si ocupa el tercio de la
      tecla le lava el texto y se pierde el contraste. */
-  :global([data-d='J']) .tab::after,
-  :global([data-d='J']) .side-item::after {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: var(--d-p1);
-    background: linear-gradient(180deg,
-      color-mix(in srgb, var(--d-surface) 78%, transparent), transparent);
-    pointer-events: none;
-  }
-  :global([data-d='J']) .tab:hover,
-  :global([data-d='J']) .side-item:hover { background: var(--d-surface); }
 
   /* Hundida y apagada: sombra interior, sin realce, y el esmalte del acento
      en el fondo del pozo para que el estado no dependa solo del color. */
-  :global([data-d='J']) .tab.on,
-  :global([data-d='J']) .side-item.on,
-  :global([data-d='J']) .chip.on,
-  :global([data-d='J']) .seg-b.on,
-  :global([data-d='J']) .pg.on,
-  :global([data-d='J']) .crumb-now {
-    background: var(--d-sunk-fill);
-    color: var(--d-ink);
-    font-weight: var(--d-w-semi);
-    border-color: var(--d-edge);
-    box-shadow:
-      inset 0 var(--d-p1) var(--d-p2) calc(-1 * var(--d-p1)) var(--d-edge),
-      inset 0 -3px 0 var(--d-accent);
-  }
-  :global([data-d='J']) .tab.on::after,
-  :global([data-d='J']) .side-item.on::after { content: none; }
-  :global([data-d='J']) .tab.on .tab-n,
-  :global([data-d='J']) .side-item.on .side-n,
-  :global([data-d='J']) .chip.on .chip-n { color: var(--d-ink-2); }
-  :global([data-d='J']) .tab:active,
-  :global([data-d='J']) .side-item:active { transform: translateY(1px); }
-  :global([data-d='J']) .crumb-now {
-    padding-inline: var(--d-p2);
-    border-radius: var(--d-r);
-  }
-  :global([data-d='J']) .crumb-b { border-radius: var(--d-r); }
-  :global([data-d='J']) .chip-n,
-  :global([data-d='J']) .tab-n { font-weight: var(--d-w-med); }
-  :global([data-d='J']) .row { border-bottom-color: var(--d-line); }
 
   /* ======================================================================
      K · HALO — cero bordes en toda la celda. Nada se separa con una línea:

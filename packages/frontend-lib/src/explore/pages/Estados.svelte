@@ -580,78 +580,13 @@
      E · AIRE — ni un borde en toda la celda. Radios enormes, aire enorme,
      la palabra de estado flotando en su propia cápsula blanca.
      ====================================================================== */
-  :global([data-d='E']) .blk {
-    border: 0; border-radius: var(--d-r-lg);
-    box-shadow: none; padding: var(--d-p3);
-  }
-  :global([data-d='E']) .blk-kind {
-    justify-self: start; padding: var(--d-p1) var(--d-p2);
-    background: var(--d-surface); border-radius: var(--d-r-pill);
-  }
-  :global([data-d='E']) .blk-title { font-size: var(--d-t-lg); letter-spacing: -.015em; }
-  :global([data-d='E']) .blk-body { font-size: var(--d-t-sm); }
-  :global([data-d='E']) .blk-acts { padding-top: var(--d-p1); }
-  :global([data-d='E']) .blk--toast {
-    --blk-bg: var(--d-surface);
-    box-shadow: var(--d-shadow-lg); padding: var(--d-p3) var(--d-p4);
-  }
-  :global([data-d='E']) .sec-body { gap: var(--d-p2); }
-  :global([data-d='E']) .scene { border: 0; border-radius: var(--d-r-lg); background: var(--d-sunk); }
-  :global([data-d='E']) .dlg { border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg); padding: var(--d-p4); }
-  :global([data-d='E']) .veil {
-    background: color-mix(in srgb, var(--d-ground) 74%, transparent);
-    backdrop-filter: blur(2px);
-  }
-  :global([data-d='E']) .skel-b { height: 1.05em; border-radius: var(--d-r-pill); }
-  :global([data-d='E']) .proc-track { border-radius: var(--d-r-pill); }
 
   /* ======================================================================
      F · TERMINAL — cada aviso es una línea de log: el nivel va como bloque
      de color detrás del texto y el resto se alinea a la cuadrícula.
      ====================================================================== */
-  :global([data-d='F']) .blk {
-    --blk-bg: var(--d-sunk);
-    border: 0; border-radius: 0;
-    padding: var(--d-p1) var(--d-p2);
-    grid-template-columns: auto minmax(0, 1fr);
-    column-gap: var(--d-p2); row-gap: 0;
-  }
-  :global([data-d='F']) .blk-kind {
-    grid-column: 1; grid-row: 1; align-self: start;
-    padding: 0 var(--d-p1);
-    background: var(--tone-band); color: var(--tone-fg);
-  }
-  :global([data-d='F']) .blk-title,
-  :global([data-d='F']) .blk-body,
-  :global([data-d='F']) .blk-acts,
-  :global([data-d='F']) .dlg-check { grid-column: 2; }
-  :global([data-d='F']) .blk-title { font-size: var(--d-t-sm); font-weight: var(--d-w-med); }
-  :global([data-d='F']) .blk-body { color: var(--d-ink-3); }
-  :global([data-d='F']) .blk-acts { padding-top: var(--d-p1); }
-  :global([data-d='F']) .sec-cap { color: var(--d-accent); white-space: nowrap; overflow: hidden; }
-  :global([data-d='F']) .sec-cap::before { content: '── '; color: var(--d-line); }
-  :global([data-d='F']) .sec-cap::after { content: ' ────────────────────────────────────────'; color: var(--d-line); }
-  :global([data-d='F']) .scene { border-color: var(--d-line); }
-  :global([data-d='F']) .veil { background: color-mix(in srgb, var(--d-ground) 76%, transparent); }
-  :global([data-d='F']) .dlg { --blk-bg: var(--d-surface); border: 1px solid var(--d-edge); padding: var(--d-p2); }
-  :global([data-d='F']) .scene-name { color: var(--d-ink-2); }
   /* El esqueleto y la barra se dibujan con caracteres, no con rectángulos:
      bloques del ancho de un carácter, alineados a la cuadrícula. */
-  :global([data-d='F']) .skel-b {
-    height: 1em; border-radius: 0; background: repeating-linear-gradient(90deg, var(--d-line) 0 6px, transparent 6px 7px);
-  }
-  :global([data-d='F']) .skel-row { min-height: var(--d-row-h); }
-  :global([data-d='F']) .proc-track { height: auto; background: transparent; border-radius: 0; line-height: 1.2; }
-  :global([data-d='F']) .proc-track::before { content: '········································'; color: var(--d-ink-3); letter-spacing: .1em; }
-  :global([data-d='F']) .proc-fill {
-    position: absolute; inset: 0 auto 0 0; height: auto;
-    background: transparent; overflow: hidden; white-space: nowrap; color: var(--d-accent);
-  }
-  :global([data-d='F']) .proc-fill::before { content: '████████████████████████████████████████'; }
-  :global([data-d='F']) .proc-fill--wait { background: var(--d-accent-soft); }
-  :global([data-d='F']) .proc-fill--wait::before { content: ''; }
-  :global([data-d='F']) .proc-track--wait { height: var(--d-p1); background: var(--d-sunk); }
-  :global([data-d='F']) .proc-track--wait::before { content: ''; }
 
   /* ======================================================================
      G · BANDA — ninguna caja: franjas a sangre, raíl fijo de etiquetas a la
@@ -696,32 +631,7 @@
      H · FICHA — la palabra de estado sale como pestaña por encima de la
      ficha, el canto apilado va debajo y bajo el titular hay regla doble.
      ====================================================================== */
-  :global([data-d='H']) .blk {
-    --blk-bg: var(--d-surface);
-    border-color: var(--d-edge); box-shadow: var(--d-shadow);
-    margin-top: 1.9em; padding: var(--d-p2) var(--d-p3) var(--d-p3);
-  }
-  :global([data-d='H']) .blk-kind {
-    position: absolute; top: 0; left: -1px; transform: translateY(-100%);
-    max-width: calc(100% + 2px);
-    padding: calc(var(--d-p1) * .5) var(--d-p2);
-    background: var(--d-sunk);
-    border: 1px solid var(--d-edge); border-bottom: 0;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
-  }
-  :global([data-d='H']) .blk-title { padding-bottom: var(--d-p1); border-bottom: 3px double var(--d-line); }
-  :global([data-d='H']) .sec-body { gap: var(--d-p2); }
-  :global([data-d='H']) .scene { background: var(--d-surface); box-shadow: var(--d-shadow); margin-bottom: 5px; }
-  :global([data-d='H']) .dlg { box-shadow: var(--d-shadow-lg); margin-bottom: var(--d-p4); }
-  :global([data-d='H']) .veil { background: color-mix(in srgb, var(--d-ground) 74%, transparent); }
-  :global([data-d='H']) .skel-b { background: var(--d-sunk); border-bottom: 1px solid var(--d-line); height: 1.15em; }
   /* En manila, lo que carga también es una ficha (sin pestaña todavía). */
-  :global([data-d='H']) .load,
-  :global([data-d='H']) .proc {
-    background: var(--d-surface); border: 1px solid var(--d-edge);
-    box-shadow: var(--d-shadow); padding: var(--d-p2) var(--d-p3); margin-bottom: 5px;
-  }
-  :global([data-d='H']) .proc-track { background: var(--d-sunk); border: 1px solid var(--d-edge); }
 
   /* ======================================================================
      I · CRISTAL. El aviso es una lámina de vidrio sobre el campo teñido y el
@@ -825,71 +735,11 @@
      esmalte con degradado vertical, realce duro arriba y sombra profunda
      abajo. El barrido de brillo vive en el tercio superior.
      ====================================================================== */
-  :global([data-d='J']) .blk {
-    --blk-bg: linear-gradient(180deg,
-              color-mix(in srgb, var(--d-surface) 62%, var(--tone-band)) 0%,
-              var(--tone-band) 100%);
-    isolation: isolate;
-    border-color: var(--tone-edge); border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow); padding: var(--d-p3);
-    transition: box-shadow 110ms ease;
-  }
   /* El barrido: pointer-events none para no taparle el clic a nada, y
      z-index -1 para caer entre el esmalte y el texto. Encima del texto sería
      un velo blanco sobre el titular, que es lo único que hay que poder leer. */
-  :global([data-d='J']) .blk::after {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
-    z-index: -1; pointer-events: none;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 40% 40% / var(--d-r-lg) var(--d-r-lg) 100% 100%;
-    background: linear-gradient(180deg,
-                color-mix(in srgb, var(--d-surface) 74%, transparent), transparent);
-    transition: opacity 110ms ease;
-  }
   /* La palabra de estado es una ficha de esmalte levantada, no una etiqueta. */
-  :global([data-d='J']) .blk-kind {
-    justify-self: start; padding: var(--d-p1) var(--d-p2);
-    border-radius: var(--d-r-pill);
-    background: linear-gradient(180deg,
-                color-mix(in srgb, var(--d-surface) 70%, var(--tone-band)), var(--tone-band));
-    box-shadow: 0 2px 5px -2px color-mix(in srgb, var(--d-ink) 34%, transparent),
-                inset 0 1px 0 color-mix(in srgb, var(--d-surface) 92%, transparent);
-  }
   /* Al presionar, el brillo se apaga y la placa se hunde. */
-  :global([data-d='J']) .blk:has(.d-btn:active) {
-    box-shadow: inset 0 2px 6px color-mix(in srgb, var(--d-ink) 28%, transparent);
-  }
-  :global([data-d='J']) .blk:has(.d-btn:active)::after { opacity: .3; }
-  :global([data-d='J']) .blk--toast { --blk-bg: var(--d-surface-fill); box-shadow: var(--d-shadow-lg); }
-  :global([data-d='J']) .scene {
-    background: var(--d-sunk-fill); border-color: var(--d-edge);
-    border-radius: var(--d-r-lg); box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .veil {
-    background: linear-gradient(180deg,
-                color-mix(in srgb, var(--d-ink) 28%, transparent),
-                color-mix(in srgb, var(--d-ink) 56%, transparent));
-  }
-  :global([data-d='J']) .dlg {
-    --blk-bg: var(--d-surface-fill);
-    border-color: var(--d-edge); border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow-lg); padding: var(--d-p3) var(--d-p4) var(--d-p4);
-  }
-  :global([data-d='J']) .skel-b {
-    background: var(--d-sunk-fill); border-radius: var(--d-r-pill); height: .95em;
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 90%, transparent);
-  }
-  :global([data-d='J']) .proc-track {
-    height: var(--d-p2); background: var(--d-sunk-fill); border-radius: var(--d-r-pill);
-    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 24%, transparent);
-  }
-  :global([data-d='J']) .proc-fill {
-    background: var(--d-accent-fill);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 76%, transparent);
-  }
-  :global([data-d='J']) .d-pill {
-    background: linear-gradient(180deg,
-                color-mix(in srgb, var(--d-surface) 52%, var(--tone-band)), var(--tone-band));
-  }
 
   /* ======================================================================
      K · HALO — cero bordes y cero rellenos sólidos. El aviso existe porque

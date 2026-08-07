@@ -671,68 +671,12 @@
      E · AIRE — ni un borde en toda la celda. El separador de la barra es
      espacio, el grupo son pastillas sueltas y el dividido se parte en dos.
      ====================================================================== */
-  :global([data-d='E']) .spec { gap: var(--d-p4); }
-  :global([data-d='E']) .sec {
-    background: var(--d-surface);
-    border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow);
-    padding: var(--d-p3) var(--d-p4) var(--d-p4);
-  }
-  :global([data-d='E']) .sec-cap { margin-bottom: var(--d-p3); }
-  :global([data-d='E']) .sec-body { gap: var(--d-p3); }
-  :global([data-d='E']) .bar { gap: var(--d-p2); }
-  :global([data-d='E']) .bar-sep { border-left: 0; width: var(--d-p3); min-height: 0; margin-inline: 0; }
-  :global([data-d='E']) .grp { gap: var(--d-p2); }
-  :global([data-d='E']) .split { gap: var(--d-p1); }
-  :global([data-d='E']) .d-btn.split-main,
-  :global([data-d='E']) .d-btn.split-toggle {
-    border-radius: var(--d-r-pill); margin-left: 0; border-inline-start-color: transparent;
-  }
-  :global([data-d='E']) .menu { border-radius: var(--d-r-lg); }
-  :global([data-d='E']) .menu-item { border-radius: var(--d-r-pill); padding-inline: var(--d-p2); }
-  :global([data-d='E']) .link { text-underline-offset: 6px; }
 
   /* ======================================================================
      F · TERMINAL — la barra es una línea de comandos: prompt, [cmd] [cmd],
      tubería como separador. Los iconos se cambian por glifos para que todo
      caiga en la rejilla del carácter.
      ====================================================================== */
-  :global([data-d='F']) .spec { gap: var(--d-p2); }
-  :global([data-d='F']) .sec-cap {
-    display: flex; align-items: center; gap: var(--d-p1);
-    margin-bottom: var(--d-p1); color: var(--d-accent);
-  }
-  :global([data-d='F']) .sec-cap::before { content: '──'; color: var(--d-line); }
-  :global([data-d='F']) .sec-cap::after { content: ''; flex: 1; border-top: 1px solid var(--d-line); }
-  :global([data-d='F']) .sec-body { gap: var(--d-p1); }
-  :global([data-d='F']) .bar {
-    background: var(--d-sunk);
-    border: 1px solid var(--d-line);
-    padding: var(--d-p1) var(--d-p2);
-  }
-  :global([data-d='F']) .bar::before {
-    content: 'strix ~ $'; color: var(--d-accent);
-    font-size: var(--d-t-xs); white-space: nowrap;
-  }
-  :global([data-d='F']) .bar-sep {
-    border-left: 0; width: auto; min-height: 0; margin-inline: var(--d-p1);
-  }
-  :global([data-d='F']) .bar-sep::before { content: '|'; color: var(--d-ink-3); }
-  :global([data-d='F']) .ico { display: none; }
-  :global([data-d='F']) .glyph { display: inline; color: var(--d-ink-3); }
-  :global([data-d='F']) .menu { border-color: var(--d-edge); padding: 0; gap: 0; }
-  :global([data-d='F']) .menu-item { border-radius: 0; }
-  :global([data-d='F']) .menu-item::before { content: '> '; color: var(--d-accent); white-space: pre; }
-  :global([data-d='F']) .menu-item:hover { background: var(--d-accent-soft); }
-  :global([data-d='F']) .link { color: var(--d-accent); text-decoration: none; }
-  :global([data-d='F']) .link::before { content: '>> '; white-space: pre; }
-  :global([data-d='F']) .link:hover { text-decoration: underline; }
-  :global([data-d='F']) .spin {
-    width: .55em; height: 1em;
-    border: 0; border-radius: 0;
-    background: var(--d-accent);
-    animation: d-blink 900ms steps(1) infinite;
-  }
 
   /* ======================================================================
      G · BANDA — ninguna caja. Franjas a sangre separadas por un pelo de
@@ -774,40 +718,8 @@
      H · FICHA — cada sección es una ficha con la pestaña saliendo arriba (la
      pestaña ES la cabecera), regla doble bajo ella y canto apilado abajo.
      ====================================================================== */
-  :global([data-d='H']) .spec { --tab: 25px; gap: var(--d-p4); }
-  :global([data-d='H']) .sec {
-    margin-top: var(--tab);
-    background: var(--d-surface);
-    border: 1px solid var(--d-edge);
-    border-radius: var(--d-r);
-    box-shadow: var(--d-shadow);
-    padding: var(--d-p3);
-  }
-  :global([data-d='H']) .sec-cap {
-    position: absolute; top: calc(1px - var(--tab)); left: -1px; margin: 0;
-    padding: calc(var(--d-p1) / 2) var(--d-p3);
-    max-width: calc(100% + 2px);
-    background: var(--d-sunk);
-    border: 1px solid var(--d-edge); border-bottom: 0;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  :global([data-d='H']) .sec-body {
-    padding-top: var(--d-p2);
-    border-top: 1px solid var(--d-line);
-    box-shadow: inset 0 2px 0 -1px var(--d-surface), inset 0 3px 0 -1px var(--d-line);
-  }
-  :global([data-d='H']) .bar {
-    background: var(--d-sunk);
-    border: 1px solid var(--d-line);
-    padding: var(--d-p1);
-  }
-  :global([data-d='H']) .menu { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='H']) .link { color: var(--d-accent); text-underline-offset: 3px; }
   /* La regla doble vuelve como separador de la barra, y la nota al pie de la
      ficha se lee como anotación a mano. */
-  :global([data-d='H']) .bar-sep { border-left-style: double; border-left-width: calc(var(--d-bw) * 3); }
-  :global([data-d='H']) .hint { font-style: italic; }
 
   /* ======================================================================
      I · CRISTAL — vidrio sobre el campo de manchas.
@@ -914,68 +826,13 @@
      POR DEBAJO del contenido — un velo blanco al 62 % encima de la cabecera se
      la come. Por eso la sección se aísla y el contenido sube a z-index 1.
      ====================================================================== */
-  :global([data-d='J']) .spec { gap: var(--d-p4); }
-  :global([data-d='J']) .sec {
-    isolation: isolate;
-    background: var(--d-surface-fill);
-    border: max(var(--d-bw), 1px) solid var(--d-line);
-    border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow-lg);
-    padding: var(--d-p3);
-  }
-  :global([data-d='J']) .sec::after {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 40% 40% / var(--d-r-lg) var(--d-r-lg) 100% 100%;
-    background: linear-gradient(180deg, color-mix(in srgb, var(--d-surface) 62%, transparent), transparent);
-    pointer-events: none;
-    z-index: 0;
-  }
-  :global([data-d='J']) .sec-cap,
-  :global([data-d='J']) .sec-body { position: relative; z-index: 1; }
-  :global([data-d='J']) .sec-body { gap: var(--d-p3); }
   /* Aislar la plancha la convierte en contexto de apilado, y entonces el orden
      entre secciones deja de ser automático: sin esta escalera el menú del
      botón dividido —que cuelga hacia abajo— quedaría debajo de la plancha
      siguiente, que es opaca. La escalera va al revés del DOM. */
-  :global([data-d='J']) .sec:nth-child(1) { z-index: 6; }
-  :global([data-d='J']) .sec:nth-child(2) { z-index: 5; }
-  :global([data-d='J']) .sec:nth-child(3) { z-index: 4; }
-  :global([data-d='J']) .sec:nth-child(4) { z-index: 3; }
-  :global([data-d='J']) .sec:nth-child(5) { z-index: 2; }
-  :global([data-d='J']) .sec:nth-child(6) { z-index: 1; }
   /* La bandeja: un rebaje lacado, con el degradado invertido y sombra interior. */
-  :global([data-d='J']) .bar {
-    gap: var(--d-p2);
-    background: var(--d-sunk-fill);
-    border-radius: var(--d-r-lg);
-    box-shadow: inset 0 2px 5px color-mix(in srgb, var(--d-ink) 16%, transparent);
-    padding: var(--d-p1) var(--d-p2);
-  }
-  :global([data-d='J']) .bar-sep {
-    border-left: 0; width: max(var(--d-bw), 1px); min-height: 0;
-    align-self: stretch; margin-inline: var(--d-p1);
-    background: linear-gradient(180deg, transparent,
-                color-mix(in srgb, var(--d-ink) 26%, transparent), transparent);
-  }
   /* El grupo es una sola plancha partida en gajos: comparten canto y cada gajo
      conserva su propio realce blanco arriba. */
-  :global([data-d='J']) .grp { gap: 0; }
-  :global([data-d='J']) .grp > .d-btn { border-radius: 0; }
-  :global([data-d='J']) .grp > .d-btn:first-child {
-    border-start-start-radius: var(--d-r); border-end-start-radius: var(--d-r);
-  }
-  :global([data-d='J']) .grp > .d-btn:last-child {
-    border-start-end-radius: var(--d-r); border-end-end-radius: var(--d-r);
-  }
-  :global([data-d='J']) .grp > .d-btn + .d-btn { margin-left: calc(-1 * max(var(--d-bw), 1px)); }
-  :global([data-d='J']) .menu {
-    background: var(--d-surface-fill);
-    border-color: var(--d-edge);
-    border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow-lg);
-  }
-  :global([data-d='J']) .menu-item:hover { background: var(--d-sunk-fill); }
-  :global([data-d='J']) .link { color: var(--d-accent); text-underline-offset: 3px; }
 
   /* ======================================================================
      K · HALO — cero bordes, cero cajas.
@@ -1901,8 +1758,7 @@
 
   /* Al final del todo, para ganarle en orden a las variaciones por dirección. */
   @media (prefers-reduced-motion: reduce) {
-    .spin,
-    :global([data-d='F']) .spin { animation: none; opacity: .6; }
+    .spin{ animation: none; opacity: .6; }
     :global([data-d='M']) .d-btn--primary::before { transition: none; }
   }
 </style>

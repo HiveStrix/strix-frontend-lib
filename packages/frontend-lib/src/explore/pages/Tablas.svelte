@@ -653,56 +653,8 @@
   :global([data-d='D']) .etitle { text-transform: uppercase; font-weight: var(--d-w-bold); letter-spacing: .02em; }
 
   /* ── E · AIRE — filas de 56px, cero líneas duras, selección en pastilla ── */
-  :global([data-d='E']) .tbl { border-spacing: 0 4px; min-width: 660px; }
-  :global([data-d='E']) .tbl th,
-  :global([data-d='E']) .tbl td { border: 0; padding: 0 var(--d-p2); }
-  :global([data-d='E']) .tbl thead th { background: transparent; padding-bottom: var(--d-p1); }
-  :global([data-d='E']) .tbl tbody td { border-bottom: 0; height: var(--d-row-h); }
-  :global([data-d='E']) .tbl tbody td.c-sel { border-radius: var(--d-r) 0 0 var(--d-r); }
-  :global([data-d='E']) .tbl tbody td.c-act { border-radius: 0 var(--d-r) var(--d-r) 0; }
-  :global([data-d='E']) .tbl tbody tr.on td.c-sel { box-shadow: none; }
-  :global([data-d='E']) .pick { --pick: 22px; border: 0; border-radius: var(--d-r-pill); background: var(--d-sunk); }
-  :global([data-d='E']) .pick:checked, :global([data-d='E']) .pick:indeterminate { background: var(--d-accent); }
-  :global([data-d='E']) .acts .d-btn { min-height: 34px; padding-inline: var(--d-p2); }
-  :global([data-d='E']) .d-pill svg { width: 11px; height: 11px; }
-  :global([data-d='E']) .clist { gap: var(--d-p2); padding-bottom: var(--d-p2); }
-  :global([data-d='E']) ul.clist > li.citem { border-radius: var(--d-r-lg); padding: var(--d-p2) var(--d-p3); min-height: var(--d-row-h); align-content: center; }
-  :global([data-d='E']) ul.clist > li.citem:hover { background: var(--d-sunk); }
-  :global([data-d='E']) .empty { padding: var(--d-p2) 0 var(--d-p3); gap: var(--d-p3); }
-  :global([data-d='E']) .etitle { font-size: var(--d-t-xl); }
 
   /* ── F · TERMINAL — rejilla de caracteres de 24px, cursor y bloques ────── */
-  :global([data-d='F']) .tbl { min-width: 560px; }
-  :global([data-d='F']) .tbl th,
-  :global([data-d='F']) .tbl td { border: 0; padding: 0 var(--d-p2); height: var(--d-row-h); }
-  :global([data-d='F']) .tbl thead th { background: transparent; border-bottom: var(--d-bw) solid var(--d-line); }
-  :global([data-d='F']) .hcap { color: var(--d-accent); }
-  :global([data-d='F']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap {
-    background: var(--d-accent); color: var(--d-accent-ink); padding-inline: 4px;
-  }
-  :global([data-d='F']) .tbl tbody td { border-bottom: 0; }
-  :global([data-d='F']) .tbl tbody tr.on td.c-sel { box-shadow: none; }
-  :global([data-d='F']) .cursor::before { content: '\00a0\00a0'; }
-  :global([data-d='F']) .tbl tbody tr.on .cursor::before { content: '> '; color: var(--d-accent); }
-  :global([data-d='F']) .d-pill { border: 0; padding: 0 var(--d-p2); }
-  :global([data-d='F']) tr.alert .d-pill, :global([data-d='F']) li.alert .d-pill {
-    background: var(--tone-fg); color: var(--d-ground);
-  }
-  :global([data-d='F']) .pick { --pick: 12px; }
-  :global([data-d='F']) .sortmark::before { content: '^'; }
-  :global([data-d='F']) .sortmark[data-dir='desc']::before { content: 'v'; }
-  :global([data-d='F']) .clist { background: var(--d-sunk); }
-  :global([data-d='F']) ul.clist > li.citem {
-    grid-template-columns: 82px minmax(0, 1fr);
-    gap: 0 var(--d-p2);
-    align-items: center;
-    min-height: var(--d-row-h);
-    padding: 0 var(--d-p2);
-  }
-  :global([data-d='F']) .cibody { flex-wrap: nowrap; overflow: hidden; }
-  :global([data-d='F']) .cinm { flex-basis: auto; }
-  :global([data-d='F']) .etitle::before { content: '! '; color: var(--d-att); }
-  :global([data-d='F']) .empty { padding-block: var(--d-p2); }
 
   /* ── G · BANDA — sin caja: franjas a sangre con canto de color y raíl ──── */
   :global([data-d='G']) .stack { gap: 0; }
@@ -731,27 +683,6 @@
   :global([data-d='G']) .empty { padding: var(--d-p3) var(--d-p3) var(--d-p4); }
 
   /* ── H · FICHA — pestaña arriba, regla doble, renglones de fichero ─────── */
-  :global([data-d='H']) .headnote { display: none; }
-  :global([data-d='H']) .tbl thead th { border-bottom: calc(var(--d-bw) * 4) double var(--d-edge); }
-  :global([data-d='H']) .tbl tbody tr:nth-child(even) td { background: var(--d-sunk); }
-  :global([data-d='H']) .tbl tbody tr:hover td,
-  :global([data-d='H']) .tbl tbody tr.is-hover td { background: var(--d-neu-band); }
-  :global([data-d='H']) .tbl tbody tr.on td { background: var(--d-accent-soft); }
-  :global([data-d='H']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
-  :global([data-d='H']) ul.clist > li.citem {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 0 var(--d-p2);
-    align-items: baseline;
-    border-bottom: var(--d-bw) solid var(--d-line);
-  }
-  :global([data-d='H']) ul.clist > li.citem:last-child { border-bottom: 0; }
-  :global([data-d='H']) .cicode {
-    background: var(--d-sunk);
-    border: var(--d-bw) solid var(--d-edge);
-    border-radius: var(--d-r) var(--d-r) 0 0;
-    padding: 1px var(--d-p1);
-  }
-  :global([data-d='H']) .empty { padding-block: var(--d-p2) var(--d-p3); }
 
   /* ==========================================================================
      LAS ONCE NUEVAS · I–S.
@@ -843,63 +774,15 @@
      Todo lo que se pinta acá se pinta con los rellenos en degradado de la
      dirección (--d-*-fill) o con degradados armados entre dos tokens. El
      barrido de brillo del panel ya lo pone directions.css: no se duplica. */
-  :global([data-d='J']) .tbl thead th {
-    background: var(--d-sunk-fill);
-    border-bottom: 1px solid var(--d-line);
-    box-shadow: inset 0 1px 0 var(--d-surface);   /* realce duro arriba */
-  }
   /* La columna ordenada NO se invierte a tinta clara: el barrido de brillo del
      panel cae justo encima de la cabecera y un blanco sobre laca roja bajo ese
      velo se cae de AA. Se marca con un canto de esmalte y la etiqueta en el
      color de acento, que bajo el mismo velo gana contraste en vez de perderlo. */
-  :global([data-d='J']) .tbl thead th[aria-sort]:not([aria-sort='none']) {
-    box-shadow: inset 0 -3px 0 var(--d-accent), inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='J']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-accent); }
-  :global([data-d='J']) .tbl tbody td {
-    background: var(--d-surface-fill);
-    border-bottom: 1px solid var(--d-line);
-    box-shadow: inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='J']) .tbl tbody tr.alert td { background: linear-gradient(180deg, var(--tone-band), var(--d-surface)); }
-  :global([data-d='J']) .tbl tbody tr:hover td,
-  :global([data-d='J']) .tbl tbody tr.is-hover td { background: linear-gradient(180deg, var(--d-surface), var(--d-sunk)); }
   /* Seleccionada = placa hundida: se le apaga el realce y el degradado baja de
      tono. Es el mismo gesto que el :active del botón, sin gastar color. */
-  :global([data-d='J']) .tbl tbody tr.on td { background: var(--d-sunk-fill); box-shadow: none; }
-  :global([data-d='J']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
-  :global([data-d='J']) .pick {
-    background: var(--d-surface-fill);
-    box-shadow: inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='J']) .pick:checked,
-  :global([data-d='J']) .pick:indeterminate { background: var(--d-accent-fill); }
   /* La lista: placas gruesas, cada una con su propio barrido. El barrido va por
      DEBAJO del texto (z-index negativo dentro de un contexto propio), así que
      no le come contraste a nada ni le tapa el clic al botón de la fila. */
-  :global([data-d='J']) .d-panel.clistpanel { background: transparent; border-color: transparent; box-shadow: none; }
-  :global([data-d='J']) .d-panel.clistpanel::after { content: none; }
-  :global([data-d='J']) .clistpanel .d-panel-head { border-bottom: 0; padding-inline: 0; }
-  :global([data-d='J']) .clist { gap: var(--d-p1); padding-bottom: var(--d-p2); }
-  :global([data-d='J']) ul.clist > li.citem {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    background: var(--d-surface-fill);
-    border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) ul.clist > li.citem::after {
-    content: '';
-    position: absolute; inset: 0 0 auto 0; height: 38%;
-    background: linear-gradient(180deg, var(--d-surface), transparent);
-    opacity: .8;
-    pointer-events: none;
-    z-index: -1;
-  }
-  :global([data-d='J']) ul.clist > li.citem.alert { background: linear-gradient(180deg, var(--tone-band), var(--d-surface)); }
-  :global([data-d='J']) ul.clist > li.citem.on { background: var(--d-sunk-fill); box-shadow: none; }
-  :global([data-d='J']) .empty { padding-block: var(--d-p3); }
 
   /* ── K · HALO — cero bordes; la fila que urge irradia ──────────────────────
      El estado no es un relleno ni una línea: es el color del resplandor. Una
@@ -1541,8 +1424,6 @@
      ========================================================================== */
   @container spec (max-width: 720px) {
     .tbl,
-    :global([data-d='E']) .tbl,
-    :global([data-d='F']) .tbl,
     :global([data-d='G']) .tbl { min-width: 0; }
     .c-fam, .c-loc, .c-read { display: none; }
     .sub { display: block; }
@@ -1550,9 +1431,7 @@
     .nm { white-space: normal; }
     :global([data-d='G']) ul.clist > li.citem { grid-template-columns: minmax(0, 1fr); padding-left: var(--d-p3); }
     :global([data-d='G']) .cicode { text-align: left; }
-    :global([data-d='B']) ul.clist > li.citem,
-    :global([data-d='F']) ul.clist > li.citem,
-    :global([data-d='H']) ul.clist > li.citem { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='B']) ul.clist > li.citem{ grid-template-columns: minmax(0, 1fr); }
   }
   @container spec (max-width: 420px) {
     .foot { flex-direction: column; align-items: flex-start; }
@@ -1606,17 +1485,11 @@
   :global([data-d='A']) ul.clist > li.citem.alert,
   :global([data-d='B']) ul.clist > li.citem.alert,
   :global([data-d='C']) ul.clist > li.citem.alert,
-  :global([data-d='D']) ul.clist > li.citem.alert,
-  :global([data-d='E']) ul.clist > li.citem.alert,
-  :global([data-d='F']) ul.clist > li.citem.alert,
-  :global([data-d='H']) ul.clist > li.citem.alert { background: var(--tone-band); }
+  :global([data-d='D']) ul.clist > li.citem.alert{ background: var(--tone-band); }
   :global([data-d='A']) ul.clist > li.citem.on,
   :global([data-d='B']) ul.clist > li.citem.on,
   :global([data-d='C']) ul.clist > li.citem.on,
-  :global([data-d='D']) ul.clist > li.citem.on,
-  :global([data-d='E']) ul.clist > li.citem.on,
-  :global([data-d='F']) ul.clist > li.citem.on,
-  :global([data-d='H']) ul.clist > li.citem.on { background: var(--d-accent-soft); }
+  :global([data-d='D']) ul.clist > li.citem.on{ background: var(--d-accent-soft); }
   /* A no usa el patrón `ul.clist >` en su base, así que necesita además su
      propio par al mismo peso. */
   :global([data-d='A']) ul.clist > li.citem.alert { background: var(--tone-band); }

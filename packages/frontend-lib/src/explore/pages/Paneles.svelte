@@ -584,72 +584,11 @@
      E · AIRE — cero bordes en toda la celda. La cifra es enorme y ligera,
      y la separación la hace el espacio, nunca una línea.
      ====================================================================== */
-  :global([data-d='E']) .kpi { border: 0; padding: var(--d-p4); }
-  :global([data-d='E']) .kpi-body { margin-top: var(--d-p2); }
-  :global([data-d='E']) .kpi-fig {
-    font-size: calc(var(--d-t-2xl) * 1.35); font-weight: var(--d-w);
-    letter-spacing: -.035em; line-height: 1.06;
-  }
-  :global([data-d='E']) .kpi-tag { border: 0; padding: calc(var(--d-p1) / 2) var(--d-p2); }
-  :global([data-d='E']) .kpi.on { background: var(--tone-band); box-shadow: var(--d-shadow-lg); }
-  :global([data-d='E']) .sec-title { font-size: var(--d-t-xl); font-weight: var(--d-w-med); }
-  :global([data-d='E']) .sec-head { padding-bottom: var(--d-p2); }
-  :global([data-d='E']) .callout { border: 0; padding: var(--d-p4); }
-  :global([data-d='E']) .plan-row { border-bottom: 0; }
-  :global([data-d='E']) .plans { display: grid; gap: calc(var(--d-p1) / 2); }
-  :global([data-d='E']) .nest { background: var(--d-sunk); box-shadow: none; border: 0; }
-  :global([data-d='E']) .ficha-meta { gap: var(--d-p2); }
 
   /* ======================================================================
      F · TERMINAL — cada KPI es una línea de dos renglones: etiqueta con
      guía de puntos, cifra en una casilla de color, y la nota colgando.
      ====================================================================== */
-  :global([data-d='F']) .root { padding: var(--d-p2); }
-  :global([data-d='F']) .kpis {
-    grid-template-columns: minmax(0, 1fr); gap: 0;
-    border: var(--d-bw) solid var(--d-line);
-  }
-  :global([data-d='F']) .kpi {
-    display: grid; grid-template-columns: minmax(0, 1fr) auto;
-    align-content: center; column-gap: var(--d-p2);
-    min-height: calc(var(--d-row-h) * 2);
-    padding: 0 var(--d-p2);
-    border: 0; border-bottom: var(--d-bw) solid var(--d-line); box-shadow: none;
-  }
-  :global([data-d='F']) .kpi:last-child { border-bottom: 0; }
-  :global([data-d='F']) .kpi-body { display: contents; }
-  :global([data-d='F']) .kpi-lab { grid-column: 1; grid-row: 1; }
-  :global([data-d='F']) .kpi-lab::after {
-    content: ''; flex: 1 1 auto; min-width: var(--d-p3);
-    border-bottom: var(--d-bw) dotted var(--d-line);
-    transform: translateY(-.3em);
-  }
-  :global([data-d='F']) .kpi-fig {
-    grid-column: 2; grid-row: 1; align-self: center;
-    font-size: var(--d-t-lg);
-    background: var(--tone-band); color: var(--tone-fg);
-    padding-inline: var(--d-p1);
-  }
-  :global([data-d='F']) .kpi-note { grid-column: 1 / -1; grid-row: 2; margin-top: 0; }
-  :global([data-d='F']) .kpi-note::before { content: '└ '; color: var(--d-line); }
-  :global([data-d='F']) .kpi-tag {
-    grid-column: 1 / -1; grid-row: 3; justify-self: start;
-    margin-top: 0; border-radius: 0; border: 0;
-  }
-  :global([data-d='F']) .kpi.on { background: var(--d-sunk); }
-  :global([data-d='F']) .kpi.on .kpi-lab::before { content: '> '; color: var(--d-accent); }
-  :global([data-d='F']) .sec-title {
-    font-size: var(--d-t-md); text-transform: uppercase; letter-spacing: .08em;
-  }
-  :global([data-d='F']) .sec-title::before { content: '## '; color: var(--d-accent); }
-  :global([data-d='F']) .sec-desc::before { content: '# '; color: var(--d-line); }
-  :global([data-d='F']) .callout {
-    background: var(--d-surface); border-color: var(--d-line); padding: var(--d-p2);
-  }
-  :global([data-d='F']) .callout-kicker {
-    background: var(--tone-band); padding: 0 var(--d-p1); justify-self: start;
-  }
-  :global([data-d='F']) .nest-wrap { padding: var(--d-p1) var(--d-p2); }
 
   /* ======================================================================
      G · BANDA — ninguna caja. Franjas a sangre, raíl de etiquetas a la
@@ -709,37 +648,6 @@
      H · FICHA — la etiqueta es una PESTAÑA que sobresale arriba, la ficha
      lleva canto apilado abajo y el encabezado va bajo regla doble.
      ====================================================================== */
-  :global([data-d='H']) .kpi {
-    gap: 0;
-    margin-top: calc(var(--d-p4) + var(--d-p2));
-    padding-top: var(--d-p2);
-    border-color: var(--d-edge);
-  }
-  :global([data-d='H']) .kpi-lab {
-    position: absolute; bottom: 100%; left: calc(-1 * var(--d-bw));
-    margin-bottom: calc(-1 * var(--d-bw));
-    max-width: calc(100% + var(--d-bw) * 2);
-    padding: calc(var(--d-p1) / 2) var(--d-p2);
-    background: var(--d-sunk);
-    border: var(--d-bw) solid var(--d-edge); border-bottom: 0;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
-  }
-  :global([data-d='H']) .kpi-body { margin-top: 0; }
-  :global([data-d='H']) .kpi.on { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='H']) .kpi.on .kpi-lab { background: var(--d-accent-soft); color: var(--d-accent); }
-  :global([data-d='H']) .sec-head {
-    padding-bottom: var(--d-p1);
-    border-bottom: calc(var(--d-bw) * 3) double var(--d-edge);
-  }
-  :global([data-d='H']) .callout {
-    background: var(--d-surface); box-shadow: var(--d-shadow); border-color: var(--tone-edge);
-  }
-  :global([data-d='H']) .callout-kicker {
-    background: var(--tone-band);
-    margin: calc(-1 * var(--d-p3)) calc(-1 * var(--d-p3)) 0;
-    padding: calc(var(--d-p1) / 2) var(--d-p3);
-  }
-  :global([data-d='H']) .nest { background: var(--d-sunk); }
 
   /* ======================================================================
      I · CRISTAL — la tira de KPIs es UNA sola pieza de vidrio y las cuatro
@@ -835,53 +743,8 @@
      --d-ink-on, que en las dos es blanco puro, y se gradúa con opacidad. Es la
      única tinta clara que el contrato ofrece.
      ====================================================================== */
-  :global([data-d='J']) .kpi {
-    overflow: hidden;
-    background: var(--d-surface-fill);
-    border-color: var(--d-line);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .kpi::after {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
-    border-radius: var(--d-r-lg) var(--d-r-lg) 40% 40% /
-                   var(--d-r-lg) var(--d-r-lg) 100% 100%;
-    background: linear-gradient(180deg, var(--d-ink-on), transparent);
-    opacity: .55;
-    pointer-events: none;
-    z-index: 0;
-    transition: opacity 120ms ease;
-  }
   /* El barrido es un pseudo posicionado: sin esto pintaría ENCIMA del contenido
      en línea del botón. El texto sube a su propia capa. */
-  :global([data-d='J']) .kpi-lab,
-  :global([data-d='J']) .kpi-body { position: relative; z-index: 1; }
-  :global([data-d='J']) .kpi:focus-visible { outline-offset: calc(-1 * var(--d-p1)); }
-  :global([data-d='J']) .kpi:active { transform: translateY(var(--d-bw)); }
-  :global([data-d='J']) .kpi:active::after { opacity: 0; }
-  :global([data-d='J']) .kpi.on {
-    background: var(--d-sunk-fill);
-    border-color: var(--tone-edge);
-    box-shadow: inset 0 var(--d-p1) var(--d-p2) calc(-1 * var(--d-p1)) var(--d-edge);
-  }
-  :global([data-d='J']) .kpi.on::after { opacity: .18; }
-  :global([data-d='J']) .kpi.on .kpi-lab { color: var(--d-ink); font-weight: var(--d-w-bold); }
-  :global([data-d='J']) .kpi-fig { text-shadow: 0 var(--d-bw) 0 var(--d-ink-on); }
-  :global([data-d='J']) .kpi-tag { background: linear-gradient(180deg, var(--d-ink-on), var(--tone-band)); }
-  :global([data-d='J']) .sec-head { border-bottom: var(--d-bw) solid var(--d-line); padding-bottom: var(--d-p2); }
-  :global([data-d='J']) .callout {
-    position: relative; overflow: hidden;
-    background: linear-gradient(180deg, var(--tone-band), var(--d-surface));
-    border-color: var(--tone-edge);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .callout::before {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 34%;
-    background: linear-gradient(180deg, var(--d-ink-on), transparent);
-    opacity: .5; pointer-events: none;
-  }
-  :global([data-d='J']) .callout-kicker,
-  :global([data-d='J']) .callout-txt { position: relative; z-index: 1; }
-  :global([data-d='J']) .nest { background: var(--d-sunk-fill); }
 
   /* ======================================================================
      K · HALO — cero bordes y cero rellenos sólidos. Un KPI existe porque
@@ -1625,13 +1488,10 @@
     .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .kpis--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .aside-row { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: start; }
-    :global([data-d='F']) .kpis,
     :global([data-d='G']) .kpis { grid-template-columns: minmax(0, 1fr); }
-    :global([data-d='F']) .aside-row,
     :global([data-d='G']) .aside-row { grid-template-columns: minmax(0, 1fr); }
     /* E paga su aire: con este padding, cuatro columnas parten las notas en
        dos palabras por línea. Aguanta en dos hasta que haya sitio de verdad. */
-    :global([data-d='E']) .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     /* Las que se apilan en carriles o franjas: cuatro columnas las convierte
        otra vez en tarjetas y pierden la silueta entera. */
     :global([data-d='N']) .kpis,
@@ -1658,8 +1518,6 @@
     :global([data-d='P']) .ficha-meta > .d-rail > .d-cap { text-align: right; }
   }
   @container (min-width: 800px) {
-    :global([data-d='E']) .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    :global([data-d='E']) .kpis--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     :global([data-d='K']) .kpis,
     :global([data-d='L']) .kpis,
     :global([data-d='M']) .kpis,
@@ -1704,7 +1562,6 @@
     :global([data-d='O']) .kpi:hover,
     :global([data-d='S']) .kpi:hover,
     :global([data-d='S']) .kpi.on { transform: none; }
-    :global([data-d='J']) .kpi::after,
     :global([data-d='M']) .kpi::before,
     :global([data-d='Q']) .kpi::after { transition: none; }
   }

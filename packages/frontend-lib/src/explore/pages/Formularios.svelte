@@ -626,45 +626,6 @@
      50px con la unidad flotando dentro; el buscador es una pastilla suelta;
      las secciones se separan solo con espacio.
      ====================================================================== */
-  :global([data-d='E']) .fm-seek {
-    background: transparent; border: 0; box-shadow: none; padding: 0; gap: var(--d-p1);
-  }
-  :global([data-d='E']) .fm-seek-ctl { gap: var(--d-p2); }
-  :global([data-d='E']) .fm-q { border-radius: var(--d-r-pill); padding-inline: var(--d-p3); }
-  :global([data-d='E']) .fm-body { gap: var(--d-p4); }
-  :global([data-d='E']) .fm-grid { gap: var(--d-p3); }
-  :global([data-d='E']) .fm-leg {
-    font-size: var(--d-t-lg); font-weight: var(--d-w-semi);
-    letter-spacing: -.015em; color: var(--d-ink); margin-bottom: var(--d-p3);
-  }
-  :global([data-d='E']) .fm-cap { margin-bottom: var(--d-p2); }
-  :global([data-d='E']) .fm-unit { position: relative; }
-  :global([data-d='E']) .fm-unit > .fm-inp { border-radius: 14px; padding-right: 48px; }
-  :global([data-d='E']) .fm-u {
-    position: absolute; right: var(--d-p2); top: 0; bottom: 0;
-    border: 0; border-radius: 0; background: transparent;
-    font-size: var(--d-t-sm); min-width: 0;
-  }
-  :global([data-d='E']) .fm-mark {
-    width: 24px; height: 24px; border: 0; background: var(--d-sunk); border-radius: 8px;
-  }
-  :global([data-d='E']) .fm-mark svg { width: 13px; height: 13px; }
-  :global([data-d='E']) .fm-mark--rd { border-radius: 999px; }
-  :global([data-d='E']) .fm-sw { width: 52px; height: 30px; border: 0; background: var(--d-sunk); }
-  :global([data-d='E']) .fm-sw::after {
-    width: 24px; height: 24px; top: 3px; left: 3px;
-    background: var(--d-surface); box-shadow: var(--d-shadow);
-  }
-  :global([data-d='E']) .fm-in:checked + .fm-sw::after { transform: translateX(22px); background: var(--d-surface); }
-  :global([data-d='E']) .fm-stack { gap: var(--d-p1); }
-  :global([data-d='E']) .fm-f--bad .fm-inp { background: var(--d-crit-band); color: var(--d-crit); border: 0; }
-  :global([data-d='E']) .fm-f--off .fm-inp[disabled] { color: var(--d-ink-3); border: 0; }
-  :global([data-d='E']) .fm-msg { padding-inline: var(--d-p2); }
-  :global([data-d='E']) .fm-hint { padding-inline: var(--d-p2); }
-  :global([data-d='E']) .d-btn { border: 0; }
-  :global([data-d='E']) .fm-seek-btn,
-  :global([data-d='E']) .fm-acts .d-btn { background: var(--d-accent-soft); }
-  :global([data-d='E']) .fm-acts .d-btn--primary { background: var(--d-accent); }
 
   /* ======================================================================
      F · TERMINAL — el campo es una línea de prompt: etiqueta a la izquierda
@@ -672,59 +633,6 @@
      buscador. Casilla y radio son [x] y (•); el interruptor es un bloque de
      color detrás de la palabra.
      ====================================================================== */
-  :global([data-d='F']) .fm { padding: var(--d-p2); gap: var(--d-p2); }
-  :global([data-d='F']) .fm-seek {
-    display: flex; align-items: center; flex-wrap: wrap; gap: var(--d-p1) var(--d-p2);
-    background: var(--d-sunk); border: 0; border-radius: 0; box-shadow: none;
-    padding: var(--d-p1) var(--d-p2);
-  }
-  :global([data-d='F']) .fm-seek-lab { flex: none; }
-  :global([data-d='F']) .fm-seek-ctl { flex: 1 1 160px; gap: 0; flex-wrap: nowrap; align-items: center; }
-  :global([data-d='F']) .fm-seek-ctl::after { content: '▌'; flex: none; color: var(--d-accent); }
-  :global([data-d='F']) .fm-q { border: 0; background: transparent; padding-inline: 0; }
-  :global([data-d='F']) .fm-seek-hint { flex-basis: 100%; }
-  :global([data-d='F']) .fm-set { border: 1px solid var(--d-line); padding: var(--d-p1) var(--d-p2) var(--d-p2); }
-  :global([data-d='F']) .fm-leg { color: var(--d-accent); padding-inline: var(--d-p1); margin-bottom: var(--d-p1); }
-  :global([data-d='F']) .fm-leg::before { content: '── '; color: var(--d-line); }
-  :global([data-d='F']) .fm-leg::after { content: ' ─────'; color: var(--d-line); }
-  :global([data-d='F']) .fm-grid { grid-template-columns: 1fr; gap: 0; }
-  :global([data-d='F']) .fm-f {
-    grid-template-columns: minmax(0, 14ch) minmax(0, 1fr);
-    gap: 0 var(--d-p1); align-items: start; padding-block: 1px;
-  }
-  :global([data-d='F']) .fm-lab { padding-top: 3px; }
-  :global([data-d='F']) .fm-u {
-    border: 0; border-radius: 0; background: transparent;
-    min-width: 0; padding-left: var(--d-p1); justify-content: flex-start;
-  }
-  :global([data-d='F']) .fm-cap { margin-bottom: 0; }
-  :global([data-d='F']) .fm-stack { gap: 0; }
-  :global([data-d='F']) .fm-opt { gap: var(--d-p1); }
-  :global([data-d='F']) .fm-mark {
-    width: auto; height: auto; border: 0; border-radius: 0;
-    background: transparent; color: var(--d-accent); font-family: var(--d-mono);
-  }
-  :global([data-d='F']) .fm-mark svg { display: none; }
-  :global([data-d='F']) .fm-mark--ck::before { content: '[ ]'; }
-  :global([data-d='F']) .fm-in:checked + .fm-mark { background: transparent; color: var(--d-accent); }
-  :global([data-d='F']) .fm-in:checked + .fm-mark--ck::before { content: '[x]'; }
-  :global([data-d='F']) .fm-mark--rd::after {
-    content: '( )'; width: auto; height: auto; background: transparent; border-radius: 0;
-  }
-  :global([data-d='F']) .fm-in:checked + .fm-mark--rd::after { content: '(•)'; }
-  :global([data-d='F']) .fm-sw {
-    width: auto; height: auto; border: 0; border-radius: 0; padding: 0 5px;
-    background: var(--d-neu-band); color: var(--d-neu); font-size: var(--d-t-xs);
-  }
-  :global([data-d='F']) .fm-sw::after {
-    content: 'off'; position: static; width: auto; height: auto;
-    background: transparent; border-radius: 0; transform: none;
-  }
-  :global([data-d='F']) .fm-in:checked + .fm-sw { background: var(--d-accent-soft); color: var(--d-accent); }
-  :global([data-d='F']) .fm-in:checked + .fm-sw::after { content: 'on'; background: transparent; transform: none; }
-  :global([data-d='F']) .fm-state { display: none; }
-  :global([data-d='F']) .fm-msg { background: var(--d-crit-band); padding: 1px var(--d-p1); }
-  :global([data-d='F']) .fm-f--bad .fm-inp { background: var(--d-crit-band); color: var(--d-crit); }
 
   /* ======================================================================
      G · BANDA — ninguna caja. Franjas horizontales a sangre, raíl fijo de
@@ -789,35 +697,6 @@
      que la ficha. Regla doble bajo cada encabezado, bloques manila
      insertados en la ficha blanca y canto apilado bajo cada control.
      ====================================================================== */
-  :global([data-d='H']) .fm-seek {
-    position: relative; margin-top: 26px; margin-bottom: 5px;
-    border-color: var(--d-edge); border-radius: var(--d-r);
-  }
-  :global([data-d='H']) .fm-seek-lab {
-    position: absolute; top: -25px; left: -1px;
-    padding: 5px var(--d-p3) 6px; max-width: calc(100% + 2px);
-    background: var(--d-sunk);
-    border: 1px solid var(--d-edge); border-bottom: 0;
-    border-radius: 4px 4px 0 0;
-  }
-  :global([data-d='H']) .fm-leg,
-  :global([data-d='H']) .fm-cap {
-    width: 100%; padding-bottom: 5px; margin-bottom: var(--d-p2);
-    border-bottom: 3px double var(--d-line);
-  }
-  :global([data-d='H']) .fm-opts,
-  :global([data-d='H']) .fm-states {
-    background: var(--d-sunk);
-    border: 1px solid var(--d-line); border-radius: var(--d-r);
-    box-shadow: 0 1px 0 var(--d-edge);
-    padding: var(--d-p2) var(--d-p3) var(--d-p3);
-  }
-  :global([data-d='H']) .fm-mark,
-  :global([data-d='H']) .fm-sw { box-shadow: 0 1px 0 var(--d-edge); }
-  :global([data-d='H']) .fm-opt:active .fm-mark,
-  :global([data-d='H']) .fm-opt:active .fm-sw { transform: translateY(1px); box-shadow: none; }
-  :global([data-d='H']) .fm-msg { background: var(--d-crit-band); padding: 4px var(--d-p2); border-radius: var(--d-r); }
-  :global([data-d='H']) .fm-set { padding-bottom: var(--d-p1); }
 
   /* ======================================================================
      I · CRISTAL — el campo es un POZO de vidrio: filo especular arriba,
@@ -953,84 +832,8 @@
      en --d-sunk-fill (más oscura) y el barrido es --d-surface (más clara)
      recortado con una máscara que solo usa alfa, no paleta.
      ====================================================================== */
-  :global([data-d='J']) .fm-seek,
-  :global([data-d='J']) .fm-set,
-  :global([data-d='J']) .fm-opts,
-  :global([data-d='J']) .fm-states {
-    position: relative;
-    overflow: hidden;
-    background: var(--d-sunk-fill);
-    border: var(--d-bw) solid var(--d-line);
-    border-radius: var(--d-r-lg);
-    padding: var(--d-p3);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .fm-seek::after,
-  :global([data-d='J']) .fm-set::after,
-  :global([data-d='J']) .fm-opts::after,
-  :global([data-d='J']) .fm-states::after {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 38%;
-    background: var(--d-surface);
-    -webkit-mask-image: linear-gradient(180deg, currentColor 0%, transparent 100%);
-    mask-image: linear-gradient(180deg, currentColor 0%, transparent 100%);
-    opacity: .75;
-    pointer-events: none;
-  }
   /* El contenido va POR ENCIMA del barrido; el barrido solo baña la placa. */
-  :global([data-d='J']) .fm-seek > *,
-  :global([data-d='J']) .fm-set > *,
-  :global([data-d='J']) .fm-opts > *,
-  :global([data-d='J']) .fm-states > * { position: relative; z-index: 1; }
-  :global([data-d='J']) .fm-leg { margin-bottom: var(--d-p2); }
-  :global([data-d='J']) .fm-u {
-    background: var(--d-sunk-fill);
-    border-color: var(--d-edge);
-    box-shadow: inset 0 1px 0 var(--d-line);
-  }
-  :global([data-d='J']) .fm-mark {
-    background: var(--d-surface-fill);
-    border-color: var(--d-edge);
-    box-shadow: 0 2px 4px -1px var(--d-edge), inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='J']) .fm-in:checked + .fm-mark {
-    background: var(--d-accent-fill);
-    border-color: var(--d-accent-edge);
-  }
-  :global([data-d='J']) .fm-sw {
-    background: var(--d-sunk-fill);
-    border-color: var(--d-edge);
-    box-shadow: inset 0 2px 4px -1px var(--d-edge);
-  }
-  :global([data-d='J']) .fm-sw::after {
-    background: var(--d-surface-fill);
-    box-shadow: 0 1px 3px -1px var(--d-edge);
-  }
-  :global([data-d='J']) .fm-in:checked + .fm-sw { background: var(--d-accent-fill); }
   /* Al presionar, el brillo se apaga y la pieza se hunde. */
-  :global([data-d='J']) .fm-opt:active .fm-mark,
-  :global([data-d='J']) .fm-opt:active .fm-sw {
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 5px -1px var(--d-edge);
-  }
-  :global([data-d='J']) .fm-f--bad .fm-inp,
-  :global([data-d='J']) .fm-f--bad .fm-u {
-    background: var(--tone-band);
-    border-color: var(--d-crit);
-  }
-  :global([data-d='J']) .fm-msg {
-    background: var(--tone-band);
-    border-radius: var(--d-r);
-    padding: 4px var(--d-p2);
-    box-shadow: inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='J']) .fm-f--off .fm-inp[disabled] {
-    background: var(--d-sunk-fill);
-    box-shadow: inset 0 2px 4px -1px var(--d-edge);
-  }
-  :global([data-d='J']) .fm-foot { background: var(--d-sunk-fill); }
 
   /* ======================================================================
      K · HALO — cero bordes en toda la celda. Un campo existe porque irradia:
@@ -2117,7 +1920,6 @@
     :global([data-d='G']) .fm-lab,
     :global([data-d='G']) .fm-seek-lab { text-align: left; }
     :global([data-d='G']) .fm-foot { padding-left: var(--d-p3); }
-    :global([data-d='F']) .fm-f { grid-template-columns: minmax(0, 1fr); }
     :global([data-d='B']) .fm-seek { grid-template-columns: minmax(0, 1fr); }
     :global([data-d='B']) .fm-seek-lab { border-right: 0; border-bottom: 1px solid var(--d-edge); padding-block: 3px; }
   }

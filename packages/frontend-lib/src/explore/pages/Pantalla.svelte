@@ -792,98 +792,14 @@
   :global([data-d='D']) .foot { border-top-color: var(--d-ink); }
 
   /* ── E · AIRE — cero bordes en toda la celda; separa el espacio ──────── */
-  :global([data-d='E']) .topbar {
-    background: transparent; border-bottom: 0;
-    padding: var(--d-p3) var(--d-p3) var(--d-p1);
-  }
-  :global([data-d='E']) .scroll { padding: var(--d-p2) var(--d-p3) var(--d-p3); }
-  :global([data-d='E']) .verdict {
-    background: transparent; border: 0; padding: var(--d-p1) 0 var(--d-p2);
-  }
-  :global([data-d='E']) .vt {
-    font-size: var(--d-t-xl); font-weight: var(--d-w); letter-spacing: -.025em; line-height: 1.28;
-  }
-  :global([data-d='E']) .kpi {
-    border: 0; box-shadow: none; background: var(--d-sunk);
-    border-radius: var(--d-r-lg); padding: var(--d-p2) var(--d-p3) var(--d-p3);
-  }
-  :global([data-d='E']) .kpi[aria-pressed='true'] { background: var(--tone-band); }
-  :global([data-d='E']) .kl { text-transform: none; letter-spacing: 0; }
-  :global([data-d='E']) .filters { padding-block: var(--d-p1); }
-  :global([data-d='E']) .fams { gap: var(--d-p1); }
-  :global([data-d='E']) .fam {
-    border: 0; background: var(--d-sunk); border-radius: var(--d-r-pill);
-    padding: 9px var(--d-p2); font-size: var(--d-t-xs);
-  }
-  :global([data-d='E']) .fam[aria-pressed='true'] { background: var(--d-accent); color: var(--d-accent-ink); }
-  :global([data-d='E']) .fam[aria-pressed='true'] .ct { color: var(--d-accent-ink); opacity: .75; }
-  :global([data-d='E']) .lhead { background: transparent; border-bottom: 0; padding-bottom: 0; }
-  :global([data-d='E']) .lhead, :global([data-d='E']) .row {
-    grid-template-columns: 82px minmax(0, 2fr) minmax(0, 1.25fr) 78px 124px;
-  }
   /* la fila no lleva línea: la separa el aire, y el reposo es una pastilla */
-  :global([data-d='E']) .rows { display: flex; flex-direction: column; gap: 2px; padding: var(--d-p1) var(--d-p1) var(--d-p2); }
-  :global([data-d='E']) .row { border-bottom: 0; border-radius: var(--d-r); }
-  :global([data-d='E']) .ghead {
-    background: transparent; border-bottom: 0;
-    padding: var(--d-p3) var(--d-p3) var(--d-p1);
-    font-size: var(--d-t-md); font-weight: var(--d-w-semi);
-    text-transform: none; letter-spacing: 0; color: var(--d-ink);
-  }
-  :global([data-d='E']) .track { height: 10px; border-radius: var(--d-r-pill); }
-  :global([data-d='E']) .thr { background: var(--d-ink-3); opacity: .55; }
-  :global([data-d='E']) .foot { background: transparent; border-top: 0; }
 
   /* ── F · TERMINAL — una pantalla de texto, el color como bloque ──────── */
-  :global([data-d='F']) .topbar { background: var(--d-sunk); border-bottom-color: var(--d-line); }
-  :global([data-d='F']) .title::before { content: '~/'; color: var(--d-ink-3); }
-  :global([data-d='F']) .search::before { content: '$'; color: var(--d-accent); flex: none; }
-  :global([data-d='F']) .verdict {
-    background: var(--tone-band); border-color: var(--tone-edge); border-radius: 0;
-    padding: var(--d-p1) var(--d-p2);
-  }
-  :global([data-d='F']) .vt { font-size: var(--d-t-md); font-weight: var(--d-w-med); color: var(--tone-fg); }
-  :global([data-d='F']) .vt::before { content: '!! '; }
   /* la tira de KPIs es una rejilla de un pelo, no cuatro tarjetas */
-  :global([data-d='F']) .kpis { gap: 1px; background: var(--d-line); border: 1px solid var(--d-line); }
-  :global([data-d='F']) .kpi { border: 0; border-radius: 0; padding: var(--d-p1) var(--d-p2); }
-  :global([data-d='F']) .kv {
-    font-size: var(--d-t-lg); background: var(--tone-band); color: var(--tone-fg); padding: 0 var(--d-p1);
-  }
-  :global([data-d='F']) .lhead { background: transparent; border-bottom: var(--d-bw) dashed var(--d-line); }
-  :global([data-d='F']) .ghead { background: transparent; border-bottom: 0; color: var(--d-accent); }
   /* la regla de guiones de F es texto corrido: .gn vuelve a inline para que los
      dos pseudos y la marca sigan siendo una sola corrida y no tres cajas */
-  :global([data-d='F']) .gn { display: inline; }
-  :global([data-d='F']) .gn::before { content: '── '; color: var(--d-line); }
-  :global([data-d='F']) .gn::after { content: ' ─────────────'; color: var(--d-line); }
   /* columnas separadas por regla, como una tabla de terminal */
-  :global([data-d='F']) .c-eq, :global([data-d='F']) .c-plan,
-  :global([data-d='F']) .c-metric, :global([data-d='F']) .c-state {
-    border-left: var(--d-bw) solid var(--d-line); padding-left: var(--d-p2);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  :global([data-d='F']) .nm, :global([data-d='F']) .pl,
-  :global([data-d='F']) .mv, :global([data-d='F']) .sub { display: inline; overflow: visible; }
-  :global([data-d='F']) .sub::before { content: ' · '; color: var(--d-line); }
-  :global([data-d='F']) .lhead, :global([data-d='F']) .row {
-    grid-template-columns: 72px minmax(0, 2.4fr) minmax(0, 1.2fr) 118px 104px;
-  }
-  :global([data-d='F']) .fam {
-    border: 0; background: transparent; color: var(--d-ink-2); padding: 0 2px; border-radius: 0;
-  }
-  :global([data-d='F']) .fam::before { content: '['; color: var(--d-ink-3); }
-  :global([data-d='F']) .fam::after { content: ']'; color: var(--d-ink-3); }
-  :global([data-d='F']) .fam[aria-pressed='true'] { background: var(--d-accent-soft); color: var(--d-accent); }
   /* la barra de progreso es una barra de caracteres, con marca de umbral */
-  :global([data-d='F']) .ascii {
-    position: relative; flex: 1 1 auto; letter-spacing: 0;
-    color: var(--tone-fg); font-size: var(--d-t-sm); white-space: pre;
-  }
-  :global([data-d='F']) .ascii::after {
-    content: '|'; position: absolute; left: 16.7ch; top: 0; color: var(--d-ink-3);
-  }
-  :global([data-d='F']) .foot { background: var(--d-sunk); }
 
   /* ── G · BANDA — ninguna caja: estratos a sangre y raíl a la izquierda ─ */
   :global([data-d='G']) .scroll { padding: 0; gap: 0; }
@@ -956,47 +872,8 @@
   :global([data-d='G']) .vk { justify-content: flex-end; }
 
   /* ── H · FICHA — pestaña arriba, canto apilado abajo, regla doble ────── */
-  :global([data-d='H']) .topbar {
-    background: var(--d-sunk); border-bottom-color: var(--d-edge);
-    box-shadow: 0 2px 0 var(--d-surface), 0 3px 0 var(--d-edge);
-    margin-bottom: 3px;
-  }
-  :global([data-d='H']) .verdict {
-    box-shadow: 0 2px 0 var(--d-surface), 0 3px 0 var(--tone-edge);
-    margin-bottom: 3px;
-  }
-  :global([data-d='H']) .kpis { padding-bottom: 5px; }
-  :global([data-d='H']) .kpi[aria-pressed='true'] { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='H']) .fam {
-    background: var(--d-sunk); border-color: var(--d-edge);
-    border-radius: 4px 4px 0 0; box-shadow: 0 1px 0 var(--d-edge); margin-bottom: 2px;
-  }
-  :global([data-d='H']) .fam[aria-pressed='true'] {
-    background: var(--d-surface); border-bottom-color: var(--d-accent);
-    box-shadow: 0 2px 0 var(--d-accent);
-  }
   /* la regla doble bajo el encabezado de columnas — el tic de la ficha */
-  :global([data-d='H']) .lhead {
-    background: var(--d-surface); border-bottom-color: var(--d-line);
-    box-shadow: inset 0 -3px 0 -1px var(--d-line);
-    padding-bottom: calc(var(--d-p1) + 3px);
-  }
-  :global([data-d='H']) .ghead { background: var(--d-sunk); border-bottom-color: var(--d-edge); }
-  :global([data-d='H']) .track {
-    height: 9px; border-radius: 0; border: 1px solid var(--d-edge); background: var(--d-sunk);
-  }
   /* relleno tramado: la barra de una ficha se raya, no se pinta */
-  :global([data-d='H']) .fill {
-    border-radius: 0;
-    background:
-      repeating-linear-gradient(45deg, var(--tone-fg) 0 1px, transparent 1px 4px),
-      var(--tone-band);
-    box-shadow: inset -2px 0 0 var(--tone-fg);
-  }
-  :global([data-d='H']) .tlr { border-bottom: 1px solid var(--d-line); padding-bottom: var(--d-p2); }
-  :global([data-d='H']) .tlr:last-child { border-bottom: 0; }
-  :global([data-d='H']) .thr { background: var(--d-ink-2); }
-  :global([data-d='H']) .foot { background: var(--d-sunk); border-top-color: var(--d-edge); }
 
   /* ======================================================================
      LAS ONCE NUEVAS — I … S.
@@ -1123,88 +1000,11 @@
      pero no un --d-gloss: el barrido existe solo dentro de .d-panel::after
      en directions.css y el marcado propio de una página no puede reusarlo.
      Se sintetiza acá una vez, a partir de --d-surface, y se reparte. */
-  :global([data-d='J']) .screen { --pg-gloss: color-mix(in srgb, var(--d-surface) 62%, transparent); }
-  :global([data-d='J']) .topbar {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 38%), var(--d-surface-fill);
-    border-bottom-color: var(--d-edge);
-    box-shadow: var(--d-shadow);
-    position: relative; z-index: 2;
-  }
-  :global([data-d='J']) .title { font-weight: var(--d-w-bold); }
-  :global([data-d='J']) .verdict {
-    background:
-      linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%),
-      linear-gradient(180deg, var(--tone-band) 0%, var(--d-surface) 100%);
-    border-color: var(--tone-edge);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .kpi {
-    border-radius: var(--d-r-lg);
-    border-color: var(--d-edge);
-    padding: var(--d-p2) var(--d-p3) var(--d-p3);
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%), var(--d-surface-fill);
-    box-shadow: var(--d-shadow);
-  }
   /* al presionar, el brillo se apaga y la placa se hunde */
-  :global([data-d='J']) .kpi:active {
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 5px color-mix(in srgb, var(--d-ink) 26%, transparent);
-  }
-  :global([data-d='J']) .kpi[aria-pressed='true'] {
-    background:
-      linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%),
-      linear-gradient(180deg, var(--tone-band) 0%, var(--d-surface) 100%);
-  }
-  :global([data-d='J']) .sect { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='J']) .lhead {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 60%), var(--d-sunk-fill);
-    border-bottom-color: var(--d-edge);
-  }
-  :global([data-d='J']) .ghead {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 70%), var(--d-sunk-fill);
-    border-bottom-color: var(--d-edge);
-  }
-  :global([data-d='J']) .fam {
-    border-radius: var(--d-r-pill);
-    border-color: var(--d-edge);
-    padding: 5px var(--d-p2);
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 48%), var(--d-surface-fill);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .fam:active {
-    transform: translateY(1px);
-    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 24%, transparent);
-  }
   /* la pastilla marcada es la única superficie oscura de J: el barrido se
      cambia por el realce del canto para no aclarar el fondo justo debajo de
      una etiqueta blanca de 12px */
-  :global([data-d='J']) .fam[aria-pressed='true'] {
-    background: var(--d-accent-fill);
-    color: var(--d-accent-ink); border-color: var(--d-accent-edge);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .fam[aria-pressed='true'] .ct { color: inherit; }
   /* el carril es un hueco húmedo y el relleno una placa con su propio brillo */
-  :global([data-d='J']) .track {
-    height: 12px;
-    background: var(--d-sunk-fill);
-    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 22%, transparent);
-    overflow: hidden;
-  }
-  :global([data-d='J']) .fill {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 55%), var(--tone-fg);
-  }
-  :global([data-d='J']) .thr { background: var(--d-ink-2); }
-  :global([data-d='J']) .tlb { gap: var(--d-p3); }
-  :global([data-d='J']) .tlr {
-    border-radius: var(--d-r); padding: var(--d-p2) var(--d-p3);
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 44%), var(--d-surface-fill);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .foot {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 60%), var(--d-sunk-fill);
-    border-top-color: var(--d-edge);
-  }
 
   /* ── K · HALO — nada tiene borde: existe lo que irradia ────────────────
      El estado es el COLOR DEL RESPLANDOR, no un relleno. Los KPIs son
@@ -2115,17 +1915,11 @@
     :global([data-d='G']) .topbar .mod { align-items: flex-start; text-align: left; }
     :global([data-d='G']) .fcount { text-align: left; }
     :global([data-d='G']) .vk { justify-content: flex-start; }
-    :global([data-d='E']) .lhead, :global([data-d='E']) .row,
     :global([data-d='D']) .lhead, :global([data-d='D']) .row,
     :global([data-d='B']) .lhead, :global([data-d='B']) .row,
-    :global([data-d='F']) .lhead, :global([data-d='F']) .row,
     :global([data-d='G']) .lhead, :global([data-d='G']) .row { grid-template-columns: minmax(0, 1fr) auto; }
     /* el marco de la barra de filtros se apila: la etiqueta pasa arriba */
     :global([data-d='B']) .filters { grid-template-columns: minmax(0, 1fr); }
-    :global([data-d='F']) .c-eq, :global([data-d='F']) .c-plan,
-    :global([data-d='F']) .c-metric, :global([data-d='F']) .c-state {
-      border-left: 0; padding-left: 0;
-    }
     :global([data-d='B']) .flab { border-right: 0; border-bottom: 1px solid var(--d-line); }
   }
   @media (max-width: 560px) {

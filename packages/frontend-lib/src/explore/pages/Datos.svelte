@@ -1154,52 +1154,8 @@
   :global([data-d='D']) .cal-detail { border: var(--d-bw) solid var(--d-ink); box-shadow: var(--d-shadow); padding: var(--d-p2); }
 
   /* ── E · AIRE — ni un borde en toda la celda, curva y espacio ───────── */
-  :global([data-d='E']) .dv { --dv-h: 22px; --dv-lab: 124px; --dv-dot: 20px; }
-  :global([data-d='E']) .dv-bar { background: transparent; box-shadow: none; padding: 0; }
-  :global([data-d='E']) .dv-fld { background: var(--d-sunk); border-radius: var(--d-r-pill); padding-left: var(--d-p2); }
-  :global([data-d='E']) .dv-sel { background: transparent; border-radius: var(--d-r-pill); }
-  :global([data-d='E']) .dv-note { background: var(--d-sunk); border-radius: var(--d-r-pill); padding: var(--d-p1) var(--d-p2); }
-  :global([data-d='E']) .dv-body { gap: var(--d-p3); }
-  :global([data-d='E']) .pb-fill { border-radius: var(--d-r-pill); }
-  :global([data-d='E']) .pb-zone { opacity: .6; }
-  :global([data-d='E']) .pb-thr { width: 4px; background: var(--d-surface); opacity: 1; }
-  :global([data-d='E']) .pb-thr--soft { display: none; }
-  :global([data-d='E']) .ck-svg { width: 148px; height: 84px; }
-  :global([data-d='E']) .ck-trk, :global([data-d='E']) .ck-arc { stroke-linecap: round; stroke-width: 12; }
-  :global([data-d='E']) .tl { gap: var(--d-p1); }
-  :global([data-d='E']) .tl-track { height: 16px; }
-  :global([data-d='E']) .tl-elapsed { inset-block: 0; opacity: .22; border-radius: var(--d-r-pill); }
-  :global([data-d='E']) .tl-now { inset-block: -4px; width: 6px; margin-left: -3px; border-radius: var(--d-r-pill); opacity: .16; }
-  :global([data-d='E']) .tl-dot { box-shadow: none; background: var(--tone-band); }
-  :global([data-d='E']) .sp-svg { height: 84px; }
-  :global([data-d='E']) .sp-base, :global([data-d='E']) .sp-grid { display: none; }
-  :global([data-d='E']) .sp-curve { stroke-width: 2.4; stroke-linecap: round; }
-  :global([data-d='E']) .ds-bar { height: 20px; gap: 4px; background: transparent; overflow: visible; }
-  :global([data-d='E']) .ds-seg { border-radius: var(--d-r-pill); }
-  :global([data-d='E']) .ds-seg + .ds-seg { box-shadow: none; }
-  :global([data-d='E']) .cal-strip { grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--d-p1); }
-  :global([data-d='E']) .cal-day { min-height: 56px; }
-  :global([data-d='E']) .cal-day--hoy { box-shadow: none; background: var(--d-accent-soft); }
-  :global([data-d='E']) .cal-detail { margin-top: var(--d-p3); }
 
   /* ── F · TERMINAL — todo carácter, el color como bloque tras el texto ─ */
-  :global([data-d='F']) .dv { padding: var(--d-p2); gap: var(--d-p2); }
-  :global([data-d='F']) .dv-bar { background: var(--d-sunk); border: 0; padding: var(--d-p1) var(--d-p2); }
-  :global([data-d='F']) .dv-rail { text-transform: none; letter-spacing: 0; color: var(--d-accent); }
-  :global([data-d='F']) .dv-rail::before { content: 'strix plan ▸ '; color: var(--d-ink-3); }
-  :global([data-d='F']) .dv-body { gap: var(--d-p1); }
-  :global([data-d='F']) .sp-mono { display: block; overflow-x: auto; }
-  :global([data-d='F']) .ds-key li, :global([data-d='F']) .tl-key li, :global([data-d='F']) .cal-list li { font-size: var(--d-t-xs); }
-  :global([data-d='F']) .cal-strip { gap: 0; }
-  :global([data-d='F']) .cal-day {
-    min-height: 26px; padding: 2px 0; gap: 0;
-    border: 0; border-radius: 0; background: var(--d-sunk);
-  }
-  :global([data-d='F']) .cal-day[data-tone] { background: var(--tone-band); }
-  :global([data-d='F']) .cal-day--wknd { background: var(--d-ground); }
-  :global([data-d='F']) .cal-day--hoy { box-shadow: inset 0 0 0 1px var(--d-accent); }
-  :global([data-d='F']) .cal-n { font-size: var(--d-t-xs); font-weight: var(--d-w); }
-  :global([data-d='F']) .cal-detail { background: var(--d-sunk); padding: var(--d-p1) var(--d-p2); }
 
   /* ── G · BANDA — ninguna caja, a sangre, todo colgado del raíl ──────── */
   :global([data-d='G']) .dv { --dv-h: 8px; --dv-lab: var(--d-rail); --dv-lane: var(--d-rail); }
@@ -1237,25 +1193,6 @@
   :global([data-d='G']) .cal-day--hoy { box-shadow: inset 3px 0 0 var(--tone-fg, var(--d-ink)), inset 0 -2px 0 var(--d-ink); }
 
   /* ── H · FICHA — manila, doble regla, canto apilado ─────────────────── */
-  :global([data-d='H']) .dv { --dv-h: 12px; }
-  :global([data-d='H']) .dv-bar { background: var(--d-sunk); border-color: var(--d-edge); box-shadow: 0 1px 0 var(--d-edge); }
-  :global([data-d='H']) .pb-track, :global([data-d='H']) .tl-track, :global([data-d='H']) .ck-trklane,
-  :global([data-d='H']) .ds-bar {
-    border-radius: var(--d-r); border: 1px solid var(--d-edge); background: var(--d-sunk);
-  }
-  :global([data-d='H']) .pb + .pb, :global([data-d='H']) .ck + .ck {
-    margin-top: var(--d-p2); padding-top: var(--d-p2);
-    border-top: 1px solid var(--d-line);
-    box-shadow: inset 0 2px 0 -1px var(--d-surface), inset 0 3px 0 -1px var(--d-line);
-  }
-  :global([data-d='H']) .tl-key, :global([data-d='H']) .ds-key {
-    margin-top: var(--d-p2); padding-top: var(--d-p2);
-    border-top: 1px solid var(--d-line);
-    box-shadow: inset 0 2px 0 -1px var(--d-surface), inset 0 3px 0 -1px var(--d-line);
-  }
-  :global([data-d='H']) .sp-svg { border: 1px solid var(--d-edge); border-radius: var(--d-r); }
-  :global([data-d='H']) .cal-day--hoy { box-shadow: inset 0 0 0 1px var(--d-accent); }
-  :global([data-d='H']) .cal-detail { background: var(--d-sunk); border: 1px solid var(--d-edge); border-radius: var(--d-r); padding: var(--d-p2); }
 
   /* ══════════════════════════════════════════════════════════════════════
      LAS ONCE NUEVAS — I J K L M N O P Q R S.
@@ -1369,67 +1306,9 @@
      dirección (color-mix sobre --d-surface) encima del color del tono. Un
      --d-gloss en el contrato ahorraría esta línea en las cuatro direcciones
      que la necesitan (J, N, O, Q). */
-  :global([data-d='J']) .dv {
-    --dv-h: 16px; --dv-dot: 16px;
-    --dv-gloss: linear-gradient(180deg, color-mix(in srgb, var(--d-surface) 88%, transparent), transparent);
-  }
-  :global([data-d='J']) .dv-bar {
-    position: relative; overflow: hidden;
-    background: var(--d-surface-fill);
-    border-color: var(--d-edge); border-radius: var(--d-r-lg);
-  }
-  :global([data-d='J']) .dv-bar::after {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
-    background: var(--dv-gloss); pointer-events: none;
-  }
-  :global([data-d='J']) .pb-track, :global([data-d='J']) .tl-track,
-  :global([data-d='J']) .ck-trklane, :global([data-d='J']) .ds-bar {
-    background: var(--d-sunk-fill);
-    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 22%, transparent);
-  }
-  :global([data-d='J']) .pb-fill, :global([data-d='J']) .ck-fill, :global([data-d='J']) .ds-seg {
-    background-color: var(--tone-fg);
-    background-image: var(--dv-gloss);
-    background-size: 100% 55%; background-repeat: no-repeat;
-  }
-  :global([data-d='J']) .pb-thr {
-    width: 3px; opacity: 1;
-    background: var(--d-ink);
-    box-shadow: 1px 0 0 color-mix(in srgb, var(--d-surface) 80%, transparent);
-  }
-  :global([data-d='J']) .pb-thr--soft { width: 2px; opacity: .3; box-shadow: none; }
-  :global([data-d='J']) .tl-elapsed { border-radius: var(--d-r-pill); }
-  :global([data-d='J']) .tl-dot { box-shadow: 0 0 0 1px var(--tone-fg), var(--d-shadow); }
-  :global([data-d='J']) .sp-svg {
-    background: var(--dv-gloss) top / 100% 40% no-repeat, var(--d-sunk-fill);
-    border-radius: var(--d-r);
-    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 16%, transparent);
-  }
-  :global([data-d='J']) .cal-strip { gap: 3px; }
-  :global([data-d='J']) .cal-day {
-    position: relative; overflow: hidden;
-    background: var(--d-surface-fill); border-color: var(--d-edge);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='J']) .cal-day[data-tone] { background-color: var(--tone-band); background-image: none; }
-  :global([data-d='J']) .cal-day::before {
-    content: ''; position: absolute; inset: 0 0 auto 0; height: 42%;
-    background: var(--dv-gloss); pointer-events: none;
-  }
   /* Al presionar, el brillo se apaga y la placa se hunde. */
-  :global([data-d='J']) .cal-day:active { transform: translateY(1px); box-shadow: inset 0 2px 5px color-mix(in srgb, var(--d-ink) 26%, transparent); }
-  :global([data-d='J']) .cal-day:active::before { opacity: 0; }
-  :global([data-d='J']) .cal-day--wknd { background: var(--d-sunk-fill); }
   /* Una regla prefijada con [data-d] le gana a la base .cal-day--hoy, así que
      cada dirección que repinta el día tiene que devolverle el anillo de hoy. */
-  :global([data-d='J']) .cal-day--hoy,
-  :global([data-d='J']) .cal-day--hoy[data-tone] { box-shadow: var(--d-shadow), inset 0 0 0 1px var(--d-ink); }
-  :global([data-d='J']) .cal-day--on::after { background: var(--d-accent); }
-  :global([data-d='J']) .cal-detail {
-    background: var(--d-sunk-fill); border-radius: var(--d-r-lg);
-    padding: var(--d-p2) var(--d-p3);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 90%, transparent);
-  }
 
   /* ── K · HALO — cero bordes: la barra es luz que se derrama ───────────
      El relleno no termina en un canto, se apaga: degradado del propio tono a

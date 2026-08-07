@@ -50,21 +50,6 @@ export const DIRECTIONS = [
     form: 'Borde 2px tinta. Radio 0. Sombra dura 4px sin desenfoque — al presionar, el bloque se mueve hacia ella. Tipografía pesada: etiquetas 800 en caja alta.'
   },
   {
-    id: 'E',
-    name: 'Aire',
-    tagline: 'Sin bordes. Solo espacio.',
-    silhouette: 'Pastillas grandes y suaves que casi se disuelven en el fondo. Ningún borde en toda la pantalla.',
-    form: 'Radio 20–28px. Cero bordes. Sombra muy difusa y baja. Padding generoso, fila de 56px, cuerpo a 16px. Las etiquetas en caja normal, sin versalitas.'
-  },
-  {
-    id: 'F',
-    name: 'Terminal',
-    tagline: 'Rejilla monoespaciada, fondo oscuro.',
-    silhouette: 'Una pantalla de texto. Todo alineado a la cuadrícula del carácter, densidad máxima.',
-    form: 'Monoespaciada en todo. Radio 0, fila de 24px, texto 12–13px. Los estados son bloques de color detrás del texto. La cabecera de un panel es una regla de guiones.',
-    dark: true
-  },
-  {
     id: 'G',
     name: 'Banda',
     tagline: 'Sin tarjetas. Estratos de borde a borde.',
@@ -72,25 +57,12 @@ export const DIRECTIONS = [
     form: 'Ninguna caja. La estructura la dan el raíl de etiquetas de 148px y una franja de color de 3px en el canto izquierdo que lleva el estado. Radio 0. Sombra nunca.'
   },
   {
-    id: 'H',
-    name: 'Ficha',
-    tagline: 'Fichas de archivo, con pestaña y canto apilado.',
-    silhouette: 'Tarjetas con una pestaña sobresaliendo arriba que lleva el título, y un canto doble abajo que sugiere más fichas detrás.',
-    form: 'Fondo manila, ficha blanca. La pestaña ES la cabecera: nada de barra de título dentro. Radio 2px en la ficha, 4px arriba en la pestaña. Regla doble bajo el encabezado.'  },
-  {
     id: 'I',
     finalista: true,
     name: 'Cristal',
     tagline: 'Vidrio líquido sobre un campo de color.',
     silhouette: 'Paneles translúcidos que dejan pasar el fondo teñido, con un filo especular arriba. Nada opaco.',
     form: 'backdrop-filter de verdad: el fondo es un campo de manchas de color y los paneles lo desenfocan. Radio 18–26px. El borde es luz, no línea: 1px blanco al 65 % más un realce interior arriba.'
-  },
-  {
-    id: 'J',
-    name: 'Laca',
-    tagline: 'Esmalte brillante. Superficies que reflejan.',
-    silhouette: 'Placas gruesas y muy redondeadas con un barrido de brillo en el tercio superior y sombra profunda debajo.',
-    form: 'Cada superficie es un degradado vertical, no un color plano. Realce blanco duro en el borde de arriba, sombra larga y difusa abajo. Radio 14–22px, fila de 46px. Al presionar, el brillo se apaga y la placa se hunde.'
   },
   {
     id: 'K',
@@ -188,6 +160,15 @@ export const DIRECTIONS = [
     silhouette: 'Superficies translúcidas por todas partes, y encima objetos opacos y compactos: los controles.',
     form: 'Misma página de vidrio, pero la capa interactiva es maciza. Botones y campos son sólidos, sin desenfoque y sin transparencia, con su propia sombra de contacto. La consecuencia es que la opacidad pasa a ser la señal de affordance: se sabe qué se puede tocar por lo que NO deja pasar el fondo. Lo transparente es página; lo opaco es control.',
     mezcla: 'I + affordance material',
+    finalista: true
+  },
+  {
+    id: 'W',
+    name: 'Cristal templado',
+    tagline: 'Vidrio donde sirve. Opaco donde estorba. Halo solo donde urge.',
+    silhouette: 'Paneles translúcidos sobre un campo de color, tablas planas y tranquilas, y una sola fila que irradia: la vencida.',
+    form: 'Cristal con tres correcciones y una regla de reserva. Nada que FLOTE es translúcido: menús, desplegables, diálogos y globos van sólidos, porque un menú translúcido deja que el texto de abajo se cruce con el de arriba y ninguno de los dos se lee. Las filas de tabla vuelven a ser planas, con banda opaca y sin anillo ni margen, porque una tabla de objetos flotantes es engorrosa de leer. Las fichas de filtro son las de Cristal, que ya funcionaban. Y el halo queda reservado a lo crítico: si todo brilla, nada urge.',
+    mezcla: 'I corregido',
     finalista: true
   }
 ];
