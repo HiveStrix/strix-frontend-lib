@@ -1,0 +1,20 @@
+{
+  "name": "strix-frontend-example",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ejemplos ejecutables de @strix/frontend-lib: pantallas reales armadas con la librería.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@strix/frontend-lib": "file:../strix-FrontendLib"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "svelte": "^5.19.0",
+    "vite": "^6.0.0"
+  }
+}
