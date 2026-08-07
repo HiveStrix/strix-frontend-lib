@@ -602,12 +602,803 @@
   :global([data-d='H']) .proc-track { background: var(--d-sunk); border: 1px solid var(--d-edge); }
 
   /* ======================================================================
+     I · CRISTAL — el aviso es una lámina de vidrio sobre el campo teñido y
+     el velo del diálogo es vidrio DE VERDAD: desenfoca la flota que queda
+     debajo en vez de pintarle un gris encima.
+
+     La regla que ordena la celda: vidrio sobre vidrio se enturbia. Solo dos
+     capas desenfocan acá —la lámina y el velo—. Lo que va ENCIMA del velo
+     (el diálogo, el chip de tipo) se anida con TRANSPARENCIA, nunca con más
+     desenfoque.
+     ====================================================================== */
+  :global([data-d='I']) .blk {
+    --blk-bg: var(--d-surface);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    border-color: var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow); padding: var(--d-p3);
+  }
+  /* El filo especular. Va en z-index -1: por encima del vidrio y por DEBAJO
+     del texto — pintado encima le come el contraste al titular. */
+  :global([data-d='I']) .blk::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    border-radius: inherit; pointer-events: none;
+    background: radial-gradient(130% 74% at 14% -32%,
+                color-mix(in srgb, var(--d-line) 72%, transparent) 0%, transparent 62%);
+  }
+  /* El tono se anida con transparencia: banda translúcida y un filo de luz,
+     sin un segundo backdrop-filter. */
+  :global([data-d='I']) .blk-kind {
+    justify-self: start; padding: 3px var(--d-p2) 3px var(--d-p1);
+    background: var(--tone-band); border: 1px solid var(--tone-edge);
+    border-radius: var(--d-r-pill);
+  }
+  :global([data-d='I']) .blk--toast { --blk-bg: var(--d-sunk); box-shadow: var(--d-shadow-lg); }
+  :global([data-d='I']) .scene {
+    background: var(--d-surface);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    border-color: var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='I']) .veil {
+    background: color-mix(in srgb, var(--d-line) 58%, transparent);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+  }
+  /* Sobre el velo NO va otro desenfoque. El diálogo condensa el mismo vidrio
+     pintándolo dos veces —1−(1−a)²—, que es más opaco sin inventar un color
+     que no está en el bloque de tokens. */
+  :global([data-d='I']) .dlg {
+    --blk-bg: linear-gradient(var(--d-surface), var(--d-surface)),
+              linear-gradient(var(--d-surface), var(--d-surface));
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg); padding: var(--d-p4);
+  }
+  :global([data-d='I']) .skel-b {
+    background: color-mix(in srgb, var(--d-line) 58%, transparent);
+    border-radius: var(--d-r-pill);
+  }
+  :global([data-d='I']) .proc-track {
+    background: var(--d-sunk); border-radius: var(--d-r-pill);
+    box-shadow: inset 0 1px 3px color-mix(in srgb, var(--d-ink) 14%, transparent);
+  }
+  :global([data-d='I']) .proc-fill {
+    border-radius: var(--d-r-pill);
+    box-shadow: 0 0 var(--d-p2) calc(-1 * var(--d-p1)) var(--d-accent);
+  }
+  /* HALLAZGO de contraste, el mismo que ya está escrito en Acciones, Tablas y
+     Formularios: en directions.css `[data-d='I'] .d-btn` pesa (0,2,0) y
+     `.d-btn--primary` pesa (0,1,0), así que el vidrio blanco le gana el fondo
+     al primario y queda tinta blanca sobre blanco — 1.02:1, invisible. El
+     arreglo de raíz va en directions.css; mientras tanto esta página lo repone. */
+  :global([data-d='I']) .d-btn--primary {
+    background: var(--d-accent);
+    color: var(--d-accent-ink);
+  }
+
+  /* ======================================================================
+     J · LACA — ninguna superficie es color plano: el aviso es una placa de
+     esmalte con degradado vertical, realce duro arriba y sombra profunda
+     abajo. El barrido de brillo vive en el tercio superior.
+     ====================================================================== */
+  :global([data-d='J']) .blk {
+    --blk-bg: linear-gradient(180deg,
+              color-mix(in srgb, var(--d-surface) 62%, var(--tone-band)) 0%,
+              var(--tone-band) 100%);
+    isolation: isolate;
+    border-color: var(--tone-edge); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow); padding: var(--d-p3);
+    transition: box-shadow 110ms ease;
+  }
+  /* El barrido: pointer-events none para no taparle el clic a nada, y
+     z-index -1 para caer entre el esmalte y el texto. Encima del texto sería
+     un velo blanco sobre el titular, que es lo único que hay que poder leer. */
+  :global([data-d='J']) .blk::after {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
+    z-index: -1; pointer-events: none;
+    border-radius: var(--d-r-lg) var(--d-r-lg) 40% 40% / var(--d-r-lg) var(--d-r-lg) 100% 100%;
+    background: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-surface) 74%, transparent), transparent);
+    transition: opacity 110ms ease;
+  }
+  /* La palabra de estado es una ficha de esmalte levantada, no una etiqueta. */
+  :global([data-d='J']) .blk-kind {
+    justify-self: start; padding: var(--d-p1) var(--d-p2);
+    border-radius: var(--d-r-pill);
+    background: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-surface) 70%, var(--tone-band)), var(--tone-band));
+    box-shadow: 0 2px 5px -2px color-mix(in srgb, var(--d-ink) 34%, transparent),
+                inset 0 1px 0 color-mix(in srgb, var(--d-surface) 92%, transparent);
+  }
+  /* Al presionar, el brillo se apaga y la placa se hunde. */
+  :global([data-d='J']) .blk:has(.d-btn:active) {
+    box-shadow: inset 0 2px 6px color-mix(in srgb, var(--d-ink) 28%, transparent);
+  }
+  :global([data-d='J']) .blk:has(.d-btn:active)::after { opacity: .3; }
+  :global([data-d='J']) .blk--toast { --blk-bg: var(--d-surface-fill); box-shadow: var(--d-shadow-lg); }
+  :global([data-d='J']) .scene {
+    background: var(--d-sunk-fill); border-color: var(--d-edge);
+    border-radius: var(--d-r-lg); box-shadow: var(--d-shadow);
+  }
+  :global([data-d='J']) .veil {
+    background: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-ink) 28%, transparent),
+                color-mix(in srgb, var(--d-ink) 56%, transparent));
+  }
+  :global([data-d='J']) .dlg {
+    --blk-bg: var(--d-surface-fill);
+    border-color: var(--d-edge); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow-lg); padding: var(--d-p3) var(--d-p4) var(--d-p4);
+  }
+  :global([data-d='J']) .skel-b {
+    background: var(--d-sunk-fill); border-radius: var(--d-r-pill); height: .95em;
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 90%, transparent);
+  }
+  :global([data-d='J']) .proc-track {
+    height: var(--d-p2); background: var(--d-sunk-fill); border-radius: var(--d-r-pill);
+    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 24%, transparent);
+  }
+  :global([data-d='J']) .proc-fill {
+    background: var(--d-accent-fill);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 76%, transparent);
+  }
+  :global([data-d='J']) .d-pill {
+    background: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-surface) 52%, var(--tone-band)), var(--tone-band));
+  }
+
+  /* ======================================================================
+     K · HALO — cero bordes y cero rellenos sólidos. El aviso existe porque
+     IRRADIA: anillo de 1px en su propio tono más un resplandor difuso. La
+     alerta crítica es la que más luz tira de toda la celda.
+     ====================================================================== */
+  :global([data-d='K']) .blk {
+    --blk-bg: var(--tone-band);
+    border: 0; border-radius: var(--d-r-lg); padding: var(--d-p3);
+    box-shadow: 0 0 0 1px var(--tone-edge),
+                0 var(--d-p2) calc(var(--d-p4) * 2) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* La crítica no comparte intensidad con las demás: irradia hacia afuera y
+     se enciende por dentro. El estado es el color del resplandor. */
+  :global([data-d='K']) .blk[data-tone='critical'] {
+    box-shadow: inset 0 0 var(--d-p4) calc(-1 * var(--d-p2)) var(--tone-fg),
+                0 0 0 1px var(--tone-edge),
+                0 var(--d-p2) calc(var(--d-p4) * 3) calc(-1 * var(--d-p3)) var(--tone-fg);
+  }
+  :global([data-d='K']) .blk-kind {
+    color: var(--tone-fg);
+    text-shadow: 0 0 var(--d-p2) color-mix(in srgb, var(--tone-fg) 55%, transparent);
+  }
+  :global([data-d='K']) .blk-title {
+    text-shadow: 0 0 var(--d-p3) color-mix(in srgb, var(--d-ink) 24%, transparent);
+  }
+  :global([data-d='K']) .sec-cap {
+    color: var(--d-accent);
+    text-shadow: 0 0 var(--d-p2) color-mix(in srgb, var(--d-accent) 42%, transparent);
+  }
+  :global([data-d='K']) .scene {
+    background: var(--d-sunk); border: 0; border-radius: var(--d-r-lg);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--d-ink) 10%, transparent);
+  }
+  /* El velo no es un gris: es la oscuridad, y el diálogo la enciende de rojo
+     desde adentro. */
+  :global([data-d='K']) .veil {
+    background:
+      radial-gradient(88% 70% at 50% 50%,
+        color-mix(in srgb, var(--d-crit) 18%, transparent) 0%, transparent 72%),
+      color-mix(in srgb, var(--d-ink-on) 80%, transparent);
+  }
+  :global([data-d='K']) .dlg {
+    --blk-bg: var(--d-surface); padding: var(--d-p4);
+    box-shadow: 0 0 0 1px var(--tone-edge),
+                0 var(--d-p3) calc(var(--d-p4) * 3) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  :global([data-d='K']) .skel-b {
+    background: color-mix(in srgb, var(--d-ink) 7%, transparent);
+    border-radius: var(--d-r-pill);
+    box-shadow: 0 0 var(--d-p3) calc(-1 * var(--d-p1)) var(--d-accent);
+  }
+  :global([data-d='K']) .proc-track {
+    background: color-mix(in srgb, var(--d-ink) 7%, transparent);
+    border-radius: var(--d-r-pill);
+  }
+  :global([data-d='K']) .proc-fill {
+    border-radius: var(--d-r-pill);
+    box-shadow: 0 0 var(--d-p3) calc(var(--d-p1) * -.5) var(--d-accent);
+  }
+
+  /* ======================================================================
+     L · GUIJARRO — cuatro radios distintos por contenedor y distintos entre
+     vecinos. Si los cinco avisos comparten los mismos cuatro, vuelven a ser
+     tarjetas.
+
+     HALLAZGO: el bloque de tokens de L solo trae DOS juegos de radio
+     (--d-r y --d-r-lg). La silueta pide una permutación por pieza, así que
+     las variantes salen de rotar la escala de espaciado —p1/p2/p3/p4, cuatro
+     valores distintos— en lugar de inventar píxeles. Lo que falta en
+     directions.css es algo como --d-r-alt-1 / -2 / -3.
+     ====================================================================== */
+  :global([data-d='L']) .blk {
+    --blk-bg: var(--d-surface);
+    border: 0; padding: var(--d-p3);
+    border-radius: var(--d-p4) var(--d-p2) var(--d-p3) var(--d-p1);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='L']) .blk + .blk { border-radius: var(--d-p2) var(--d-p4) var(--d-p1) var(--d-p3); }
+  :global([data-d='L']) .blk--toast { border-radius: var(--d-p3) var(--d-p1) var(--d-p4) var(--d-p2); }
+  :global([data-d='L']) .blk-kind {
+    justify-self: start;
+    padding: calc(var(--d-p1) * .5) var(--d-p2);
+    background: var(--tone-band);
+    border-radius: var(--d-p2) var(--d-p1) var(--d-p3) var(--d-p1);
+    box-shadow: 2px 3px 7px -3px color-mix(in srgb, var(--d-ink) 32%, transparent);
+  }
+  /* Cinco guijarros en fila, ninguno con la forma del de al lado. */
+  :global([data-d='L']) .pillrow > .d-pill { border-radius: var(--d-p3) var(--d-p1) var(--d-p2) var(--d-p1); }
+  :global([data-d='L']) .pillrow > .d-pill:nth-child(2) { border-radius: var(--d-p1) var(--d-p3) var(--d-p1) var(--d-p2); }
+  :global([data-d='L']) .pillrow > .d-pill:nth-child(3) { border-radius: var(--d-p2) var(--d-p2) var(--d-p3) var(--d-p1); }
+  :global([data-d='L']) .pillrow > .d-pill:nth-child(4) { border-radius: var(--d-p3) var(--d-p2) var(--d-p1) var(--d-p3); }
+  :global([data-d='L']) .pillrow > .d-pill:nth-child(5) { border-radius: var(--d-p1) var(--d-p2) var(--d-p2) var(--d-p3); }
+  :global([data-d='L']) .scene {
+    border: 0; background: var(--d-sunk);
+    border-radius: var(--d-p4) var(--d-p3) var(--d-p2) var(--d-p4);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='L']) .veil { background: color-mix(in srgb, var(--d-ink) 34%, transparent); }
+  :global([data-d='L']) .dlg {
+    --blk-bg: var(--d-surface);
+    border-radius: var(--d-p3) var(--d-p4) var(--d-p2) var(--d-p4);
+    box-shadow: var(--d-shadow-lg); padding: var(--d-p3) var(--d-p4) var(--d-p4);
+  }
+  :global([data-d='L']) .skel-b { height: 1em; border-radius: var(--d-p2) var(--d-p1) var(--d-p2) var(--d-p1); }
+  :global([data-d='L']) .skel-row:nth-child(2) .skel-b { border-radius: var(--d-p1) var(--d-p2) var(--d-p1) var(--d-p2); }
+  :global([data-d='L']) .skel-row:nth-child(3) .skel-b { border-radius: var(--d-p2) var(--d-p2) var(--d-p1) var(--d-p1); }
+  :global([data-d='L']) .proc-track {
+    height: var(--d-p1); background: var(--d-sunk); border-radius: var(--d-r-pill);
+    box-shadow: inset 3px 4px 9px -5px color-mix(in srgb, var(--d-ink) 34%, transparent);
+  }
+  :global([data-d='L']) .proc-fill { border-radius: var(--d-r-pill); }
+
+  /* ======================================================================
+     M · BRUMA — sin contenedores. Ningún aviso tiene relleno ni borde: lo
+     que agrupa es una mancha de color desenfocada que se derrama por detrás
+     y se desvanece sin filo. Los titulares van en serif.
+     ====================================================================== */
+  :global([data-d='M']) .blk {
+    --blk-bg: none;
+    isolation: isolate;
+    border: 0; box-shadow: none; padding: var(--d-p2) 0;
+  }
+  /* Dos manchas descentradas y desenfocadas, en z-index -1: se derraman fuera
+     del bloque, que es justamente lo que un contenedor no puede hacer. */
+  :global([data-d='M']) .blk::before {
+    content: ''; position: absolute; z-index: -1; pointer-events: none;
+    inset: calc(-1 * var(--d-p3)) calc(-1 * var(--d-p4));
+    background:
+      radial-gradient(62% 70% at 18% 14%, var(--tone-band) 0%, transparent 70%),
+      radial-gradient(52% 58% at 88% 86%, var(--tone-band) 0%, transparent 68%);
+    filter: blur(26px);
+  }
+  :global([data-d='M']) .blk-title,
+  :global([data-d='M']) .proc-lbl {
+    font-family: var(--d-display);
+    font-size: var(--d-t-lg); font-weight: 400; letter-spacing: -.01em; line-height: 1.24;
+  }
+  :global([data-d='M']) .blk--toast .blk-title { font-size: var(--d-t-md); }
+  :global([data-d='M']) .blk-kind { color: var(--tone-fg); }
+  :global([data-d='M']) .sec-body { gap: var(--d-p4); }
+  :global([data-d='M']) .scene { background: none; border: 0; border-radius: 0; }
+  /* El velo tampoco es una caja: es niebla que se cierra hacia el centro. */
+  :global([data-d='M']) .veil {
+    background: radial-gradient(120% 92% at 50% 46%,
+                color-mix(in srgb, var(--d-ground) 94%, transparent) 34%,
+                color-mix(in srgb, var(--d-ground) 42%, transparent) 100%);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+  }
+  /* El diálogo se lee sobre papel opaco en el centro, pero su borde se
+     disuelve: es legible sin volverse un rectángulo. */
+  :global([data-d='M']) .dlg {
+    /* El papel llega opaco hasta el 74 %: la fila de acciones vive abajo y
+       tiene que leerse sobre algo, aunque el filo siga disolviéndose. */
+    --blk-bg: radial-gradient(96% 104% at 50% 46%, var(--d-ground) 0 74%, transparent 100%);
+    border: 0; box-shadow: none; padding: var(--d-p4); margin: var(--d-p3);
+  }
+  :global([data-d='M']) .dlg::before { inset: calc(-1 * var(--d-p4)); filter: blur(30px); }
+  :global([data-d='M']) .skel-b {
+    height: .9em; background: var(--d-neu-band);
+    border-radius: var(--d-r-pill); filter: blur(3px);
+  }
+  :global([data-d='M']) .proc-track {
+    height: var(--d-p1); background: var(--d-sunk); border-radius: var(--d-r-pill);
+  }
+  :global([data-d='M']) .proc-fill {
+    border-radius: var(--d-r-pill);
+    background: linear-gradient(90deg, transparent, var(--d-accent));
+  }
+  /* Misma trampa que en I: `[data-d='M'] .d-btn { background: var(--d-sunk) }`
+     tapa a `.d-btn--primary`, y el primario queda papel sobre papel — 1.08:1. */
+  :global([data-d='M']) .d-btn--primary {
+    background: var(--d-accent);
+    color: var(--d-accent-ink);
+  }
+
+  /* ======================================================================
+     N · CINTA — los avisos no se separan: se MONTAN. Cada uno es un carril
+     con degradado a lo largo, una cápsula de punta redonda con el color del
+     estado metida adentro, y el de abajo sube sobre el de arriba dejándole
+     una sombra de contacto. Hay orden de apilado, no solo aire.
+     ====================================================================== */
+  :global([data-d='N']) .sec-body { gap: 0; }
+  :global([data-d='N']) .blk {
+    --blk-bg: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 58%, var(--d-sunk) 100%);
+    border-color: var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + var(--d-p2));
+  }
+  :global([data-d='N']) .blk + .blk {
+    margin-top: calc(-1 * var(--d-p2)); z-index: 1;
+    box-shadow: var(--d-shadow-lg);
+  }
+  /* La cápsula: puntas redondas de verdad, dentro del carril. No es un borde
+     de 3px como en Banda ni una espina cuadrada como en Espina. */
+  :global([data-d='N']) .blk::before {
+    content: ''; position: absolute;
+    left: var(--d-p2); top: var(--d-p2); bottom: var(--d-p2); width: var(--d-p1);
+    border-radius: var(--d-r-pill);
+    background: linear-gradient(180deg, var(--tone-fg) 0%,
+                color-mix(in srgb, var(--tone-fg) 42%, transparent) 100%);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 80%, transparent);
+  }
+  :global([data-d='N']) .blk-kind {
+    justify-self: start; padding: calc(var(--d-p1) * .4) var(--d-p2);
+    border-radius: var(--d-r-pill);
+    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 100%);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='N']) .blk--toast { --blk-bg: var(--d-surface-fill); }
+  :global([data-d='N']) .scene {
+    border: 0; border-radius: var(--d-r-lg);
+    background: var(--d-sunk-fill); box-shadow: var(--d-shadow);
+    padding: var(--d-p1);
+  }
+  :global([data-d='N']) .veil {
+    border-radius: var(--d-r-lg);
+    background: linear-gradient(100deg,
+                color-mix(in srgb, var(--d-ink) 46%, transparent),
+                color-mix(in srgb, var(--d-ink) 28%, transparent));
+  }
+  :global([data-d='N']) .dlg {
+    --blk-bg: var(--d-surface-fill);
+    border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg);
+    padding: var(--d-p3) var(--d-p3) var(--d-p3) calc(var(--d-p3) + var(--d-p2));
+  }
+  /* Lo que carga también son carriles, montados igual que los avisos. */
+  :global([data-d='N']) .skel-row {
+    border-radius: var(--d-r-pill); background: var(--d-surface-fill);
+    box-shadow: var(--d-shadow); margin-bottom: calc(var(--d-p1) * .5);
+    padding-inline: var(--d-p3);
+  }
+  :global([data-d='N']) .skel-b { border-radius: var(--d-r-pill); background: var(--d-sunk-fill); }
+  :global([data-d='N']) .proc-track {
+    height: var(--d-p2); border-radius: var(--d-r-pill); background: var(--d-sunk-fill);
+    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 14%, transparent);
+  }
+  :global([data-d='N']) .proc-fill {
+    border-radius: var(--d-r-pill); background: var(--d-accent-fill);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 68%, transparent);
+  }
+
+  /* ======================================================================
+     O · PRISMA — vidrio con la marca teñida ADENTRO. La palabra de estado no
+     es una barra opaca que parte la tarjeta (eso es Marca): es una FACETA
+     que sale del canto izquierdo y termina en punta redonda, teñida de marca
+     y de tono a la vez. Y la botonera es vidrio SEGMENTADO: una sola lámina
+     con divisiones, no tres botones sueltos.
+     ====================================================================== */
+  :global([data-d='O']) .blk {
+    --blk-bg: linear-gradient(180deg,
+              color-mix(in srgb, var(--d-brand) 15%, transparent) 0%, transparent 62%),
+              var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-color: var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow); padding: var(--d-p3); overflow: hidden;
+  }
+  :global([data-d='O']) .blk-kind {
+    justify-self: start;
+    margin-left: calc(-1 * var(--d-p3));
+    padding: var(--d-p1) var(--d-p3);
+    border-radius: 0 var(--d-r-pill) var(--d-r-pill) 0;
+    background: linear-gradient(90deg,
+                color-mix(in srgb, var(--d-brand) 28%, transparent), var(--tone-band));
+    border-block: 1px solid var(--d-line);
+    border-right: 1px solid var(--tone-edge);
+    color: var(--tone-fg);
+  }
+  /* Vidrio segmentado. Sin overflow:hidden: el anillo de foco de cada
+     segmento tiene que poder salirse del grupo. */
+  :global([data-d='O']) .blk-acts {
+    justify-self: start; gap: 0;
+    background: var(--d-surface);
+    border: 1px solid var(--d-line); border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='O']) .blk-acts > .d-btn {
+    background: transparent; border: 0; border-radius: 0; box-shadow: none;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+  :global([data-d='O']) .blk-acts > .d-btn + .d-btn { border-left: 1px solid var(--d-line); }
+  :global([data-d='O']) .blk-acts > .d-btn:first-child {
+    border-start-start-radius: var(--d-r); border-end-start-radius: var(--d-r);
+  }
+  :global([data-d='O']) .blk-acts > .d-btn:last-child {
+    border-start-end-radius: var(--d-r); border-end-end-radius: var(--d-r);
+  }
+  :global([data-d='O']) .blk-acts > .d-btn:hover {
+    background: color-mix(in srgb, var(--d-brand) 12%, transparent);
+  }
+  /* Un segmento sigue diciendo lo que es: el primario se llena de marca y el
+     destructivo de su banda, dentro de la misma lámina. El hover se re-declara
+     en los dos porque el genérico de arriba les gana por especificidad y les
+     lavaría el relleno justo cuando el puntero está encima. */
+  :global([data-d='O']) .blk-acts > .d-btn--primary,
+  :global([data-d='O']) .blk-acts > .d-btn--primary:hover {
+    background: var(--d-accent); color: var(--d-accent-ink);
+  }
+  :global([data-d='O']) .blk-acts > .d-btn--danger,
+  :global([data-d='O']) .blk-acts > .d-btn--danger:hover {
+    background: var(--d-crit-band); color: var(--d-crit);
+  }
+  /* El destructivo responde con un anillo, no con otro color: dentro de una
+     lámina segmentada un cambio de tinte se lee como cambio de estado. */
+  :global([data-d='O']) .blk-acts > .d-btn--danger:hover { box-shadow: inset 0 0 0 1px var(--d-crit-edge); }
+  :global([data-d='O']) .dlg-acts { justify-self: end; padding-top: 0; margin-top: var(--d-p1); }
+  :global([data-d='O']) .scene {
+    background: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-color: var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+  }
+  /* El velo es vidrio de verdad, teñido de marca: desenfoca la flota. */
+  :global([data-d='O']) .veil {
+    background: color-mix(in srgb, var(--d-brand) 20%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  }
+  /* Encima del velo no va otro desenfoque: el diálogo condensa el mismo
+     vidrio pintándolo dos veces. */
+  :global([data-d='O']) .dlg {
+    --blk-bg: linear-gradient(var(--d-surface), var(--d-surface)),
+              linear-gradient(var(--d-surface), var(--d-surface));
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg);
+  }
+  :global([data-d='O']) .skel-b {
+    background: color-mix(in srgb, var(--d-line) 62%, transparent);
+    border-radius: var(--d-r-pill);
+  }
+  :global([data-d='O']) .proc-track {
+    background: var(--d-sunk); border-radius: var(--d-r-pill);
+    box-shadow: inset 0 1px 3px color-mix(in srgb, var(--d-ink) 12%, transparent);
+  }
+  :global([data-d='O']) .proc-fill { border-radius: var(--d-r-pill); }
+
+  /* ======================================================================
+     P · ESPINA — UNA columna de marca que baja por toda la celda y de la que
+     cuelga todo. Ninguna caja. El estado no pinta fondos: le MUERDE una
+     muesca de su tono a la espina.
+     ====================================================================== */
+  :global([data-d='P']) .page {
+    padding-left: calc(var(--d-p1) + var(--d-p3));
+    /* La medida que decide el raíl se toma de acá, no del viewport. */
+    container-type: inline-size;
+  }
+  :global([data-d='P']) .page::before {
+    content: ''; position: absolute; inset: 0 auto 0 0;
+    width: var(--d-p1); background: var(--d-brand);
+  }
+  :global([data-d='P']) .sec {
+    row-gap: var(--d-p1); padding-block: var(--d-p2);
+    border-top: 1px solid var(--d-line);
+  }
+  :global([data-d='P']) .sec:first-child { border-top: 0; }
+  :global([data-d='P']) .sec-body { gap: var(--d-p2); }
+  :global([data-d='P']) .blk {
+    --blk-bg: transparent;
+    border: 0; border-radius: 0; box-shadow: none; padding: var(--d-p2) 0;
+  }
+  :global([data-d='P']) .blk + .blk { border-top: 1px solid var(--d-line); }
+  /* La muesca: cada aviso se come su tramo de espina con su propio tono. */
+  :global([data-d='P']) .blk::before {
+    content: ''; position: absolute; top: 0; bottom: 0;
+    left: calc(-1 * (var(--d-p1) + var(--d-p3)));
+    width: var(--d-p1); background: var(--tone-fg);
+  }
+  :global([data-d='P']) .blk-kind { color: var(--tone-fg); }
+  /* Las píldoras cuelgan de una mordida, no de una franja lateral: es lo que
+     las separa de las de Banda, que llevan el tono a la izquierda. */
+  :global([data-d='P']) .pillrow > .d-pill {
+    background: transparent; border: 0; border-radius: 0;
+    border-bottom: 2px solid var(--tone-fg);
+    padding-inline: 0; padding-bottom: 2px;
+  }
+  :global([data-d='P']) .scene { border: 0; border-top: 1px solid var(--d-line); border-radius: 0; }
+  :global([data-d='P']) .veil { background: color-mix(in srgb, var(--d-brand) 32%, transparent); }
+  :global([data-d='P']) .dlg {
+    --blk-bg: var(--d-surface);
+    margin: 0; padding: var(--d-p3); box-shadow: var(--d-shadow-lg);
+    border-left: var(--d-p1) solid var(--tone-fg);
+  }
+  /* El diálogo cuelga de su propia espina, no de la de la página: la muesca
+     de la página quedaría fuera del escenario y recortada. */
+  :global([data-d='P']) .dlg::before { content: none; }
+  :global([data-d='P']) .dlg-acts { justify-content: flex-start; }
+  :global([data-d='P']) .skel-row { border-bottom: 1px solid var(--d-line); }
+  :global([data-d='P']) .skel-b { background: var(--d-sunk); border-radius: 0; }
+  :global([data-d='P']) .proc-track { background: var(--d-sunk); border-radius: 0; }
+  :global([data-d='P']) .proc-fill { background: var(--d-brand); border-radius: 0; }
+
+  /* EL RAÍL DE 152px, DE VUELTA — pero solo donde de verdad hay ancho. La
+     consulta va contra .page, no contra el viewport: en esta rejilla una
+     celda de 430px convive con una de 900px y una media query no sabe
+     distinguirlas, que es exactamente por lo que el raíl se había retirado. */
+  @container (min-width: 560px) {
+    :global([data-d='P']) .sec {
+      grid-template-columns: var(--d-rail) minmax(0, 1fr);
+      column-gap: var(--d-p3);
+    }
+    :global([data-d='P']) .sec-cap { grid-column: 1; grid-row: 1; text-align: right; }
+    :global([data-d='P']) .sec-body { grid-column: 2; grid-row: 1; }
+    :global([data-d='P']) .blk {
+      grid-template-columns: var(--d-rail) minmax(0, 1fr);
+      column-gap: var(--d-p3);
+    }
+    :global([data-d='P']) .blk-kind { grid-column: 1; grid-row: 1; justify-content: flex-end; text-align: right; }
+    :global([data-d='P']) .blk-title,
+    :global([data-d='P']) .blk-body,
+    :global([data-d='P']) .blk-acts,
+    :global([data-d='P']) .dlg-check { grid-column: 2; }
+    /* El diálogo NO lleva raíl aunque la página sea ancha: vive dentro del
+       escenario y con márgenes, y ahí 152px de gutter son media caja. */
+    :global([data-d='P']) .dlg { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='P']) .dlg .blk-kind { grid-column: 1; grid-row: auto; justify-content: flex-start; text-align: left; }
+    :global([data-d='P']) .dlg .blk-title,
+    :global([data-d='P']) .dlg .blk-body,
+    :global([data-d='P']) .dlg .blk-acts,
+    :global([data-d='P']) .dlg .dlg-check { grid-column: 1; }
+  }
+
+  /* ======================================================================
+     Q · CHAROL — masa dura con superficie mojada. Borde 2px negro, sombra
+     sólida desplazada y el brillo encima. La palabra de estado no es la
+     bandera plana de Peso: es una chapa de charol remachada sobre el canto,
+     con su propio borde negro y su propia sombra sólida.
+     ====================================================================== */
+  :global([data-d='Q']) .blk {
+    --blk-bg: linear-gradient(180deg,
+              color-mix(in srgb, var(--d-surface) 68%, var(--tone-band)) 0%,
+              var(--tone-band) 100%);
+    isolation: isolate;
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p3) var(--d-p3) var(--d-p3);
+    transition: transform 90ms ease, box-shadow 90ms ease;
+  }
+  /* El charol: barrido húmedo en el tercio de arriba, dentro del borde duro.
+     pointer-events none y z-index -1 — encima del texto sería un velo blanco
+     sobre el titular. */
+  :global([data-d='Q']) .blk::after {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 34%;
+    z-index: -1; pointer-events: none;
+    border-radius: calc(var(--d-r-lg) - var(--d-bw)) calc(var(--d-r-lg) - var(--d-bw)) 0 0;
+    background: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-surface) 66%, transparent), transparent);
+    transition: opacity 90ms ease;
+  }
+  /* Al presionar, la masa se mueve hacia su sombra y el charol se apaga. */
+  :global([data-d='Q']) .blk:has(.d-btn:active) {
+    transform: translate(3px, 3px);
+    box-shadow: inset 0 2px 6px color-mix(in srgb, var(--d-ink) 34%, transparent);
+  }
+  :global([data-d='Q']) .blk:has(.d-btn:active)::after { opacity: .28; }
+  :global([data-d='Q']) .blk-kind {
+    justify-self: start;
+    margin-top: calc(-1 * var(--d-p2) - var(--d-bw));
+    padding: calc(var(--d-p1) * .5) var(--d-p2);
+    color: var(--d-ink);
+    background: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-surface) 55%, var(--tone-band)), var(--tone-band));
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r-pill);
+    box-shadow: 3px 3px 0 var(--d-ink),
+                inset 0 1px 0 color-mix(in srgb, var(--d-surface) 88%, transparent);
+  }
+  :global([data-d='Q']) .blk-title { font-size: var(--d-t-md); font-weight: var(--d-w-bold); }
+  :global([data-d='Q']) .sec-cap { border-bottom: var(--d-bw) solid var(--d-ink); padding-bottom: 2px; }
+  :global([data-d='Q']) .scene {
+    background: var(--d-sunk-fill);
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+  }
+  /* Agua negra con un reflejo diagonal encima: el velo también está mojado. */
+  :global([data-d='Q']) .veil {
+    background:
+      linear-gradient(112deg, transparent 34%,
+        color-mix(in srgb, var(--d-surface) 26%, transparent) 46%, transparent 58%),
+      color-mix(in srgb, var(--d-ink) 52%, transparent);
+  }
+  :global([data-d='Q']) .dlg {
+    --blk-bg: var(--d-surface-fill);
+    border-color: var(--d-ink); box-shadow: var(--d-shadow-lg);
+  }
+  :global([data-d='Q']) .dlg-acts { padding-top: var(--d-p2); }
+  :global([data-d='Q']) .skel-b {
+    height: 1.1em; background: var(--d-sunk-fill);
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r-pill);
+  }
+  :global([data-d='Q']) .proc-track {
+    height: var(--d-p2); background: var(--d-sunk-fill);
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r-pill);
+  }
+  :global([data-d='Q']) .proc-fill {
+    background: var(--d-accent-fill);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 68%, transparent);
+  }
+
+  /* ======================================================================
+     R · VITRINA — densidad de terminal en vidrio oscuro. La más densa de las
+     diecinueve: cada aviso es una lámina translúcida con una regleta de
+     cabecera a la altura de fila (26px) y una barra de tono mordida en el
+     canto. Terminal mete el nivel en una columna a la izquierda; acá el
+     nivel es un ESTANTE que cruza la lámina de lado a lado.
+     ====================================================================== */
+  :global([data-d='R']) .page { gap: var(--d-p3); }
+  :global([data-d='R']) .sec-body { gap: var(--d-p1); }
+  :global([data-d='R']) .blk {
+    --blk-bg: var(--d-surface);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    border-color: var(--d-line); border-radius: var(--d-r);
+    box-shadow: var(--d-shadow), inset 2px 0 0 var(--tone-fg);
+    padding: 0 0 var(--d-p1);
+    row-gap: calc(var(--d-p1) * .6);
+  }
+  :global([data-d='R']) .blk-kind {
+    min-height: var(--d-row-h); padding: 0 var(--d-p2);
+    background: color-mix(in srgb, var(--tone-fg) 13%, transparent);
+    border-bottom: 1px solid var(--d-line);
+    color: var(--tone-fg);
+  }
+  :global([data-d='R']) .blk-title { padding-inline: var(--d-p2); }
+  :global([data-d='R']) .blk-body { padding-inline: var(--d-p2); line-height: 1.35; }
+  :global([data-d='R']) .blk-acts { padding-inline: var(--d-p2); gap: var(--d-p1); }
+  :global([data-d='R']) .dlg-check { padding-inline: var(--d-p2); }
+  :global([data-d='R']) .sec-cap {
+    color: var(--d-accent); padding-bottom: 2px; border-bottom: 1px solid var(--d-line);
+  }
+  :global([data-d='R']) .d-pill { border-radius: var(--d-r); padding: 0 var(--d-p1); }
+  :global([data-d='R']) .pill-lg { padding: 1px var(--d-p2); }
+  :global([data-d='R']) .scene {
+    background: var(--d-surface);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    border-color: var(--d-line); border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='R']) .veil {
+    background: color-mix(in srgb, var(--d-ink-on) 72%, transparent);
+    backdrop-filter: blur(10px) saturate(.9);
+    -webkit-backdrop-filter: blur(10px) saturate(.9);
+  }
+  /* HALLAZGO: --d-ground en I, O y R es un FONDO compuesto (varias capas de
+     gradiente), no un color, así que no sirve para color-mix ni para tapar
+     una lista. Acá el opaco sale de --d-ink-on, que sí es color. El vidrio
+     del diálogo se densifica apilando capas en vez de bajar la opacidad. */
+  :global([data-d='R']) .dlg {
+    --blk-bg: linear-gradient(var(--d-surface), var(--d-surface)),
+              linear-gradient(var(--d-sunk), var(--d-sunk)),
+              linear-gradient(var(--d-ink-on), var(--d-ink-on));
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border-color: var(--d-edge); box-shadow: var(--d-shadow-lg);
+    margin: var(--d-p2);
+  }
+  :global([data-d='R']) .load, :global([data-d='R']) .proc {
+    background: var(--d-surface); border: 1px solid var(--d-line);
+    border-radius: var(--d-r); padding: var(--d-p1) var(--d-p2);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  :global([data-d='R']) .skel-row { min-height: var(--d-row-h); border-bottom: 1px solid var(--d-line); }
+  :global([data-d='R']) .skel-b {
+    height: .72em; border-radius: var(--d-r);
+    background: color-mix(in srgb, var(--d-ink) 13%, transparent);
+  }
+  :global([data-d='R']) .proc-track {
+    height: var(--d-p1); border-radius: var(--d-r);
+    background: color-mix(in srgb, var(--d-ink) 10%, transparent);
+  }
+  :global([data-d='R']) .proc-fill {
+    box-shadow: 0 0 var(--d-p3) calc(-1 * var(--d-p2)) var(--d-accent);
+  }
+
+  /* ======================================================================
+     S · UMBRA — la tarjeta se queda BLANCA y lo que informa es la sombra
+     teñida de abajo.
+
+     En directions.css la firma solo la llevan .d-panel y .d-row. Acá se la
+     damos a TODO el marcado propio de esta página: el aviso, el toast, el
+     diálogo, el escenario, las píldoras, las filas de esqueleto y los
+     bloques de carga y proceso.
+
+     HALLAZGO: S no trae un token de sombra de tono (algo como
+     --d-shadow-tone). La geometría de abajo sale de la escala de espaciado
+     —p1/p2/p3/p4— para no escribir píxeles a mano.
+     ====================================================================== */
+  :global([data-d='S']) .blk {
+    --blk-bg: var(--d-surface);
+    border: 0; border-radius: var(--d-r-lg); padding: var(--d-p3);
+    box-shadow: var(--d-shadow),
+                0 var(--d-p1) calc(var(--d-p3) * 1.6) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* El color no toca el contenido: la palabra va en tinta y el tono se queda
+     en la marca —la forma, no el relleno— y en la luz de abajo. */
+  :global([data-d='S']) .blk-kind { color: var(--d-ink-2); }
+  :global([data-d='S']) .blk-kind svg { color: var(--tone-fg); }
+  :global([data-d='S']) .blk--toast {
+    box-shadow: var(--d-shadow-lg),
+                0 var(--d-p2) calc(var(--d-p4) * 1.6) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  :global([data-d='S']) .pillrow > .d-pill {
+    background: var(--d-surface); color: var(--d-ink-2);
+    box-shadow: 0 calc(var(--d-p1) * .6) var(--d-p2) calc(-1 * var(--d-p1)) var(--tone-fg);
+  }
+  :global([data-d='S']) .pillrow > .d-pill svg { color: var(--tone-fg); }
+  :global([data-d='S']) .scene { border: 0; border-radius: var(--d-r-lg); box-shadow: var(--d-shadow); }
+  /* Mientras el diálogo destructivo está abierto, el escenario entero
+     proyecta rojo: la advertencia se lee desde el otro lado del cuarto sin
+     que una sola letra cambie de color. */
+  :global([data-d='S']) .scene:has(.dlg) {
+    box-shadow: var(--d-shadow-lg),
+                0 var(--d-p2) calc(var(--d-p4) * 2) calc(-1 * var(--d-p3)) var(--d-crit);
+  }
+  :global([data-d='S']) .veil { background: color-mix(in srgb, var(--d-surface) 76%, transparent); }
+  :global([data-d='S']) .dlg {
+    border-radius: var(--d-r-lg); padding: var(--d-p3) var(--d-p4) var(--d-p4);
+    box-shadow: var(--d-shadow-lg),
+                0 var(--d-p2) calc(var(--d-p4) * 2) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* Las filas del escenario ya llevan la firma por primitiva; las del
+     esqueleto no son .d-row, así que se la damos acá. */
+  :global([data-d='S']) .skel-row {
+    min-height: var(--d-row-h); margin-bottom: var(--d-p1); padding-inline: var(--d-p2);
+    background: var(--d-surface); border-radius: var(--d-r); box-shadow: var(--d-shadow);
+  }
+  :global([data-d='S']) .skel-b { background: var(--d-sunk); border-radius: var(--d-r-pill); }
+  :global([data-d='S']) .load {
+    background: var(--d-surface); border-radius: var(--d-r-lg);
+    padding: var(--d-p3); box-shadow: var(--d-shadow);
+  }
+  :global([data-d='S']) .proc {
+    background: var(--d-surface); border-radius: var(--d-r-lg); padding: var(--d-p3);
+    box-shadow: var(--d-shadow),
+                0 var(--d-p1) calc(var(--d-p3) * 1.6) calc(-1 * var(--d-p2)) var(--d-info);
+  }
+  :global([data-d='S']) .proc-track { background: var(--d-sunk); border-radius: var(--d-r-pill); }
+  :global([data-d='S']) .proc-fill {
+    border-radius: var(--d-r-pill);
+    box-shadow: 0 2px var(--d-p2) calc(-1 * var(--d-p1)) var(--d-info);
+  }
+
+  /* ======================================================================
      Movimiento y tamaños chicos.
      ====================================================================== */
   @media (prefers-reduced-motion: reduce) {
     .skel-b { animation: none; opacity: .72; }
     .proc-fill--wait { animation: none; width: 100%; opacity: .6; }
     .blk { transition: none; }
+    /* El barrido de esmalte de J y Q también se apaga al presionar: sin
+       transición, no con una transición larga. */
+    .blk::after { transition: none; }
   }
 
   /* Debajo de 720px el raíl de G se pliega: 148px de etiquetas en un teléfono
@@ -625,5 +1416,13 @@
     .blk-acts .d-btn, .dlg-acts .d-btn { flex: 1 1 auto; }
     .dlg { margin: var(--d-p2); }
     .reopen { align-items: flex-start; }
+    /* La lámina segmentada de O deja de encogerse y ocupa el ancho: si no,
+       los segmentos se estiran fuera de su propio marco. */
+    :global([data-d='O']) .blk-acts { justify-self: stretch; }
+    :global([data-d='O']) .dlg-acts { justify-self: stretch; }
+    /* En N los carriles montados no se pisan cuando el texto ya ocupa tres
+       líneas: a este ancho el solape se lee como error de maquetación. */
+    :global([data-d='N']) .blk + .blk { margin-top: 0; }
+    :global([data-d='N']) .sec-body { gap: var(--d-p1); }
   }
 </style>

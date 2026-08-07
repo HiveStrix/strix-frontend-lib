@@ -32,6 +32,20 @@
     neutral: 'Sin lectura', info: 'Nota'
   };
 
+  /* ── Qué familia de dibujo le toca a cada dirección ──────────────────────
+     Tres reparticiones, y ninguna es de paleta: cambian el DIBUJO.
+       · celdas de carácter — F y R. R es Terminal + Cristal: su densidad
+         (fila de 26px, monoespaciada) sale de la misma rejilla de caracteres
+         que F, solo que apoyada sobre vidrio oscuro.
+       · dial de dos arcos — A, C, E, H y K. K entra porque dos arcos que
+         irradian sobre negro es exactamente lo que Halo tiene para decir de
+         un medidor; en carriles rectos ese resplandor se pierde.
+       · barras macizas en el minigráfico — D y Q. Q es Peso + Laca: la misma
+         columna sólida, con el barrido húmedo encima. */
+  const isMono = (id) => id === 'F' || id === 'R';
+  const isDial = (id) => id === 'A' || id === 'C' || id === 'E' || id === 'H' || id === 'K';
+  const isBarChart = (id) => id === 'D' || id === 'Q';
+
   /* ── Eje de días ─────────────────────────────────────────────────────── */
   const BACK = 20; // días de historia siempre visibles a la izquierda
   const TICKS = { 30: [-20, 0, 15, 30], 60: [-20, 0, 15, 30, 60], 90: [-20, 0, 15, 45, 90] };
@@ -176,7 +190,10 @@
 
 <Grid min="440px">
   {#each directions as d (d.id)}
-    <Direction id={d.id} flush={d.id === 'G' || d.id === 'F'}>
+    <!-- P va a sangre como G: su silueta es una columna de marca de la que
+         cuelgan franjas de borde a borde, y con 20px de aire alrededor deja de
+         ser una espina y vuelve a ser una tarjeta. -->
+    <Direction id={d.id} flush={d.id === 'G' || d.id === 'F' || d.id === 'P'}>
       <div class="dv">
 
         <!-- ══ Barra de vista ══ -->
@@ -210,7 +227,7 @@
             <span class="d-cap">umbral 100 %</span>
           </header>
           <div class="d-panel-body dv-body dv-stack dv-bleed">
-            {#if d.id === 'F'}
+            {#if isMono(d.id)}
               {#each BARS as g}
                 <div class="mrow" data-tone={g.tone}>
                   <span class="mlab d-id">{g.asset}</span>
@@ -274,7 +291,7 @@
                   <span class="ck-task">{c.task} · {c.every}</span>
                 </p>
 
-                {#if d.id === 'F'}
+                {#if isMono(d.id)}
                   {#each [c.cal, c.use] as k}
                     <div class="mrow" data-tone={k.tone}>
                       <span class="mlab">{k.key}</span>
@@ -285,7 +302,7 @@
                       <span class="mword">{c.first === k.key ? '◄ primero' : k.left}</span>
                     </div>
                   {/each}
-                {:else if d.id === 'A' || d.id === 'C' || d.id === 'E' || d.id === 'H'}
+                {:else if isDial(d.id)}
                   <div class="ck-dial">
                     <svg
                       class="ck-svg"
@@ -377,7 +394,7 @@
             <span class="d-cap">hoy · 6 ago</span>
           </header>
           <div class="d-panel-body dv-body dv-bleed">
-            {#if d.id === 'F'}
+            {#if isMono(d.id)}
               <div class="tl-mono">
                 {#each TL as p}
                   <div class="mrow mrow--tl" data-tone={p.tone}>
@@ -470,13 +487,13 @@
               Horas por semana de la Batidora Imer Syntesi 250, de la semana del 17 de mayo a la del 2 de agosto:
               {SPARK.join(', ')} horas.
             </p>
-            {#if d.id === 'F'}
+            {#if isMono(d.id)}
               <div class="sp-mono" aria-hidden="true">
                 {#each SPARK as v}
                   <span class="sp-ch" class:sp-ch--zero={v === 0} class:sp-ch--top={v === SP_TOP}>{block(v)}</span>
                 {/each}
               </div>
-            {:else if d.id === 'D'}
+            {:else if isBarChart(d.id)}
               <svg class="sp-svg" viewBox="0 0 {SP_W} {SP_H}" preserveAspectRatio="none" aria-hidden="true">
                 {#each SPARK as v, i}
                   <rect class="sp-bar" x={spx(i) - barW / 2} y={spy(v)} width={barW} height={SP_H - SP_PAD - spy(v)} />
@@ -518,7 +535,7 @@
             <span class="d-cap d-num">{FLEET_N} equipos</span>
           </header>
           <div class="d-panel-body dv-body dv-bleed">
-            {#if d.id === 'F'}
+            {#if isMono(d.id)}
               <div class="ds-mono" aria-hidden="true">
                 {#each monoFleet() as k}
                   <span class="ds-mgrp" data-tone={k.tone}
@@ -811,7 +828,12 @@
   .mc--now { color: var(--d-accent); }
   .mc--on { color: var(--tone-fg); }
   .mc--over { color: var(--d-crit); background: var(--d-crit-band); }
-  .mc--off { color: var(--d-line); }
+  /* Las celdas vacías son el CARRIL de la barra, no decoración: sin ellas no
+     se ve cuánto falta. Estaban en --d-line, que es un token de hairline y no
+     de tinta: sobre el fondo de F daba 1.32:1 — la mitad de la barra
+     desaparecía. --d-ink-3 la deja en 4.65:1 y el relleno sigue distinguiéndose
+     porque es █ en color de tono contra · en gris. */
+  .mc--off { color: var(--d-ink-3); }
   .mc--thr { color: var(--d-accent); }
   .mnote { margin: 0 0 var(--d-p1) 7ch; font-size: var(--d-t-2xs); color: var(--d-ink-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .mnote--legend { margin-left: 0; }
@@ -1014,6 +1036,759 @@
   :global([data-d='H']) .cal-detail { background: var(--d-sunk); border: 1px solid var(--d-edge); border-radius: var(--d-r); padding: var(--d-p2); }
 
   /* ══════════════════════════════════════════════════════════════════════
+     LAS ONCE NUEVAS — I J K L M N O P Q R S.
+
+     Mismo contrato que arriba: :global() para cruzar la frontera de
+     Direction.svelte, y ni un color, radio, sombra o medida que un token
+     pueda dar. Donde el material de una dirección pide algo que su bloque de
+     tokens no nombra, queda escrito como HALLAZGO y se declara en el espacio
+     --dv-*, que es el que esta página ya usa para lo que el contrato no cubre.
+
+     Traducciones que valen para toda la familia «datos y tiempo»:
+       barra    K luz que se derrama · M mancha sin filo · N cinta de puntas
+                redondas · Q bloque macizo con brillo · S barra blanca cuya
+                sombra lleva el tono · R caracteres de bloque
+       umbral   I filo de luz · J bisel de esmalte · M smudge radial ·
+                P muesca en la espina · Q regla de 2px de tinta
+     ══════════════════════════════════════════════════════════════════════ */
+
+  /* ── I · CRISTAL — una sola capa de vidrio, nunca dos ─────────────────
+     HALLAZGO: el contrato no tiene token de desenfoque. directions.css
+     escribe blur(18px)/blur(20px)/blur(16px) a mano en I, O y R, así que acá
+     se declara --dv-blur con el valor de cada una: el día que exista --d-blur
+     estas tres líneas se borran solas.
+     LA TRAMPA: .d-panel YA desenfoca. Todo lo que vive DENTRO de un panel
+     —surcos de barra, tiras de día, la ficha del detalle— se anida con
+     TRANSPARENCIA y jamás con un segundo backdrop-filter: dos vidrios
+     seguidos lavan el campo de manchas y el vidrio se vuelve plástico gris.
+     El único backdrop-filter de esta página está en .dv-bar, que se apoya
+     directo sobre el fondo. */
+  :global([data-d='I']) .dv { --dv-blur: 18px; --dv-h: 12px; --dv-dot: 15px; }
+  :global([data-d='I']) .dv-bar {
+    border-radius: var(--d-r-lg);
+    backdrop-filter: blur(var(--dv-blur)) saturate(1.5);
+    -webkit-backdrop-filter: blur(var(--dv-blur)) saturate(1.5);
+  }
+  :global([data-d='I']) .pb-track, :global([data-d='I']) .tl-track,
+  :global([data-d='I']) .ck-trklane, :global([data-d='I']) .ds-bar {
+    background: color-mix(in srgb, var(--d-ink) 7%, transparent);
+    border-radius: var(--d-r-pill);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+  :global([data-d='I']) .pb-fill, :global([data-d='I']) .ck-fill {
+    background: color-mix(in srgb, var(--tone-fg) 76%, transparent);
+    box-shadow: inset 0 1px 0 var(--d-line);
+    border-radius: var(--d-r-pill);
+  }
+  /* El umbral es un filo de luz con su propio contrafilo oscuro: así se lee
+     tanto sobre el surco vacío como sobre el relleno teñido. */
+  :global([data-d='I']) .pb-thr, :global([data-d='I']) .ck-fin, :global([data-d='I']) .tl-now {
+    background: var(--d-line); opacity: 1;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--d-ink) 18%, transparent);
+  }
+  :global([data-d='I']) .pb-thr--soft { box-shadow: none; opacity: .5; }
+  :global([data-d='I']) .tl-elapsed { opacity: .35; border-radius: var(--d-r-pill); }
+  :global([data-d='I']) .tl-dot {
+    background: var(--d-surface);
+    box-shadow: 0 0 0 1px var(--tone-edge), inset 0 1px 0 var(--d-line), var(--d-shadow);
+  }
+  :global([data-d='I']) .ds-seg { background: color-mix(in srgb, var(--tone-fg) 72%, transparent); }
+  :global([data-d='I']) .ds-seg + .ds-seg { box-shadow: inset 1px 0 0 var(--d-line); }
+  :global([data-d='I']) .sp-base, :global([data-d='I']) .sp-grid {
+    stroke: color-mix(in srgb, var(--d-ink) 14%, transparent);
+  }
+  :global([data-d='I']) .sp-line { stroke-width: 2; }
+  :global([data-d='I']) .sp-end { stroke: var(--d-line); stroke-width: 1.5; }
+  :global([data-d='I']) .cal-strip { gap: 3px; }
+  :global([data-d='I']) .cal-day {
+    background: var(--d-surface); border-color: var(--d-line);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+  :global([data-d='I']) .cal-day[data-tone] { background: var(--tone-band); border-color: var(--tone-edge); }
+  :global([data-d='I']) .cal-day--wknd { background: var(--d-sunk); }
+  :global([data-d='I']) .cal-day--hoy { box-shadow: inset 0 0 0 1px var(--d-accent), inset 0 1px 0 var(--d-line); }
+  :global([data-d='I']) .cal-day--on::after { background: var(--d-accent); }
+  :global([data-d='I']) .cal-detail {
+    background: var(--d-sunk); border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+
+  /* ── J · LACA — ninguna superficie es color plano ─────────────────────
+     El barrido vive en el tercio de arriba, va en un pseudo con
+     pointer-events:none y se pinta ANTES que la marca de selección: por eso
+     el brillo de un día es ::before y la muesca de elegido sigue siendo
+     ::after, que es la que tiene que quedar arriba de todo.
+     HALLAZGO: J declara --d-accent-fill pero no un degradado por tono, así
+     que el esmalte de una barra de estado se arma con el propio blanco de la
+     dirección (color-mix sobre --d-surface) encima del color del tono. Un
+     --d-gloss en el contrato ahorraría esta línea en las cuatro direcciones
+     que la necesitan (J, N, O, Q). */
+  :global([data-d='J']) .dv {
+    --dv-h: 16px; --dv-dot: 16px;
+    --dv-gloss: linear-gradient(180deg, color-mix(in srgb, var(--d-surface) 88%, transparent), transparent);
+  }
+  :global([data-d='J']) .dv-bar {
+    position: relative; overflow: hidden;
+    background: var(--d-surface-fill);
+    border-color: var(--d-edge); border-radius: var(--d-r-lg);
+  }
+  :global([data-d='J']) .dv-bar::after {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
+    background: var(--dv-gloss); pointer-events: none;
+  }
+  :global([data-d='J']) .pb-track, :global([data-d='J']) .tl-track,
+  :global([data-d='J']) .ck-trklane, :global([data-d='J']) .ds-bar {
+    background: var(--d-sunk-fill);
+    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 22%, transparent);
+  }
+  :global([data-d='J']) .pb-fill, :global([data-d='J']) .ck-fill, :global([data-d='J']) .ds-seg {
+    background-color: var(--tone-fg);
+    background-image: var(--dv-gloss);
+    background-size: 100% 55%; background-repeat: no-repeat;
+  }
+  :global([data-d='J']) .pb-thr {
+    width: 3px; opacity: 1;
+    background: var(--d-ink);
+    box-shadow: 1px 0 0 color-mix(in srgb, var(--d-surface) 80%, transparent);
+  }
+  :global([data-d='J']) .pb-thr--soft { width: 2px; opacity: .3; box-shadow: none; }
+  :global([data-d='J']) .tl-elapsed { border-radius: var(--d-r-pill); }
+  :global([data-d='J']) .tl-dot { box-shadow: 0 0 0 1px var(--tone-fg), var(--d-shadow); }
+  :global([data-d='J']) .sp-svg {
+    background: var(--dv-gloss) top / 100% 40% no-repeat, var(--d-sunk-fill);
+    border-radius: var(--d-r);
+    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 16%, transparent);
+  }
+  :global([data-d='J']) .cal-strip { gap: 3px; }
+  :global([data-d='J']) .cal-day {
+    position: relative; overflow: hidden;
+    background: var(--d-surface-fill); border-color: var(--d-edge);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='J']) .cal-day[data-tone] { background-color: var(--tone-band); background-image: none; }
+  :global([data-d='J']) .cal-day::before {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 42%;
+    background: var(--dv-gloss); pointer-events: none;
+  }
+  /* Al presionar, el brillo se apaga y la placa se hunde. */
+  :global([data-d='J']) .cal-day:active { transform: translateY(1px); box-shadow: inset 0 2px 5px color-mix(in srgb, var(--d-ink) 26%, transparent); }
+  :global([data-d='J']) .cal-day:active::before { opacity: 0; }
+  :global([data-d='J']) .cal-day--wknd { background: var(--d-sunk-fill); }
+  /* Una regla prefijada con [data-d] le gana a la base .cal-day--hoy, así que
+     cada dirección que repinta el día tiene que devolverle el anillo de hoy. */
+  :global([data-d='J']) .cal-day--hoy,
+  :global([data-d='J']) .cal-day--hoy[data-tone] { box-shadow: var(--d-shadow), inset 0 0 0 1px var(--d-ink); }
+  :global([data-d='J']) .cal-day--on::after { background: var(--d-accent); }
+  :global([data-d='J']) .cal-detail {
+    background: var(--d-sunk-fill); border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 90%, transparent);
+  }
+
+  /* ── K · HALO — cero bordes: la barra es luz que se derrama ───────────
+     El relleno no termina en un canto, se apaga: degradado del propio tono a
+     transparente y resplandor hacia afuera. El umbral tampoco es una línea de
+     tinta —K no tiene tinta que poner— sino una brasa del color de acento. */
+  :global([data-d='K']) .dv {
+    --dv-h: 12px; --dv-dot: 17px;
+    --dv-glow: color-mix(in srgb, var(--tone-fg) 55%, transparent);
+  }
+  :global([data-d='K']) .dv-bar { background: none; border: 0; box-shadow: var(--d-shadow); border-radius: var(--d-r-lg); }
+  :global([data-d='K']) .pb-track, :global([data-d='K']) .tl-track,
+  :global([data-d='K']) .ck-trklane, :global([data-d='K']) .ds-bar {
+    background: var(--d-neu-band); border-radius: var(--d-r-pill); overflow: visible;
+  }
+  :global([data-d='K']) .pb-fill, :global([data-d='K']) .ck-fill {
+    border-radius: var(--d-r-pill);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tone-fg) 22%, transparent), var(--tone-fg));
+    box-shadow: 0 0 18px 1px var(--dv-glow);
+  }
+  :global([data-d='K']) .pb-zone { opacity: .55; }
+  :global([data-d='K']) .pb-thr, :global([data-d='K']) .ck-fin {
+    background: var(--d-accent); opacity: 1;
+    box-shadow: 0 0 10px var(--d-accent);
+  }
+  :global([data-d='K']) .pb-thr--soft { background: var(--d-ink-3); box-shadow: none; opacity: .5; }
+  :global([data-d='K']) .tl-now { background: var(--d-accent); box-shadow: 0 0 12px var(--d-accent); }
+  :global([data-d='K']) .tl-elapsed { opacity: .3; border-radius: var(--d-r-pill); }
+  :global([data-d='K']) .tl-dot {
+    background: var(--tone-fg); color: var(--d-ink-on);
+    box-shadow: 0 0 22px 2px var(--dv-glow);
+  }
+  :global([data-d='K']) .ck-trk { stroke: color-mix(in srgb, var(--d-ink) 10%, transparent); }
+  :global([data-d='K']) .ck-arc { stroke-linecap: round; filter: drop-shadow(0 0 7px var(--tone-fg)); }
+  :global([data-d='K']) .ck-over { filter: drop-shadow(0 0 6px var(--tone-fg)); }
+  :global([data-d='K']) .pb-val, :global([data-d='K']) .ck-pc, :global([data-d='K']) .ds-v {
+    text-shadow: 0 0 14px var(--dv-glow);
+  }
+  :global([data-d='K']) .ds-bar { gap: 3px; background: none; }
+  :global([data-d='K']) .ds-seg { border-radius: var(--d-r-pill); box-shadow: 0 0 16px -2px var(--dv-glow); }
+  :global([data-d='K']) .ds-seg + .ds-seg { box-shadow: 0 0 16px -2px var(--dv-glow); }
+  :global([data-d='K']) .sp-line, :global([data-d='K']) .sp-end { filter: drop-shadow(0 0 6px var(--tone-fg)); }
+  :global([data-d='K']) .sp-base, :global([data-d='K']) .sp-grid { display: none; }
+  :global([data-d='K']) .cal-strip { gap: 3px; }
+  :global([data-d='K']) .cal-day { background: none; border: 0; box-shadow: inset 0 0 0 1px var(--d-neu-edge); }
+  :global([data-d='K']) .cal-day[data-tone] { background: var(--tone-band); box-shadow: inset 0 0 0 1px var(--tone-edge), 0 0 22px -6px var(--tone-fg); }
+  :global([data-d='K']) .cal-day--wknd { background: none; box-shadow: none; }
+  :global([data-d='K']) .cal-day--hoy,
+  :global([data-d='K']) .cal-day--hoy[data-tone] { box-shadow: inset 0 0 0 1px var(--d-accent-edge), 0 0 26px -8px var(--d-accent); }
+  :global([data-d='K']) .cal-day--on::after { background: var(--d-accent); box-shadow: 0 0 10px var(--d-accent); }
+  :global([data-d='K']) .cal-detail { padding: var(--d-p2) var(--d-p3); border-radius: var(--d-r-lg); box-shadow: var(--d-shadow); }
+
+  /* ── L · GUIJARRO — cuatro radios por pieza, y distintos entre vecinos ─
+     Si el surco, el relleno y el día de al lado comparten los mismos cuatro
+     valores, vuelven a ser tarjetas: por eso tres juegos que rotan. Las
+     barras suben a 22px porque con 10px el navegador escala los radios hasta
+     casi igualarlos y la piedra se vuelve pastilla. */
+  :global([data-d='L']) .dv {
+    --dv-h: 22px; --dv-dot: 18px; --dv-lab: 112px;
+    --dv-peb-1: 10px 18px 8px 15px;
+    --dv-peb-2: 17px 9px 16px 11px;
+    --dv-peb-3: 14px 20px 11px 8px;
+    --dv-lift: -3px -3px 8px -4px color-mix(in srgb, var(--d-surface) 92%, transparent);
+    --dv-drop: 5px 6px 14px -6px color-mix(in srgb, var(--d-ink) 34%, transparent);
+  }
+  :global([data-d='L']) .dv-bar { border: 0; border-radius: var(--dv-peb-3); box-shadow: var(--d-shadow); }
+  :global([data-d='L']) .pb-track, :global([data-d='L']) .ck-trklane {
+    border-radius: var(--dv-peb-1);
+    box-shadow: inset 3px 4px 9px -5px color-mix(in srgb, var(--d-ink) 34%, transparent);
+    /* El surco deja de recortar: si no, la piedra que va adentro pierde su
+       sombra doble contra el borde y vuelve a leerse como un relleno plano. */
+    overflow: visible;
+  }
+  :global([data-d='L']) .pb:nth-child(2) .pb-track { border-radius: var(--dv-peb-2); }
+  :global([data-d='L']) .pb:nth-child(3) .pb-track { border-radius: var(--dv-peb-3); }
+  :global([data-d='L']) .ck-lane:nth-child(2) .ck-trklane { border-radius: var(--dv-peb-2); }
+  /* El relleno es su propia piedra dentro del surco, con otros cuatro radios. */
+  :global([data-d='L']) .pb-fill, :global([data-d='L']) .ck-fill {
+    border-radius: var(--dv-peb-3); box-shadow: var(--dv-drop), var(--dv-lift);
+  }
+  :global([data-d='L']) .pb:nth-child(2) .pb-fill { border-radius: var(--dv-peb-1); }
+  :global([data-d='L']) .pb-thr, :global([data-d='L']) .ck-fin {
+    width: 4px; border-radius: var(--d-r-pill); background: var(--d-ink); opacity: .3;
+  }
+  :global([data-d='L']) .pb-thr--soft { opacity: .14; }
+  :global([data-d='L']) .tl-track { border-radius: var(--dv-peb-2); }
+  :global([data-d='L']) .tl-elapsed { border-radius: var(--dv-peb-1); opacity: .38; }
+  :global([data-d='L']) .tl-now { background: var(--d-ink); opacity: .4; width: 3px; border-radius: var(--d-r-pill); }
+  :global([data-d='L']) .tl-dot { border-radius: var(--dv-peb-3); box-shadow: var(--dv-drop); }
+  :global([data-d='L']) .ds-bar { background: none; overflow: visible; gap: var(--d-p1); height: calc(var(--dv-h) * 1.1); }
+  :global([data-d='L']) .ds-seg { border-radius: var(--dv-peb-1); box-shadow: var(--dv-drop), var(--dv-lift); }
+  :global([data-d='L']) .ds-seg:nth-child(2) { border-radius: var(--dv-peb-2); }
+  :global([data-d='L']) .ds-seg:nth-child(3) { border-radius: var(--dv-peb-3); }
+  :global([data-d='L']) .ds-seg + .ds-seg { box-shadow: var(--dv-drop), var(--dv-lift); }
+  :global([data-d='L']) .sp-svg {
+    background: var(--d-sunk); border-radius: var(--dv-peb-2);
+    box-shadow: inset 3px 4px 10px -6px color-mix(in srgb, var(--d-ink) 34%, transparent);
+  }
+  :global([data-d='L']) .sp-line { stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  :global([data-d='L']) .sp-base, :global([data-d='L']) .sp-grid { display: none; }
+  :global([data-d='L']) .cal-strip { gap: var(--d-p1); }
+  :global([data-d='L']) .cal-day { border: 0; border-radius: var(--dv-peb-1); box-shadow: var(--dv-drop), var(--dv-lift); }
+  :global([data-d='L']) .cal-day:nth-child(3n+2) { border-radius: var(--dv-peb-2); }
+  :global([data-d='L']) .cal-day:nth-child(3n) { border-radius: var(--dv-peb-3); }
+  :global([data-d='L']) .cal-day:active { box-shadow: inset 3px 4px 9px -4px color-mix(in srgb, var(--d-ink) 40%, transparent); }
+  :global([data-d='L']) .cal-day--hoy { box-shadow: var(--dv-drop), var(--dv-lift), inset 0 0 0 2px var(--d-accent); }
+  :global([data-d='L']) .cal-day--on::after { border-radius: var(--d-r-pill); background: var(--d-accent); }
+  :global([data-d='L']) .cal-detail {
+    background: var(--d-sunk); border-radius: var(--dv-peb-3);
+    padding: var(--d-p2) var(--d-p3);
+  }
+
+  /* ── M · BRUMA — el umbral es una mancha, no una línea ─────────────────
+     Ni un contenedor: el surco desaparece y lo que queda es color derramado
+     por detrás. Donde hay texto la suavidad se hace con radial-gradient (que
+     difumina el fondo sin tocar la letra) y donde no la hay, con filter:blur.
+     Los titulares y las cifras pasan a la serif de --d-display: en una página
+     de datos, el número en serif es la mitad de la firma de esta dirección. */
+  :global([data-d='M']) .dv { --dv-h: 14px; --dv-dot: 16px; }
+  :global([data-d='M']) .dv-bar { background: none; border: 0; box-shadow: none; padding-inline: 0; }
+  :global([data-d='M']) .pb-name, :global([data-d='M']) .ck-title,
+  :global([data-d='M']) .cal-day-name, :global([data-d='M']) .sp-mid {
+    font-family: var(--d-display);
+  }
+  :global([data-d='M']) .pb-val, :global([data-d='M']) .ck-pc,
+  :global([data-d='M']) .ds-v, :global([data-d='M']) .cal-n {
+    font-family: var(--d-display); font-weight: 400;
+  }
+  :global([data-d='M']) .pb-track, :global([data-d='M']) .ck-trklane, :global([data-d='M']) .tl-track {
+    background: none; overflow: visible; border-radius: 0;
+  }
+  :global([data-d='M']) .pb-fill, :global([data-d='M']) .ck-fill {
+    background: linear-gradient(90deg, transparent, var(--tone-fg));
+    filter: blur(4px); opacity: .55; border-radius: var(--d-r-pill);
+  }
+  :global([data-d='M']) .pb-zone, :global([data-d='M']) .tl-zone { filter: blur(9px); }
+  /* El umbral: un smudge radial centrado en el 100 %, no un canto. */
+  :global([data-d='M']) .pb-thr {
+    width: var(--d-p3); margin-left: calc(var(--d-p3) / -2); opacity: .5;
+    background: radial-gradient(closest-side, var(--d-ink) 0%, transparent 72%);
+  }
+  :global([data-d='M']) .pb-thr--soft { opacity: .2; }
+  :global([data-d='M']) .ck-fin, :global([data-d='M']) .tl-now {
+    width: var(--d-p2); margin-left: calc(var(--d-p2) / -2); opacity: .35;
+    background: radial-gradient(closest-side, var(--d-ink) 0%, transparent 74%);
+  }
+  :global([data-d='M']) .tl-elapsed { filter: blur(3px); opacity: .4; }
+  :global([data-d='M']) .tl-dot {
+    background: radial-gradient(closest-side, var(--tone-band) 0%, transparent 76%);
+    box-shadow: none; color: var(--tone-fg);
+  }
+  :global([data-d='M']) .ds-bar { background: none; overflow: visible; height: calc(var(--dv-h) * 1.6); }
+  :global([data-d='M']) .ds-seg { filter: blur(6px); opacity: .8; }
+  :global([data-d='M']) .ds-seg + .ds-seg { box-shadow: none; }
+  :global([data-d='M']) .sp-area { filter: blur(7px); }
+  :global([data-d='M']) .sp-line { opacity: .45; }
+  :global([data-d='M']) .sp-base, :global([data-d='M']) .sp-grid { display: none; }
+  :global([data-d='M']) .cal-strip { gap: 0; }
+  :global([data-d='M']) .cal-day { background: none; border: 0; }
+  :global([data-d='M']) .cal-day[data-tone] {
+    background: radial-gradient(70% 62% at 50% 62%, var(--tone-band) 0%, transparent 72%);
+  }
+  :global([data-d='M']) .cal-day--wknd { background: radial-gradient(70% 62% at 50% 62%, var(--d-neu-band) 0%, transparent 74%); }
+  :global([data-d='M']) .cal-day--hoy { box-shadow: none; background: radial-gradient(70% 62% at 50% 62%, var(--d-accent-soft) 0%, transparent 74%); }
+  :global([data-d='M']) .cal-day--on::after { height: 2px; background: var(--d-ink-3); }
+  :global([data-d='M']) .cal-detail { position: relative; padding: var(--d-p2) 0; }
+  :global([data-d='M']) .cal-detail::before {
+    content: ''; position: absolute; inset: 0 calc(-1 * var(--d-p3));
+    background: radial-gradient(58% 70% at 22% 20%, var(--d-neu-band) 0%, transparent 72%);
+    filter: blur(14px); pointer-events: none; z-index: -1;
+  }
+
+  /* ── N · CINTA — carriles que se montan uno sobre otro ────────────────
+     Cada barra, cada fila y cada día son un carril de puntas redondas. Se
+     solapan unos milímetros, así que hay orden de apilado explícito y sombra
+     de contacto hacia arriba: la cinta que va encima proyecta sobre la de
+     abajo, que es lo que hace que se lean como cintas y no como filas. */
+  :global([data-d='N']) .dv {
+    --dv-h: 16px; --dv-dot: 16px;
+    --dv-contact: 0 -4px 9px -5px color-mix(in srgb, var(--d-ink) 34%, transparent);
+    --dv-lip: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 92%, transparent);
+  }
+  :global([data-d='N']) .dv-bar { border-radius: var(--d-r-pill); background: var(--d-surface-fill); border-color: var(--d-line); }
+  :global([data-d='N']) .dv-stack { gap: 0; }
+  :global([data-d='N']) .pb {
+    padding: var(--d-p1) var(--d-p3);
+    border-radius: var(--d-r-lg);
+    background: var(--d-surface-fill);
+    box-shadow: var(--d-shadow), var(--dv-contact);
+  }
+  :global([data-d='N']) .pb + .pb { margin-top: calc(-1 * var(--d-p1)); }
+  :global([data-d='N']) .pb:nth-child(1) { z-index: 1; }
+  :global([data-d='N']) .pb:nth-child(2) { z-index: 2; }
+  :global([data-d='N']) .pb:nth-child(3) { z-index: 3; }
+  :global([data-d='N']) .pb-track, :global([data-d='N']) .ck-trklane, :global([data-d='N']) .tl-track {
+    border-radius: var(--d-r-pill); background: var(--d-sunk-fill);
+    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 16%, transparent);
+  }
+  :global([data-d='N']) .pb-fill, :global([data-d='N']) .ck-fill {
+    border-radius: var(--d-r-pill);
+    background: linear-gradient(100deg, color-mix(in srgb, var(--tone-fg) 72%, transparent) 0%, var(--tone-fg) 100%);
+    box-shadow: var(--dv-lip);
+  }
+  :global([data-d='N']) .pb-thr, :global([data-d='N']) .ck-fin { border-radius: var(--d-r-pill); width: 3px; }
+  :global([data-d='N']) .tl { gap: 0; }
+  :global([data-d='N']) .tl-axis { padding-inline: var(--d-p3); }
+  :global([data-d='N']) .tl-row {
+    position: relative; border-radius: var(--d-r-lg);
+    padding: var(--d-p1) var(--d-p3);
+    background: var(--d-surface-fill);
+    box-shadow: var(--d-shadow), var(--dv-contact);
+    margin-top: calc(-1 * var(--d-p1));
+  }
+  :global([data-d='N']) .tl-row[data-tone] { background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 58%); }
+  /* La primera cinta no se monta sobre el eje: ahí arriba están las marcas de
+     días y taparlas media línea las vuelve ilegibles. */
+  :global([data-d='N']) .tl-row:nth-child(2) { z-index: 1; margin-top: 0; }
+  :global([data-d='N']) .tl-row:nth-child(3) { z-index: 2; }
+  :global([data-d='N']) .tl-row:nth-child(4) { z-index: 3; }
+  :global([data-d='N']) .tl-row:nth-child(5) { z-index: 4; }
+  :global([data-d='N']) .tl-row:nth-child(6) { z-index: 5; }
+  :global([data-d='N']) .tl-row:nth-child(7) { z-index: 6; }
+  :global([data-d='N']) .tl-elapsed { border-radius: var(--d-r-pill); }
+  :global([data-d='N']) .tl-dot { box-shadow: var(--d-shadow); }
+  /* La tira de días es UN carril: las puntas se redondean solo en los extremos
+     y el día elegido monta por encima de sus dos vecinos. */
+  :global([data-d='N']) .ds-bar, :global([data-d='N']) .cal-strip { gap: 0; overflow: visible; }
+  /* Acá el solape NO se hace con margen negativo: el ancho de cada tramo ES el
+     dato (8/14/62/4 equipos), y montarlos unos milímetros dejaría un pedazo de
+     carril vacío a la derecha que se lee como flota sin contar. El montaje lo
+     dan las puntas redondas, el orden de apilado y la sombra de contacto a la
+     izquierda; el reparto queda exacto. */
+  :global([data-d='N']) .ds-seg {
+    border-radius: var(--d-r-pill);
+    box-shadow: var(--dv-lip), -4px 0 9px -5px color-mix(in srgb, var(--d-ink) 34%, transparent);
+  }
+  :global([data-d='N']) .ds-seg + .ds-seg {
+    box-shadow: var(--dv-lip), -4px 0 9px -5px color-mix(in srgb, var(--d-ink) 34%, transparent);
+  }
+  :global([data-d='N']) .ds-seg:nth-child(2) { z-index: 1; }
+  :global([data-d='N']) .ds-seg:nth-child(3) { z-index: 2; }
+  :global([data-d='N']) .ds-seg:nth-child(4) { z-index: 3; }
+  :global([data-d='N']) .cal-day { border: 0; border-radius: 0; background: var(--d-surface-fill); box-shadow: var(--dv-lip); }
+  :global([data-d='N']) .cal-day:first-child { border-radius: var(--d-r-pill) 0 0 var(--d-r-pill); }
+  :global([data-d='N']) .cal-day:last-child { border-radius: 0 var(--d-r-pill) var(--d-r-pill) 0; }
+  :global([data-d='N']) .cal-day[data-tone] { background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 88%); }
+  :global([data-d='N']) .cal-day--wknd { background: var(--d-sunk-fill); }
+  :global([data-d='N']) .cal-day--on { position: relative; z-index: 2; border-radius: var(--d-r-pill); box-shadow: var(--d-shadow-lg), var(--dv-lip); }
+  :global([data-d='N']) .cal-day--hoy,
+  :global([data-d='N']) .cal-day--hoy[data-tone] { box-shadow: var(--dv-lip), inset 0 0 0 1px var(--d-accent); }
+  :global([data-d='N']) .cal-detail { border-radius: var(--d-r-lg); background: var(--d-sunk-fill); padding: var(--d-p2) var(--d-p3); box-shadow: var(--dv-lip); }
+  :global([data-d='N']) .sp-line { stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+  :global([data-d='N']) .sp-area { opacity: .35; }
+  :global([data-d='N']) .sp-base { display: none; }
+  :global([data-d='N']) .sp-svg { background: var(--d-sunk-fill); border-radius: var(--d-r-lg); }
+
+  /* ── O · PRISMA — la marca vive DENTRO del vidrio ─────────────────────
+     El surco de una barra no es gris: es vidrio teñido de marca, y el relleno
+     es la misma marca subida de tono. La tira de catorce días es la única
+     botonera de esta página, así que acá se hace VIDRIO SEGMENTADO —un solo
+     panel translúcido partido por filos de luz— y no catorce botones sueltos.
+     Igual que en I: dentro del panel se anida con transparencia, nunca con un
+     segundo desenfoque. */
+  :global([data-d='O']) .dv { --dv-blur: 20px; --dv-h: 12px; --dv-dot: 15px; }
+  :global([data-d='O']) .dv-bar {
+    border-radius: var(--d-r-lg);
+    background-image: linear-gradient(180deg, color-mix(in srgb, var(--d-brand) 18%, transparent), transparent);
+    backdrop-filter: blur(var(--dv-blur)) saturate(1.5);
+    -webkit-backdrop-filter: blur(var(--dv-blur)) saturate(1.5);
+    box-shadow: var(--d-shadow-lg);
+  }
+  :global([data-d='O']) .pb-name b, :global([data-d='O']) .tl-lab b,
+  :global([data-d='O']) .ck-title b, :global([data-d='O']) .cal-day-name b { color: var(--d-brand); }
+  :global([data-d='O']) .pb-track, :global([data-d='O']) .tl-track,
+  :global([data-d='O']) .ck-trklane, :global([data-d='O']) .ds-bar {
+    background: color-mix(in srgb, var(--d-brand) 9%, transparent);
+    border-radius: var(--d-r-pill);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+  :global([data-d='O']) .pb-fill, :global([data-d='O']) .ck-fill {
+    background: color-mix(in srgb, var(--tone-fg) 78%, transparent);
+    box-shadow: inset 0 1px 0 var(--d-line);
+    border-radius: var(--d-r-pill);
+  }
+  :global([data-d='O']) .pb-thr, :global([data-d='O']) .ck-fin { background: var(--d-brand); opacity: .55; }
+  :global([data-d='O']) .pb-thr--soft { opacity: .22; }
+  :global([data-d='O']) .tl-axis {
+    background: color-mix(in srgb, var(--d-brand) 10%, transparent);
+    border-radius: var(--d-r); padding-block: 2px;
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+  :global([data-d='O']) .tl-now { background: var(--d-brand); opacity: .6; }
+  :global([data-d='O']) .tl-dot { box-shadow: 0 0 0 1px var(--tone-edge), inset 0 1px 0 var(--d-line), var(--d-shadow); }
+  :global([data-d='O']) .ds-seg { background: color-mix(in srgb, var(--tone-fg) 76%, transparent); }
+  :global([data-d='O']) .ds-seg + .ds-seg { box-shadow: inset 1px 0 0 var(--d-line); }
+  :global([data-d='O']) .sp-svg { background: color-mix(in srgb, var(--d-surface) 55%, transparent); border-radius: var(--d-r); box-shadow: inset 0 1px 0 var(--d-line); }
+  :global([data-d='O']) .sp-base, :global([data-d='O']) .sp-grid { stroke: color-mix(in srgb, var(--d-brand) 22%, transparent); }
+  :global([data-d='O']) .cal-strip {
+    gap: 0;
+    background: color-mix(in srgb, var(--d-surface) 72%, transparent);
+    border: 1px solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    overflow: hidden;
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='O']) .cal-day {
+    background: none; border: 0; border-radius: 0;
+    border-left: 1px solid var(--d-line);
+  }
+  :global([data-d='O']) .cal-day:first-child { border-left: 0; }
+  :global([data-d='O']) .cal-day[data-tone] { background: var(--tone-band); }
+  :global([data-d='O']) .cal-day--wknd { background: color-mix(in srgb, var(--d-ink) 5%, transparent); }
+  :global([data-d='O']) .cal-day--hoy { box-shadow: inset 0 0 0 1px var(--d-brand); }
+  :global([data-d='O']) .cal-day--on { background: color-mix(in srgb, var(--d-brand) 16%, transparent); }
+  :global([data-d='O']) .cal-day--on::after { background: var(--d-brand); }
+  :global([data-d='O']) .cal-detail {
+    background: color-mix(in srgb, var(--d-surface) 60%, transparent);
+    border-radius: var(--d-r-lg); padding: var(--d-p2) var(--d-p3);
+    box-shadow: var(--d-shadow);
+  }
+
+  /* ── P · ESPINA — el raíl vuelve, pero solo donde hay ancho ───────────
+     directions.css retiró el raíl de 152px porque se aplicaba a ciegas y en
+     una tarjeta de 200px dejaba un carácter por línea. Acá vuelve con la
+     condición que le faltaba: esta página mide su propia celda con container
+     queries, así que el raíl vive por encima de 430px y por debajo se
+     desarma (ver el bloque ESTRECHO). De la espina cuelga todo, y el estado
+     no pinta fondo: le muerde un tramo de su tono.
+     HALLAZGO: el ancho de la espina no es un token. directions.css lo escribe
+     como width:6px en tres reglas; acá se declara --dv-spine para que las
+     franjas de esta página muerdan exactamente la misma columna. */
+  :global([data-d='P']) .dv {
+    --dv-lab: var(--d-rail); --dv-lane: var(--d-rail);
+    --dv-h: 8px; --dv-dot: 12px; --dv-spine: 6px;
+    --dv-bite: linear-gradient(180deg, var(--d-brand) 0 26%, var(--tone-fg) 26% 74%, var(--d-brand) 74% 100%);
+  }
+  :global([data-d='P']) .dv-bar {
+    position: relative;
+    border: 0; border-bottom: 1px solid var(--d-line); border-radius: 0;
+    box-shadow: none; padding-left: calc(var(--d-p3) + var(--dv-spine));
+  }
+  :global([data-d='P']) .dv-bar::before {
+    content: ''; position: absolute; inset: 0 auto 0 0;
+    width: var(--dv-spine); background: var(--d-brand);
+  }
+  :global([data-d='P']) .dv-rail { width: var(--dv-lab); text-align: right; flex: none; color: var(--d-brand); }
+  :global([data-d='P']) .dv-bleed { padding-inline: 0; }
+  :global([data-d='P']) .pb {
+    grid-template-columns: var(--dv-lab) minmax(0, 1fr);
+    column-gap: var(--d-p3); align-items: center;
+    padding-block: var(--d-p1); padding-left: var(--dv-spine);
+  }
+  :global([data-d='P']) .pb::before {
+    content: ''; position: absolute; inset: 0 auto 0 0;
+    width: var(--dv-spine); background: var(--dv-bite);
+  }
+  :global([data-d='P']) .pb + .pb { border-top: 1px solid var(--d-line); }
+  :global([data-d='P']) .pb-head { grid-column: 1; grid-row: 1 / span 2; flex-direction: column; align-items: flex-end; text-align: right; padding-left: var(--d-p3); }
+  :global([data-d='P']) .pb-track { grid-column: 2; grid-row: 1; border-radius: 0; }
+  :global([data-d='P']) .pb-foot { grid-column: 2; grid-row: 2; padding-right: var(--d-p3); }
+  :global([data-d='P']) .pb-thr { background: var(--d-brand); opacity: 1; }
+  :global([data-d='P']) .pb-thr--soft { opacity: .3; }
+  :global([data-d='P']) .ck { padding: var(--d-p1) 0 var(--d-p2); position: relative; }
+  :global([data-d='P']) .ck + .ck { margin-top: 0; border-top: 1px solid var(--d-line); }
+  :global([data-d='P']) .ck-title, :global([data-d='P']) .ck-say { padding-left: calc(var(--d-p3) + var(--dv-spine)); }
+  :global([data-d='P']) .ck-lane { column-gap: var(--d-p3); padding-right: var(--d-p3); }
+  :global([data-d='P']) .ck-lane-lab { text-align: right; color: var(--d-brand); }
+  :global([data-d='P']) .ck-trklane, :global([data-d='P']) .tl-track { border-radius: 0; }
+  :global([data-d='P']) .ck-fin, :global([data-d='P']) .tl-now { background: var(--d-brand); }
+  :global([data-d='P']) .tl { gap: 0; }
+  :global([data-d='P']) .tl-axis, :global([data-d='P']) .tl-row { gap: var(--d-p3); }
+  :global([data-d='P']) .tl-axis { padding-left: calc(var(--d-p3) + var(--dv-spine)); }
+  :global([data-d='P']) .tl-row {
+    position: relative; border-top: 1px solid var(--d-line);
+    padding-block: var(--d-p1); padding-left: var(--dv-spine);
+  }
+  :global([data-d='P']) .tl-row::before {
+    content: ''; position: absolute; inset: 0 auto 0 0;
+    width: var(--dv-spine); background: var(--dv-bite);
+  }
+  :global([data-d='P']) .tl-lab { text-align: right; justify-items: end; padding-left: var(--d-p3); }
+  :global([data-d='P']) .tl-lab b { color: var(--d-brand); }
+  :global([data-d='P']) .tl-dot { border-radius: 0; }
+  :global([data-d='P']) .tl-key, :global([data-d='P']) .ds-key, :global([data-d='P']) .sp-caps,
+  :global([data-d='P']) .cal-detail, :global([data-d='P']) .dv-foot,
+  :global([data-d='P']) .cal-strip { padding-inline: var(--d-p3); }
+  :global([data-d='P']) .ds-bar { border-radius: 0; }
+  /* La tira cuelga de una espina horizontal, y el día con vencimiento le
+     muerde un tramo del ancho de su columna. */
+  :global([data-d='P']) .cal-strip { gap: 0; border-top: var(--dv-spine) solid var(--d-brand); }
+  :global([data-d='P']) .cal-day { border: 0; border-left: 1px solid var(--d-line); border-radius: 0; }
+  :global([data-d='P']) .cal-day:first-child { border-left: 0; }
+  :global([data-d='P']) .cal-day[data-tone] { background: none; }
+  :global([data-d='P']) .cal-day[data-tone]::before {
+    content: ''; position: absolute; top: calc(-1 * var(--dv-spine)); left: 0; right: 0;
+    height: var(--dv-spine); background: var(--tone-fg);
+  }
+  :global([data-d='P']) .cal-day--wknd { background: var(--d-sunk); }
+  :global([data-d='P']) .cal-day--hoy { box-shadow: inset 0 -2px 0 var(--d-brand); }
+  :global([data-d='P']) .cal-day--on::after { background: var(--d-brand); }
+
+  /* ── Q · CHAROL — masa dura con la superficie mojada ──────────────────
+     La barra es un bloque macizo: 2px de tinta alrededor, relleno sólido con
+     canto negro a la derecha, y el barrido húmedo en el tercio de arriba. Los
+     días comparten borde en vez de separarse —si cada uno llevara su propia
+     sombra sólida, catorce sombras seguidas se leen como ruido— y solo el
+     conjunto proyecta. */
+  :global([data-d='Q']) .dv {
+    --dv-h: 20px; --dv-dot: 16px;
+    --dv-gloss: linear-gradient(180deg, color-mix(in srgb, var(--d-surface) 62%, transparent), transparent);
+  }
+  :global([data-d='Q']) .dv-bar {
+    position: relative; overflow: hidden;
+    background: var(--d-surface-fill);
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='Q']) .dv-bar::after {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 34%;
+    background: var(--dv-gloss); pointer-events: none;
+  }
+  :global([data-d='Q']) .dv-note, :global([data-d='Q']) .pb-val { text-transform: uppercase; font-weight: var(--d-w-bold); }
+  :global([data-d='Q']) .pb-val { color: var(--d-ink); }
+  :global([data-d='Q']) .pb-track, :global([data-d='Q']) .ck-trklane, :global([data-d='Q']) .tl-track {
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r);
+    background: var(--d-surface-fill); overflow: hidden;
+  }
+  :global([data-d='Q']) .pb-fill, :global([data-d='Q']) .ck-fill {
+    background-color: var(--tone-band);
+    background-image: var(--dv-gloss);
+    background-size: 100% 55%; background-repeat: no-repeat;
+    border-right: var(--d-bw) solid var(--d-ink);
+  }
+  :global([data-d='Q']) .pb-thr, :global([data-d='Q']) .pb-thr--soft { width: 3px; opacity: 1; background: var(--d-ink); }
+  :global([data-d='Q']) .ck-fin { width: 3px; inset-block: -4px; }
+  :global([data-d='Q']) .tl-elapsed { inset-block: 0; opacity: 1; background: var(--tone-band); }
+  :global([data-d='Q']) .tl-now { width: var(--d-bw); inset-block: -4px; }
+  :global([data-d='Q']) .tl-dot {
+    border-radius: var(--d-r); background: var(--tone-band); color: var(--d-ink);
+    box-shadow: 0 0 0 var(--d-bw) var(--d-ink), inset 0 1px 0 color-mix(in srgb, var(--d-surface) 80%, transparent);
+  }
+  :global([data-d='Q']) .ds-bar {
+    position: relative; border: var(--d-bw) solid var(--d-ink);
+    border-radius: var(--d-r); background: var(--d-sunk-fill);
+  }
+  :global([data-d='Q']) .ds-bar::after {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 45%;
+    background: var(--dv-gloss); pointer-events: none;
+  }
+  :global([data-d='Q']) .ds-seg { background: var(--tone-band); }
+  :global([data-d='Q']) .ds-seg + .ds-seg { box-shadow: inset var(--d-bw) 0 0 var(--d-ink); }
+  :global([data-d='Q']) .ds-key li, :global([data-d='Q']) .cal-list li, :global([data-d='Q']) .tl-key li { color: var(--d-ink); }
+  :global([data-d='Q']) .sp-svg {
+    background: var(--dv-gloss) top / 100% 40% no-repeat, var(--d-surface-fill);
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r);
+  }
+  :global([data-d='Q']) .sp-bar { fill: var(--d-accent); }
+  :global([data-d='Q']) .sp-base { stroke: var(--d-ink); stroke-width: 2; }
+  :global([data-d='Q']) .cal-strip { gap: 0; }
+  :global([data-d='Q']) .cal-day {
+    position: relative; overflow: hidden;
+    background: var(--d-surface-fill);
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r);
+    margin-left: calc(-1 * var(--d-bw));
+  }
+  :global([data-d='Q']) .cal-day:first-child { margin-left: 0; }
+  :global([data-d='Q']) .cal-day[data-tone] { background-color: var(--tone-band); background-image: none; }
+  :global([data-d='Q']) .cal-day::before {
+    content: ''; position: absolute; inset: 0 0 auto 0; height: 40%;
+    background: var(--dv-gloss); pointer-events: none;
+  }
+  :global([data-d='Q']) .cal-day--wknd { background: var(--d-sunk-fill); }
+  :global([data-d='Q']) .cal-day--hoy,
+  :global([data-d='Q']) .cal-day--hoy[data-tone] {
+    background-color: var(--d-ink); background-image: none;
+    color: var(--d-ink-on); box-shadow: none; z-index: 1;
+  }
+  :global([data-d='Q']) .cal-day--hoy .cal-dow, :global([data-d='Q']) .cal-day--hoy .cal-mk { color: var(--d-ink-on); }
+  :global([data-d='Q']) .cal-day--hoy.cal-day--on::after { background: var(--d-ink-on); }
+  :global([data-d='Q']) .cal-day:active { transform: translate(2px, 2px); }
+  :global([data-d='Q']) .cal-day:active::before { opacity: 0; }
+  :global([data-d='Q']) .cal-detail {
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r);
+    background: var(--d-surface-fill); box-shadow: var(--d-shadow);
+    padding: var(--d-p2);
+  }
+
+  /* ── R · VITRINA — la densidad de F, el material de I ─────────────────
+     R hereda las celdas de carácter (ver isMono en el script): la rejilla del
+     monoespaciado es lo que le da la fila de 26px. Lo que cambia contra F es
+     el material —cada fila es una lámina de vidrio sobre el campo frío— y por
+     eso la misma densidad no aprieta: el fondo respira a través.
+     El desenfoque está solo en .dv-bar, que se apoya sobre el fondo; dentro de
+     los paneles, transparencia. */
+  :global([data-d='R']) .dv { --dv-blur: 16px; --dv-h: 6px; }
+  :global([data-d='R']) .dv-bar {
+    padding: var(--d-p1) var(--d-p2); border-radius: var(--d-r);
+    backdrop-filter: blur(var(--dv-blur)) saturate(1.3);
+    -webkit-backdrop-filter: blur(var(--dv-blur)) saturate(1.3);
+  }
+  :global([data-d='R']) .dv-rail { color: var(--d-accent); }
+  :global([data-d='R']) .dv-rail::before { content: 'vitrina ▸ '; color: var(--d-ink-3); }
+  :global([data-d='R']) .dv-body { gap: var(--d-p1); }
+  :global([data-d='R']) .mrow {
+    min-height: var(--d-row-h);
+    padding-inline: var(--d-p1);
+    background: var(--d-surface);
+    border-bottom: 1px solid var(--d-line);
+  }
+  :global([data-d='R']) .mrow:hover { background: color-mix(in srgb, var(--d-ink-3) 14%, transparent); }
+  :global([data-d='R']) .mrow--tl { background: none; }
+  :global([data-d='R']) .mnote { margin-bottom: 0; padding-inline: var(--d-p1); }
+  /* El .5 de opacidad dejaba el carril en 2.10:1 sobre el vidrio oscuro. Sin
+     él llega a 4.05:1 — pasa el 3:1 que le corresponde a un elemento gráfico,
+     pero no el 4.5:1 de texto, y no puede: el techo se lo pone --d-ink-3 de R
+     (#8798A4), que es el token que no rinde sobre sus propios fondos. */
+  :global([data-d='R']) .mc--off { color: var(--d-ink-3); }
+  :global([data-d='R']) .sp-mono {
+    background: var(--d-surface); border: 1px solid var(--d-line); border-radius: var(--d-r);
+    padding: var(--d-p1); display: block; overflow-x: auto;
+  }
+  :global([data-d='R']) .ds-mono { background: var(--d-surface); border-radius: var(--d-r); padding: var(--d-p1); }
+  :global([data-d='R']) .ds-key li, :global([data-d='R']) .tl-key li, :global([data-d='R']) .cal-list li { font-size: var(--d-t-xs); }
+  :global([data-d='R']) .cal-strip { gap: 1px; }
+  :global([data-d='R']) .cal-day {
+    min-height: var(--d-row-h); padding: 2px 0; gap: 0;
+    border: 0; border-radius: var(--d-r);
+    background: var(--d-surface);
+  }
+  :global([data-d='R']) .cal-day[data-tone] { background: var(--tone-band); }
+  /* En una dirección oscura el sábado no puede ser MÁS claro que el resto: la
+     tinta de R es casi blanca, así que el velo que hunde es --d-ink-on. */
+  :global([data-d='R']) .cal-day--wknd { background: color-mix(in srgb, var(--d-ink-on) 45%, transparent); }
+  :global([data-d='R']) .cal-day--hoy { box-shadow: inset 0 0 0 1px var(--d-accent); }
+  :global([data-d='R']) .cal-day--on::after { background: var(--d-accent); }
+  :global([data-d='R']) .cal-n { font-size: var(--d-t-xs); font-weight: var(--d-w); }
+  :global([data-d='R']) .cal-detail {
+    background: var(--d-surface); border: 1px solid var(--d-line); border-radius: var(--d-r);
+    padding: var(--d-p1) var(--d-p2); margin-top: var(--d-p1);
+  }
+
+  /* ── S · UMBRA — la firma baja al marcado propio de la página ──────────
+     directions.css se la da solo a .d-panel y .d-row. Todo lo que esta página
+     dibuja a mano —la barra de vista, cada barra de plan, cada tramo de la
+     flota, cada tarjeta de día, la lámina del minigráfico— se queda BLANCO y
+     lo que informa es la luz teñida de abajo. La barra de progreso es el caso
+     puro: relleno blanco sobre surco gris, y el rojo o el verde solo existen
+     como sombra. El tono nunca toca el texto; la forma la sigue llevando la
+     marca de demo.js, así que el estado tampoco queda solo en el color. */
+  :global([data-d='S']) .dv {
+    --dv-h: 14px; --dv-dot: 16px;
+    --dv-cast: 0 10px 26px -12px var(--tone-fg), 0 2px 8px -5px color-mix(in srgb, var(--d-ink) 22%, transparent);
+    --dv-cast-sm: 0 6px 14px -7px var(--tone-fg), 0 1px 3px -1px color-mix(in srgb, var(--d-ink) 18%, transparent);
+  }
+  :global([data-d='S']) .dv-bar { border: 0; border-radius: var(--d-r-lg); box-shadow: var(--d-shadow); }
+  :global([data-d='S']) .dv-stack { gap: var(--d-p3); }
+  :global([data-d='S']) .pb {
+    background: var(--d-surface); border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3); box-shadow: var(--dv-cast);
+  }
+  :global([data-d='S']) .pb-track, :global([data-d='S']) .ck-trklane, :global([data-d='S']) .tl-track {
+    background: color-mix(in srgb, var(--d-ink) 7%, transparent);
+    border-radius: var(--d-r-pill); overflow: visible;
+  }
+  :global([data-d='S']) .pb-fill, :global([data-d='S']) .ck-fill {
+    background: var(--d-surface); border-radius: var(--d-r-pill);
+    box-shadow: var(--dv-cast-sm);
+  }
+  :global([data-d='S']) .pb-thr { background: var(--d-ink); opacity: .32; }
+  :global([data-d='S']) .pb-thr--soft { opacity: .14; }
+  :global([data-d='S']) .ck-fin { background: var(--d-ink); opacity: .32; }
+  :global([data-d='S']) .tl-elapsed { background: var(--d-ink); opacity: .12; border-radius: var(--d-r-pill); }
+  :global([data-d='S']) .tl { gap: var(--d-p1); }
+  :global([data-d='S']) .tl-row[data-tone] {
+    background: var(--d-surface); border-radius: var(--d-r);
+    padding: var(--d-p1) var(--d-p2); margin-bottom: var(--d-p1);
+    box-shadow: var(--dv-cast-sm);
+  }
+  :global([data-d='S']) .tl-dot { background: var(--d-surface); box-shadow: var(--dv-cast-sm); }
+  :global([data-d='S']) .ds-bar { background: none; overflow: visible; gap: var(--d-p1); height: calc(var(--dv-h) * 1.6); }
+  :global([data-d='S']) .ds-seg {
+    background: var(--d-surface); border-radius: var(--d-r);
+    box-shadow: var(--dv-cast-sm);
+  }
+  :global([data-d='S']) .ds-seg + .ds-seg { box-shadow: var(--dv-cast-sm); }
+  :global([data-d='S']) .sp-svg {
+    background: var(--d-surface); border-radius: var(--d-r-lg);
+    box-shadow: 0 10px 26px -12px var(--d-info), 0 1px 4px -2px color-mix(in srgb, var(--d-ink) 18%, transparent);
+  }
+  :global([data-d='S']) .sp-line { stroke: var(--d-ink); stroke-width: 1.8; }
+  :global([data-d='S']) .sp-end { fill: var(--d-ink); }
+  :global([data-d='S']) .sp-area { fill: var(--d-sunk); }
+  :global([data-d='S']) .sp-base { stroke: transparent; }
+  :global([data-d='S']) .cal-strip { gap: var(--d-p1); }
+  :global([data-d='S']) .cal-day { border: 0; background: var(--d-surface); box-shadow: var(--d-shadow); }
+  :global([data-d='S']) .cal-day[data-tone] { background: var(--d-surface); color: var(--d-ink-2); box-shadow: var(--dv-cast-sm); }
+  :global([data-d='S']) .cal-day--wknd { background: var(--d-sunk); box-shadow: none; }
+  :global([data-d='S']) .cal-day--hoy,
+  :global([data-d='S']) .cal-day--hoy[data-tone] { box-shadow: var(--dv-cast-sm), inset 0 0 0 1px var(--d-ink); }
+  :global([data-d='S']) .cal-detail {
+    background: var(--d-surface); border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3); box-shadow: var(--d-shadow);
+  }
+
+  /* ══════════════════════════════════════════════════════════════════════
      ESTRECHO — manda el ancho de la CELDA, no el de la ventana. Por eso
      container queries: dos celdas de 400px en un monitor de 1600 también
      son estrechas, y una media query no se entera.
@@ -1023,6 +1798,13 @@
     .cal-strip { grid-template-columns: repeat(7, minmax(0, 1fr)); }
     .ds-note { display: none; }
     .ck-svg { width: 104px; height: 60px; }
+    /* P · la condición que le faltaba al raíl de 152px: acá abajo ya no hay
+       ancho para él, y una columna fija de ese tamaño deja un carácter por
+       línea. La espina no depende del ancho, así que se queda. */
+    :global([data-d='P']) .ck-lanes { --dv-lane: 96px; }
+    /* N · con la celda angosta las cintas se apilan más apretadas y el solape
+       se achica: a 14px de montura, dos carriles de 40px se comen el texto. */
+    :global([data-d='N']) .pb + .pb, :global([data-d='N']) .tl-row { margin-top: -3px; }
   }
   @container (max-width: 330px) {
     .tl, .pb { --dv-lab: 0px; }
@@ -1042,5 +1824,16 @@
     :global([data-d='G']) .pb-head { grid-row: auto; align-items: flex-start; text-align: left; }
     :global([data-d='G']) .pb-track, :global([data-d='G']) .pb-foot { grid-column: 1; grid-row: auto; }
     :global([data-d='G']) .tl-lab { text-align: left; justify-items: start; }
+    /* P pierde el raíl igual que G, pero no la espina: la columna de marca
+       sigue a la izquierda y las etiquetas se meten hacia adentro para no
+       pegarse a ella. Esto es lo que el raíl a ciegas no sabía hacer. */
+    :global([data-d='P']) .pb, :global([data-d='P']) .tl-row, :global([data-d='P']) .tl-axis,
+    :global([data-d='P']) .ck-lane { padding-left: calc(var(--d-p3) + var(--dv-spine)); }
+    :global([data-d='P']) .tl-lab, :global([data-d='P']) .pb-head { padding-left: 0; text-align: left; justify-items: start; align-items: flex-start; }
+    :global([data-d='P']) .dv-rail { width: auto; }
+    :global([data-d='P']) .pb { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='P']) .pb-head { grid-row: auto; }
+    :global([data-d='P']) .pb-track, :global([data-d='P']) .pb-foot { grid-column: 1; grid-row: auto; }
+    :global([data-d='P']) .ck-lane-lab { text-align: left; }
   }
 </style>

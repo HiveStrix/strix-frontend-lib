@@ -633,7 +633,10 @@
     border-bottom-color: var(--d-accent-edge);
     font-weight: var(--d-w-semi);
   }
-  :global([data-d='C']) .gc { color: var(--d-brand); opacity: .7; }
+  /* el conteo va más callado que el nombre del grupo, pero no tanto: a .7 el
+     color de marca sobre --d-accent-soft caía a 3.5:1. A .85 sigue leyéndose
+     como secundario (4.8:1 contra 6.7:1 del nombre) y pasa AA. */
+  :global([data-d='C']) .gc { color: var(--d-brand); opacity: .85; }
   :global([data-d='C']) .fam[aria-pressed='true'] {
     background: var(--d-brand); color: var(--d-brand-ink); border-color: var(--d-brand);
   }
@@ -909,6 +912,935 @@
   :global([data-d='H']) .foot { background: var(--d-sunk); border-top-color: var(--d-edge); }
 
   /* ======================================================================
+     LAS ONCE NUEVAS — I … S.
+
+     Dos reglas mandan de aquí abajo. La primera: [data-d] vive en
+     Direction.svelte, otro componente, así que TODO empieza por
+     :global([data-d='X']) — sin eso el selector no coincide con nada y no
+     avisa. La segunda: ni un color a mano. Cuando una dirección pide una
+     tinta que su bloque de tokens no publica —el barrido de la laca, el
+     negro al 30 % de una sombra de contacto— se compone con color-mix a
+     partir de un token suyo, y la ausencia queda anotada como hallazgo.
+     ====================================================================== */
+
+  /* ── I · CRISTAL — losas sueltas de vidrio sobre el campo de manchas ───
+     ANIDADO, que es donde esta dirección se rompe: el desenfoque vive SOLO
+     en la capa que toca el fondo —barra, veredicto, KPIs, pie—. Dentro de
+     .sect, que ya es .d-panel y ya desenfoca, no hay un segundo
+     backdrop-filter: ahí el material se hace con alfa. Vidrio sobre vidrio
+     se enturbia y el contenido deja de leerse.
+     HALLAZGO: el radio de desenfoque no está tokenizado. directions.css lo
+     lleva escrito dentro de cada selector (18px en I, 20 en O, 16 en R), así
+     que la página no tiene de dónde heredarlo y lo repite a mano para que la
+     barra sea el mismo vidrio que el panel. Un --d-blur lo resolvería en un
+     solo lugar. */
+  :global([data-d='I']) .topbar {
+    margin: var(--d-p3) var(--d-p3) 0;
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    background: var(--d-surface);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='I']) .verdict {
+    border-color: var(--d-line);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: var(--d-shadow);
+  }
+  /* cada KPI es su propia losa: I separa, O —que comparte material— une */
+  :global([data-d='I']) .kpi {
+    border-radius: var(--d-r-lg);
+    border-color: var(--d-line);
+    padding: var(--d-p3);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='I']) .kpi:hover { transform: translateY(-1px); box-shadow: var(--d-shadow-lg); }
+  :global([data-d='I']) .kpi[aria-pressed='true'] { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='I']) .sect { box-shadow: var(--d-shadow-lg); }
+  /* DENTRO del panel no se desenfoca nada más: solo alfa */
+  :global([data-d='I']) .lhead { background: var(--d-sunk); border-bottom-color: var(--d-line); }
+  :global([data-d='I']) .ghead {
+    background: var(--tone-band); border-bottom-color: var(--d-line); color: var(--d-ink);
+  }
+  :global([data-d='I']) .row:hover { background: var(--d-sunk); }
+  :global([data-d='I']) .fam {
+    border-radius: var(--d-r-pill); border-color: var(--d-line); background: var(--d-surface);
+  }
+  :global([data-d='I']) .fam[aria-pressed='true'] { border-color: var(--d-accent-edge); }
+  :global([data-d='I']) .track {
+    background: var(--d-sunk); box-shadow: inset 0 0 0 1px var(--d-line);
+  }
+  :global([data-d='I']) .fill { box-shadow: inset 0 1px 0 var(--d-line); }
+  :global([data-d='I']) .thr { background: var(--d-ink-3); }
+  /* la línea del plan vive DENTRO del panel: se hace con alfa, sin un
+     segundo desenfoque encima del que ya trae .d-panel */
+  :global([data-d='I']) .tlr {
+    background: var(--d-sunk); border-radius: var(--d-r);
+    padding: var(--d-p2) var(--d-p3);
+  }
+  /* .d-pill trae backdrop-filter propio del primitivo, y dentro del panel eso
+     ya es vidrio sobre vidrio sobre vidrio: se apaga, el alfa alcanza */
+  :global([data-d='I']) .c-state .d-pill,
+  :global([data-d='I']) .tlw { backdrop-filter: none; -webkit-backdrop-filter: none; }
+  :global([data-d='I']) .foot {
+    margin: 0 var(--d-p3) var(--d-p3);
+    border: var(--d-bw) solid var(--d-line);
+    border-top-color: var(--d-line);
+    border-radius: var(--d-r-lg);
+    background: var(--d-sunk);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    box-shadow: var(--d-shadow);
+  }
+  /* HALLAZGO de contraste, el mismo que ya está escrito en Acciones, Tablas y
+     Formularios: en directions.css `[data-d='I'] .d-btn` pesa (0,2,0) y
+     `.d-btn--primary` pesa (0,1,0), así que el vidrio blanco le gana el fondo
+     al primario y queda tinta blanca sobre blanco — 1.02:1. Acá se comía
+     «Registrar lectura», la única acción primaria de la pantalla. */
+  :global([data-d='I']) .d-btn--primary {
+    background: var(--d-accent);
+    color: var(--d-accent-ink);
+  }
+
+  /* ── J · LACA — ninguna superficie es un color plano ───────────────────
+     El barrido se pinta como CAPA DE FONDO, no como pseudo-elemento: así no
+     hay orden de pintado que discutir —queda debajo del texto por
+     definición— ni clic que robar, que es lo que pasa cuando un ::after
+     esmaltado se estira sobre un botón.
+     HALLAZGO: J publica --d-surface-fill, --d-sunk-fill y --d-accent-fill,
+     pero no un --d-gloss: el barrido existe solo dentro de .d-panel::after
+     en directions.css y el marcado propio de una página no puede reusarlo.
+     Se sintetiza acá una vez, a partir de --d-surface, y se reparte. */
+  :global([data-d='J']) .screen { --pg-gloss: color-mix(in srgb, var(--d-surface) 62%, transparent); }
+  :global([data-d='J']) .topbar {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 38%), var(--d-surface-fill);
+    border-bottom-color: var(--d-edge);
+    box-shadow: var(--d-shadow);
+    position: relative; z-index: 2;
+  }
+  :global([data-d='J']) .title { font-weight: var(--d-w-bold); }
+  :global([data-d='J']) .verdict {
+    background:
+      linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%),
+      linear-gradient(180deg, var(--tone-band) 0%, var(--d-surface) 100%);
+    border-color: var(--tone-edge);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='J']) .kpi {
+    border-radius: var(--d-r-lg);
+    border-color: var(--d-edge);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%), var(--d-surface-fill);
+    box-shadow: var(--d-shadow);
+  }
+  /* al presionar, el brillo se apaga y la placa se hunde */
+  :global([data-d='J']) .kpi:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 5px color-mix(in srgb, var(--d-ink) 26%, transparent);
+  }
+  :global([data-d='J']) .kpi[aria-pressed='true'] {
+    background:
+      linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%),
+      linear-gradient(180deg, var(--tone-band) 0%, var(--d-surface) 100%);
+  }
+  :global([data-d='J']) .sect { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='J']) .lhead {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 60%), var(--d-sunk-fill);
+    border-bottom-color: var(--d-edge);
+  }
+  :global([data-d='J']) .ghead {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 70%), var(--d-sunk-fill);
+    border-bottom-color: var(--d-edge);
+  }
+  :global([data-d='J']) .fam {
+    border-radius: var(--d-r-pill);
+    border-color: var(--d-edge);
+    padding: 5px var(--d-p2);
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 48%), var(--d-surface-fill);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='J']) .fam:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 24%, transparent);
+  }
+  /* la pastilla marcada es la única superficie oscura de J: el barrido se
+     cambia por el realce del canto para no aclarar el fondo justo debajo de
+     una etiqueta blanca de 12px */
+  :global([data-d='J']) .fam[aria-pressed='true'] {
+    background: var(--d-accent-fill);
+    color: var(--d-accent-ink); border-color: var(--d-accent-edge);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='J']) .fam[aria-pressed='true'] .ct { color: inherit; }
+  /* el carril es un hueco húmedo y el relleno una placa con su propio brillo */
+  :global([data-d='J']) .track {
+    height: 12px;
+    background: var(--d-sunk-fill);
+    box-shadow: inset 0 2px 4px color-mix(in srgb, var(--d-ink) 22%, transparent);
+    overflow: hidden;
+  }
+  :global([data-d='J']) .fill {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 55%), var(--tone-fg);
+  }
+  :global([data-d='J']) .thr { background: var(--d-ink-2); }
+  :global([data-d='J']) .tlb { gap: var(--d-p3); }
+  :global([data-d='J']) .tlr {
+    border-radius: var(--d-r); padding: var(--d-p2) var(--d-p3);
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 44%), var(--d-surface-fill);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='J']) .foot {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 60%), var(--d-sunk-fill);
+    border-top-color: var(--d-edge);
+  }
+
+  /* ── K · HALO — nada tiene borde: existe lo que irradia ────────────────
+     El estado es el COLOR DEL RESPLANDOR, no un relleno. Los KPIs son
+     cuatro luces de colores distintos flotando sobre negro; a ojos
+     entrecerrados no hay ni una caja en toda la celda.
+     HALLAZGO: K no publica ningún token de resplandor —radio, dispersión—,
+     solo los tonos. Los desenfoques van a mano; el color, siempre de token. */
+  :global([data-d='K']) .topbar {
+    background: transparent; border-bottom: 0;
+    box-shadow: 0 26px 50px -34px var(--d-accent);
+  }
+  :global([data-d='K']) .title { text-shadow: 0 0 20px color-mix(in srgb, var(--d-ink) 45%, transparent); }
+  :global([data-d='K']) .verdict {
+    border: 0; background: var(--tone-band);
+    box-shadow: 0 0 0 1px var(--tone-edge), 0 18px 64px -22px var(--tone-fg);
+  }
+  :global([data-d='K']) .vt { text-shadow: 0 0 24px color-mix(in srgb, var(--tone-fg) 40%, transparent); }
+  :global([data-d='K']) .kpi {
+    background: transparent; border: 0; border-radius: var(--d-r-lg);
+    padding: var(--d-p3);
+    box-shadow: 0 0 0 1px var(--tone-edge), 0 14px 46px -18px var(--tone-fg);
+  }
+  :global([data-d='K']) .kpi:hover { box-shadow: 0 0 0 1px var(--tone-fg), 0 16px 54px -16px var(--tone-fg); }
+  :global([data-d='K']) .kv { text-shadow: 0 0 22px var(--tone-fg); }
+  /* pulsado: el anillo se enciende entero, no solo cambia el tono */
+  :global([data-d='K']) .kpi[aria-pressed='true'] {
+    background: var(--tone-band);
+    box-shadow: 0 0 0 2px var(--tone-fg), 0 20px 66px -14px var(--tone-fg);
+  }
+  :global([data-d='K']) .sect { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='K']) .lhead {
+    background: transparent; border-bottom: 0;
+    box-shadow: 0 1px 0 var(--d-neu-edge);
+  }
+  /* el título del grupo no lleva banda: se enciende en su tono */
+  :global([data-d='K']) .ghead {
+    background: transparent; border-bottom: 0;
+    color: var(--tone-fg); text-shadow: 0 0 18px var(--tone-fg);
+    padding-top: var(--d-p2);
+  }
+  :global([data-d='K']) .gc { color: var(--d-ink-3); text-shadow: none; }
+  :global([data-d='K']) .row:hover { background: var(--d-neu-band); }
+  :global([data-d='K']) .fam {
+    background: transparent; border: 0; border-radius: var(--d-r-pill);
+    box-shadow: 0 0 0 1px var(--d-neu-edge);
+  }
+  :global([data-d='K']) .fam:hover { box-shadow: 0 0 0 1px var(--d-ink-3), 0 6px 22px -12px var(--d-ink-2); }
+  :global([data-d='K']) .fam[aria-pressed='true'] {
+    background: var(--d-accent-soft); color: var(--d-ink);
+    box-shadow: 0 0 0 1px var(--d-accent), 0 8px 28px -12px var(--d-accent);
+  }
+  :global([data-d='K']) .track {
+    height: 6px; background: transparent; box-shadow: inset 0 0 0 1px var(--d-neu-edge);
+  }
+  :global([data-d='K']) .fill { background: var(--tone-fg); box-shadow: 0 0 20px -2px var(--tone-fg); }
+  :global([data-d='K']) .thr { background: var(--d-ink-3); }
+  /* cada plan es otra luz suelta, con el anillo del tono y nada de relleno */
+  :global([data-d='K']) .tlr {
+    border-radius: var(--d-r); padding: var(--d-p2) var(--d-p3);
+    box-shadow: 0 0 0 1px var(--tone-edge), 0 12px 44px -22px var(--tone-fg);
+  }
+  :global([data-d='K']) .tlid { color: var(--d-accent); }
+  :global([data-d='K']) .foot {
+    background: transparent; border-top: 0;
+    box-shadow: 0 -22px 44px -34px var(--d-accent);
+  }
+
+  /* ── L · GUIJARRO — cuatro radios distintos, y distintos entre vecinos ─
+     HALLAZGO: L publica solo DOS juegos de radios (--d-r y --d-r-lg) y una
+     piedra necesita más de dos perfiles: con dos, las vecinas se vuelven a
+     leer como la misma tarjeta. Los otros dos salen de CRUZAR los que hay
+     con la barra de border-radius —radios horizontales de uno, verticales
+     del otro—, que sigue siendo token y no un valor inventado. */
+  :global([data-d='L']) .topbar {
+    margin: var(--d-p2) var(--d-p2) 0;
+    border: 0; border-radius: var(--d-r-lg) / var(--d-r);
+    background: var(--d-surface);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='L']) .verdict {
+    border: 0; border-radius: var(--d-r-lg);
+    background: var(--tone-band);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='L']) .kpi { border: 0; box-shadow: var(--d-shadow); padding: var(--d-p2) var(--d-p3) var(--d-p3); }
+  :global([data-d='L']) .kpi:nth-child(1) { border-radius: var(--d-r-lg); }
+  :global([data-d='L']) .kpi:nth-child(2) { border-radius: var(--d-r); }
+  :global([data-d='L']) .kpi:nth-child(3) { border-radius: var(--d-r-lg) / var(--d-r); }
+  :global([data-d='L']) .kpi:nth-child(4) { border-radius: var(--d-r) / var(--d-r-lg); }
+  :global([data-d='L']) .kpi:active { box-shadow: inset 3px 4px 9px -4px color-mix(in srgb, var(--d-ink) 32%, transparent); }
+  :global([data-d='L']) .kpi[aria-pressed='true'] { background: var(--tone-band); }
+  :global([data-d='L']) .sect { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='L']) .lhead { background: transparent; border-bottom: 0; }
+  /* cada fila es su propio canto: sin líneas, y ninguna igual a la de al lado */
+  :global([data-d='L']) .rows {
+    display: flex; flex-direction: column; gap: var(--d-p1);
+    padding: var(--d-p1) var(--d-p2) var(--d-p2);
+  }
+  :global([data-d='L']) .row { border-bottom: 0; background: var(--d-sunk); }
+  :global([data-d='L']) .row:nth-child(4n + 1) { border-radius: var(--d-r); }
+  :global([data-d='L']) .row:nth-child(4n + 2) { border-radius: var(--d-r) / var(--d-r-lg); }
+  :global([data-d='L']) .row:nth-child(4n + 3) { border-radius: var(--d-r-lg) / var(--d-r); }
+  :global([data-d='L']) .row:nth-child(4n) { border-radius: var(--d-r-lg); }
+  /* el encabezado de grupo es una piedrita, no una franja de borde a borde */
+  :global([data-d='L']) .ghead {
+    width: fit-content; max-width: 100%;
+    border-bottom: 0; background: var(--tone-band); color: var(--d-ink);
+    border-radius: var(--d-r-lg) / var(--d-r);
+    padding: var(--d-p1) var(--d-p3);
+    margin-top: var(--d-p1);
+  }
+  :global([data-d='L']) .fam:nth-child(odd) { border-radius: var(--d-r); }
+  :global([data-d='L']) .fam:nth-child(even) { border-radius: var(--d-r) / var(--d-r-lg); }
+  :global([data-d='L']) .fam { border: 0; background: var(--d-sunk); box-shadow: var(--d-shadow); padding: 6px var(--d-p2); }
+  :global([data-d='L']) .fam[aria-pressed='true'] { background: var(--d-accent); color: var(--d-accent-ink); }
+  :global([data-d='L']) .fam[aria-pressed='true'] .ct { color: inherit; }
+  :global([data-d='L']) .track { height: 12px; border-radius: var(--d-r) / var(--d-r-lg); background: var(--d-sunk); }
+  :global([data-d='L']) .fill { border-radius: inherit; }
+  :global([data-d='L']) .thr { background: var(--d-ink-3); }
+  :global([data-d='L']) .tlr {
+    background: var(--d-surface); border-radius: var(--d-r-lg) / var(--d-r);
+    padding: var(--d-p2) var(--d-p3); box-shadow: var(--d-shadow);
+  }
+  :global([data-d='L']) .foot {
+    margin: 0 var(--d-p2) var(--d-p2);
+    border-top: 0; border-radius: var(--d-r) / var(--d-r-lg);
+    background: var(--d-surface); box-shadow: var(--d-shadow);
+  }
+
+  /* ── M · BRUMA — no hay contenedores; el color se derrama por detrás ───
+     HALLAZGO DE PINTADO, el que hacía invisible a esta dirección: el
+     derrame de directions.css es un ::before con z-index:-1, y un
+     z-index negativo se pinta ANTES del fondo de cualquier bloque no
+     posicionado que tenga encima — incluido el .stage de Direction.svelte,
+     que es opaco. Ningún ancestro crea contexto de apilado, así que la
+     mancha quedaba debajo del fondo. `isolation: isolate` en el elemento
+     que la hospeda crea ese contexto y la mancha vuelve a verse, sin tocar
+     directions.css. Va en todo lo que derrama, propio o heredado.
+     El desenfoque de 26px se repite a mano porque no hay token: si la
+     página usara otro, las manchas propias y las del primitivo se leerían
+     como dos nieblas distintas. */
+  :global([data-d='M']) .topbar { background: transparent; border-bottom: 0; padding-bottom: 0; }
+  :global([data-d='M']) .title {
+    font-family: var(--d-display); font-weight: 400;
+    font-size: var(--d-t-2xl); letter-spacing: -.02em;
+  }
+  :global([data-d='M']) .verdict {
+    position: relative; isolation: isolate;
+    background: none; border: 0; border-radius: 0;
+    padding: var(--d-p2) 0 var(--d-p3);
+  }
+  :global([data-d='M']) .verdict::before {
+    content: ''; position: absolute; inset: -22px -30px; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(62% 70% at 16% 20%, var(--tone-band) 0%, transparent 70%),
+      radial-gradient(52% 58% at 86% 84%, var(--tone-band) 0%, transparent 68%);
+    filter: blur(26px);
+  }
+  /* el veredicto es el titular de la pantalla: serif, grande, sin caja */
+  :global([data-d='M']) .vt {
+    font-family: var(--d-display); font-weight: 400;
+    font-size: var(--d-t-xl); line-height: 1.28; letter-spacing: -.015em;
+  }
+  /* los KPIs derraman con gradientes en el propio fondo: dentro de un
+     <button> un pseudo con z-index negativo es terreno resbaladizo */
+  :global([data-d='M']) .kpi {
+    border: 0; box-shadow: none; border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+    background:
+      radial-gradient(72% 130% at 18% 0%, var(--tone-band) 0%, transparent 72%),
+      radial-gradient(62% 120% at 96% 100%, var(--tone-band) 0%, transparent 70%);
+  }
+  :global([data-d='M']) .kv { font-family: var(--d-display); font-weight: 400; letter-spacing: -.01em; }
+  :global([data-d='M']) .kpi[aria-pressed='true'] {
+    background:
+      radial-gradient(78% 140% at 18% 0%, var(--tone-band) 0%, transparent 76%),
+      radial-gradient(68% 130% at 96% 100%, var(--tone-band) 0%, transparent 74%);
+    box-shadow: inset 0 -2px 0 var(--tone-fg);
+  }
+  :global([data-d='M']) .sect { isolation: isolate; }
+  /* sin caja no hay borde interior que alinee: la rejilla se alinea sola */
+  :global([data-d='M']) .lhead { background: transparent; border-bottom: 0; padding-inline: 0; }
+  :global([data-d='M']) .row { padding-inline: 0; }
+  :global([data-d='M']) .ghead {
+    position: relative; isolation: isolate;
+    background: transparent; border-bottom: 0; padding-inline: 0;
+    font-family: var(--d-display); font-size: var(--d-t-lg); font-weight: 400;
+    text-transform: none; letter-spacing: 0; color: var(--d-ink);
+  }
+  :global([data-d='M']) .ghead::before {
+    content: ''; position: absolute; inset: -14px -26px; z-index: -1; pointer-events: none;
+    background: radial-gradient(58% 120% at 12% 50%, var(--tone-band) 0%, transparent 72%);
+    filter: blur(22px);
+  }
+  :global([data-d='M']) .fam { border: 0; background: var(--d-sunk); border-radius: var(--d-r-pill); padding: 5px var(--d-p2); }
+  :global([data-d='M']) .fam[aria-pressed='true'] { background: var(--d-accent-soft); }
+  :global([data-d='M']) .tlb { padding-inline: 0; }
+  :global([data-d='M']) .tlr { position: relative; isolation: isolate; padding-block: var(--d-p1); }
+  :global([data-d='M']) .tlr::before {
+    content: ''; position: absolute; inset: -10px -24px; z-index: -1; pointer-events: none;
+    background: radial-gradient(52% 130% at 70% 50%, var(--tone-band) 0%, transparent 74%);
+    filter: blur(24px);
+  }
+  /* el carril no tiene filo: el relleno se desvanece hacia atrás */
+  :global([data-d='M']) .track { height: 5px; background: var(--d-sunk); }
+  :global([data-d='M']) .fill {
+    background: linear-gradient(90deg, transparent 0%, var(--tone-fg) 60%);
+    box-shadow: 0 0 14px 2px var(--tone-band);
+  }
+  :global([data-d='M']) .thr { background: var(--d-ink-3); }
+  :global([data-d='M']) .foot { background: transparent; border-top: 0; }
+  /* Misma trampa que en I: `[data-d='M'] .d-btn { background: var(--d-sunk) }`
+     tapa a `.d-btn--primary`, y el primario queda papel sobre papel — 1.07:1. */
+  :global([data-d='M']) .d-btn--primary {
+    background: var(--d-accent);
+    color: var(--d-accent-ink);
+  }
+
+  /* ── N · CINTA — carriles de puntas redondas que se montan ─────────────
+     Hay orden de apilado explícito: el carril de arriba pasa por encima del
+     de abajo, y el de abajo devuelve una sombra de contacto hacia arriba.
+     Sin las dos cosas —solapamiento y contacto— esto son pastillas sueltas. */
+  :global([data-d='N']) .topbar {
+    position: relative; z-index: 6;
+    margin: var(--d-p2) var(--d-p3) calc(-1 * var(--d-p1));
+    padding: var(--d-p1) var(--d-p4);
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-pill);
+    background: var(--d-surface-fill);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='N']) .scroll { gap: 0; padding-top: var(--d-p3); }
+  :global([data-d='N']) .scroll > * { position: relative; }
+  :global([data-d='N']) .scroll > * + * { margin-top: calc(-1 * var(--d-p1)); }
+  :global([data-d='N']) .verdict {
+    z-index: 5;
+    border-radius: var(--d-r-pill); border-color: var(--tone-edge);
+    padding: var(--d-p2) var(--d-p4);
+    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 64%);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='N']) .kpis { z-index: 4; }
+  :global([data-d='N']) .filters { z-index: 3; }
+  :global([data-d='N']) .list { z-index: 2; }
+  :global([data-d='N']) .tl { z-index: 1; }
+  /* cuatro cintas que se montan de izquierda a derecha */
+  :global([data-d='N']) .kpi {
+    position: relative;
+    border-radius: var(--d-r-pill); border-color: var(--d-line);
+    padding: var(--d-p1) var(--d-p3);
+    background: var(--d-surface-fill);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='N']) .kpi + .kpi { margin-left: calc(-1 * var(--d-p2)); }
+  :global([data-d='N']) .kpi[aria-pressed='true'] {
+    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 70%);
+    z-index: 1;
+  }
+  :global([data-d='N']) .lhead { background: transparent; border-bottom: 0; padding-inline: var(--d-p4); }
+  :global([data-d='N']) .rows { padding: 0 var(--d-p2) var(--d-p2); }
+  /* la cinta de abajo queda encima, así que la sombra de contacto va hacia arriba */
+  :global([data-d='N']) .row {
+    margin-bottom: calc(var(--d-p1) / -2);
+    box-shadow:
+      0 -3px 7px -5px color-mix(in srgb, var(--d-ink) 34%, transparent),
+      var(--d-shadow);
+  }
+  :global([data-d='N']) .ghead {
+    width: fit-content; max-width: 100%;
+    position: relative; z-index: 2;
+    border-bottom: 0; border-radius: var(--d-r-pill);
+    padding: var(--d-p1) var(--d-p3);
+    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 72%);
+    box-shadow: var(--d-shadow);
+    margin-bottom: calc(var(--d-p1) / -2);
+  }
+  :global([data-d='N']) .fams { gap: 0; }
+  :global([data-d='N']) .fam {
+    border-radius: var(--d-r-pill); border-color: var(--d-line);
+    padding: 4px var(--d-p2);
+    background: var(--d-surface-fill);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='N']) .fam + .fam { margin-left: calc(var(--d-p1) / -3); }
+  :global([data-d='N']) .fam:hover, :global([data-d='N']) .fam:focus-visible { z-index: 1; }
+  :global([data-d='N']) .fam[aria-pressed='true'] {
+    background: var(--d-accent-fill); color: var(--d-accent-ink);
+    border-color: var(--d-accent-edge); z-index: 2;
+  }
+  :global([data-d='N']) .fam[aria-pressed='true'] .ct { color: inherit; }
+  :global([data-d='N']) .track { background: var(--d-sunk-fill); height: 10px; }
+  :global([data-d='N']) .fill {
+    background: linear-gradient(100deg, var(--tone-band) 0%, var(--tone-fg) 70%);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='N']) .thr { background: var(--d-ink-2); }
+  :global([data-d='N']) .foot {
+    position: relative; z-index: 7;
+    margin: calc(-1 * var(--d-p1)) var(--d-p3) var(--d-p2);
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-pill);
+    padding: var(--d-p1) var(--d-p4);
+    background: var(--d-sunk-fill);
+    box-shadow: var(--d-shadow);
+  }
+
+  /* ── O · PRISMA — vidrio con la marca teñida ADENTRO ───────────────────
+     La botonera es UNA pieza de vidrio segmentado, no tres botones sueltos:
+     los KPIs y las familias comparten losa y se separan por una división de
+     luz. Ahí está la diferencia de silueta con I, que usa el mismo material
+     pero suelta cada pieza.
+     ANIDADO: igual que en I, el desenfoque solo en la capa que toca el
+     fondo. Dentro de .sect —que ya desenfoca— nada más que alfa. */
+  :global([data-d='O']) .topbar {
+    background: linear-gradient(180deg, var(--d-accent-soft) 0%, transparent 100%), var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-bottom-color: var(--d-line);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='O']) .title { color: var(--d-brand-ink); }
+  :global([data-d='O']) .verdict {
+    border-color: var(--d-line);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    box-shadow: var(--d-shadow-lg);
+  }
+  /* UNA losa de vidrio dividida en cuatro */
+  :global([data-d='O']) .kpis {
+    gap: 0;
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    background: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    box-shadow: var(--d-shadow-lg);
+    overflow: hidden;
+  }
+  :global([data-d='O']) .kpi {
+    background: transparent; border: 0; border-radius: 0; box-shadow: none;
+    border-left: var(--d-bw) solid var(--d-line);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+  }
+  :global([data-d='O']) .kpi:first-child { border-left: 0; }
+  :global([data-d='O']) .kpi:hover { background: var(--d-sunk); }
+  :global([data-d='O']) .kpi[aria-pressed='true'] {
+    background: var(--tone-band); box-shadow: inset 0 -3px 0 var(--tone-fg);
+  }
+  /* la botonera de familias, misma idea: vidrio segmentado */
+  :global([data-d='O']) .fams {
+    gap: 0;
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    background: var(--d-surface);
+    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: var(--d-shadow);
+    overflow: hidden;
+  }
+  :global([data-d='O']) .fam {
+    background: transparent; border: 0; border-radius: 0;
+    border-left: var(--d-bw) solid var(--d-line);
+    padding: 6px var(--d-p2);
+  }
+  :global([data-d='O']) .fam:first-child { border-left: 0; }
+  /* la losa recorta a sus segmentos, así que el foco se dibuja hacia adentro
+     o el anillo se pierde contra el canto del vidrio */
+  :global([data-d='O']) .kpi:focus-visible,
+  :global([data-d='O']) .fam:focus-visible { outline-offset: -2px; }
+  :global([data-d='O']) .fam[aria-pressed='true'] {
+    background: var(--d-accent-soft); color: var(--d-brand-ink);
+    box-shadow: inset 0 -2px 0 var(--d-accent);
+  }
+  :global([data-d='O']) .sect { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='O']) .lhead { background: var(--d-sunk); border-bottom-color: var(--d-line); }
+  :global([data-d='O']) .ghead {
+    background: var(--d-accent-soft); color: var(--d-brand-ink);
+    border-bottom-color: var(--d-line); font-weight: var(--d-w-semi);
+  }
+  :global([data-d='O']) .gc { color: var(--d-brand-ink); opacity: .75; }
+  :global([data-d='O']) .row:hover { background: var(--d-sunk); }
+  :global([data-d='O']) .track { background: var(--d-sunk); box-shadow: inset 0 0 0 1px var(--d-line); }
+  :global([data-d='O']) .thr { background: var(--d-ink-3); }
+  :global([data-d='O']) .foot {
+    background: linear-gradient(180deg, transparent 0%, var(--d-accent-soft) 100%), var(--d-sunk);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-top-color: var(--d-line);
+  }
+  /* la cabecera del panel ya es vidrio teñido: la nota de la derecha, que es
+     .d-cap y pinta en --d-brand, se lleva a la tinta de marca para no quedar
+     teal sobre teal */
+  :global([data-d='O']) .d-panel-head .d-cap { color: var(--d-brand-ink); }
+
+  /* ── P · ESPINA — una columna de marca de la que cuelga todo ───────────
+     EL RAÍL DE 152px VUELVE, pero solo donde hay ancho de verdad: el
+     veredicto, la barra de filtros, la tira de KPIs y las líneas del plan
+     ocupan el ancho entero de la pantalla. Las tarjetas angostas que lo
+     rompían no existen en esta página, y bajo 760px se recoge (abajo).
+     La tira de KPIs deja de ser cuatro columnas y pasa a ser cuatro
+     estratos colgados del raíl: es lo que separa a P de G a ojos
+     entrecerrados, porque G mantiene la rejilla de cuatro.
+     HALLAZGO: el ancho de la espina (6px en directions.css) no está
+     tokenizado. La página lo repite a mano; si no, la columna de la
+     pantalla y la de cada .d-panel quedarían desalineadas por un pelo. */
+  :global([data-d='P']) .topbar {
+    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px), var(--d-surface);
+    border-bottom-color: var(--d-line);
+    padding-left: calc(var(--d-p3) + 6px);
+  }
+  :global([data-d='P']) .kicker { color: var(--d-brand); }
+  :global([data-d='P']) .scroll {
+    padding: 0; gap: 0;
+    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px);
+  }
+  :global([data-d='P']) .verdict {
+    position: relative;
+    grid-template-columns: var(--d-rail) minmax(0, 1fr);
+    gap: 0 var(--d-p3); align-items: baseline;
+    background: transparent; border: 0; border-bottom: 1px solid var(--d-line); border-radius: 0;
+    padding: var(--d-p3) var(--d-p3) var(--d-p3) calc(var(--d-p3) + 6px);
+  }
+  /* el estado no pinta el fondo: muerde la espina con una muesca de su tono */
+  :global([data-d='P']) .verdict::before,
+  :global([data-d='P']) .ghead::before,
+  :global([data-d='P']) .kpi::before {
+    content: ''; position: absolute; inset: 0 auto 0 0; width: 6px; pointer-events: none;
+    background: linear-gradient(180deg, var(--d-brand) 0 26%, var(--tone-fg) 26% 74%, var(--d-brand) 74%);
+  }
+  :global([data-d='P']) .vk { justify-content: flex-end; text-align: right; color: var(--d-brand); }
+  :global([data-d='P']) .kpis { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  :global([data-d='P']) .kpi {
+    position: relative;
+    display: grid; grid-template-columns: var(--d-rail) auto minmax(0, 1fr);
+    align-items: baseline; gap: 0 var(--d-p3);
+    background: transparent; border: 0; border-radius: 0; box-shadow: none;
+    border-bottom: 1px solid var(--d-line);
+    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + 6px);
+  }
+  :global([data-d='P']) .kl {
+    grid-column: 1; grid-row: 1; justify-content: flex-end; text-align: right;
+    color: var(--d-brand); font-weight: var(--d-w-semi);
+  }
+  :global([data-d='P']) .kv { grid-column: 2; grid-row: 1; font-size: var(--d-t-xl); }
+  :global([data-d='P']) .kn { grid-column: 3; grid-row: 1; text-align: right; }
+  :global([data-d='P']) .kpi[aria-pressed='true'] { background: var(--d-sunk); }
+  /* la franja de filtros es opaca y taparía la espina de .scroll: se la
+     vuelve a pintar encima, del mismo ancho */
+  :global([data-d='P']) .filters {
+    grid-template-columns: var(--d-rail) minmax(0, 1fr);
+    gap: 0 var(--d-p3); align-items: center;
+    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px), var(--d-sunk);
+    border-bottom: 1px solid var(--d-line);
+    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + 6px);
+  }
+  /* el panel trae 6px de padding para dejarle sitio a su propia espina, y eso
+     empujaba la muesca de cada fila a un segundo carril de 6 a 12px: dos
+     columnas de marca donde tiene que haber una. Sin ese padding, la espina
+     del panel y las muescas de filas y grupos caen en el mismo carril. */
+  :global([data-d='P']) .sect { padding-left: 0; }
+  :global([data-d='P']) .flab { text-align: right; color: var(--d-brand); }
+  :global([data-d='P']) .fam {
+    border: 0; border-bottom: 2px solid transparent; border-radius: 0;
+    background: transparent; padding-inline: 4px;
+  }
+  :global([data-d='P']) .fam[aria-pressed='true'] {
+    background: transparent; color: var(--d-brand); border-bottom-color: var(--d-brand);
+  }
+  /* la rejilla del listado arranca donde termina la espina */
+  :global([data-d='P']) .lhead { background: transparent; padding-left: calc(var(--d-p3) + 6px); }
+  :global([data-d='P']) .ghead {
+    position: relative;
+    background: var(--d-sunk); color: var(--d-brand);
+    border-bottom-color: var(--d-line);
+    padding-left: calc(var(--d-p3) + 6px);
+  }
+  /* mismo ajuste que en C: a .7 el conteo caía a 3.7:1 sobre --d-sunk. */
+  :global([data-d='P']) .gc { color: var(--d-brand); opacity: .85; }
+  :global([data-d='P']) .tlb { padding: 0; gap: 0; }
+  :global([data-d='P']) .tlr {
+    position: relative;
+    grid-template-columns: var(--d-rail) minmax(0, 1fr);
+    gap: 0 var(--d-p3); align-items: baseline;
+    border-bottom: 1px solid var(--d-line);
+    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + 6px);
+  }
+  :global([data-d='P']) .tlr::before {
+    content: ''; position: absolute; inset: 0 auto 0 0; width: 6px;
+    background: linear-gradient(180deg, var(--d-brand) 0 26%, var(--tone-fg) 26% 74%, var(--d-brand) 74%);
+  }
+  :global([data-d='P']) .tlid { text-align: right; color: var(--d-brand); }
+  :global([data-d='P']) .track { height: 4px; border-radius: 0; background: var(--d-sunk); }
+  :global([data-d='P']) .fill { border-radius: 0; }
+  :global([data-d='P']) .thr { top: -4px; bottom: -4px; background: var(--d-ink-2); }
+  :global([data-d='P']) .foot {
+    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px), var(--d-sunk);
+    border-top-color: var(--d-line);
+    padding-left: calc(var(--d-p3) + 6px);
+  }
+
+  /* ── Q · CHAROL — masa dura con la superficie mojada ───────────────────
+     Borde de 2px, sombra sólida desplazada y el barrido húmedo encima. El
+     barrido va en el fondo, como en J, para que no le tape el clic a nada.
+     HALLAZGO: mismo vacío que J — no hay --d-gloss. Se compone acá desde
+     --d-surface, que en Q es blanco puro. */
+  :global([data-d='Q']) .screen { --pg-gloss: color-mix(in srgb, var(--d-surface) 58%, transparent); }
+  /* La barra lleva tinta clara, así que NO lleva barrido: un blanco al 58 %
+     sobre el tercio de arriba deja el texto en 3:1 justo donde vive. Lo
+     mojado se lo da el propio degradado de --d-accent-fill —que ya no es un
+     color plano— más el realce duro de 1px del canto. */
+  :global([data-d='Q']) .topbar {
+    background: var(--d-accent-fill);
+    color: var(--d-accent-ink);
+    border-bottom: var(--d-bw) solid var(--d-ink);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 75%, transparent);
+  }
+  :global([data-d='Q']) .title { text-transform: uppercase; font-weight: var(--d-w-bold); }
+  :global([data-d='Q']) .kicker { color: var(--d-accent-ink); }
+  /* crimson sobre crimson no se ve: la acción se invierte a placa clara */
+  :global([data-d='Q']) .topbar .act {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%), var(--d-surface-fill);
+    color: var(--d-ink);
+  }
+  :global([data-d='Q']) .verdict {
+    border: var(--d-bw) solid var(--d-ink);
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%), var(--tone-band);
+    box-shadow: var(--d-shadow);
+    margin-right: 5px;
+  }
+  :global([data-d='Q']) .vt { font-weight: var(--d-w-semi); }
+  :global([data-d='Q']) .kpis { padding-right: 5px; }
+  :global([data-d='Q']) .kpi {
+    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r-lg);
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 34%), var(--tone-band);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+  }
+  :global([data-d='Q']) .kv { color: var(--d-ink); }
+  :global([data-d='Q']) .kl { text-transform: uppercase; font-weight: var(--d-w-bold); font-size: var(--d-t-xs); }
+  :global([data-d='Q']) .kpi:active {
+    transform: translate(5px, 5px);
+    box-shadow: inset 0 2px 5px color-mix(in srgb, var(--d-ink) 35%, transparent);
+  }
+  /* misma razón que en la barra: sobre crimson el barrido se cambia por el
+     realce duro del canto, que no cruza ninguna palabra */
+  :global([data-d='Q']) .kpi[aria-pressed='true'] {
+    background: var(--d-accent-fill);
+    color: var(--d-accent-ink);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='Q']) .kpi[aria-pressed='true'] .kv,
+  :global([data-d='Q']) .kpi[aria-pressed='true'] .kn { color: var(--d-accent-ink); }
+  :global([data-d='Q']) .sect { margin-right: 5px; box-shadow: var(--d-shadow); }
+  :global([data-d='Q']) .lhead {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 50%), var(--d-sunk-fill);
+    border-bottom-color: var(--d-ink);
+  }
+  :global([data-d='Q']) .ghead {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 45%), var(--tone-band);
+    color: var(--d-ink); font-weight: var(--d-w-bold);
+    border-top: var(--d-bw) solid var(--d-ink); border-bottom-color: var(--d-ink);
+  }
+  :global([data-d='Q']) .fam {
+    border-color: var(--d-ink); border-radius: var(--d-r);
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 45%), var(--d-surface-fill);
+    box-shadow: 3px 3px 0 var(--d-ink);
+    text-transform: uppercase; font-weight: var(--d-w-semi); margin-bottom: 3px;
+  }
+  :global([data-d='Q']) .fam:active { transform: translate(3px, 3px); box-shadow: none; }
+  :global([data-d='Q']) .fam[aria-pressed='true'] {
+    background: var(--d-accent-fill);
+    color: var(--d-accent-ink);
+    box-shadow: 3px 3px 0 var(--d-ink), inset 0 1px 0 color-mix(in srgb, var(--d-surface) 70%, transparent);
+  }
+  :global([data-d='Q']) .fam[aria-pressed='true'] .ct { color: inherit; }
+  :global([data-d='Q']) .track {
+    height: 16px; border: var(--d-bw) solid var(--d-ink);
+    background: var(--d-sunk-fill); overflow: hidden;
+  }
+  :global([data-d='Q']) .fill {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 55%), var(--tone-fg);
+  }
+  :global([data-d='Q']) .thr { top: -3px; bottom: -3px; width: 2px; background: var(--d-ink); }
+  :global([data-d='Q']) .foot {
+    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 45%), var(--d-sunk-fill);
+    border-top: var(--d-bw) solid var(--d-ink);
+  }
+
+  /* ── R · VITRINA — densidad de consola, material de vidrio ─────────────
+     La más densa de las diecinueve: fila de 26px, todo en una línea, y aun
+     así respira porque el fondo pasa a través. No repite los corchetes ni
+     los guiones de F: lo que la separa de Terminal es el material y el
+     cebrado de vidrio, no otro juego de signos.
+     ANIDADO: blur solo en barra, KPIs y pie. Dentro de .sect, alfa. */
+  :global([data-d='R']) .scroll { padding: var(--d-p2); gap: var(--d-p2); }
+  :global([data-d='R']) .topbar {
+    padding: var(--d-p1) var(--d-p2);
+    background: var(--d-surface);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    border-bottom-color: var(--d-line);
+  }
+  :global([data-d='R']) .title {
+    font-size: var(--d-t-md); text-transform: uppercase;
+    letter-spacing: .12em; color: var(--d-accent);
+  }
+  :global([data-d='R']) .verdict {
+    border-radius: var(--d-r); border-color: var(--tone-edge);
+    padding: var(--d-p1) var(--d-p2);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  }
+  :global([data-d='R']) .vt { font-size: var(--d-t-md); font-weight: var(--d-w-med); color: var(--tone-fg); }
+  :global([data-d='R']) .kpis { gap: var(--d-p1); }
+  /* el KPI se aplasta a dos líneas de consola */
+  :global([data-d='R']) .kpi {
+    flex-direction: row; align-items: baseline; flex-wrap: wrap;
+    gap: 0 var(--d-p1);
+    padding: var(--d-p1) var(--d-p2);
+    border-color: var(--d-line); border-radius: var(--d-r);
+    background: var(--d-surface);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  }
+  :global([data-d='R']) .kv { font-size: var(--d-t-lg); }
+  :global([data-d='R']) .kn { flex: 1 1 100%; }
+  :global([data-d='R']) .kpi[aria-pressed='true'] { box-shadow: inset 0 0 0 1px var(--tone-fg); }
+  :global([data-d='R']) .sect { box-shadow: var(--d-shadow); }
+  :global([data-d='R']) .lhead { background: var(--d-sunk); border-bottom-color: var(--d-line); }
+  :global([data-d='R']) .lhead, :global([data-d='R']) .row {
+    grid-template-columns: 64px minmax(0, 2.2fr) minmax(0, 1.4fr) 92px 100px;
+    gap: var(--d-p2);
+  }
+  /* una fila, una línea: 26px y ni un pixel más */
+  :global([data-d='R']) .nm, :global([data-d='R']) .pl,
+  :global([data-d='R']) .mv, :global([data-d='R']) .sub { display: inline; overflow: visible; }
+  :global([data-d='R']) .sub::before { content: ' · '; color: var(--d-ink-3); }
+  :global([data-d='R']) .c-eq, :global([data-d='R']) .c-plan, :global([data-d='R']) .c-metric {
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  /* cebrado de vidrio: el renglón par deja pasar un poco menos de fondo */
+  :global([data-d='R']) .row:nth-child(even) { background: var(--d-sunk); }
+  :global([data-d='R']) .ghead {
+    min-height: var(--d-row-h); padding: 0 var(--d-p2);
+    background: var(--tone-band); color: var(--tone-fg); border-bottom: 0;
+  }
+  :global([data-d='R']) .gc { color: var(--d-ink-3); }
+  :global([data-d='R']) .fam {
+    padding: 0 var(--d-p1); font-size: var(--d-t-2xs);
+    border-color: var(--d-line); background: var(--d-surface);
+  }
+  :global([data-d='R']) .fam[aria-pressed='true'] { border-color: var(--d-accent); }
+  :global([data-d='R']) .tlb { padding: var(--d-p1) var(--d-p2) var(--d-p2); gap: var(--d-p1); }
+  /* el carril es un medidor segmentado, no una pastilla */
+  :global([data-d='R']) .track {
+    height: 8px; border-radius: var(--d-r); background-color: var(--d-sunk);
+    background-image: repeating-linear-gradient(90deg, var(--d-line) 0 1px, transparent 1px 8.333%);
+    box-shadow: inset 0 0 0 1px var(--d-line);
+  }
+  :global([data-d='R']) .fill { box-shadow: 0 0 12px -2px var(--tone-fg); }
+  :global([data-d='R']) .thr { background: var(--d-ink-2); }
+  :global([data-d='R']) .foot {
+    padding: var(--d-p1) var(--d-p2);
+    background: var(--d-sunk);
+    backdrop-filter: blur(16px) saturate(1.3);
+    -webkit-backdrop-filter: blur(16px) saturate(1.3);
+    border-top-color: var(--d-line);
+  }
+
+  /* ── S · UMBRA — la tarjeta se queda blanca; informa la sombra ─────────
+     HALLAZGO, y es el que más pesa: la firma de S está escrita a mano
+     dentro de directions.css y SOLO para .d-panel y .d-row. No existe un
+     --d-shadow-tone, así que todo el marcado propio de una página —los
+     KPIs, el veredicto, los encabezados de grupo, las líneas del plan—
+     nacía sin firma y la dirección se caía justo donde se arma la pantalla.
+     Se recompone acá una vez, en --pg-lift, y se reparte a todo lo que
+     informa un estado. El contenido no se tiñe en ningún caso: el número va
+     en tinta, y lo que dice el estado son la marca, la palabra y la luz. */
+  :global([data-d='S']) .screen { --pg-lift: 0 10px 30px -12px var(--tone-fg); }
+  :global([data-d='S']) .topbar {
+    background: var(--d-surface); border-bottom: 0;
+    box-shadow: var(--d-shadow);
+    position: relative; z-index: 2;
+  }
+  :global([data-d='S']) .verdict {
+    background: var(--d-surface); border: 0;
+    box-shadow: var(--pg-lift), var(--d-shadow);
+  }
+  :global([data-d='S']) .vt { color: var(--d-ink); }
+  :global([data-d='S']) .kpi {
+    background: var(--d-surface); border: 0; border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+    box-shadow: var(--pg-lift), var(--d-shadow);
+  }
+  /* el número va en tinta: en esta dirección el color no toca el contenido */
+  :global([data-d='S']) .kv { color: var(--d-ink); }
+  :global([data-d='S']) .kpi:hover { transform: translateY(-1px); box-shadow: var(--pg-lift), var(--d-shadow-lg); }
+  /* pulsado sin cambiar de color: anillo de tinta, que se ve en gris también */
+  :global([data-d='S']) .kpi[aria-pressed='true'] {
+    background: var(--d-surface);
+    box-shadow: inset 0 0 0 2px var(--d-ink), var(--pg-lift);
+  }
+  :global([data-d='S']) .sect { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='S']) .lhead { background: transparent; border-bottom: 0; }
+  /* las filas ya traen la firma del primitivo: acá se les hace sitio */
+  :global([data-d='S']) .rows { padding: var(--d-p1) var(--d-p2) var(--d-p2); }
+  :global([data-d='S']) .ghead {
+    background: var(--d-surface); border-bottom: 0; border-radius: var(--d-r);
+    margin: var(--d-p2) 0 var(--d-p1);
+    box-shadow: var(--pg-lift);
+    position: relative; z-index: 1;
+  }
+  :global([data-d='S']) .fam {
+    border: 0; background: var(--d-sunk); border-radius: var(--d-r-pill);
+    padding: 5px var(--d-p2);
+  }
+  :global([data-d='S']) .fam[aria-pressed='true'] {
+    background: var(--d-surface); color: var(--d-ink);
+    box-shadow: 0 4px 12px -5px var(--d-ink), inset 0 0 0 1px var(--d-edge);
+  }
+  :global([data-d='S']) .track { background: var(--d-sunk); height: 10px; }
+  :global([data-d='S']) .fill { box-shadow: var(--pg-lift); }
+  :global([data-d='S']) .thr { background: var(--d-ink-3); }
+  /* la línea del plan es marcado propio: sin esto, se quedaba sin firma */
+  :global([data-d='S']) .tlb { padding: var(--d-p2) var(--d-p3) var(--d-p3); gap: var(--d-p3); }
+  :global([data-d='S']) .tlr {
+    background: var(--d-surface); border-radius: var(--d-r);
+    padding: var(--d-p2) var(--d-p3);
+    box-shadow: var(--pg-lift), var(--d-shadow);
+  }
+  /* hasta la pastilla se queda limpia: el fondo pasa a blanco y el tono se va
+     abajo, a la luz. La palabra y la marca siguen llevando el estado, así que
+     no queda información colgando solo del color */
+  :global([data-d='S']) .c-state .d-pill,
+  :global([data-d='S']) .tlw {
+    background: var(--d-surface);
+    box-shadow: 0 4px 12px -6px var(--tone-fg);
+  }
+  :global([data-d='S']) .foot {
+    background: var(--d-surface); border-top: 0;
+    box-shadow: 0 -8px 24px -14px color-mix(in srgb, var(--d-ink) 55%, transparent);
+  }
+
+  /* ======================================================================
      RESPONSIVE — hasta 380px. La fila deja de ser tabla y pasa a ser ficha
      de dos columnas: lo que identifica a la izquierda, el estado a la derecha.
      ====================================================================== */
@@ -952,5 +1884,48 @@
     .search { flex: 1 1 100%; order: 3; }
     .act { margin-left: auto; }
     .tlt { flex: 1 1 100%; }
+  }
+
+  /* ── Las once nuevas, en angosto. Se recoge siempre lo mismo: raíles
+     fijos, rejillas de columnas y solapamientos horizontales, que son las
+     tres cosas que necesitan ancho para no volverse un carácter por línea.
+     El material —vidrio, esmalte, luz, piedra— no se toca: no depende del
+     ancho y es lo que identifica a cada dirección. ────────────────────── */
+  @media (max-width: 760px) {
+    /* P — el raíl de 152px se guarda de nuevo: bajo este ancho es
+       exactamente la trampa por la que se había retirado. La espina se
+       queda, porque no depende del ancho. */
+    :global([data-d='P']) .verdict,
+    :global([data-d='P']) .filters,
+    :global([data-d='P']) .tlr,
+    :global([data-d='P']) .kpi { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='P']) .kl,
+    :global([data-d='P']) .kv,
+    :global([data-d='P']) .kn {
+      grid-column: 1; grid-row: auto; text-align: left; justify-content: flex-start;
+    }
+    :global([data-d='P']) .vk,
+    :global([data-d='P']) .flab,
+    :global([data-d='P']) .tlid { text-align: left; justify-content: flex-start; }
+    /* R — la fila de consola se rinde y pasa a ficha, como todas */
+    :global([data-d='R']) .lhead, :global([data-d='R']) .row {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+    :global([data-d='R']) .c-eq, :global([data-d='R']) .c-plan, :global([data-d='R']) .c-metric {
+      white-space: normal;
+    }
+  }
+  @media (max-width: 560px) {
+    /* O — la losa segmentada pasa a dos por dos: las divisiones de luz
+       cambian de sitio o quedan cortando por la mitad de una fila */
+    :global([data-d='O']) .kpi:nth-child(odd) { border-left: 0; }
+    :global([data-d='O']) .kpi:nth-child(n + 3) { border-top: var(--d-bw) solid var(--d-line); }
+    /* N — dos carriles por fila: el que abre cada fila no se monta con
+       nada a su izquierda, y el solapamiento pasa a ser vertical */
+    :global([data-d='N']) .kpi:nth-child(odd) { margin-left: 0; }
+    :global([data-d='N']) .kpi:nth-child(n + 3) { margin-top: calc(-1 * var(--d-p1)); }
+    /* I — con la barra y el pie flotando, el aire de los lados se recorta */
+    :global([data-d='I']) .topbar { margin: var(--d-p2) var(--d-p2) 0; }
+    :global([data-d='I']) .foot { margin: 0 var(--d-p2) var(--d-p2); }
   }
 </style>

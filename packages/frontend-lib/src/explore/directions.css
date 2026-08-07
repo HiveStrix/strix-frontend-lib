@@ -785,19 +785,25 @@
    del papel. Es la única señal de agrupación que tiene esta dirección. */
 [data-d='M'] .d-panel[data-tone]::before {
   background:
-    radial-gradient(62% 70% at 18% 14%, var(--tone-band) 0%, transparent 70%),
-    radial-gradient(52% 58% at 88% 86%, var(--tone-band) 0%, transparent 68%);
-  opacity: 1.6;
+    radial-gradient(62% 70% at 18% 14%, var(--tone-wash) 0%, transparent 70%),
+    radial-gradient(52% 58% at 88% 86%, var(--tone-wash) 0%, transparent 68%);
 }
-/* Manchas más saturadas: a 26px de desenfoque, lo que en una banda sólida sería
-   estridente acá apenas se insinúa. */
+/* La mancha necesita saturación —a 26px de desenfoque, lo que en una banda
+   sólida sería estridente acá apenas se insinúa— pero la píldora usa la MISMA
+   banda sin desenfoque y quedaba demasiado oscura para su tinta: 27 corridas de
+   texto bajo AA. Son dos cosas distintas, así que son dos tokens distintos. */
 [data-d='M'] {
-  --d-pos-band: rgba(74, 140, 92, .38);
-  --d-att-band: rgba(200, 145, 30, .42);
-  --d-crit-band: rgba(190, 70, 48, .36);
-  --d-info-band: rgba(80, 92, 170, .32);
-  --d-neu-band: rgba(120, 100, 78, .26);
+  --d-pos-wash: rgba(74, 140, 92, .38);
+  --d-att-wash: rgba(200, 145, 30, .42);
+  --d-crit-wash: rgba(190, 70, 48, .36);
+  --d-info-wash: rgba(80, 92, 170, .32);
+  --d-neu-wash: rgba(120, 100, 78, .26);
 }
+[data-d='M'] [data-tone='positive']  { --tone-wash: var(--d-pos-wash); }
+[data-d='M'] [data-tone='attention'] { --tone-wash: var(--d-att-wash); }
+[data-d='M'] [data-tone='critical']  { --tone-wash: var(--d-crit-wash); }
+[data-d='M'] [data-tone='info']      { --tone-wash: var(--d-info-wash); }
+[data-d='M'] [data-tone='neutral']   { --tone-wash: var(--d-neu-wash); }
 [data-d='M'] .d-panel-head { border-bottom: 0; padding-inline: 0; }
 [data-d='M'] .d-panel-title {
   font-family: var(--d-display);
@@ -1136,7 +1142,7 @@
     #080B0F;
   --d-surface: rgba(190, 225, 255, .07);
   --d-sunk: rgba(190, 225, 255, .04);
-  --d-ink: #DCE7EE; --d-ink-2: #A9BAC6; --d-ink-3: #8798A4; --d-ink-on: #080B0F;
+  --d-ink: #DCE7EE; --d-ink-2: #A9BAC6; --d-ink-3: #A6B3BC; --d-ink-on: #080B0F;
   --d-line: rgba(190, 225, 255, .14); --d-edge: rgba(190, 225, 255, .22); --d-bw: 1px;
   --d-r: 3px; --d-r-lg: 6px; --d-r-pill: 999px;
   --d-shadow: 0 6px 26px -10px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(190, 225, 255, .12);
@@ -1155,7 +1161,7 @@
   --d-att: #F0C671; --d-att-band: rgba(240, 198, 113, .14); --d-att-edge: rgba(240, 198, 113, .34);
   --d-crit: #FF9084; --d-crit-band: rgba(255, 144, 132, .14); --d-crit-edge: rgba(255, 144, 132, .34);
   --d-info: #9FB6F5; --d-info-band: rgba(159, 182, 245, .14); --d-info-edge: rgba(159, 182, 245, .34);
-  --d-neu: #93A4B0; --d-neu-band: rgba(147, 164, 176, .12); --d-neu-edge: rgba(147, 164, 176, .28);
+  --d-neu: #AEBCC6; --d-neu-band: rgba(147, 164, 176, .12); --d-neu-edge: rgba(147, 164, 176, .28);
   --d-focus: #6FD8E0;
 }
 [data-d='R'] .d-panel {
