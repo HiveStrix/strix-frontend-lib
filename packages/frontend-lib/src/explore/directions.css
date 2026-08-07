@@ -1376,7 +1376,14 @@
      --d-edge la refracción de abajo, que es como se comporta el vidrio de
      verdad. Un trazo de 1px alrededor de todo es una convención de CSS, no del
      material, y por eso se lee genérico. */
-  --d-line: rgba(255, 255, 255, .92); --d-edge: rgba(14, 23, 32, .10); --d-bw: 0px;
+  /* --d-line SIGUE SIENDO EL COLOR DE UNA LÍNEA. Cambiarle el significado a un
+     token compartido rompe a todo el que ya lo usaba: las páginas dibujan sus
+     divisores con `inset 0 1px 0 var(--d-line)`, así que ponerlo en blanco los
+     volvió invisibles y dejó marcas sueltas en la tabla. El reflejo especular
+     es OTRA cosa y por lo tanto otro token. */
+  --d-line: rgba(14, 23, 32, .09); --d-edge: rgba(14, 23, 32, .13); --d-bw: 0px;
+  /* El brillo del canto de arriba, donde le pega la luz. */
+  --d-spec: rgba(255, 255, 255, .92);
   --d-r: 14px; --d-r-lg: 26px; --d-r-pill: 999px;
   /* TRES ALTURAS, y cada una significa algo: base (la página), levantado (un
      panel), flotante (lo que se despega). Nada más. Una escala de elevación con
@@ -1386,7 +1393,7 @@
   --d-lift-3: 0 4px 12px rgba(18, 38, 66, .16), 0 30px 64px -18px rgba(18, 38, 66, .44);
   /* El canto: reflejo arriba, refracción abajo. Los dos juntos son lo que hace
      que una superficie parezca tener grosor. */
-  --d-bevel: inset 0 1px 0 var(--d-line), inset 0 -1px 0 var(--d-edge);
+  --d-bevel: inset 0 1px 0 var(--d-spec), inset 0 -1px 0 var(--d-edge);
   --d-shadow: 0 8px 28px -10px rgba(18, 38, 66, .20), inset 0 1px 0 rgba(255, 255, 255, .88);
   --d-shadow-lg: 0 24px 56px -18px rgba(18, 38, 66, .32), inset 0 1px 0 rgba(255, 255, 255, .92);
   --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
@@ -1828,7 +1835,7 @@
 [data-d='W'] .d-panel-head {
   border: 0;
   background: rgba(255, 255, 255, .28);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, .7), 0 2px 6px -4px rgba(18, 38, 66, .22);
+  box-shadow: 0 1px 0 var(--d-spec), 0 2px 6px -4px rgba(18, 38, 66, .22);
   border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
 }
 [data-d='W'] .d-panel-foot {
@@ -1841,7 +1848,9 @@
 /* ── Las filas: separadas por luz, no por raya ──────────────────────────── */
 [data-d='W'] .d-row {
   border: 0;
-  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, .55), 0 1px 0 rgba(14, 23, 32, .05);
+  /* Un surco: la línea tenue separa y la luz debajo le da profundidad. Solo con
+     luz no se separa nada sobre una superficie clara, que fue justo el error. */
+  box-shadow: inset 0 -1px 0 var(--d-line), 0 1px 0 var(--d-spec);
 }
 [data-d='W'] .d-row:last-child { box-shadow: none; }
 
@@ -1976,4 +1985,76 @@
   }
   [data-d='W'] .d-row[data-tone='critical']::before,
   [data-d='W'] .d-panel[data-tone='critical']::before { width: 12px; }
+}
+
+/* ── W · LA LEY, APLICADA A TODA LA DIRECCIÓN ────────────────────────────
+   Quitar el borde de las primitivas compartidas no alcanzó: cada página dibuja
+   su propio marcado con clases propias —.sec, .pick, .c-code, .fam— y esas
+   nunca pasaron por .d-panel. Medido: 73 bordes seguían vivos, 42 solo en la
+   tabla.
+
+   «Ni una línea» es una ley de la dirección, no una propiedad de seis
+   componentes, así que se aplica como ley. Se neutraliza el COLOR del borde y
+   no su ancho: la geometría no se mueve ni un píxel, no hay saltos de maqueta
+   ni nada que recalcular. */
+/* Con !important, y el motivo importa: las reglas de página pesan (0,3,0)
+   —el atributo, la clase, y la clase de alcance que agrega Svelte— contra
+   (0,1,0) de un selector universal. Sin esto la ley no gana, y subir la
+   especificidad a fuerza de selectores repetidos sería la misma violencia
+   peor disimulada. Una ley de dirección que las páginas no pueden contradecir
+   es exactamente para lo que existe !important. */
+[data-d='W'] *,
+[data-d='W'] *::before,
+[data-d='W'] *::after { border-color: transparent !important; }
+
+/* Lo que perdía su contorno lo recupera por profundidad, que es la tesis. */
+
+/* Todo lo que se presiona se levanta, lleve la clase que lleve. Incluye las
+   fichas de filtro, que son botones aunque no usen .d-btn. */
+[data-d='W'] button:not(.d-btn):not([class*='ghost']) {
+  box-shadow: var(--d-lift-1), inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+[data-d='W'] button:not(.d-btn):active { transform: translateY(1px); }
+/* Una ficha presionada se HUNDE en vez de encenderse: es el mismo vocabulario
+   que el botón, y no gasta color, que acá está reservado. */
+[data-d='W'] button[aria-pressed='true']:not(.d-btn) {
+  box-shadow: inset 0 2px 5px rgba(18, 38, 66, .20);
+  background: rgba(255, 255, 255, .5);
+}
+
+/* Casilla y radio: son controles cuya FORMA es una caja, así que necesitan
+   contorno. Se lo da el bisel envolviendo el perímetro —que es lo mismo que
+   hace --d-bevel en un panel, solo que en una pieza de 16px— más el hundido
+   que dice «esto se llena». No es un borde: es el canto. */
+[data-d='W'] input[type='checkbox'],
+[data-d='W'] input[type='radio'] {
+  box-shadow:
+    inset 0 0 0 1px rgba(14, 23, 32, .22),
+    inset 0 2px 3px rgba(18, 38, 66, .16),
+    0 1px 0 rgba(255, 255, 255, .7);
+}
+[data-d='W'] input[type='checkbox']:checked,
+[data-d='W'] input[type='radio']:checked {
+  box-shadow: var(--d-lift-1), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+
+/* Los separadores de una barra de herramientas eran un borde de 1px. Pasan a
+   ser un pliegue: sombra a un lado, luz al otro. */
+[data-d='W'] [class*='sep'] {
+  background: linear-gradient(90deg, rgba(14, 23, 32, .10), rgba(255, 255, 255, .85));
+}
+
+/* El foco es la única excepción, y no se discute: tiene que verse siempre,
+   incluso encima de todo lo demás. */
+[data-d='W'] :focus-visible {
+  outline: 2px solid var(--d-accent);
+  outline-offset: 2px;
+}
+
+/* En modo forzado de colores la ley se suspende entera: ahí el borde es lo
+   único que sobrevive y una dirección sin líneas se queda sin contenedores. */
+@media (forced-colors: active) {
+  [data-d='W'] *,
+  [data-d='W'] *::before,
+  [data-d='W'] *::after { border-color: currentColor !important; }
 }
