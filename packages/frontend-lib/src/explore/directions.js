@@ -73,7 +73,49 @@ export const DIRECTIONS = [
     name: 'Ficha',
     tagline: 'Fichas de archivo, con pestaña y canto apilado.',
     silhouette: 'Tarjetas con una pestaña sobresaliendo arriba que lleva el título, y un canto doble abajo que sugiere más fichas detrás.',
-    form: 'Fondo manila, ficha blanca. La pestaña ES la cabecera: nada de barra de título dentro. Radio 2px en la ficha, 4px arriba en la pestaña. Regla doble bajo el encabezado.'
+    form: 'Fondo manila, ficha blanca. La pestaña ES la cabecera: nada de barra de título dentro. Radio 2px en la ficha, 4px arriba en la pestaña. Regla doble bajo el encabezado.'  },
+  {
+    id: 'I',
+    name: 'Cristal',
+    tagline: 'Vidrio líquido sobre un campo de color.',
+    silhouette: 'Paneles translúcidos que dejan pasar el fondo teñido, con un filo especular arriba. Nada opaco.',
+    form: 'backdrop-filter de verdad: el fondo es un campo de manchas de color y los paneles lo desenfocan. Radio 18–26px. El borde es luz, no línea: 1px blanco al 65 % más un realce interior arriba.'
+  },
+  {
+    id: 'J',
+    name: 'Laca',
+    tagline: 'Esmalte brillante. Superficies que reflejan.',
+    silhouette: 'Placas gruesas y muy redondeadas con un barrido de brillo en el tercio superior y sombra profunda debajo.',
+    form: 'Cada superficie es un degradado vertical, no un color plano. Realce blanco duro en el borde de arriba, sombra larga y difusa abajo. Radio 14–22px, fila de 46px. Al presionar, el brillo se apaga y la placa se hunde.'
+  },
+  {
+    id: 'K',
+    name: 'Halo',
+    tagline: 'Las cosas se definen por la luz que emiten.',
+    silhouette: 'Formas luminosas sobre negro, sin un solo borde. El estado es el color del resplandor.',
+    form: 'Cero bordes y cero rellenos sólidos. Un elemento existe porque irradia: anillo tenue de 1px en su propio tono más un resplandor difuso hacia afuera. El texto lleva bloom apenas perceptible.',
+    dark: true
+  },
+  {
+    id: 'L',
+    name: 'Guijarro',
+    tagline: 'Formas de piedra de río. Ninguna esquina igual a otra.',
+    silhouette: 'Cantos rodados: cada contenedor tiene sus cuatro radios distintos y ninguna corrida recta.',
+    form: 'border-radius con cuatro valores diferentes, nunca uno. Sin bordes. Sombra direccional doble —una cálida abajo a la derecha, una luz fría arriba a la izquierda— como un objeto sobre una mesa. Fila de 52px, padding amplio.'
+  },
+  {
+    id: 'M',
+    name: 'Bruma',
+    tagline: 'El color se derrama en vez de encajonarse.',
+    silhouette: 'Sin contenedores. Manchas de color desenfocadas que se posan detrás del contenido y se desvanecen sin filo.',
+    form: 'Ningún panel tiene relleno ni borde. El estado es una mancha radial difuminada que se derrama por detrás. Titulares en serif, texto en sans: es la única dirección con dos familias tipográficas.'
+  },
+  {
+    id: 'N',
+    name: 'Cinta',
+    tagline: 'Carriles continuos que se montan uno sobre otro.',
+    silhouette: 'Cintas horizontales de extremos redondos que se solapan y se apilan, con degradado a lo largo del carril.',
+    form: 'El contenedor no es una caja: es un carril de 999px de radio en las puntas, con degradado longitudinal y brillo arriba. Los carriles se montan unos milímetros entre sí, así que hay orden de apilado y sombra de contacto.'
   }
 ];
 

@@ -26,11 +26,20 @@
     { id: 'pantalla', name: 'Pantalla completa', note: 'La flota, armada de principio a fin', c: Pantalla }
   ];
 
-  let page = PAGES[0];
+  // La página y las direcciones vivas se leen de la URL, para que un enlace
+  // apunte a una comparación concreta: ?p=pantalla&d=I,K,N abre esas tres en la
+  // pantalla completa. Sin eso, «mirá la de vidrio contra la de halo» obliga a
+  // describir catorce clics.
+  const params = typeof location !== 'undefined' ? new URLSearchParams(location.search) : new URLSearchParams();
+  let page = PAGES.find((p) => p.id === params.get('p')) ?? PAGES[0];
   // Ruling a direction out is the actual work here, so it is one click and it
   // persists across pages — you compare the survivors, not the full eight, once
   // you've made up your mind about a couple of them.
-  let live = new Set(DIRECTIONS.map((d) => d.id));
+  const pedidas = (params.get('d') ?? '')
+    .split(',')
+    .map((x) => x.trim().toUpperCase())
+    .filter((x) => DIRECTIONS.some((d) => d.id === x));
+  let live = new Set(pedidas.length ? pedidas : DIRECTIONS.map((d) => d.id));
   let solo = null;
 
   const toggle = (id) => {

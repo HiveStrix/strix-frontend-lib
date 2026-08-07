@@ -490,3 +490,422 @@
 [data-tone='critical']  { --tone-fg: var(--d-crit); --tone-band: var(--d-crit-band); --tone-edge: var(--d-crit-edge); }
 [data-tone='info']      { --tone-fg: var(--d-info); --tone-band: var(--d-info-band); --tone-edge: var(--d-info-edge); }
 [data-tone='neutral']   { --tone-fg: var(--d-neu);  --tone-band: var(--d-neu-band);  --tone-edge: var(--d-neu-edge); }
+
+/* ==========================================================================
+   SEIS DIRECCIONES MÁS — material y forma blanda.
+
+   Las ocho de arriba son casi todas rectas y casi todas opacas. Estas seis
+   entran por el otro lado: vidrio, esmalte, luz emitida, piedra, agua y cinta.
+
+   La regla que las gobierna es la misma y es más exigente que antes: la
+   primera ronda dejó tres direcciones compartiendo el mismo contenedor
+   (A, C, H son la misma tarjeta con distinto sombrero) y dos compartiendo la
+   misma rejilla recta (B y F). Ninguna de estas seis puede ser material nuevo
+   sobre una caja vieja: cada una cambia QUÉ ES un contenedor.
+   ========================================================================== */
+
+/* ── I · CRISTAL ─────────────────────────────────────────────────────────
+   El contenedor deja pasar lo que tiene detrás. Por eso el fondo NO es un
+   color plano: sin un campo con manchas, un desenfoque de fondo no desenfoca
+   nada y el vidrio se ve como plástico gris. */
+[data-d='I'] {
+  --d-ground:
+    radial-gradient(72% 58% at 12% 8%, #BFD6F2 0%, transparent 62%),
+    radial-gradient(64% 66% at 88% 22%, #E3D2EE 0%, transparent 64%),
+    radial-gradient(84% 66% at 46% 98%, #C6E7DE 0%, transparent 66%),
+    #EDF1F6;
+  --d-surface: rgba(255, 255, 255, .56);
+  --d-sunk: rgba(255, 255, 255, .30);
+  --d-ink: #0E1720; --d-ink-2: #2E3B48; --d-ink-3: #4C5866; --d-ink-on: #ffffff;
+  --d-line: rgba(255, 255, 255, .68); --d-edge: rgba(14, 23, 32, .16); --d-bw: 1px;
+  --d-r: 14px; --d-r-lg: 24px; --d-r-pill: 999px;
+  /* El realce interior de arriba es el reflejo especular: sin él, el vidrio se
+     lee como papel translúcido. */
+  --d-shadow: 0 8px 30px -10px rgba(18, 38, 66, .22), inset 0 1px 0 rgba(255, 255, 255, .85);
+  --d-shadow-lg: 0 26px 60px -18px rgba(18, 38, 66, .34), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 520; --d-w-semi: 600; --d-w-bold: 680;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
+  --d-row-h: 46px;
+  --d-accent: #1E4FA8; --d-accent-ink: #ffffff;
+  --d-accent-soft: rgba(30, 79, 168, .12); --d-accent-edge: rgba(30, 79, 168, .30);
+  --d-pos: #1C5B39; --d-pos-band: rgba(46, 140, 88, .18); --d-pos-edge: rgba(46, 140, 88, .38);
+  --d-att: #7A4A00; --d-att-band: rgba(190, 130, 20, .20); --d-att-edge: rgba(190, 130, 20, .42);
+  --d-crit: #9B1F17; --d-crit-band: rgba(198, 60, 48, .18); --d-crit-edge: rgba(198, 60, 48, .40);
+  --d-info: #2A3A78; --d-info-band: rgba(64, 84, 180, .16); --d-info-edge: rgba(64, 84, 180, .36);
+  --d-neu: #3F4B58; --d-neu-band: rgba(255, 255, 255, .38); --d-neu-edge: rgba(14, 23, 32, .16);
+}
+[data-d='I'] .d-panel {
+  backdrop-filter: blur(18px) saturate(1.5);
+  -webkit-backdrop-filter: blur(18px) saturate(1.5);
+  border-color: var(--d-line);
+}
+[data-d='I'] .d-panel-head { border-bottom-color: rgba(14, 23, 32, .10); }
+[data-d='I'] .d-panel-foot { background: rgba(255, 255, 255, .22); border-top-color: rgba(255, 255, 255, .5); }
+[data-d='I'] .d-row { border-bottom-color: rgba(14, 23, 32, .08); }
+[data-d='I'] .d-btn {
+  background: rgba(255, 255, 255, .52);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border-color: rgba(255, 255, 255, .72);
+  box-shadow: 0 2px 10px -4px rgba(18, 38, 66, .28), inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+[data-d='I'] .d-btn--primary { border-color: rgba(255, 255, 255, .34); }
+[data-d='I'] .d-btn--ghost { background: transparent; box-shadow: none; backdrop-filter: none; }
+[data-d='I'] .d-input, [data-d='I'] .d-select, [data-d='I'] .d-textarea {
+  background: rgba(255, 255, 255, .42);
+  border-color: rgba(255, 255, 255, .7);
+  box-shadow: inset 0 1px 3px rgba(18, 38, 66, .10);
+}
+[data-d='I'] .d-pill { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+/* ── J · LACA ────────────────────────────────────────────────────────────
+   Ninguna superficie es un color plano: todas son un degradado vertical con
+   realce duro arriba y sombra larga abajo. Es lo que separa el esmalte del
+   papel pintado. */
+[data-d='J'] {
+  --d-ground: #E6E1DA;
+  --d-surface: #FBF8F4;
+  --d-surface-fill: linear-gradient(180deg, #FFFFFF 0%, #F2EEE9 100%);
+  --d-sunk: #EAE4DC;
+  --d-sunk-fill: linear-gradient(180deg, #EFEAE4 0%, #E4DED6 100%);
+  --d-ink: #191512; --d-ink-2: #3F3831; --d-ink-3: #5F564C; --d-ink-on: #ffffff;
+  --d-line: rgba(25, 21, 18, .10); --d-edge: rgba(25, 21, 18, .16); --d-bw: 1px;
+  --d-r: 13px; --d-r-lg: 21px; --d-r-pill: 999px;
+  --d-shadow: 0 10px 20px -8px rgba(50, 38, 26, .30), inset 0 1px 0 rgba(255, 255, 255, .95);
+  --d-shadow-lg: 0 26px 46px -16px rgba(50, 38, 26, .42), inset 0 1px 0 rgba(255, 255, 255, .95);
+  --d-p1: 9px; --d-p2: 13px; --d-p3: 18px; --d-p4: 24px; --d-gap: 18px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 14px; --d-t-md: 15px;
+  --d-t-lg: 20px; --d-t-xl: 27px; --d-t-2xl: 36px;
+  --d-w: 450; --d-w-med: 560; --d-w-semi: 640; --d-w-bold: 720;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .07em;
+  --d-label-weight: 640; --d-label-color: var(--d-ink-3);
+  --d-row-h: 46px;
+  --d-accent: #9C2A1D;
+  --d-accent-fill: linear-gradient(180deg, #C03A2C 0%, #8E2418 100%);
+  --d-accent-ink: #ffffff; --d-accent-soft: #F7E4E0; --d-accent-edge: #8E2418;
+  --d-pos: #1E5A34; --d-pos-band: #DDEEE0; --d-pos-edge: #A9CDB2;
+  --d-att: #7C4A02; --d-att-band: #F8E9CE; --d-att-edge: #DDBE86;
+  --d-crit: #9A2317; --d-crit-band: #F8DED9; --d-crit-edge: #E0AFA6;
+  --d-info: #2F3C74; --d-info-band: #E1E3F1; --d-info-edge: #B3B8D6;
+  --d-neu: #5F564C; --d-neu-band: #EAE4DC; --d-neu-edge: #C9C0B4;
+}
+/* El barrido de brillo vive en el tercio superior y no se mueve con el scroll:
+   es esmalte, no un reflejo animado. */
+[data-d='J'] .d-panel::after {
+  content: ''; position: absolute; inset: 0 0 auto 0; height: 38%;
+  border-radius: var(--d-r-lg) var(--d-r-lg) 40% 40% / var(--d-r-lg) var(--d-r-lg) 100% 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+[data-d='J'] .d-panel { overflow: hidden; }
+[data-d='J'] .d-btn {
+  background: linear-gradient(180deg, #FFFFFF 0%, #EDE8E2 100%);
+  border-color: rgba(25, 21, 18, .18);
+  box-shadow: 0 3px 6px -2px rgba(50, 38, 26, .28), inset 0 1px 0 rgba(255, 255, 255, .95);
+  font-weight: var(--d-w-semi);
+}
+/* Al presionar, el brillo se apaga y la placa se hunde: el gesto físico. */
+[data-d='J'] .d-btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 2px 5px rgba(50, 38, 26, .30);
+}
+[data-d='J'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
+[data-d='J'] .d-input, [data-d='J'] .d-select, [data-d='J'] .d-textarea {
+  background: linear-gradient(180deg, #F4F1EC 0%, #FFFFFF 60%);
+  box-shadow: inset 0 2px 4px rgba(50, 38, 26, .14);
+  border-color: rgba(25, 21, 18, .18);
+}
+[data-d='J'] .d-pill { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7); }
+
+/* ── K · HALO ────────────────────────────────────────────────────────────
+   Cero bordes en toda la dirección. Un elemento existe porque irradia. El
+   estado no es un relleno: es el color de su resplandor. */
+[data-d='K'] {
+  --d-ground: #05070A;
+  --d-surface: #0B1017;
+  --d-sunk: #080C11;
+  --d-ink: #E9F0F6; --d-ink-2: #B4C2CE; --d-ink-3: #8A9AA8; --d-ink-on: #05070A;
+  --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
+  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
+  --d-shadow: 0 0 0 1px rgba(150, 190, 230, .10), 0 10px 44px -14px rgba(80, 150, 255, .22);
+  --d-shadow-lg: 0 0 0 1px rgba(150, 190, 230, .16), 0 24px 80px -20px rgba(80, 150, 255, .34);
+  --d-p1: 9px; --d-p2: 13px; --d-p3: 18px; --d-p4: 24px; --d-gap: 20px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 20px; --d-t-xl: 27px; --d-t-2xl: 37px;
+  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 680;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .1em;
+  --d-label-weight: 560; --d-label-color: var(--d-ink-3);
+  --d-row-h: 48px;
+  --d-accent: #63E6C4; --d-accent-ink: #04140F;
+  --d-accent-soft: rgba(99, 230, 196, .12); --d-accent-edge: rgba(99, 230, 196, .34);
+  --d-pos: #5EE3A4; --d-pos-band: rgba(94, 227, 164, .10); --d-pos-edge: rgba(94, 227, 164, .32);
+  --d-att: #FFC65C; --d-att-band: rgba(255, 198, 92, .10); --d-att-edge: rgba(255, 198, 92, .32);
+  --d-crit: #FF8878; --d-crit-band: rgba(255, 136, 120, .10); --d-crit-edge: rgba(255, 136, 120, .32);
+  --d-info: #8FB6FF; --d-info-band: rgba(143, 182, 255, .10); --d-info-edge: rgba(143, 182, 255, .32);
+  --d-neu: #9AA9B7; --d-neu-band: rgba(154, 169, 183, .08); --d-neu-edge: rgba(154, 169, 183, .26);
+  --d-focus: #63E6C4;
+}
+/* Un panel con tono irradia en ese tono. Es la dirección donde el color de
+   estado se ve desde el otro lado del cuarto sin leer una palabra. */
+[data-d='K'] .d-panel[data-tone] {
+  box-shadow: 0 0 0 1px var(--tone-edge), 0 12px 50px -16px var(--tone-fg);
+}
+[data-d='K'] .d-panel-head { border-bottom: 0; }
+[data-d='K'] .d-panel-foot { border-top: 0; background: transparent; }
+[data-d='K'] .d-row { border-bottom: 1px solid rgba(150, 190, 230, .07); }
+[data-d='K'] .d-btn {
+  background: rgba(150, 190, 230, .06);
+  border-color: transparent;
+  box-shadow: 0 0 0 1px rgba(150, 190, 230, .14);
+}
+[data-d='K'] .d-btn:hover { box-shadow: 0 0 0 1px rgba(150, 190, 230, .26), 0 6px 26px -10px rgba(120, 180, 255, .5); }
+[data-d='K'] .d-btn--primary {
+  background: var(--d-accent);
+  box-shadow: 0 0 0 1px rgba(99, 230, 196, .5), 0 8px 34px -10px rgba(99, 230, 196, .7);
+}
+[data-d='K'] .d-btn--ghost { background: transparent; box-shadow: none; }
+[data-d='K'] .d-input, [data-d='K'] .d-select, [data-d='K'] .d-textarea {
+  background: rgba(150, 190, 230, .05);
+  border-color: transparent;
+  box-shadow: inset 0 0 0 1px rgba(150, 190, 230, .14);
+}
+[data-d='K'] .d-input:focus-visible, [data-d='K'] .d-select:focus-visible {
+  outline: 0;
+  box-shadow: inset 0 0 0 1px var(--d-accent), 0 0 22px -6px var(--d-accent);
+}
+[data-d='K'] .d-pill { box-shadow: 0 0 16px -5px var(--tone-fg); }
+
+/* ── L · GUIJARRO ────────────────────────────────────────────────────────
+   Cuatro radios distintos por contenedor, nunca uno. Ninguna corrida recta en
+   toda la pantalla. La sombra es doble y direccional: cálida abajo a la
+   derecha, luz fría arriba a la izquierda — un objeto sobre una mesa. */
+[data-d='L'] {
+  --d-ground: #EFE9E1;
+  --d-surface: #FFFDFA;
+  --d-sunk: #F4EEE6;
+  --d-ink: #29231C; --d-ink-2: #544B41; --d-ink-3: #6B6155; --d-ink-on: #ffffff;
+  --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
+  --d-r: 16px 22px 14px 20px;
+  --d-r-lg: 34px 26px 38px 28px;
+  --d-r-pill: 999px 999px 999px 999px;
+  --d-shadow: 7px 9px 20px -8px rgba(92, 72, 52, .26), -4px -4px 12px -6px rgba(255, 255, 255, .95);
+  --d-shadow-lg: 14px 20px 44px -14px rgba(92, 72, 52, .34), -6px -6px 18px -8px rgba(255, 255, 255, .95);
+  --d-p1: 12px; --d-p2: 16px; --d-p3: 22px; --d-p4: 30px; --d-gap: 22px;
+  --d-t-2xs: 11.5px; --d-t-xs: 13px; --d-t-sm: 14.5px; --d-t-md: 15.5px;
+  --d-t-lg: 21px; --d-t-xl: 28px; --d-t-2xl: 38px;
+  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 660;
+  --d-label-size: 12.5px; --d-label-case: none; --d-label-track: 0;
+  --d-label-weight: 520; --d-label-color: var(--d-ink-3);
+  --d-row-h: 52px;
+  --d-accent: #7A4A2E; --d-accent-ink: #FFFDFA;
+  --d-accent-soft: #EFE1D6; --d-accent-edge: transparent;
+  --d-pos: #35603F; --d-pos-band: #E3EEE2; --d-pos-edge: transparent;
+  --d-att: #7E5711; --d-att-band: #F5EBD8; --d-att-edge: transparent;
+  --d-crit: #97362A; --d-crit-band: #F6E2DC; --d-crit-edge: transparent;
+  --d-info: #414A70; --d-info-band: #E5E7EF; --d-info-edge: transparent;
+  --d-neu: #665C50; --d-neu-band: #EDE7DE; --d-neu-edge: transparent;
+}
+/* Cada guijarro es distinto del de al lado: si todos comparten los mismos
+   cuatro radios dejan de ser piedras y vuelven a ser tarjetas. */
+[data-d='L'] .d-panel { border: 0; }
+[data-d='L'] .d-panel:nth-of-type(2n) { border-radius: 28px 36px 24px 40px; }
+[data-d='L'] .d-panel:nth-of-type(3n) { border-radius: 40px 24px 34px 26px; }
+[data-d='L'] .d-panel-head { border-bottom: 0; padding-bottom: var(--d-p1); }
+[data-d='L'] .d-panel-title { font-size: var(--d-t-lg); font-weight: var(--d-w-semi); letter-spacing: -.015em; }
+[data-d='L'] .d-panel-foot { border-top: 0; background: transparent; }
+[data-d='L'] .d-row { border-bottom: 1px solid #EAE2D8; }
+[data-d='L'] .d-btn {
+  border: 0;
+  border-radius: 18px 24px 16px 22px;
+  min-height: 46px;
+  box-shadow: 4px 5px 12px -5px rgba(92, 72, 52, .30), -2px -2px 7px -3px rgba(255, 255, 255, .95);
+}
+[data-d='L'] .d-btn:nth-of-type(2n) { border-radius: 24px 16px 22px 18px; }
+[data-d='L'] .d-btn:active { box-shadow: inset 3px 4px 9px -4px rgba(92, 72, 52, .38); }
+[data-d='L'] .d-btn--ghost { box-shadow: none; }
+[data-d='L'] .d-input, [data-d='L'] .d-select, [data-d='L'] .d-textarea {
+  background: var(--d-sunk);
+  border: 0;
+  border-radius: 18px 24px 16px 22px;
+  min-height: 50px;
+  box-shadow: inset 3px 4px 9px -5px rgba(92, 72, 52, .28);
+}
+[data-d='L'] .d-textarea { border-radius: 26px 20px 30px 22px; }
+[data-d='L'] .d-pill { border: 0; padding: 4px var(--d-p2); }
+
+/* ── M · BRUMA ───────────────────────────────────────────────────────────
+   No hay contenedores. Lo que agrupa es una mancha de color desenfocada que se
+   posa detrás del contenido y se desvanece sin filo. Única dirección con dos
+   familias tipográficas: serif para lo que titula, sans para lo que se opera. */
+[data-d='M'] {
+  --d-ground: #FBF9F5;
+  --d-surface: transparent;
+  --d-sunk: rgba(120, 100, 78, .05);
+  --d-ink: #241E17; --d-ink-2: #4C4136; --d-ink-3: #675B4C; --d-ink-on: #ffffff;
+  --d-line: rgba(70, 56, 40, .10); --d-edge: rgba(70, 56, 40, .16); --d-bw: 0px;
+  --d-r: 12px; --d-r-lg: 26px; --d-r-pill: 999px;
+  --d-shadow: none; --d-shadow-lg: none;
+  --d-p1: 10px; --d-p2: 15px; --d-p3: 21px; --d-p4: 28px; --d-gap: 26px;
+  --d-t-2xs: 11.5px; --d-t-xs: 13px; --d-t-sm: 14.5px; --d-t-md: 15.5px;
+  --d-t-lg: 22px; --d-t-xl: 30px; --d-t-2xl: 42px;
+  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 700;
+  --d-label-size: 11.5px; --d-label-case: uppercase; --d-label-track: .1em;
+  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
+  --d-row-h: 46px;
+  --d-display: Georgia, 'Iowan Old Style', 'Times New Roman', serif;
+  --d-accent: #6B3A2A; --d-accent-ink: #FBF9F5;
+  --d-accent-soft: rgba(107, 58, 42, .12); --d-accent-edge: transparent;
+  --d-pos: #2F5B39; --d-pos-band: rgba(74, 140, 92, .16); --d-pos-edge: transparent;
+  --d-att: #7A5306; --d-att-band: rgba(200, 145, 30, .18); --d-att-edge: transparent;
+  --d-crit: #93301F; --d-crit-band: rgba(190, 70, 48, .16); --d-crit-edge: transparent;
+  --d-info: #3B4470; --d-info-band: rgba(80, 92, 170, .14); --d-info-edge: transparent;
+  --d-neu: #625648; --d-neu-band: rgba(120, 100, 78, .12); --d-neu-edge: transparent;
+}
+/* La mancha. Es el único «contenedor» de esta dirección: no tiene borde, no
+   tiene relleno sólido, y sus límites son un desenfoque. */
+[data-d='M'] .d-panel { background: none; border: 0; box-shadow: none; }
+[data-d='M'] .d-panel::before {
+  content: ''; position: absolute; inset: -26px -30px;
+  /* Dos manchas descentradas, no una centrada: una sola queda simétrica y se
+     lee como un relleno con las esquinas borrosas — que es exactamente la caja
+     que esta dirección no quiere ser. Descentradas y de tamaños distintos, se
+     leen como algo que se derramó. */
+  background:
+    radial-gradient(62% 70% at 18% 14%, var(--tone-wash, rgba(150, 122, 88, .26)) 0%, transparent 70%),
+    radial-gradient(52% 58% at 88% 86%, var(--tone-wash-2, rgba(120, 128, 96, .20)) 0%, transparent 68%);
+  filter: blur(26px);
+  pointer-events: none;
+  z-index: -1;
+}
+/* Un panel con estado se tiñe de su tono; uno sin estado se queda en el ocre
+   del papel. Es la única señal de agrupación que tiene esta dirección. */
+[data-d='M'] .d-panel[data-tone]::before {
+  background:
+    radial-gradient(62% 70% at 18% 14%, var(--tone-band) 0%, transparent 70%),
+    radial-gradient(52% 58% at 88% 86%, var(--tone-band) 0%, transparent 68%);
+  opacity: 1.6;
+}
+/* Manchas más saturadas: a 26px de desenfoque, lo que en una banda sólida sería
+   estridente acá apenas se insinúa. */
+[data-d='M'] {
+  --d-pos-band: rgba(74, 140, 92, .38);
+  --d-att-band: rgba(200, 145, 30, .42);
+  --d-crit-band: rgba(190, 70, 48, .36);
+  --d-info-band: rgba(80, 92, 170, .32);
+  --d-neu-band: rgba(120, 100, 78, .26);
+}
+[data-d='M'] .d-panel-head { border-bottom: 0; padding-inline: 0; }
+[data-d='M'] .d-panel-title {
+  font-family: var(--d-display);
+  font-size: var(--d-t-lg); font-weight: 400; letter-spacing: -.01em;
+}
+[data-d='M'] .d-panel-body { padding-inline: 0; }
+[data-d='M'] .d-panel-foot { border-top: 0; background: transparent; padding-inline: 0; }
+[data-d='M'] .d-row { border-bottom: 1px solid rgba(70, 56, 40, .09); padding-inline: 0; }
+[data-d='M'] .d-btn {
+  border: 0;
+  background: var(--d-sunk);
+  box-shadow: none;
+  min-height: 42px;
+}
+[data-d='M'] .d-btn--ghost { background: transparent; }
+[data-d='M'] .d-input, [data-d='M'] .d-select, [data-d='M'] .d-textarea {
+  background: transparent;
+  border: 0; border-bottom: 1px solid var(--d-edge);
+  border-radius: 0; padding-inline: 0; min-height: 42px;
+}
+[data-d='M'] .d-pill { border: 0; padding: 3px var(--d-p2); }
+
+/* ── N · CINTA ───────────────────────────────────────────────────────────
+   El contenedor no es una caja: es un carril. Puntas redondas, degradado a lo
+   largo, y los carriles se montan unos milímetros entre sí — hay orden de
+   apilado y sombra de contacto, como cintas puestas una sobre otra. */
+[data-d='N'] {
+  --d-ground: #F1EDE7;
+  --d-surface: #F8F4EE;
+  --d-surface-fill: linear-gradient(100deg, #FFFFFF 0%, #F6F2EC 58%, #EFE9E1 100%);
+  --d-sunk: #EDE7DF;
+  --d-sunk-fill: linear-gradient(100deg, #F2EDE6 0%, #E8E2D9 100%);
+  --d-ink: #221E19; --d-ink-2: #4A4239; --d-ink-3: #64594C; --d-ink-on: #ffffff;
+  --d-line: rgba(40, 32, 24, .10); --d-edge: rgba(40, 32, 24, .16); --d-bw: 1px;
+  --d-r: 999px; --d-r-lg: 30px; --d-r-pill: 999px;
+  --d-shadow: 0 6px 14px -6px rgba(70, 54, 38, .28), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-shadow-lg: 0 16px 32px -12px rgba(70, 54, 38, .36), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-p1: 9px; --d-p2: 14px; --d-p3: 20px; --d-p4: 26px; --d-gap: 14px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 530; --d-w-semi: 620; --d-w-bold: 700;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 620; --d-label-color: var(--d-ink-3);
+  --d-row-h: 44px;
+  --d-accent: #235A50;
+  --d-accent-fill: linear-gradient(100deg, #2E6F63 0%, #1B4A41 100%);
+  --d-accent-ink: #ffffff; --d-accent-soft: #DFEBE7; --d-accent-edge: #1B4A41;
+  --d-pos: #205C39; --d-pos-band: #E0EDE2; --d-pos-edge: #ADCDB5;
+  --d-att: #7A4E06; --d-att-band: #F7E9D2; --d-att-edge: #DCBD8B;
+  --d-crit: #96271B; --d-crit-band: #F7DFDA; --d-crit-edge: #DFB0A7;
+  --d-info: #33406E; --d-info-band: #E2E5F0; --d-info-edge: #B4BAD5;
+  --d-neu: #625648; --d-neu-band: #EBE5DC; --d-neu-edge: #C7BEB1;
+}
+/* El carril: puntas redondas de verdad, no un rectángulo con las esquinas
+   suavizadas. 999px en el radio horizontal contra la mitad del alto. */
+[data-d='N'] .d-panel {
+  border-radius: var(--d-r-lg);
+  border-color: var(--d-line);
+}
+[data-d='N'] .d-panel + .d-panel {
+  margin-top: calc(-1 * var(--d-p1));
+  position: relative;
+}
+[data-d='N'] .d-panel-head {
+  border-bottom: 0;
+  border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
+  background: var(--d-sunk);
+}
+[data-d='N'] .d-panel-foot { border-top: 0; border-radius: 0 0 var(--d-r-lg) var(--d-r-lg); }
+/* Cada fila es su propia cinta, con contacto contra la de abajo. */
+[data-d='N'] .d-row {
+  border-bottom: 0;
+  border-radius: 999px;
+  background: var(--d-surface);
+  box-shadow: 0 3px 8px -4px rgba(70, 54, 38, .26), inset 0 1px 0 rgba(255, 255, 255, .85);
+  margin-bottom: 5px;
+  padding-inline: var(--d-p3);
+}
+[data-d='N'] .d-row[data-tone] {
+  background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 62%);
+}
+[data-d='N'] .d-btn {
+  border-radius: 999px;
+  background: var(--d-surface);
+  min-height: 40px;
+  padding-inline: var(--d-p3);
+}
+[data-d='N'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
+[data-d='N'] .d-input, [data-d='N'] .d-select {
+  border-radius: 999px;
+  background: var(--d-sunk);
+  min-height: 42px;
+  padding-inline: var(--d-p3);
+  box-shadow: inset 0 2px 4px rgba(70, 54, 38, .12);
+}
+[data-d='N'] .d-textarea { border-radius: 22px; background: var(--d-sunk); }
+
+/* Los degradados de J y N son RELLENO, no color. Van solo donde se pintan
+   fondos; --d-accent y --d-surface siguen siendo colores en las catorce
+   direcciones, que es lo que permite escribir `color: var(--d-accent)` sin
+   preguntarse en cuál estás. */
+[data-d='J'] .d-panel, [data-d='J'] .d-btn { background: var(--d-surface-fill); }
+[data-d='J'] .d-panel-foot { background: var(--d-sunk-fill); }
+[data-d='J'] .d-btn--primary { background: var(--d-accent-fill); }
+[data-d='J'] .d-btn--ghost { background: transparent; }
+[data-d='N'] .d-panel, [data-d='N'] .d-row, [data-d='N'] .d-btn { background: var(--d-surface-fill); }
+[data-d='N'] .d-panel-head, [data-d='N'] .d-input, [data-d='N'] .d-select,
+[data-d='N'] .d-textarea { background: var(--d-sunk-fill); }
+[data-d='N'] .d-btn--primary { background: var(--d-accent-fill); }
+[data-d='N'] .d-btn--ghost { background: transparent; }
+[data-d='N'] .d-row[data-tone] { background: linear-gradient(100deg, var(--tone-band) 0%, #FBF8F3 62%); }
