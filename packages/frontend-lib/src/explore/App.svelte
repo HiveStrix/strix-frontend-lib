@@ -54,8 +54,8 @@
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <strong>Strix · ocho direcciones</strong>
-      <span>Mismo contenido, ocho formas. Elegí una y el sistema se reconstruye sobre ella.</span>
+      <strong>Strix · direcciones</strong>
+      <span>Mismo contenido, {DIRECTIONS.length} formas. Elegí una y el sistema se reconstruye sobre ella.</span>
     </div>
     <nav class="pages" aria-label="Familias de elementos">
       {#each PAGES as p}

@@ -115,7 +115,47 @@ export const DIRECTIONS = [
     name: 'Cinta',
     tagline: 'Carriles continuos que se montan uno sobre otro.',
     silhouette: 'Cintas horizontales de extremos redondos que se solapan y se apilan, con degradado a lo largo del carril.',
-    form: 'El contenedor no es una caja: es un carril de 999px de radio en las puntas, con degradado longitudinal y brillo arriba. Los carriles se montan unos milímetros entre sí, así que hay orden de apilado y sombra de contacto.'
+    form: 'El contenedor no es una caja: es un carril de 999px de radio en las puntas, con degradado longitudinal y brillo arriba. Los carriles se montan unos milímetros entre sí, así que hay orden de apilado y sombra de contacto.'  },
+  {
+    id: 'O',
+    name: 'Prisma',
+    tagline: 'Elevación + Marca + Cristal. El color de marca vive DENTRO del vidrio.',
+    silhouette: 'Tarjetas de vidrio que flotan de verdad, con la cabecera teñida del color de marca y un filo especular arriba.',
+    form: 'La mezcla de las tres que más aguantan uso: la sombra real de Elevación levanta la tarjeta, el vidrio de Cristal deja pasar el campo teñido, y el color de Marca es una capa translúcida en la cabecera en vez de una barra opaca. Se cambia de marca en un token y el vidrio se tiñe entero.',
+    mezcla: 'A + C + I'
+  },
+  {
+    id: 'P',
+    name: 'Espina',
+    tagline: 'Marca + Banda. El color de marca es la estructura, no un adorno.',
+    silhouette: 'Una columna de marca que baja por la izquierda y de la que cuelgan franjas a sangre. Ninguna caja.',
+    form: 'El raíl de etiquetas de Banda pasa a estar relleno del color de marca, y las franjas se enganchan a él. El estado no se pinta de fondo: muerde la espina con una muesca de su tono. Radio 0, sombra nunca.',
+    mezcla: 'C + G'
+  },
+  {
+    id: 'Q',
+    name: 'Charol',
+    tagline: 'Peso + Laca. Bloques macizos con superficie mojada.',
+    silhouette: 'Formas duras de borde negro grueso, pero con el brillo húmedo del charol encima.',
+    form: 'La masa de Peso —borde 2px, sombra sólida desplazada— con el esmalte de Laca: cada superficie es un degradado con realce blanco duro arriba. La contradicción es el punto: se ve pesado y a la vez recién pintado.',
+    mezcla: 'D + J'
+  },
+  {
+    id: 'R',
+    name: 'Vitrina',
+    tagline: 'Terminal + Cristal. Densidad de consola, material de vidrio.',
+    silhouette: 'Paneles translúcidos oscuros, monoespaciados y muy densos, sobre un campo con luz de color detrás.',
+    form: 'La rejilla de 26px y la monoespaciada de Terminal, pero las superficies son vidrio sobre un fondo con manchas frías. Es la dirección más densa de las diecinueve y aun así no se siente apretada, porque el fondo respira a través.',
+    mezcla: 'F + I',
+    dark: true
+  },
+  {
+    id: 'S',
+    name: 'Umbra',
+    tagline: 'Elevación + Bruma. La sombra lleva el estado.',
+    silhouette: 'Tarjetas blancas y limpias cuya sombra está teñida del color del estado. El color no toca el contenido.',
+    form: 'La tarjeta es blanca, sin banda ni borde de color: lo que informa es la luz de abajo. Un equipo vencido proyecta rojo, uno al día proyecta verde. Es la manera más silenciosa de que el color cargue información sin ensuciar la lectura.',
+    mezcla: 'A + M'
   }
 ];
 
