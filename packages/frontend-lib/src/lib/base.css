@@ -1,0 +1,82 @@
+/* ============================================================================
+   Strix — base
+   The reset, the type registers, and the focus rule. Everything else in the
+   library assumes this is loaded.
+   ========================================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--sx-ground);
+  color: var(--sx-ink);
+  font-family: var(--sx-font);
+  font-size: var(--sx-t-md);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img, svg, video { display: block; max-width: 100%; }
+
+/* Inputs do not inherit the family by default, and a system-stack interface
+   with one Arial select in it looks broken rather than plain. */
+button, input, select, textarea { font: inherit; color: inherit; }
+
+/* ── The three type registers ─────────────────────────────────────────────
+   Everything in a Strix surface is one of these. Adding a fourth is a decision
+   somebody has to argue for. */
+
+/* A label. Small, tracked, uppercase — the printed word on an instrument. */
+.sx-cap {
+  font-size: var(--sx-t-2xs);
+  font-weight: var(--sx-w-semi);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--sx-ink-3);
+}
+
+/* A stamped identifier: BAT001, FCM-03, OT-0042, a plate, a tax id.
+   Mono because they are read character by character, not as words. */
+.sx-id {
+  font-family: var(--sx-font-mono);
+  font-size: .94em;
+  letter-spacing: -.015em;
+}
+
+/* A figure that is compared to another figure. Never on prose. */
+.sx-num {
+  font-variant-numeric: tabular-nums lining-nums slashed-zero;
+  font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1;
+}
+
+/* ── Focus ────────────────────────────────────────────────────────────────
+   One rule, everywhere, and it must be visible on every surface the system
+   has — including on top of a solid accent fill, which is why it is drawn as
+   a ring plus a contrasting halo rather than a single outline. */
+:focus-visible {
+  outline: 2px solid var(--sx-ink);
+  outline-offset: 2px;
+  border-radius: var(--sx-r-1);
+}
+.sx-dark :focus-visible,
+[data-sx-theme="dark"] :focus-visible { outline-color: var(--sx-n-0); }
+
+/* Screen-reader-only, for the label a control needs and the eye does not. */
+.sx-sr {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+
+/* Motion is a job, not a mood: when it is unwelcome, it stops. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

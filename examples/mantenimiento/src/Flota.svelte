@@ -103,7 +103,13 @@
     </svelte:fragment>
 
     <svelte:fragment slot="actions" let:row>
-      <Button size="sm" variant="ghost">Registrar lectura de {row.id}</Button>
+      <!-- Visible corto, nombre accesible completo. Un botón que dice solo
+           «Registrar» repetido seis veces deja a quien navega por lista de
+           controles sin saber cuál es cuál; uno que dice «Registrar lectura de
+           BAT-014» desborda la columna. El texto oculto resuelve las dos. -->
+      <Button size="sm" variant="ghost">
+        Registrar<span class="sx-sr"> lectura de {row.id}</span>
+      </Button>
     </svelte:fragment>
   </Table>
 

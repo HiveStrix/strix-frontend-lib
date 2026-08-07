@@ -1,0 +1,492 @@
+/* ==========================================================================
+   THE EIGHT DIRECTIONS, AS CSS.
+
+   Two layers, and the split is the whole point:
+
+   1. TOKENS, per direction, under [data-d="X"]. Colour, radius, border width,
+      density, type. A page never hardcodes any of these.
+
+   2. PRIMITIVES, written once against those tokens, plus the handful of
+      per-direction overrides that carry the actual SILHOUETTE — corner ticks,
+      coloured head bars, hard shadows, edge stripes, tabs. Those overrides are
+      the reason this is an exploration and not a palette swap, so they live
+      here where all eight can be compared line by line, not scattered across
+      eight copies of a page.
+
+   A catalogue page uses .d-panel, .d-btn, .d-input, .d-row, .d-pill and gets
+   the direction for free. Anything a page adds on top is its own business.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Contract — every direction binds all of these. A missing token is a bug that
+   shows up as one direction silently borrowing another's value.
+   -------------------------------------------------------------------------- */
+
+[data-d] {
+  --d-focus: var(--d-ink);
+  --d-touch: 44px;
+  --d-num: tabular-nums lining-nums slashed-zero;
+  --d-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --d-font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  color: var(--d-ink);
+  background: var(--d-ground);
+  font-family: var(--d-font);
+  font-size: var(--d-t-md);
+  font-weight: var(--d-w);
+}
+
+/* ── A · ELEVACIÓN ──────────────────────────────────────────────────────── */
+[data-d='A'] {
+  --d-ground: #f5f6f7; --d-surface: #ffffff; --d-sunk: #eaeced;
+  --d-ink: #14181a; --d-ink-2: #3c4145; --d-ink-3: #6c7175; --d-ink-on: #ffffff;
+  --d-line: #dfe1e3; --d-edge: #cfd2d4; --d-bw: 1px;
+  --d-r: 7px; --d-r-lg: 11px; --d-r-pill: 999px;
+  --d-shadow: 0 1px 2px rgba(20,24,26,.06), 0 1px 1px rgba(20,24,26,.04);
+  --d-shadow-lg: 0 6px 16px -4px rgba(20,24,26,.10), 0 2px 6px -2px rgba(20,24,26,.06);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 16px; --d-p4: 20px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 25px; --d-t-2xl: 33px;
+  --d-w: 400; --d-w-med: 550; --d-w-semi: 620; --d-w-bold: 700;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .07em;
+  --d-label-weight: 620; --d-label-color: var(--d-ink-3);
+  --d-row-h: 44px;
+  --d-accent: #14181a; --d-accent-ink: #ffffff; --d-accent-soft: #eaeced; --d-accent-edge: #cfd2d4;
+  --d-pos: #2e6b3e; --d-pos-band: #e4efe2; --d-pos-edge: #c3d8c4;
+  --d-att: #8a5a00; --d-att-band: #fbeeda; --d-att-edge: #e8d4a6;
+  --d-crit: #b3261e; --d-crit-band: #fbe0dc; --d-crit-edge: #efc2bc;
+  --d-info: #4a4e7a; --d-info-band: #e7e7f2; --d-info-edge: #c9cadd;
+  --d-neu: #6c7175; --d-neu-band: #eaeced; --d-neu-edge: #cfd2d4;
+}
+
+/* ── B · INSTRUMENTO ────────────────────────────────────────────────────── */
+[data-d='B'] {
+  --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #f2f2f0;
+  --d-ink: #16181a; --d-ink-2: #40454a; --d-ink-3: #71777c; --d-ink-on: #ffffff;
+  --d-line: #d3d6d7; --d-edge: #16181a; --d-bw: 1px;
+  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
+  --d-shadow: none; --d-shadow-lg: none;
+  --d-p1: 6px; --d-p2: 8px; --d-p3: 11px; --d-p4: 14px; --d-gap: 12px;
+  --d-t-2xs: 10px; --d-t-xs: 11.5px; --d-t-sm: 12.5px; --d-t-md: 13.5px;
+  --d-t-lg: 16px; --d-t-xl: 21px; --d-t-2xl: 28px;
+  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 700;
+  --d-label-size: 10px; --d-label-case: uppercase; --d-label-track: .11em;
+  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
+  --d-row-h: 30px;
+  --d-accent: #16181a; --d-accent-ink: #ffffff; --d-accent-soft: #f2f2f0; --d-accent-edge: #16181a;
+  --d-pos: #245c33; --d-pos-band: #edf4ec; --d-pos-edge: #245c33;
+  --d-att: #7a4f00; --d-att-band: #fbf3e3; --d-att-edge: #7a4f00;
+  --d-crit: #a51f17; --d-crit-band: #fcecea; --d-crit-edge: #a51f17;
+  --d-info: #3f4370; --d-info-band: #eeeef5; --d-info-edge: #3f4370;
+  --d-neu: #71777c; --d-neu-band: #f2f2f0; --d-neu-edge: #71777c;
+}
+
+/* ── C · MARCA ──────────────────────────────────────────────────────────── */
+[data-d='C'] {
+  --d-brand: #0e5a54;          /* one token: this is what a tenant re-binds */
+  --d-brand-ink: #ffffff;
+  --d-brand-deep: #094039;
+  --d-ground: #f3f6f5; --d-surface: #ffffff; --d-sunk: #eaf0ee;
+  --d-ink: #16211f; --d-ink-2: #3d4a47; --d-ink-3: #6b7975; --d-ink-on: #ffffff;
+  --d-line: #dde5e2; --d-edge: #c6d3cf; --d-bw: 1px;
+  --d-r: 4px; --d-r-lg: 10px; --d-r-pill: 999px;
+  --d-shadow: 0 1px 2px rgba(9,40,36,.07);
+  --d-shadow-lg: 0 10px 26px -10px rgba(9,40,36,.22);
+  --d-p1: 8px; --d-p2: 11px; --d-p3: 15px; --d-p4: 19px; --d-gap: 14px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 14.5px;
+  --d-t-lg: 18px; --d-t-xl: 24px; --d-t-2xl: 31px;
+  --d-w: 400; --d-w-med: 540; --d-w-semi: 620; --d-w-bold: 700;
+  --d-label-size: 12px; --d-label-case: none; --d-label-track: 0;
+  --d-label-weight: 620; --d-label-color: var(--d-brand);
+  --d-row-h: 40px;
+  --d-accent: var(--d-brand); --d-accent-ink: var(--d-brand-ink);
+  --d-accent-soft: #e2eeeb; --d-accent-edge: #a8ccc6;
+  --d-pos: #24663a; --d-pos-band: #e3f0e5; --d-pos-edge: #bcd9c1;
+  --d-att: #8a5300; --d-att-band: #fbedd7; --d-att-edge: #e7cf9f;
+  --d-crit: #ac2118; --d-crit-band: #fbdfda; --d-crit-edge: #edbdb6;
+  --d-info: #0e5a54; --d-info-band: #e2eeeb; --d-info-edge: #a8ccc6;
+  --d-neu: #6b7975; --d-neu-band: #eaf0ee; --d-neu-edge: #c6d3cf;
+}
+
+/* ── D · PESO ───────────────────────────────────────────────────────────── */
+[data-d='D'] {
+  --d-ground: #e9e9e4; --d-surface: #ffffff; --d-sunk: #dcdcd5;
+  --d-ink: #000000; --d-ink-2: #1c1c1a; --d-ink-3: #55554f; --d-ink-on: #ffffff;
+  --d-line: #000000; --d-edge: #000000; --d-bw: 2px;
+  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
+  --d-shadow: 4px 4px 0 #000000;
+  --d-shadow-lg: 8px 8px 0 #000000;
+  --d-p1: 9px; --d-p2: 13px; --d-p3: 17px; --d-p4: 22px; --d-gap: 18px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 14px; --d-t-md: 15.5px;
+  --d-t-lg: 21px; --d-t-xl: 29px; --d-t-2xl: 42px;
+  --d-w: 500; --d-w-med: 600; --d-w-semi: 700; --d-w-bold: 800;
+  --d-label-size: 11.5px; --d-label-case: uppercase; --d-label-track: .05em;
+  --d-label-weight: 800; --d-label-color: var(--d-ink);
+  --d-row-h: 44px;
+  --d-accent: #000000; --d-accent-ink: #ffffff; --d-accent-soft: #dcdcd5; --d-accent-edge: #000000;
+  --d-pos: #000000; --d-pos-band: #9fdba9; --d-pos-edge: #000000;
+  --d-att: #000000; --d-att-band: #f6cf72; --d-att-edge: #000000;
+  --d-crit: #000000; --d-crit-band: #f5a099; --d-crit-edge: #000000;
+  --d-info: #000000; --d-info-band: #b6b8e8; --d-info-edge: #000000;
+  --d-neu: #000000; --d-neu-band: #dcdcd5; --d-neu-edge: #000000;
+}
+
+/* ── E · AIRE ───────────────────────────────────────────────────────────── */
+[data-d='E'] {
+  --d-ground: #fbfaf9; --d-surface: #ffffff; --d-sunk: #f4f2f0;
+  --d-ink: #221f1d; --d-ink-2: #504b46; --d-ink-3: #8a8580; --d-ink-on: #ffffff;
+  --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
+  --d-r: 18px; --d-r-lg: 28px; --d-r-pill: 999px;
+  --d-shadow: 0 2px 20px -8px rgba(34,31,29,.10);
+  --d-shadow-lg: 0 18px 50px -20px rgba(34,31,29,.20);
+  --d-p1: 14px; --d-p2: 20px; --d-p3: 28px; --d-p4: 36px; --d-gap: 24px;
+  --d-t-2xs: 12px; --d-t-xs: 13.5px; --d-t-sm: 15px; --d-t-md: 16px;
+  --d-t-lg: 21px; --d-t-xl: 28px; --d-t-2xl: 38px;
+  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 650;
+  --d-label-size: 13px; --d-label-case: none; --d-label-track: 0;
+  --d-label-weight: 500; --d-label-color: var(--d-ink-3);
+  --d-row-h: 56px;
+  --d-accent: #221f1d; --d-accent-ink: #ffffff; --d-accent-soft: #f0ede9; --d-accent-edge: transparent;
+  --d-pos: #38664a; --d-pos-band: #e9f1eb; --d-pos-edge: transparent;
+  --d-att: #8a6224; --d-att-band: #f7efe2; --d-att-edge: transparent;
+  --d-crit: #a63d34; --d-crit-band: #f8e8e5; --d-crit-edge: transparent;
+  --d-info: #4c5075; --d-info-band: #ecedf3; --d-info-edge: transparent;
+  --d-neu: #8a8580; --d-neu-band: #f4f2f0; --d-neu-edge: transparent;
+}
+
+/* ── F · TERMINAL ───────────────────────────────────────────────────────── */
+[data-d='F'] {
+  --d-ground: #0f1213; --d-surface: #161a1b; --d-sunk: #0a0d0e;
+  --d-ink: #d7dedc; --d-ink-2: #a6afad; --d-ink-3: #6d7876; --d-ink-on: #0f1213;
+  --d-line: #2a3132; --d-edge: #39423f; --d-bw: 1px;
+  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
+  --d-shadow: none; --d-shadow-lg: none;
+  --d-p1: 4px; --d-p2: 7px; --d-p3: 10px; --d-p4: 13px; --d-gap: 10px;
+  --d-t-2xs: 10px; --d-t-xs: 11px; --d-t-sm: 12px; --d-t-md: 13px;
+  --d-t-lg: 15px; --d-t-xl: 19px; --d-t-2xl: 26px;
+  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 700;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 500; --d-label-color: var(--d-ink-3);
+  --d-row-h: 24px;
+  --d-font: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  --d-accent: #7fd1b9; --d-accent-ink: #0a1512; --d-accent-soft: #16302a; --d-accent-edge: #2c5a4f;
+  --d-pos: #7fd1a0; --d-pos-band: #14291c; --d-pos-edge: #24462e;
+  --d-att: #e2bd6f; --d-att-band: #2b2314; --d-att-edge: #4a3a1d;
+  --d-crit: #ef9d92; --d-crit-band: #2f1a17; --d-crit-edge: #4f2822;
+  --d-info: #9aa6e8; --d-info-band: #1a1c2c; --d-info-edge: #303352;
+  --d-neu: #6d7876; --d-neu-band: #1c2122; --d-neu-edge: #39423f;
+  --d-focus: #7fd1b9;
+}
+
+/* ── G · BANDA ──────────────────────────────────────────────────────────── */
+[data-d='G'] {
+  --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #fafaf8;
+  --d-ink: #191817; --d-ink-2: #45433f; --d-ink-3: #7d7a74; --d-ink-on: #ffffff;
+  --d-line: #e6e4df; --d-edge: #d3d0c9; --d-bw: 1px;
+  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 999px;
+  --d-shadow: none; --d-shadow-lg: 0 12px 40px -14px rgba(25,24,23,.28);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 16px; --d-p4: 20px; --d-gap: 0px;
+  --d-t-2xs: 10px; --d-t-xs: 12px; --d-t-sm: 13px; --d-t-md: 14.5px;
+  --d-t-lg: 17px; --d-t-xl: 23px; --d-t-2xl: 32px;
+  --d-w: 400; --d-w-med: 530; --d-w-semi: 600; --d-w-bold: 680;
+  --d-label-size: 10px; --d-label-case: uppercase; --d-label-track: .1em;
+  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
+  --d-row-h: 40px;
+  --d-rail: 148px;             /* the left gutter of labels — this direction's spine */
+  --d-accent: #191817; --d-accent-ink: #ffffff; --d-accent-soft: #f1efea; --d-accent-edge: #d3d0c9;
+  --d-pos: #2f6440; --d-pos-band: #eef4ee; --d-pos-edge: #2f6440;
+  --d-att: #8a5806; --d-att-band: #faf1e0; --d-att-edge: #8a5806;
+  --d-crit: #ab2a20; --d-crit-band: #fbe9e6; --d-crit-edge: #ab2a20;
+  --d-info: #464a72; --d-info-band: #eeeef4; --d-info-edge: #464a72;
+  --d-neu: #7d7a74; --d-neu-band: #f4f2ee; --d-neu-edge: #d3d0c9;
+}
+
+/* ── H · FICHA ──────────────────────────────────────────────────────────── */
+[data-d='H'] {
+  --d-ground: #e3dfd6; --d-surface: #ffffff; --d-sunk: #f4f1e9;
+  --d-ink: #221f19; --d-ink-2: #4b463c; --d-ink-3: #857e70; --d-ink-on: #ffffff;
+  --d-line: #d8d2c4; --d-edge: #bdb5a2; --d-bw: 1px;
+  --d-r: 2px; --d-r-lg: 3px; --d-r-pill: 999px;
+  --d-shadow: 0 1px 0 var(--d-edge), 0 3px 0 #ffffff, 0 4px 0 var(--d-edge);
+  --d-shadow-lg: 0 1px 0 var(--d-edge), 0 3px 0 #ffffff, 0 4px 0 var(--d-edge),
+                 0 18px 34px -18px rgba(34,31,25,.4);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 16px; --d-p4: 20px; --d-gap: 20px;
+  --d-t-2xs: 10.5px; --d-t-xs: 12px; --d-t-sm: 13px; --d-t-md: 14.5px;
+  --d-t-lg: 18px; --d-t-xl: 24px; --d-t-2xl: 32px;
+  --d-w: 400; --d-w-med: 540; --d-w-semi: 620; --d-w-bold: 700;
+  --d-label-size: 10.5px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 620; --d-label-color: var(--d-ink-3);
+  --d-row-h: 38px;
+  --d-accent: #6d3a1f; --d-accent-ink: #ffffff; --d-accent-soft: #f0e5da; --d-accent-edge: #c8ab92;
+  --d-pos: #2e6237; --d-pos-band: #e8f0e3; --d-pos-edge: #b9cfb4;
+  --d-att: #8a5807; --d-att-band: #f8eed8; --d-att-edge: #ddc699;
+  --d-crit: #a72d1e; --d-crit-band: #f8e2dc; --d-crit-edge: #e2b7ab;
+  --d-info: #414a6b; --d-info-band: #e8eaf1; --d-info-edge: #bcc1d4;
+  --d-neu: #857e70; --d-neu-band: #efebe1; --d-neu-edge: #bdb5a2;
+}
+
+/* ==========================================================================
+   PRIMITIVES — written once, against the tokens above.
+   ========================================================================== */
+
+[data-d] *, [data-d] *::before, [data-d] *::after { box-sizing: border-box; }
+
+.d-cap {
+  font-size: var(--d-label-size);
+  font-weight: var(--d-label-weight);
+  letter-spacing: var(--d-label-track);
+  text-transform: var(--d-label-case);
+  color: var(--d-label-color);
+}
+.d-num { font-variant-numeric: var(--d-num); }
+.d-id { font-family: var(--d-mono); font-size: .94em; letter-spacing: -.015em; }
+.d-sr {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+[data-d] :focus-visible { outline: 2px solid var(--d-focus); outline-offset: 2px; }
+
+/* ── Panel: the container. Where the silhouettes diverge most. ──────────── */
+.d-panel {
+  position: relative;
+  background: var(--d-surface);
+  border: var(--d-bw) solid var(--d-line);
+  border-radius: var(--d-r-lg);
+  box-shadow: var(--d-shadow);
+}
+.d-panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--d-p2);
+  padding: var(--d-p2) var(--d-p3);
+  border-bottom: var(--d-bw) solid var(--d-line);
+}
+.d-panel-title { margin: 0; font-size: var(--d-t-sm); font-weight: var(--d-w-semi); letter-spacing: -.01em; }
+.d-panel-body { padding: var(--d-p3); }
+.d-panel-foot {
+  display: flex; justify-content: flex-end; gap: var(--d-p1);
+  padding: var(--d-p2) var(--d-p3);
+  border-top: var(--d-bw) solid var(--d-line);
+  background: var(--d-sunk);
+}
+
+/* B — the drawing frame: a hard outer edge and four corner ticks. */
+[data-d='B'] .d-panel { border-color: var(--d-edge); }
+[data-d='B'] .d-panel::before,
+[data-d='B'] .d-panel::after {
+  content: ''; position: absolute; width: 7px; height: 7px; pointer-events: none;
+  border: 1px solid var(--d-edge);
+}
+[data-d='B'] .d-panel::before { top: 3px; left: 3px; border-right: 0; border-bottom: 0; }
+[data-d='B'] .d-panel::after { bottom: 3px; right: 3px; border-left: 0; border-top: 0; }
+[data-d='B'] .d-panel-head { border-bottom-color: var(--d-edge); }
+[data-d='B'] .d-panel-title { text-transform: uppercase; letter-spacing: .09em; font-size: var(--d-t-2xs); }
+
+/* C — the head bar IS the container's identity. */
+[data-d='C'] .d-panel { border-color: var(--d-line); overflow: hidden; }
+[data-d='C'] .d-panel-head {
+  background: var(--d-brand); color: var(--d-brand-ink); border-bottom: 0;
+  padding: var(--d-p2) var(--d-p3);
+}
+[data-d='C'] .d-panel-title { font-weight: var(--d-w-semi); }
+[data-d='C'] .d-panel-foot { background: var(--d-sunk); }
+
+/* D — mass, and a solid shadow the block moves into. */
+[data-d='D'] .d-panel { border-color: var(--d-ink); }
+[data-d='D'] .d-panel-head { border-bottom-width: var(--d-bw); border-bottom-color: var(--d-ink); }
+[data-d='D'] .d-panel-title { text-transform: uppercase; font-weight: var(--d-w-bold); letter-spacing: -.01em; }
+[data-d='D'] .d-panel-foot { border-top-color: var(--d-ink); }
+
+/* E — no border anywhere; separation is space and a whisper of shadow. */
+[data-d='E'] .d-panel { border: 0; }
+[data-d='E'] .d-panel-head { border-bottom: 0; padding-bottom: var(--d-p1); }
+[data-d='E'] .d-panel-title { font-size: var(--d-t-lg); font-weight: var(--d-w-semi); letter-spacing: -.015em; }
+[data-d='E'] .d-panel-foot { border-top: 0; background: transparent; }
+
+/* F — the head is a rule of dashes, the way a TUI draws a box. */
+[data-d='F'] .d-panel-head {
+  border-bottom: 0; padding: var(--d-p1) var(--d-p2);
+  background: var(--d-sunk);
+}
+[data-d='F'] .d-panel-title { font-size: var(--d-t-xs); text-transform: uppercase; letter-spacing: .1em; color: var(--d-accent); }
+[data-d='F'] .d-panel-title::before { content: '── '; color: var(--d-line); }
+[data-d='F'] .d-panel-title::after { content: ' ─────'; color: var(--d-line); }
+
+/* G — there is no panel. A "panel" is a full-bleed band with a label rail. */
+[data-d='G'] .d-panel {
+  border: 0; border-top: 1px solid var(--d-line); border-bottom: 1px solid var(--d-line);
+  border-radius: 0; box-shadow: none; margin-block: -1px 0;
+}
+[data-d='G'] .d-panel-head {
+  border-bottom: 0; background: var(--d-sunk);
+  padding: var(--d-p1) var(--d-p3);
+}
+[data-d='G'] .d-panel-title {
+  font-size: var(--d-label-size); font-weight: var(--d-label-weight);
+  letter-spacing: var(--d-label-track); text-transform: uppercase; color: var(--d-ink-3);
+}
+[data-d='G'] .d-panel-foot { background: transparent; border-top-color: var(--d-line); }
+/* The rail: a fixed gutter of right-aligned labels. Collapses under 720px,
+   because a 148px rail on a phone leaves nothing for the content. */
+.d-rail { display: grid; grid-template-columns: 1fr; gap: 2px; }
+[data-d='G'] .d-rail {
+  grid-template-columns: var(--d-rail) minmax(0, 1fr);
+  gap: 0 var(--d-p3); align-items: baseline;
+  padding-block: var(--d-p1);
+}
+[data-d='G'] .d-rail > .d-cap { text-align: right; }
+@media (max-width: 720px) {
+  [data-d='G'] .d-rail { grid-template-columns: 1fr; }
+  [data-d='G'] .d-rail > .d-cap { text-align: left; }
+}
+/* State rides the left edge, never a background wash. */
+[data-d='G'] .d-panel[data-tone] { padding-left: 3px; }
+[data-d='G'] .d-panel[data-tone]::before {
+  content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
+  background: var(--tone-fg);
+}
+
+/* H — the tab is the head; the card carries a stacked edge below it. */
+[data-d='H'] .d-panel { margin-top: 26px; margin-bottom: 5px; border-color: var(--d-edge); }
+[data-d='H'] .d-panel-head {
+  position: absolute; top: -25px; left: -1px;
+  padding: 5px var(--d-p3) 6px;
+  background: var(--d-sunk);
+  border: 1px solid var(--d-edge); border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  max-width: calc(100% + 2px);
+}
+[data-d='H'] .d-panel-title { font-size: var(--d-t-xs); font-weight: var(--d-w-semi); letter-spacing: .02em; }
+/* The double rule under a card's first block — the ruled-card tell. */
+[data-d='H'] .d-panel-body { border-top: 1px solid var(--d-line); box-shadow: inset 0 2px 0 -1px var(--d-surface), inset 0 3px 0 -1px var(--d-line); }
+[data-d='H'] .d-panel-foot { background: var(--d-sunk); }
+
+/* ── Row: the unit of a list or table. ──────────────────────────────────── */
+.d-row {
+  display: flex; align-items: center; gap: var(--d-p2);
+  min-height: var(--d-row-h);
+  padding-inline: var(--d-p3);
+  border-bottom: var(--d-bw) solid var(--d-line);
+}
+.d-row:last-child { border-bottom: 0; }
+[data-d='D'] .d-row { border-bottom-color: var(--d-ink); border-bottom-width: 1px; }
+[data-d='E'] .d-row { border-bottom: 1px solid #f0edea; }
+[data-d='G'] .d-row { padding-inline: var(--d-p3); position: relative; }
+[data-d='G'] .d-row[data-tone]::before {
+  content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--tone-fg);
+}
+[data-d='F'] .d-row:hover { background: var(--d-sunk); }
+[data-d='A'] .d-row:hover, [data-d='C'] .d-row:hover, [data-d='H'] .d-row:hover { background: var(--d-sunk); }
+
+/* ── Button ─────────────────────────────────────────────────────────────── */
+.d-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--d-p1);
+  padding: 0 var(--d-p3);
+  min-height: 36px;
+  font: inherit; font-size: var(--d-t-sm); font-weight: var(--d-w-med);
+  color: var(--d-ink); background: var(--d-surface);
+  border: max(var(--d-bw), 1px) solid var(--d-edge);
+  border-radius: var(--d-r);
+  box-shadow: var(--d-shadow);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+.d-btn:hover { background: var(--d-sunk); }
+.d-btn--primary {
+  background: var(--d-accent); color: var(--d-accent-ink); border-color: var(--d-accent-edge);
+  font-weight: var(--d-w-semi);
+}
+.d-btn--primary:hover { background: var(--d-accent); filter: brightness(1.12); }
+.d-btn--ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--d-ink-2); }
+.d-btn--ghost:hover { background: var(--d-sunk); }
+.d-btn--danger { color: var(--d-crit); border-color: var(--d-crit-edge); background: var(--d-crit-band); }
+.d-btn--sm { min-height: 27px; padding: 0 var(--d-p2); font-size: var(--d-t-xs); }
+.d-btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+[data-d='B'] .d-btn { min-height: 27px; }
+[data-d='D'] .d-btn { font-weight: var(--d-w-bold); text-transform: uppercase; letter-spacing: .02em; }
+[data-d='D'] .d-btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--d-ink); }
+[data-d='E'] .d-btn { border-radius: var(--d-r-pill); min-height: 46px; padding: 0 var(--d-p3); }
+[data-d='E'] .d-btn--ghost { box-shadow: none; }
+[data-d='F'] .d-btn { min-height: 22px; padding: 0 var(--d-p2); font-size: var(--d-t-xs); }
+[data-d='F'] .d-btn::before { content: '['; color: var(--d-ink-3); }
+[data-d='F'] .d-btn::after { content: ']'; color: var(--d-ink-3); }
+[data-d='G'] .d-btn { border-color: transparent; border-bottom: 2px solid var(--d-edge); background: transparent; box-shadow: none; }
+[data-d='G'] .d-btn--primary { background: var(--d-accent); border-bottom-color: var(--d-accent); }
+[data-d='H'] .d-btn { box-shadow: 0 1px 0 var(--d-edge); }
+[data-d='H'] .d-btn:active { transform: translateY(1px); box-shadow: none; }
+
+/* A button GROUP. In B and F the buttons share edges instead of sitting apart. */
+.d-btn-group { display: inline-flex; gap: var(--d-p1); }
+[data-d='B'] .d-btn-group, [data-d='F'] .d-btn-group, [data-d='D'] .d-btn-group { gap: 0; }
+[data-d='B'] .d-btn-group > .d-btn + .d-btn,
+[data-d='D'] .d-btn-group > .d-btn + .d-btn { margin-left: calc(-1 * max(var(--d-bw), 1px)); }
+[data-d='F'] .d-btn-group > .d-btn + .d-btn { margin-left: 2px; }
+
+/* ── Field ──────────────────────────────────────────────────────────────── */
+.d-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.d-label { font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-2); }
+.d-input, .d-select, .d-textarea {
+  width: 100%;
+  padding: 0 var(--d-p2);
+  min-height: 36px;
+  font: inherit; font-size: var(--d-t-sm);
+  color: var(--d-ink);
+  background: var(--d-surface);
+  border: max(var(--d-bw), 1px) solid var(--d-edge);
+  border-radius: var(--d-r);
+}
+.d-textarea { padding: var(--d-p2); min-height: 84px; resize: vertical; }
+.d-input::placeholder { color: var(--d-ink-3); }
+.d-hint { font-size: var(--d-t-xs); color: var(--d-ink-3); }
+.d-error { font-size: var(--d-t-xs); color: var(--d-crit); font-weight: var(--d-w-med); }
+
+[data-d='A'] .d-input, [data-d='A'] .d-select, [data-d='A'] .d-textarea { border-color: var(--d-edge); background: var(--d-surface); }
+[data-d='B'] .d-input, [data-d='B'] .d-select { min-height: 27px; border-color: var(--d-line); }
+[data-d='B'] .d-label { font-size: var(--d-label-size); text-transform: uppercase; letter-spacing: var(--d-label-track); color: var(--d-ink-3); font-weight: 600; }
+[data-d='C'] .d-input:focus-visible, [data-d='C'] .d-select:focus-visible { border-color: var(--d-brand); }
+/* E — the field is a filled well with no border at all. */
+[data-d='E'] .d-input, [data-d='E'] .d-select, [data-d='E'] .d-textarea {
+  background: var(--d-sunk); border: 0; border-radius: 14px; min-height: 50px; padding-inline: var(--d-p2);
+}
+[data-d='E'] .d-textarea { border-radius: 18px; padding: var(--d-p2); }
+/* F — the field is a prompt line: underline only, with a caret marker. */
+[data-d='F'] .d-input, [data-d='F'] .d-select, [data-d='F'] .d-textarea {
+  background: var(--d-sunk); border: 1px solid var(--d-line); min-height: 22px; padding-inline: var(--d-p1);
+}
+[data-d='F'] .d-label { color: var(--d-ink-3); }
+[data-d='F'] .d-label::before { content: '$ '; color: var(--d-accent); }
+/* G — the field is a baseline, not a box. */
+[data-d='G'] .d-input, [data-d='G'] .d-select, [data-d='G'] .d-textarea {
+  border: 0; border-bottom: 1px solid var(--d-edge); border-radius: 0;
+  background: transparent; padding-inline: 0;
+}
+[data-d='G'] .d-input:focus-visible, [data-d='G'] .d-select:focus-visible {
+  outline: 0; border-bottom-color: var(--d-ink); border-bottom-width: 2px;
+}
+[data-d='H'] .d-input, [data-d='H'] .d-select, [data-d='H'] .d-textarea { background: #fffef9; }
+
+/* ── Pill: tone + mark + word. The one rule that survives every direction. ─ */
+.d-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px var(--d-p2);
+  border-radius: var(--d-r-pill);
+  font-size: var(--d-t-2xs); font-weight: var(--d-w-semi);
+  font-variant-numeric: var(--d-num);
+  line-height: 1.35; white-space: nowrap;
+  background: var(--tone-band); color: var(--tone-fg);
+  border: 1px solid var(--tone-edge);
+}
+.d-pill svg { flex: none; width: 9px; height: 9px; }
+[data-d='D'] .d-pill { border-width: 2px; color: var(--d-ink); font-weight: var(--d-w-bold); text-transform: uppercase; }
+[data-d='E'] .d-pill { padding: 5px var(--d-p2); font-size: var(--d-t-xs); border: 0; }
+[data-d='F'] .d-pill { padding: 0 5px; border-radius: 0; }
+[data-d='G'] .d-pill { background: transparent; border: 0; padding-inline: 0; }
+[data-d='G'] .d-pill::after { content: ''; }
+
+/* Tone carriers. A page writes data-tone and everything downstream resolves. */
+[data-tone='positive']  { --tone-fg: var(--d-pos);  --tone-band: var(--d-pos-band);  --tone-edge: var(--d-pos-edge); }
+[data-tone='attention'] { --tone-fg: var(--d-att);  --tone-band: var(--d-att-band);  --tone-edge: var(--d-att-edge); }
+[data-tone='critical']  { --tone-fg: var(--d-crit); --tone-band: var(--d-crit-band); --tone-edge: var(--d-crit-edge); }
+[data-tone='info']      { --tone-fg: var(--d-info); --tone-band: var(--d-info-band); --tone-edge: var(--d-info-edge); }
+[data-tone='neutral']   { --tone-fg: var(--d-neu);  --tone-band: var(--d-neu-band);  --tone-edge: var(--d-neu-edge); }

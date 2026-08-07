@@ -1,0 +1,131 @@
+/* ============================================================================
+   Strix — tokens
+   GENERATED FROM src/lib/tokens.js — do not edit by hand.
+   Run `npm run tokens` after changing the source.
+
+   For a SvelteKit app: import this file once, at the root.
+   For a Core module in a shadow root: import { hostTokens } from the library
+   and inline the result in the root component's own <style>, because a linked
+   stylesheet does not cross a shadow boundary and a strict CSP forbids the
+   @import that would.
+   ========================================================================= */
+
+:root {
+  --sx-n-0: #FFFFFF;
+  --sx-n-50: #F5F6F7;
+  --sx-n-100: #EAECED;
+  --sx-n-150: #DFE1E3;
+  --sx-n-200: #CFD2D4;
+  --sx-n-300: #B2B6B9;
+  --sx-n-400: #8B9094;
+  --sx-n-500: #6C7175;
+  --sx-n-700: #3C4145;
+  --sx-n-800: #24282B;
+  --sx-n-900: #14181A;
+  --sx-ground: var(--sx-n-50);
+  --sx-surface: var(--sx-n-0);
+  --sx-sunk: var(--sx-n-100);
+  --sx-line: var(--sx-n-150);
+  --sx-edge: var(--sx-n-200);
+  --sx-ink: var(--sx-n-900);
+  --sx-ink-2: var(--sx-n-700);
+  --sx-ink-3: var(--sx-n-500);
+  --sx-ink-on: var(--sx-n-0);
+  --sx-accent: var(--sx-n-900);
+  --sx-accent-ink: var(--sx-n-0);
+  --sx-accent-soft: var(--sx-n-100);
+  --sx-accent-edge: var(--sx-n-200);
+  --sx-positive: #2E6B3E;
+  --sx-positive-band: #E4EFE2;
+  --sx-positive-edge: #C3D8C4;
+  --sx-attention: #8A5A00;
+  --sx-attention-band: #FBEEDA;
+  --sx-attention-edge: #E8D4A6;
+  --sx-critical: #B3261E;
+  --sx-critical-band: #FBE0DC;
+  --sx-critical-edge: #EFC2BC;
+  --sx-info: #4A4E7A;
+  --sx-info-band: #E7E7F2;
+  --sx-info-edge: #C9CADD;
+  --sx-neutral: var(--sx-n-500);
+  --sx-neutral-band: var(--sx-n-100);
+  --sx-neutral-edge: var(--sx-n-200);
+  --sx-e-1: 0 1px 2px rgba(20,24,26,.06), 0 1px 1px rgba(20,24,26,.04);
+  --sx-e-2: 0 6px 16px -4px rgba(20,24,26,.10), 0 2px 6px -2px rgba(20,24,26,.06);
+  --sx-e-3: 0 24px 48px -16px rgba(20,24,26,.26), 0 6px 14px -6px rgba(20,24,26,.12);
+  --sx-e-inset: inset 0 1px 0 rgba(255,255,255,.6);
+  --sx-r-1: 7px;
+  --sx-r-2: 11px;
+  --sx-r-3: 16px;
+  --sx-r-pill: 999px;
+  --sx-t-2xs: 11px;
+  --sx-t-xs: 12.5px;
+  --sx-t-sm: 13.5px;
+  --sx-t-md: 15px;
+  --sx-t-lg: 19px;
+  --sx-t-xl: 25px;
+  --sx-t-2xl: 33px;
+  --sx-t-3xl: 46px;
+  --sx-w-normal: 400;
+  --sx-w-medium: 550;
+  --sx-w-semi: 620;
+  --sx-w-bold: 700;
+  --sx-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --sx-font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace;
+  --sx-s-1: 4px;
+  --sx-s-2: 8px;
+  --sx-s-3: 12px;
+  --sx-s-4: 16px;
+  --sx-s-5: 20px;
+  --sx-s-6: 24px;
+  --sx-s-8: 32px;
+  --sx-s-10: 40px;
+  --sx-s-12: 48px;
+  --sx-s-16: 64px;
+  --sx-s-20: 80px;
+  --sx-ease: cubic-bezier(.2, .8, .2, 1);
+  --sx-fast: 120ms;
+  --sx-beat: 220ms;
+  --sx-slow: 380ms;
+  --sx-scrim: rgba(20, 24, 26, .46);
+  --sx-touch: 44px;
+  --sx-z-sticky: 40;
+  --sx-z-overlay: 900;
+  --sx-z-toast: 1100;
+}
+
+:root[data-sx-theme="dark"], .sx-dark {
+  --sx-ground: var(--sx-n-900);
+  --sx-surface: var(--sx-n-800);
+  --sx-sunk: #1B1F22;
+  --sx-line: #2C3134;
+  --sx-edge: #3A3F43;
+  --sx-ink: #EDEFF0;
+  --sx-ink-2: #BCC1C4;
+  --sx-ink-3: #8E9498;
+  --sx-ink-on: var(--sx-n-900);
+  --sx-accent: #EDEFF0;
+  --sx-accent-ink: var(--sx-n-900);
+  --sx-accent-soft: #2C3134;
+  --sx-accent-edge: #3A3F43;
+  --sx-positive: #8FCB9B;
+  --sx-positive-band: #1D2C21;
+  --sx-positive-edge: #2E4436;
+  --sx-attention: #E7BE72;
+  --sx-attention-band: #2E2415;
+  --sx-attention-edge: #48381E;
+  --sx-critical: #F0A79E;
+  --sx-critical-band: #331B18;
+  --sx-critical-edge: #4D2823;
+  --sx-info: #ACADD6;
+  --sx-info-band: #1F2033;
+  --sx-info-edge: #33344F;
+  --sx-neutral: var(--sx-n-400);
+  --sx-neutral-band: #23272A;
+  --sx-neutral-edge: #3A3F43;
+  --sx-scrim: rgba(0, 0, 0, .62);
+  --sx-e-1: 0 1px 2px rgba(0,0,0,.4);
+  --sx-e-2: 0 6px 16px -4px rgba(0,0,0,.5), 0 2px 6px -2px rgba(0,0,0,.4);
+  --sx-e-3: 0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45);
+  --sx-e-inset: inset 0 1px 0 rgba(255,255,255,.05);
+}

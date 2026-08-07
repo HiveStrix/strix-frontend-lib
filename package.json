@@ -1,16 +1,18 @@
 {
-  "name": "strix-frontend-example",
+  "name": "strix-frontend",
   "private": true,
   "version": "0.1.0",
-  "description": "Ejemplos ejecutables de @strix/frontend-lib: pantallas reales armadas con la librería.",
+  "description": "Monorepo del frontend de Strix: el sistema de diseño y los ejemplos que lo demuestran.",
   "type": "module",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@strix/frontend-lib": "file:../strix-FrontendLib"
+    "dev": "npm run dev --workspace=@strix/ejemplo-mantenimiento",
+    "dev:lib": "npm run dev --workspace=@strix/frontend-lib",
+    "build": "npm run build --workspace=@strix/frontend-lib && npm run build --workspace=@strix/ejemplo-mantenimiento",
+    "tokens": "npm run tokens --workspace=@strix/frontend-lib"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
