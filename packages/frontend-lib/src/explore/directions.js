@@ -170,6 +170,15 @@ export const DIRECTIONS = [
     form: 'Cristal con tres correcciones y una regla de reserva. Nada que FLOTE es translúcido: menús, desplegables, diálogos y globos van sólidos, porque un menú translúcido deja que el texto de abajo se cruce con el de arriba y ninguno de los dos se lee. Las filas de tabla vuelven a ser planas, con banda opaca y sin anillo ni margen, porque una tabla de objetos flotantes es engorrosa de leer. Las fichas de filtro son las de Cristal, que ya funcionaban. Y el halo queda reservado a lo crítico: si todo brilla, nada urge.',
     mezcla: 'I corregido',
     finalista: true
+  },
+  {
+    id: 'X',
+    name: 'Cota',
+    tagline: 'El color es solo estado. La estructura es la medida.',
+    silhouette: 'Papel mate y tinta. Ni un degradado, ni un vidrio, ni una sombra difusa. Bajo cada cifra medida corre un riel con la marca de su tope.',
+    form: 'Cota es la marca de nivel en un dibujo técnico: el punto contra el que se mide todo. Dos reglas la sostienen. Primera, el color está RESERVADO al estado — el cromo es acromático de punta a punta, así que cada píxel de color en pantalla significa algo y el ojo lo busca. Segunda, ninguna cifra medida aparece sola: va sobre un riel con la marca de su tope, así que «312 h» se lee contra las 250 h del plan sin que nadie tenga que restar. El acento por defecto es tinta, no un color: es una ranura que cada producto llena.',
+    definitivo: true,
+    finalista: true
   }
 ];
 

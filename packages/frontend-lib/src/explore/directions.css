@@ -1590,57 +1590,196 @@
    de subir.
 
    Un ERP de mantenimiento se usa en turno de noche y en bodega. */
-@media (prefers-color-scheme: dark) {
-  [data-d='W'] {
-    --d-ground:
-      radial-gradient(70% 56% at 12% 6%, #14304C 0%, transparent 62%),
-      radial-gradient(60% 60% at 90% 18%, #2A1F3F 0%, transparent 64%),
-      radial-gradient(78% 60% at 50% 99%, #123A38 0%, transparent 66%),
-      #0A0E13;
-    --d-surface: rgba(190, 220, 255, .07);
-    --d-sunk: rgba(190, 220, 255, .04);
-    --d-overlay: #161B22;
-    --d-overlay-ink: #E4EBF2;
-    --d-overlay-edge: rgba(190, 220, 255, .18);
-    --d-overlay-shadow: 0 20px 48px -14px rgba(0, 0, 0, .72), 0 4px 12px -4px rgba(0, 0, 0, .5);
-    --d-ink: #E6EDF4; --d-ink-2: #B3C0CD; --d-ink-3: #A2AFBB; --d-ink-on: #0A0E13;
-    --d-line: rgba(190, 220, 255, .14); --d-edge: rgba(190, 220, 255, .24);
-    --d-accent: #7FB0F5; --d-accent-ink: #08131F;
-    --d-accent-soft: rgba(127, 176, 245, .14); --d-accent-edge: rgba(127, 176, 245, .38);
-    /* Bandas opacas también acá, y por el mismo motivo: una translúcida se
-       apila cuando hay una píldora sobre una fila teñida. */
-    --d-pos: #7FD5A4; --d-pos-band: #172A21; --d-pos-edge: #2C4636;
-    --d-att: #EFC378; --d-att-band: #2C2416; --d-att-edge: #4A3A1E;
-    --d-crit: #F79C8F; --d-crit-band: #2F1A17; --d-crit-edge: #4E2823;
-    --d-info: #9DB2F0; --d-info-band: #1B2033; --d-info-edge: #313857;
-    --d-neu: #9FADBA; --d-neu-band: #1B2026; --d-neu-edge: #333B44;
-    --d-shadow: 0 8px 28px -10px rgba(0, 0, 0, .6);
-    --d-shadow-lg: 0 24px 56px -18px rgba(0, 0, 0, .75);
-    --d-focus: #7FB0F5;
-  }
-  /* El canto, en oscuro: un filo tenue, no un realce blanco. */
-  [data-d='W'] .d-panel::after {
-    box-shadow: inset 0 0 0 1px rgba(190, 220, 255, .09);
-  }
-  [data-d='W'] .d-panel-head { border-bottom-color: rgba(190, 220, 255, .12); }
-  [data-d='W'] .d-panel-foot { background: rgba(190, 220, 255, .04); border-top-color: rgba(190, 220, 255, .10); }
-  [data-d='W'] .d-row { border-bottom-color: rgba(190, 220, 255, .10); }
-  [data-d='W'] .d-btn {
-    background: rgba(190, 220, 255, .10);
-    border-color: rgba(190, 220, 255, .18);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, .4);
-  }
-  [data-d='W'] .d-btn:hover { background: rgba(190, 220, 255, .16); }
-  [data-d='W'] .d-btn--primary { background: var(--d-accent); color: var(--d-accent-ink); border-color: var(--d-accent); }
-  [data-d='W'] .d-btn--ghost { background: transparent; border-color: transparent; box-shadow: none; }
-  [data-d='W'] .d-input, [data-d='W'] .d-select, [data-d='W'] .d-textarea {
-    background: #10161D; border-color: rgba(190, 220, 255, .20);
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35);
-  }
-  /* El halo crítico sube de intensidad: sobre oscuro, un resplandor al 55 % se
-     pierde contra el propio fondo. */
-  [data-d='W'] .d-row[data-tone='critical'],
-  [data-d='W'] .d-panel[data-tone='critical'] {
-    box-shadow: inset 3px 0 0 var(--d-crit), 0 6px 24px -8px rgba(247, 156, 143, .40);
-  }
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   X · COTA — el diseño definitivo.
+
+   Cota es la marca de nivel de un dibujo técnico: el punto contra el que se
+   mide todo lo demás. El producto entero es eso — un plan es un tope y una
+   máquina es una lectura corriendo hacia él.
+
+   POR QUÉ NO SE PARECE A LAS ANTERIORES
+
+   Las diecinueve de arriba se construyeron eligiendo un MATERIAL: vidrio,
+   esmalte, luz, piedra, papel mojado. Ese es el camino que lleva al aspecto de
+   software generado, porque el material se elige por como se ve y no por lo que
+   el producto hace. El campo de manchas pastel detrás del vidrio es el ejemplo
+   perfecto: se ve bien y no dice nada.
+
+   Cota se construye al revés, desde el sujeto. Alquiler de equipo de
+   construcción: horómetros, boletas de salida en papel químico, grasa, bodega.
+   Nada de eso es etéreo. Materiales: papel mate y tinta.
+
+   LAS DOS REGLAS
+
+   1 · EL COLOR ESTÁ RESERVADO AL ESTADO. Todo el cromo —fondos, superficies,
+       bordes, tipografía, botones, el acento— es acromático. La consecuencia no
+       es estética sino funcional: como no hay ningún otro color en pantalla, el
+       ojo encuentra el rojo antes de leer una palabra. En las direcciones donde
+       la marca tiñe cabeceras, el estado compite contra el cromo por atención.
+       Acá no tiene con qué competir.
+
+   2 · NINGUNA CIFRA MEDIDA APARECE SOLA. Va sobre un riel con la marca de su
+       tope. «312 h» no significa nada; «312 h con la marca de 250 h atrás»
+       significa que se pasó. Es el recurso estructural del sistema y codifica
+       algo verdadero del contenido, que es lo único que justifica un recurso
+       estructural.
+
+   El acento por defecto es TINTA, no un color. Es una ranura: un producto la
+   llena si tiene marca, y si no la llena el sistema sigue funcionando en vez de
+   verse a medio pintar.
+   ══════════════════════════════════════════════════════════════════════════ */
+[data-d='X'] {
+  /* Papel de bodega, no crema. El crema tibio con acento latón es la paleta que
+     la propia skill de taste prohíbe como default para todo lo que suene a
+     oficio, justamente porque es la que sale sola. Este es gris de esmalte
+     industrial: neutro, mate, sin temperatura declarada. */
+  --d-ground: #ECEDEC;
+  --d-surface: #FFFFFF;
+  --d-sunk: #F4F5F4;
+  --d-ink: #16181A; --d-ink-2: #3A3F43; --d-ink-3: #5F6468; --d-ink-on: #FFFFFF;
+  --d-line: #DEDFDE; --d-edge: #C4C7C5; --d-bw: 1px;
+  /* 4px: el canto mecanizado de una placa. 0 es Instrumento y 12 es blando. */
+  --d-r: 4px; --d-r-lg: 6px; --d-r-pill: 999px;
+  /* Papel sobre papel. Un solo píxel de desplazamiento y nada de desenfoque:
+     la profundidad la da la línea, no la sombra. */
+  --d-shadow: 0 1px 0 rgba(22, 24, 26, .06);
+  --d-shadow-lg: 0 12px 28px -12px rgba(22, 24, 26, .26), 0 1px 0 rgba(22, 24, 26, .08);
+  --d-p1: 7px; --d-p2: 11px; --d-p3: 15px; --d-p4: 20px; --d-gap: 15px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 14.5px;
+  --d-t-lg: 18px; --d-t-xl: 25px; --d-t-2xl: 34px;
+  --d-w: 400; --d-w-med: 520; --d-w-semi: 620; --d-w-bold: 700;
+  /* Etiquetas en caja normal. Las versalitas sobre cada bloque son el ritmo
+     templado que delata una IA, y la auditoría ya nos lo cobró una vez. */
+  --d-label-size: 12px; --d-label-case: none; --d-label-track: 0;
+  --d-label-weight: 560; --d-label-color: var(--d-ink-3);
+  --d-row-h: 38px;
+  --d-measure: 68ch;
+  /* LA RANURA. Tinta por defecto: un primario negro es un primario de verdad. */
+  --d-accent: #16181A; --d-accent-ink: #FFFFFF;
+  --d-accent-soft: #E7E8E7; --d-accent-edge: #16181A;
+  /* Los cuatro tonos del ecosistema, sin tocar: «vencido» tiene que verse igual
+     en mantenimiento, en facturación y en inventario. */
+  --d-pos: #2A6338; --d-pos-band: #E6EFE6; --d-pos-edge: #BDD4BE;
+  --d-att: #7E5200; --d-att-band: #F8EEDA; --d-att-edge: #E0C793;
+  --d-crit: #A82118; --d-crit-band: #FAE4E0; --d-crit-edge: #E9B7AF;
+  --d-info: #3F4472; --d-info-band: #E9EAF2; --d-info-edge: #C3C5DA;
+  --d-neu: #5F6468; --d-neu-band: #EDEEED; --d-neu-edge: #C4C7C5;
+}
+
+/* El panel es una hoja: línea, canto de 4px, un píxel de sombra. */
+[data-d='X'] .d-panel { border-color: var(--d-line); }
+[data-d='X'] .d-panel-head {
+  border-bottom-color: var(--d-line);
+  padding: var(--d-p2) var(--d-p3);
+}
+[data-d='X'] .d-panel-title {
+  font-size: var(--d-t-sm); font-weight: var(--d-w-semi); letter-spacing: -.012em;
+}
+[data-d='X'] .d-panel-foot { background: var(--d-sunk); border-top-color: var(--d-line); }
+[data-d='X'] .d-panel-body > p { max-width: var(--d-measure); }
+
+/* La fila con estado NO se rellena de color: lleva un filo de 3px en el canto.
+   Rellenar tiñe el texto de encima y obliga a re-verificar contraste en cinco
+   tonos; el filo no toca nada y se lee igual de lejos. */
+[data-d='X'] .d-row { border-bottom-color: var(--d-line); position: relative; }
+[data-d='X'] .d-row[data-tone] { padding-left: calc(var(--d-p3) + 3px); }
+[data-d='X'] .d-row[data-tone]::before {
+  content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
+  background: var(--tone-fg);
+}
+/* Solo lo vencido se tiñe, y apenas: es el único estado que interrumpe. */
+[data-d='X'] .d-row[data-tone='critical'] { background: var(--d-crit-band); }
+[data-d='X'] .d-row:hover { background: var(--d-sunk); }
+
+[data-d='X'] .d-btn {
+  border-color: var(--d-edge);
+  font-weight: var(--d-w-med);
+  box-shadow: 0 1px 0 rgba(22, 24, 26, .05);
+}
+[data-d='X'] .d-btn:hover { background: var(--d-sunk); }
+[data-d='X'] .d-btn:active { transform: translateY(1px); box-shadow: none; }
+[data-d='X'] .d-btn--primary {
+  background: var(--d-accent); color: var(--d-accent-ink);
+  border-color: var(--d-accent); font-weight: var(--d-w-semi);
+}
+[data-d='X'] .d-btn--ghost { background: transparent; border-color: transparent; box-shadow: none; }
+[data-d='X'] .d-input, [data-d='X'] .d-select, [data-d='X'] .d-textarea {
+  border-color: var(--d-edge);
+  box-shadow: inset 0 1px 0 rgba(22, 24, 26, .04);
+}
+[data-d='X'] .d-input:focus-visible, [data-d='X'] .d-select:focus-visible {
+  outline: 0; border-color: var(--d-ink);
+  box-shadow: 0 0 0 2px rgba(22, 24, 26, .22);
+}
+[data-d='X'] .d-pill { font-weight: var(--d-w-semi); }
+
+/* ── LA COTA ──────────────────────────────────────────────────────────────
+   La firma del sistema, y la única pieza de marcado nueva que introduce.
+
+   Una cifra medida nunca va sola. Va sobre un riel con una marca en su tope,
+   así que «312 h» se lee contra las 250 h del plan sin que nadie reste. Si el
+   relleno pasa la marca, se pasó; y cuánto se pasó también se ve.
+
+   Marcado:
+     <div class="d-cota" data-tone="critical" style="--cota:118">
+       <div class="d-cota-fig"><b>312</b> <span>h</span></div>
+       <div class="d-cota-rail"><i class="d-cota-fill"></i><i class="d-cota-tick"></i></div>
+       <div class="d-cota-note">tope 250 h · se pasó 62 h</div>
+     </div>
+
+   --cota es el porcentaje recorrido; la marca queda fija en el 100 %, que es el
+   tope. Está definida para las veinte direcciones para que la comparación sea
+   justa, pero es de Cota: es donde deja de ser un adorno y pasa a ser la
+   estructura de la pantalla. */
+.d-cota { display: grid; gap: 3px; min-width: 0; }
+.d-cota-fig {
+  font-variant-numeric: var(--d-num);
+  font-size: var(--d-t-lg); font-weight: var(--d-w-semi);
+  letter-spacing: -.02em; line-height: 1.1;
+  color: var(--d-ink);
+}
+.d-cota-fig span { font-size: .6em; font-weight: var(--d-w-med); color: var(--d-ink-3); }
+.d-cota-rail {
+  position: relative; height: 4px;
+  background: var(--d-sunk);
+  border-radius: 2px; overflow: visible;
+}
+.d-cota-fill {
+  position: absolute; inset: 0 auto 0 0;
+  /* El riel se dibuja hasta el 150 % del tope, así que el 100 % cae en dos
+     tercios y un sobrepaso tiene lugar donde verse. Un riel que termina en el
+     tope no puede mostrar cuánto se pasó, que es justo el dato que importa. */
+  width: min(100%, calc(var(--cota, 0) * 0.6667%));
+  background: var(--tone-fg, var(--d-ink-3));
+  border-radius: 2px;
+}
+.d-cota-tick {
+  position: absolute; top: -3px; bottom: -3px; left: 66.67%;
+  width: 1px; background: var(--d-ink);
+}
+.d-cota-note { font-size: var(--d-t-xs); color: var(--d-ink-3); font-variant-numeric: var(--d-num); }
+
+[data-d='X'] .d-cota-fig { font-size: var(--d-t-xl); }
+[data-d='X'] .d-cota-rail { height: 5px; border-radius: 0; background: #E2E4E2; }
+[data-d='X'] .d-cota-fill { border-radius: 0; }
+/* La marca del tope sobresale por arriba y por abajo, como la cota de un plano:
+   se ve incluso cuando el relleno la tapa. */
+[data-d='X'] .d-cota-tick { top: -4px; bottom: -4px; width: 1.5px; }
+[data-d='X'] .d-cota[data-tone='critical'] .d-cota-fig { color: var(--d-crit); }
+
+/* Piso de artesanía, desde el primer día y no como parche. */
+@media (forced-colors: active) {
+  [data-d='X'] .d-row[data-tone]::before { background: CanvasText; }
+  [data-d='X'] .d-row[data-tone='critical'] { outline: 2px solid CanvasText; outline-offset: -2px; }
+  [data-d='X'] .d-cota-fill { background: CanvasText; }
+  [data-d='X'] .d-cota-tick { background: CanvasText; }
+}
+@media (pointer: coarse) {
+  [data-d='X'] .d-btn { min-height: var(--d-touch); }
+  [data-d='X'] .d-input, [data-d='X'] .d-select { min-height: var(--d-touch); }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-d='X'] .d-btn:active { transform: none; }
 }
