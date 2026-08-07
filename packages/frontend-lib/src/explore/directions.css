@@ -54,7 +54,7 @@
   --d-accent: #14181a; --d-accent-ink: #ffffff; --d-accent-soft: #eaeced; --d-accent-edge: #cfd2d4;
   --d-pos: #2e6b3e; --d-pos-band: #e4efe2; --d-pos-edge: #c3d8c4;
   --d-att: #8a5a00; --d-att-band: #fbeeda; --d-att-edge: #e8d4a6;
-  --d-crit: #b3261e; --d-crit-band: #fbe0dc; --d-crit-edge: #efc2bc;
+  --d-crit: #b3261e; --d-crit-band: #FCE9E6; --d-crit-edge: #efc2bc;
   --d-info: #4a4e7a; --d-info-band: #e7e7f2; --d-info-edge: #c9cadd;
   --d-neu: #656A6E; --d-neu-band: #eaeced; --d-neu-edge: #cfd2d4;
 }
@@ -103,7 +103,7 @@
   --d-accent-soft: #e2eeeb; --d-accent-edge: #a8ccc6;
   --d-pos: #24663a; --d-pos-band: #e3f0e5; --d-pos-edge: #bcd9c1;
   --d-att: #8a5300; --d-att-band: #fbedd7; --d-att-edge: #e7cf9f;
-  --d-crit: #ac2118; --d-crit-band: #fbdfda; --d-crit-edge: #edbdb6;
+  --d-crit: #ac2118; --d-crit-band: #FDECE9; --d-crit-edge: #edbdb6;
   --d-info: #0e5a54; --d-info-band: #e2eeeb; --d-info-edge: #a8ccc6;
   --d-neu: #616E6B; --d-neu-band: #eaf0ee; --d-neu-edge: #c6d3cf;
 }
@@ -532,10 +532,10 @@
   --d-row-h: 46px;
   --d-accent: #1E4FA8; --d-accent-ink: #ffffff;
   --d-accent-soft: rgba(30, 79, 168, .12); --d-accent-edge: rgba(30, 79, 168, .30);
-  --d-pos: #1C5B39; --d-pos-band: rgba(46, 140, 88, .18); --d-pos-edge: rgba(46, 140, 88, .38);
-  --d-att: #7A4A00; --d-att-band: rgba(190, 130, 20, .20); --d-att-edge: rgba(190, 130, 20, .42);
-  --d-crit: #9B1F17; --d-crit-band: rgba(198, 60, 48, .18); --d-crit-edge: rgba(198, 60, 48, .40);
-  --d-info: #2A3A78; --d-info-band: rgba(64, 84, 180, .16); --d-info-edge: rgba(64, 84, 180, .36);
+  --d-pos: #1C5B39; --d-pos-band: #D8E9DF; --d-pos-edge: rgba(46, 140, 88, .38);
+  --d-att: #7A4A00; --d-att-band: #F0E4CE; --d-att-edge: rgba(190, 130, 20, .42);
+  --d-crit: #9B1F17; --d-crit-band: #F3DAD8; --d-crit-edge: rgba(198, 60, 48, .40);
+  --d-info: #2A3A78; --d-info-band: #DFE2F1; --d-info-edge: rgba(64, 84, 180, .36);
   --d-neu: #3F4B58; --d-neu-band: rgba(255, 255, 255, .38); --d-neu-edge: rgba(14, 23, 32, .16);
 }
 [data-d='I'] .d-panel {
@@ -1233,3 +1233,92 @@
 }
 [data-d='S'] .d-input:focus-visible { border-color: var(--d-ink); background: var(--d-surface); }
 [data-d='S'] .d-pill { border: 0; }
+
+/* ── T · HALO CLARO ──────────────────────────────────────────────────────
+   Halo, del otro lado de la luz.
+
+   El riesgo al hacerla era clonar a Umbra: las dos son superficie clara con
+   sombra de color. Se separan en la regla que conservan. Umbra viene de
+   Elevación: su tarjeta es una tarjeta, neutra, y la sombra teñida es un dato
+   añadido. Halo claro conserva la regla de Halo entera — nada tiene borde ni
+   relleno sólido; un elemento existe porque IRRADIA. El anillo de 1px en el
+   propio tono es lo que no tiene Umbra, y el acento es un color que brilla por
+   sí mismo en vez de ser tinta.
+
+   La skill de taste desaconseja los resplandores como default. Acá no son un
+   default: son la tesis declarada de la dirección, y su propia regla dice que
+   el brief manda sobre la advertencia. */
+[data-d='T'] {
+  --d-ground:
+    radial-gradient(60% 44% at 14% 2%, #E6F4F1 0%, transparent 64%),
+    radial-gradient(52% 46% at 90% 14%, #EDEEFA 0%, transparent 66%),
+    #FBFCFC;
+  --d-surface: #FFFFFF;
+  --d-sunk: #F4F8F8;
+  --d-ink: #10201E; --d-ink-2: #354746; --d-ink-3: #5A6A69; --d-ink-on: #FFFFFF;
+  --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
+  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
+  /* Sin borde: el anillo y el resplandor SON el contorno. */
+  --d-shadow: 0 0 0 1px rgba(16, 32, 30, .07), 0 8px 28px -10px rgba(20, 90, 84, .22);
+  --d-shadow-lg: 0 0 0 1px rgba(16, 32, 30, .10), 0 22px 56px -18px rgba(20, 90, 84, .34);
+  --d-p1: 9px; --d-p2: 13px; --d-p3: 18px; --d-p4: 24px; --d-gap: 20px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 20px; --d-t-xl: 27px; --d-t-2xl: 37px;
+  --d-w: 400; --d-w-med: 510; --d-w-semi: 600; --d-w-bold: 680;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .09em;
+  --d-label-weight: 580; --d-label-color: var(--d-ink-3);
+  --d-row-h: 48px;
+  --d-accent: #0F7A66; --d-accent-ink: #FFFFFF;
+  --d-accent-soft: rgba(15, 122, 102, .10); --d-accent-edge: rgba(15, 122, 102, .30);
+  --d-pos: #1C6B45; --d-pos-band: rgba(28, 107, 69, .10); --d-pos-edge: rgba(28, 107, 69, .30);
+  --d-att: #8A5300; --d-att-band: rgba(190, 130, 20, .12); --d-att-edge: rgba(190, 130, 20, .34);
+  --d-crit: #A62A1E; --d-crit-band: rgba(198, 60, 48, .10); --d-crit-edge: rgba(198, 60, 48, .30);
+  --d-info: #2F4390; --d-info-band: rgba(60, 84, 180, .10); --d-info-edge: rgba(60, 84, 180, .30);
+  --d-neu: #566665; --d-neu-band: rgba(86, 102, 101, .09); --d-neu-edge: rgba(86, 102, 101, .26);
+  --d-focus: #0F7A66;
+}
+[data-d='T'] .d-panel { border: 0; }
+/* Con tono, el anillo y el halo toman su color. Es la misma regla que en K
+   —el estado es el color de lo que irradia— solo que acá irradia sobre papel. */
+[data-d='T'] .d-panel[data-tone],
+[data-d='T'] .d-row[data-tone] {
+  box-shadow: 0 0 0 1px var(--tone-edge), 0 10px 34px -12px var(--tone-fg);
+}
+[data-d='T'] .d-row[data-tone] { border-radius: var(--d-r); margin-bottom: var(--d-p1); }
+[data-d='T'] .d-panel-head { border-bottom: 1px solid rgba(16, 32, 30, .06); }
+[data-d='T'] .d-panel-foot { border-top: 1px solid rgba(16, 32, 30, .06); background: transparent; }
+[data-d='T'] .d-row { border-bottom: 1px solid rgba(16, 32, 30, .06); }
+[data-d='T'] .d-btn {
+  border: 0;
+  box-shadow: 0 0 0 1px rgba(16, 32, 30, .09), 0 3px 12px -5px rgba(20, 90, 84, .28);
+}
+[data-d='T'] .d-btn:hover {
+  box-shadow: 0 0 0 1px var(--d-accent-edge), 0 6px 20px -6px rgba(15, 122, 102, .40);
+}
+[data-d='T'] .d-btn--primary {
+  box-shadow: 0 0 0 1px var(--d-accent), 0 8px 26px -8px rgba(15, 122, 102, .55);
+}
+[data-d='T'] .d-btn--ghost { box-shadow: none; }
+[data-d='T'] .d-input, [data-d='T'] .d-select, [data-d='T'] .d-textarea {
+  background: var(--d-surface);
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(16, 32, 30, .11);
+  min-height: 44px;
+}
+[data-d='T'] .d-input:focus-visible, [data-d='T'] .d-select:focus-visible {
+  outline: 0;
+  box-shadow: inset 0 0 0 1px var(--d-accent), 0 0 0 3px rgba(15, 122, 102, .16);
+}
+[data-d='T'] .d-pill { border: 0; box-shadow: 0 0 0 1px var(--tone-edge); }
+
+/* ── EL HUECO DEL CONTRATO, ESCRITO ────────────────────────────────────────
+   El contrato garantizaba ink e ink-2 contra las SUPERFICIES. No decía nada de
+   ink-3 contra las BANDAS de tono, y ahí es donde vive la mitad del texto
+   secundario de una tabla: la nota bajo una fila vencida. En A daba 4.37 y en C
+   4.22 — las dos direcciones con más chance de ganar.
+
+   Se corrigió aclarando las dos bandas, no oscureciendo ink-3: la banda tiene
+   margen y la tinta no. La píldora, que también vive ahí, mejoró de paso.
+
+   La regla que faltaba, para cuando esto se reconstruya: **una banda de tono es
+   una superficie**, y todo lo que se pinte encima debe medirse contra ella. */

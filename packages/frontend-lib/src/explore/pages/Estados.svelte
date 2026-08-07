@@ -1,11 +1,17 @@
 <script>
-  // ESTADOS Y DIÁLOGOS — todo lo que interrumpe.
+  // ESTADOS Y DIÁLOGOS: todo lo que interrumpe.
   //
-  // Una sola anatomía para todo lo que interrumpe: .blk = marca + palabra
+  // Una sola anatomía para lo que interrumpe: .blk = marca + palabra de estado
   // (.blk-kind), titular, cuerpo y acciones. Esa anatomía se re-arma en cada
-  // dirección: legenda sobre el marco en B, cabecera llena de color en C,
-  // sello negro en D, bloque de log en F, raíl de 148px en G, pestaña en H.
-  // Así el mismo aviso tiene ocho siluetas y no ocho paletas.
+  // dirección: píldora de estado en A, legenda sobre el marco en B, cabecera
+  // llena de color en C, faceta de vidrio en O, mancha derramada en M, anillo
+  // de luz en T. El mismo aviso tiene veinte siluetas y no veinte paletas.
+  //
+  // La palabra de estado NO es un epígrafe. Es la misma píldora que enseña la
+  // sección 1, con la misma marca y el mismo tono, aplicada a lo que
+  // interrumpe. Por eso en las finalistas se lee en caja normal y no en
+  // versalitas: la versalita solo sobrevive donde es el idioma declarado de la
+  // dirección, que es B.
   import Grid from '../Grid.svelte';
   import Direction from '../Direction.svelte';
   import { COPY, ASSETS, markOf } from '../demo.js';
@@ -67,12 +73,9 @@
 
         <!-- 2 · Aviso informativo y aviso de error. -->
         <section class="sec" aria-labelledby={'s2-' + d.id}>
-          <h4 class="sec-cap d-cap" id={'s2-' + d.id}>Avisos</h4>
+          <h4 class="sec-cap d-cap" id={'s2-' + d.id}>Avisos y errores</h4>
           <div class="sec-body">
             <div class="blk d-rail" data-tone="info">
-              <p class="blk-kind d-cap">
-                <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('info')}</svg>Aviso
-              </p>
               <h5 class="blk-title">Estado de la flota de hoy</h5>
               <p class="blk-body">{COPY.verdict}</p>
             </div>
@@ -93,7 +96,7 @@
 
         <!-- 3 · Toast de confirmación con deshacer. Vive en la celda, sin fixed. -->
         <section class="sec" aria-labelledby={'s3-' + d.id}>
-          <h4 class="sec-cap d-cap" id={'s3-' + d.id}>Confirmación</h4>
+          <h4 class="sec-cap d-cap" id={'s3-' + d.id}>Hecho, y cómo deshacerlo</h4>
           <div class="sec-body">
             {#if (toast[d.id] ?? 'on') === 'off'}
               <p class="reopen">
@@ -103,9 +106,6 @@
               </p>
             {:else if (toast[d.id] ?? 'on') === 'undone'}
               <div class="blk blk--toast d-rail" data-tone="neutral" role="status">
-                <p class="blk-kind d-cap">
-                  <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('neutral')}</svg>Deshecho
-                </p>
                 <p class="blk-title">Se descartó la lectura de 312 h en BAT-014</p>
                 <div class="blk-acts">
                   <button type="button" class="d-btn d-btn--sm" on:click={() => setToast(d.id, 'on')}>Rehacer</button>
@@ -131,7 +131,7 @@
 
         <!-- 4 · Confirmación destructiva EN LÍNEA: velo simulado dentro de la celda. -->
         <section class="sec" aria-labelledby={'s4-' + d.id}>
-          <h4 class="sec-cap d-cap" id={'s4-' + d.id}>Confirmar y eliminar</h4>
+          <h4 class="sec-cap d-cap" id={'s4-' + d.id}>Confirmar antes de eliminar</h4>
           <div class="sec-body">
             <div class="scene">
               <div class="scene-list" aria-hidden={(dlg[d.id] ?? 'open') === 'open' ? 'true' : null}>
@@ -151,7 +151,7 @@
                 <div class="blk dlg d-rail" data-tone="critical" role="alertdialog" aria-modal="false"
                      aria-labelledby={'dt-' + d.id} aria-describedby={'db-' + d.id}>
                   <p class="blk-kind d-cap">
-                    <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('critical')}</svg>Eliminar
+                    <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('critical')}</svg>Confirmar
                   </p>
                   <h5 class="blk-title" id={'dt-' + d.id}>{COPY.confirmTitle}</h5>
                   <p class="blk-body" id={'db-' + d.id}>{COPY.confirmBody}</p>
@@ -211,9 +211,6 @@
           <h4 class="sec-cap d-cap" id={'s6-' + d.id}>Vacío y sin conexión</h4>
           <div class="sec-body">
             <div class="blk d-rail" data-tone="neutral">
-              <p class="blk-kind d-cap">
-                <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('neutral')}</svg>Sin equipos
-              </p>
               <h5 class="blk-title">{COPY.emptyTitle}</h5>
               <p class="blk-body">{COPY.emptyBody}</p>
               <div class="blk-acts">
@@ -223,9 +220,6 @@
             </div>
 
             <div class="blk d-rail" data-tone="attention">
-              <p class="blk-kind d-cap">
-                <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('attention')}</svg>Sin conexión
-              </p>
               <h5 class="blk-title">No hay conexión con el servidor</h5>
               <p class="blk-body">
                 Los cambios que registres se guardan en este equipo y se envían solos cuando vuelva la señal.
@@ -253,11 +247,25 @@
 
 <style>
   /* ======================================================================
-     BASE — todo sale de los tokens --d-*. Ni un color, radio o sombra a mano.
+     BASE. Todo sale de los tokens --d-*. Ni un color, radio o sombra a mano.
+
+     Las cinco propiedades de abajo llevan valor por defecto entre paréntesis:
+     una dirección que no las rebindea queda exactamente como estaba. Es la
+     manera de mover las siete finalistas sin tocar a las trece que se quedan.
      ====================================================================== */
   .page { position: relative; display: flex; flex-direction: column; gap: var(--d-gap); min-width: 0; }
   .sec { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); row-gap: var(--d-p1); min-width: 0; }
-  .sec-cap { margin: 0; }
+  /* El encabezado de sección. Donde la versalita no es el idioma declarado de
+     la dirección, se lee en caja normal: seis versalitas seguidas dan el mismo
+     ritmo tibio en las seis secciones y ninguna gana la mirada. */
+  .sec-cap {
+    margin: 0;
+    font-size: var(--cap-size, var(--d-label-size));
+    font-weight: var(--cap-weight, var(--d-label-weight));
+    letter-spacing: var(--cap-track, var(--d-label-track));
+    text-transform: var(--cap-case, var(--d-label-case));
+    color: var(--cap-color, var(--d-label-color));
+  }
   .sec-body { display: flex; flex-direction: column; gap: var(--d-p2); min-width: 0; }
 
   .pillrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--d-p1); min-width: 0; }
@@ -277,14 +285,20 @@
     border-radius: var(--d-r);
     box-shadow: var(--d-shadow);
   }
+  /* La palabra de estado. No es un epígrafe: es la misma píldora de la sección
+     1 puesta sobre lo que interrumpe, y por eso lleva marca y tono. */
   .blk-kind {
     margin: 0; min-width: 0;
     display: inline-flex; align-items: center; gap: .4em;
     color: var(--tone-fg);
+    font-size: var(--kind-size, var(--d-label-size));
+    font-weight: var(--kind-weight, var(--d-label-weight));
+    letter-spacing: var(--kind-track, var(--d-label-track));
+    text-transform: var(--kind-case, var(--d-label-case));
   }
   .blk-kind svg { width: 1em; height: 1em; flex: none; }
-  .blk-title { margin: 0; font-size: var(--d-t-sm); font-weight: var(--d-w-semi); line-height: 1.32; letter-spacing: -.01em; }
-  .blk-body { margin: 0; font-size: var(--d-t-xs); line-height: 1.45; color: var(--d-ink-2); }
+  .blk-title { margin: 0; font-size: var(--blk-title-size, var(--d-t-sm)); font-weight: var(--d-w-semi); line-height: 1.32; letter-spacing: -.01em; }
+  .blk-body { margin: 0; font-size: var(--blk-body-size, var(--d-t-xs)); line-height: 1.45; color: var(--d-ink-2); }
   .blk-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--d-p1); min-width: 0; }
 
   /* El diálogo: misma anatomía, fondo de superficie en vez de banda de tono. */
@@ -310,13 +324,16 @@
   .skel { display: grid; min-width: 0; }
   .skel-row { display: flex; align-items: center; gap: var(--d-p2); min-height: var(--d-row-h); min-width: 0; }
   .skel-b { display: block; min-width: 0; height: .8em; border-radius: var(--d-r); background: var(--d-sunk); animation: pulse 1.5s ease-in-out infinite; }
-  .skel-b--id { width: 20%; }
+  /* El ancho de cada bloque sale de la medida del contenido real, no de un
+     porcentaje: un código de siete caracteres y una píldora de estado. */
+  .skel-b--id { width: var(--skel-id, 20%); }
   .skel-b--name { flex: 1 1 auto; }
-  .skel-b--pill { width: 18%; }
+  .skel-b--pill { width: var(--skel-pill, 18%); }
   .skel-row:nth-child(2) .skel-b { animation-delay: .18s; }
   .skel-row:nth-child(3) .skel-b { animation-delay: .36s; }
   @keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: .42 } }
-  .load-cap { margin: 0; }
+  /* Qué se está cargando se lee antes que su forma. */
+  .load-cap { margin: 0; order: var(--load-order, 0); }
 
   .proc { display: grid; row-gap: var(--d-p1); min-width: 0; }
   .proc-lbl { margin: 0; font-size: var(--d-t-sm); font-weight: var(--d-w-med); }
@@ -332,31 +349,86 @@
   .proc-meta { margin: 0; }
 
   /* ======================================================================
-     A · ELEVACIÓN — tarjetas redondeadas que flotan, separadas por aire.
+     LO QUE COMPARTEN LAS SIETE FINALISTAS.
+
+     Tres correcciones que no dependen de la silueta y que valen igual en las
+     siete. Van acá y no repetidas siete veces porque son de contenido, no de
+     forma: dicen QUÉ se lee primero y CON QUÉ medida, no cómo se ve.
+     ====================================================================== */
+  :global([data-d='A']) .page, :global([data-d='B']) .page, :global([data-d='C']) .page,
+  :global([data-d='I']) .page, :global([data-d='M']) .page, :global([data-d='O']) .page,
+  :global([data-d='T']) .page {
+    --load-order: -1;
+    --skel-id: 4.6em;
+    --skel-pill: 7em;
+    /* El titular de un aviso tiene que ganarle al cuerpo de lejos, y el cuerpo
+       tiene que leerse con el teléfono en la mano: 12,5px no alcanzaba. */
+    --blk-title-size: var(--d-t-md);
+    --blk-body-size: var(--d-t-sm);
+  }
+
+  /* EL RECORTE DE VERSALITAS. Seis de las siete dejan de escribirlas: los seis
+     encabezados de sección pasan a caja normal, y las siete palabras de estado
+     pasan a leerse como la píldora que ya son. B se las queda enteras, porque
+     su forma declarada dice literalmente que las etiquetas van fuera del marco
+     y en versalitas: ahí la versalita no es adorno, es el idioma del plano. */
+  :global([data-d='A']) .page, :global([data-d='C']) .page, :global([data-d='I']) .page,
+  :global([data-d='M']) .page, :global([data-d='O']) .page, :global([data-d='T']) .page {
+    --cap-case: none; --cap-track: 0;
+    --cap-size: var(--d-t-sm); --cap-weight: var(--d-w-semi); --cap-color: var(--d-ink);
+    --kind-case: none; --kind-track: 0;
+    --kind-size: var(--d-t-xs); --kind-weight: var(--d-w-semi);
+  }
+
+  /* ======================================================================
+     A · ELEVACIÓN. Tarjetas redondeadas que flotan, separadas por aire.
+
+     Lo que cambió: la elevación pasa a decir algo. Antes los seis bloques
+     usaban la sombra larga y flotaban todos igual, así que la altura no
+     informaba nada. Ahora lo que se queda en pantalla se apoya con la sombra
+     corta y solo lo pasajero o lo que bloquea, el toast y el diálogo, flota
+     con la larga. También se fue el canto apilado falso del toast: sugería
+     una pila de avisos que no existe, y un recurso de forma que no codifica
+     nada del contenido es decoración.
      ====================================================================== */
   :global([data-d='A']) .blk {
     --blk-bg: var(--d-surface);
     border-color: var(--d-line); border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow-lg); padding: var(--d-p3);
+    box-shadow: var(--d-shadow); padding: var(--d-p3);
   }
+  /* La palabra de estado ES la píldora de la sección 1: banda de tono, canto
+     de tono, marca y palabra. El anillo la despega del papel blanco. */
   :global([data-d='A']) .blk-kind {
     justify-self: start; padding: 3px var(--d-p2) 3px var(--d-p1);
-    background: var(--tone-band); border-radius: var(--d-r-pill);
+    background: var(--tone-band); border: 1px solid var(--tone-edge);
+    border-radius: var(--d-r-pill);
   }
-  :global([data-d='A']) .blk--toast::after {
-    content: ''; position: absolute; z-index: -1;
-    inset: auto var(--d-p3) calc(-1 * var(--d-p1));
-    height: var(--d-p2);
-    background: var(--d-surface); border: 1px solid var(--d-line);
-    border-radius: 0 0 var(--d-r-lg) var(--d-r-lg); box-shadow: var(--d-shadow);
-  }
+  :global([data-d='A']) .blk--toast { box-shadow: var(--d-shadow-lg); }
   :global([data-d='A']) .scene { border-radius: var(--d-r-lg); box-shadow: var(--d-shadow); }
   :global([data-d='A']) .dlg { border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg); }
-  :global([data-d='A']) .proc-track { border-radius: var(--d-r-pill); }
+  /* Lo que carga y lo que procesa también son tarjetas con filas: el esqueleto
+     tiene la forma del contenido final, incluido el contenedor que lo sostiene.
+     Antes flotaban sueltos sobre el fondo, que es la única parte de la celda
+     donde A no era A. */
+  :global([data-d='A']) .load, :global([data-d='A']) .proc {
+    background: var(--d-surface);
+    border: 1px solid var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow); padding: var(--d-p2) var(--d-p3) var(--d-p3);
+  }
+  :global([data-d='A']) .skel-row + .skel-row { border-top: 1px solid var(--d-line); }
 
   /* ======================================================================
-     B · INSTRUMENTO — un solo marco continuo; los avisos comparten borde y
-     la palabra de estado cabalga sobre la línea, como la leyenda de un plano.
+     B · INSTRUMENTO. Un solo marco continuo; los avisos comparten borde y la
+     palabra de estado cabalga sobre la línea, como la leyenda de un plano.
+
+     Lo que cambió, y es lo que más pedía esta dirección: densidad de cabina.
+     La celda tenía aire de tarjeta con ropa de plano. Ahora el bloque respira
+     lo que respira un instrumento, la fila del esqueleto va a la altura de
+     fila real de la dirección (30px), y las cifras se escriben en
+     monoespaciada, porque un plano no anota un número con la misma letra con
+     la que escribe una palabra. La barra de proceso deja de ser una barra
+     rellena y pasa a ser una escala graduada cada 10 %: la parte llena tapa
+     las marcas que ya pasó, que es lo que hace una aguja sobre una regla.
      ====================================================================== */
   :global([data-d='B']) .page { border: 1px solid var(--d-edge); }
   :global([data-d='B']) .page::before,
@@ -367,15 +439,15 @@
   :global([data-d='B']) .page::before { top: 3px; left: 3px; border-right: 0; border-bottom: 0; }
   :global([data-d='B']) .page::after { bottom: 3px; right: 3px; border-left: 0; border-top: 0; }
   :global([data-d='B']) .sec {
-    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+    padding: var(--d-p2) var(--d-p3) var(--d-p2);
     border-bottom: 1px solid var(--d-line);
-    row-gap: var(--d-p3);
+    row-gap: var(--d-p2);
   }
   :global([data-d='B']) .sec:last-child { border-bottom: 0; }
   :global([data-d='B']) .sec-body { gap: 0; }
   :global([data-d='B']) .blk {
     --blk-bg: var(--d-surface);
-    border-color: var(--d-edge); padding: var(--d-p4) var(--d-p3) var(--d-p3);
+    border-color: var(--d-edge); padding: var(--d-p3) var(--d-p2) var(--d-p2);
   }
   :global([data-d='B']) .blk + .blk { margin-top: -1px; }
   :global([data-d='B']) .blk-kind {
@@ -388,9 +460,28 @@
   }
   :global([data-d='B']) .pillrow { gap: 0; }
   :global([data-d='B']) .pillrow > .d-pill + .d-pill { margin-left: -1px; }
+  /* Las cifras, en monoespaciada. Las píldoras de esta página llevan la
+     lectura pegada a la palabra («Vencido · hace 12 d»), así que la píldora
+     entera va en mono: partirla en dos letras dentro de la misma pastilla se
+     ve peor que anotarla como la anota un plano. */
+  :global([data-d='B']) .d-pill,
+  :global([data-d='B']) .load-cap,
+  :global([data-d='B']) .proc-meta { font-family: var(--d-mono); }
   :global([data-d='B']) .skel-b { background: transparent; border: 1px solid var(--d-line); }
+  /* La fila que carga tiene la altura de fila de la dirección y su misma
+     línea de base: es el hueco exacto que va a ocupar el equipo que falta. */
+  :global([data-d='B']) .skel-row {
+    min-height: var(--d-row-h); border-bottom: 1px solid var(--d-line);
+  }
   :global([data-d='B']) .proc-track { background: transparent; border: 1px solid var(--d-edge); }
-  :global([data-d='B']) .proc-fill { background: var(--d-ink); }
+  /* La escala graduada: una marca cada 10 %. */
+  :global([data-d='B']) .proc-track::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(90deg, var(--d-edge) 0 1px, transparent 1px 10%);
+  }
+  /* Una espera indeterminada no tiene escala: no se sabe dónde está. */
+  :global([data-d='B']) .proc-track--wait::after { content: none; }
+  :global([data-d='B']) .proc-fill { background: var(--d-ink); position: relative; z-index: 1; }
   :global([data-d='B']) .veil {
     background:
       repeating-linear-gradient(45deg, transparent 0 4px, color-mix(in srgb, var(--d-ink) 16%, transparent) 4px 5px),
@@ -399,12 +490,24 @@
   :global([data-d='B']) .dlg { outline: 1px solid var(--d-edge); outline-offset: 3px; }
 
   /* ======================================================================
-     C · MARCA — el bloque se anuncia por su cabecera llena de color, no por
-     su borde: la palabra de estado ES la barra que corona el aviso.
+     C · MARCA. El bloque se anuncia por su cabecera llena de color, no por su
+     borde: la palabra de estado ES la barra que corona el aviso.
+
+     Dos cosas cambiaron. La primera es el radio: el aviso usaba el chico (4px)
+     mientras los paneles de la dirección usan el grande (10px), así que una
+     cabecera de color quedaba con esquinas distintas a las del panel de al
+     lado. Ahora los contenedores usan --d-r-lg y los controles --d-r, que es
+     la escala de dos pasos que la dirección declara y nada más.
+
+     La segunda es que lo que carga y lo que procesa eran los dos únicos
+     bloques de la celda sin identidad de dirección: papel suelto sobre el
+     fondo. Ahora también se anuncian por cabecera, y de paso el rótulo dice
+     qué se está cargando ANTES de mostrar su forma.
      ====================================================================== */
   :global([data-d='C']) .blk {
     --blk-bg: var(--d-surface);
-    border-color: var(--d-line); padding: 0; row-gap: var(--d-p1); overflow: hidden;
+    border-color: var(--d-line); border-radius: var(--d-r-lg);
+    padding: 0; row-gap: var(--d-p1); overflow: hidden;
   }
   :global([data-d='C']) .blk-kind {
     background: var(--tone-fg); color: var(--d-ink-on);
@@ -417,10 +520,29 @@
   :global([data-d='C']) .blk-acts,
   :global([data-d='C']) .dlg-check { margin-inline: var(--d-p3); }
   :global([data-d='C']) .blk > :last-child { margin-bottom: var(--d-p3); }
+  :global([data-d='C']) .scene { border-radius: var(--d-r-lg); }
   :global([data-d='C']) .veil { background: color-mix(in srgb, var(--d-brand-deep) 46%, transparent); }
-  :global([data-d='C']) .dlg { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='C']) .dlg { border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg); }
   :global([data-d='C']) .proc-fill { background: var(--d-brand); }
-  :global([data-d='C']) .skel-row:first-child .skel-b--id { background: var(--d-accent-soft); }
+  /* Lo que carga y lo que procesa, con la misma cabecera que todo lo demás. */
+  :global([data-d='C']) .load, :global([data-d='C']) .proc {
+    background: var(--d-surface); border: 1px solid var(--d-line);
+    border-radius: var(--d-r-lg); box-shadow: var(--d-shadow);
+    overflow: hidden; row-gap: 0; padding-bottom: var(--d-p2);
+  }
+  :global([data-d='C']) .load-cap, :global([data-d='C']) .proc-lbl {
+    background: var(--d-brand); color: var(--d-brand-ink);
+    padding: var(--d-p1) var(--d-p3);
+    font-size: var(--d-t-xs); font-weight: var(--d-w-semi);
+  }
+  :global([data-d='C']) .skel { padding-inline: var(--d-p3); }
+  :global([data-d='C']) .skel-row + .skel-row { border-top: 1px solid var(--d-line); }
+  :global([data-d='C']) .proc .proc-track { margin: var(--d-p3) var(--d-p3) var(--d-p1); }
+  :global([data-d='C']) .proc-meta { margin-inline: var(--d-p3); }
+  /* La barra de espera vive DENTRO del aviso de sin conexión, no en la tarjeta
+     de proceso: en C el cuerpo del aviso va sangrado y ella se quedaba pegada
+     al canto, desalineada con el texto que la explica. */
+  :global([data-d='C']) .blk .proc-track { margin-inline: var(--d-p3); }
 
   /* ======================================================================
      D · PESO — borde de 2px, sombra sólida y la palabra de estado como un
@@ -602,14 +724,20 @@
   :global([data-d='H']) .proc-track { background: var(--d-sunk); border: 1px solid var(--d-edge); }
 
   /* ======================================================================
-     I · CRISTAL — el aviso es una lámina de vidrio sobre el campo teñido y
-     el velo del diálogo es vidrio DE VERDAD: desenfoca la flota que queda
-     debajo en vez de pintarle un gris encima.
+     I · CRISTAL. El aviso es una lámina de vidrio sobre el campo teñido y el
+     velo del diálogo es vidrio DE VERDAD: desenfoca la flota que queda debajo
+     en vez de pintarle un gris encima.
 
      La regla que ordena la celda: vidrio sobre vidrio se enturbia. Solo dos
-     capas desenfocan acá —la lámina y el velo—. Lo que va ENCIMA del velo
-     (el diálogo, el chip de tipo) se anida con TRANSPARENCIA, nunca con más
+     capas desenfocan acá, la lámina y el velo. Lo que va ENCIMA del velo (el
+     diálogo, el chip de estado) se anida con TRANSPARENCIA, nunca con más
      desenfoque.
+
+     Lo que cambió: lo que carga y lo que procesa eran los únicos bloques de
+     la celda apoyados directamente sobre el campo de manchas, o sea texto sin
+     lámina en la dirección cuya tesis es que todo es lámina. Y el radio: el
+     esqueleto y la barra usaban radio de píldora mientras la dirección corre
+     en 14 y 24, así que ahora hay una sola escala.
      ====================================================================== */
   :global([data-d='I']) .blk {
     --blk-bg: var(--d-surface);
@@ -619,7 +747,7 @@
     box-shadow: var(--d-shadow); padding: var(--d-p3);
   }
   /* El filo especular. Va en z-index -1: por encima del vidrio y por DEBAJO
-     del texto — pintado encima le come el contraste al titular. */
+     del texto, porque pintado encima le come el contraste al titular. */
   :global([data-d='I']) .blk::after {
     content: ''; position: absolute; inset: 0; z-index: -1;
     border-radius: inherit; pointer-events: none;
@@ -647,7 +775,7 @@
     -webkit-backdrop-filter: blur(14px) saturate(1.3);
   }
   /* Sobre el velo NO va otro desenfoque. El diálogo condensa el mismo vidrio
-     pintándolo dos veces —1−(1−a)²—, que es más opaco sin inventar un color
+     pintándolo dos veces, 1−(1−a)², que es más opaco sin inventar un color
      que no está en el bloque de tokens. */
   :global([data-d='I']) .dlg {
     --blk-bg: linear-gradient(var(--d-surface), var(--d-surface)),
@@ -655,26 +783,41 @@
     backdrop-filter: none; -webkit-backdrop-filter: none;
     border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg); padding: var(--d-p4);
   }
+  /* Lo que carga y lo que procesa también son láminas. Es la única capa que
+     falta para que en esta celda no haya un solo texto apoyado sobre el campo
+     de manchas sin vidrio debajo. */
+  :global([data-d='I']) .load, :global([data-d='I']) .proc {
+    background: var(--d-surface);
+    backdrop-filter: blur(18px) saturate(1.5);
+    -webkit-backdrop-filter: blur(18px) saturate(1.5);
+    border: 1px solid var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow); padding: var(--d-p2) var(--d-p3) var(--d-p3);
+  }
   :global([data-d='I']) .skel-b {
     background: color-mix(in srgb, var(--d-line) 58%, transparent);
-    border-radius: var(--d-r-pill);
   }
   :global([data-d='I']) .proc-track {
-    background: var(--d-sunk); border-radius: var(--d-r-pill);
+    background: var(--d-sunk);
     box-shadow: inset 0 1px 3px color-mix(in srgb, var(--d-ink) 14%, transparent);
   }
   :global([data-d='I']) .proc-fill {
-    border-radius: var(--d-r-pill);
     box-shadow: 0 0 var(--d-p2) calc(-1 * var(--d-p1)) var(--d-accent);
   }
   /* HALLAZGO de contraste, el mismo que ya está escrito en Acciones, Tablas y
      Formularios: en directions.css `[data-d='I'] .d-btn` pesa (0,2,0) y
      `.d-btn--primary` pesa (0,1,0), así que el vidrio blanco le gana el fondo
-     al primario y queda tinta blanca sobre blanco — 1.02:1, invisible. El
+     al primario y queda tinta blanca sobre blanco, 1.02:1, invisible. El
      arreglo de raíz va en directions.css; mientras tanto esta página lo repone. */
   :global([data-d='I']) .d-btn--primary {
     background: var(--d-accent);
     color: var(--d-accent-ink);
+  }
+  /* Y el destructivo se lo comía la misma regla: quedaba un botón de vidrio
+     blanco indistinguible de «Cancelar» justo al lado. Vuelve su banda. */
+  :global([data-d='I']) .d-btn--danger {
+    background: var(--d-crit-band);
+    color: var(--d-crit);
+    border-color: var(--d-crit-edge);
   }
 
   /* ======================================================================
@@ -861,10 +1004,25 @@
   :global([data-d='L']) .proc-fill { border-radius: var(--d-r-pill); }
 
   /* ======================================================================
-     M · BRUMA — sin contenedores. Ningún aviso tiene relleno ni borde: lo
-     que agrupa es una mancha de color desenfocada que se derrama por detrás
-     y se desvanece sin filo. Los titulares van en serif.
+     M · BRUMA. Sin contenedores. Ningún aviso tiene relleno ni borde: lo que
+     agrupa es una mancha de color desenfocada que se derrama por detrás y se
+     desvanece sin filo. Los titulares van en serif.
+
+     Lo que cambió, y era el agujero de esta celda: la mancha usaba --tone-band,
+     que es el token pensado para una píldora chica y sin desenfoque. A 26px de
+     blur no se veía nada, así que la única señal de agrupación que tiene la
+     dirección estaba apagada y los seis avisos se leían como un solo texto
+     corrido. directions.css ya trae los tokens correctos, --*-wash, con más
+     saturación justamente porque van desenfocados. Ahora la página los usa.
+
+     El encabezado de sección también pasa a serif: un titular es un titular, y
+     esta es la única dirección con dos familias, así que la versalita sobraba
+     dos veces.
      ====================================================================== */
+  :global([data-d='M']) .page {
+    --cap-size: var(--d-t-md); --cap-weight: var(--d-w); --cap-color: var(--d-ink-3);
+  }
+  :global([data-d='M']) .sec-cap { font-family: var(--d-display); }
   :global([data-d='M']) .blk {
     --blk-bg: none;
     isolation: isolate;
@@ -876,8 +1034,8 @@
     content: ''; position: absolute; z-index: -1; pointer-events: none;
     inset: calc(-1 * var(--d-p3)) calc(-1 * var(--d-p4));
     background:
-      radial-gradient(62% 70% at 18% 14%, var(--tone-band) 0%, transparent 70%),
-      radial-gradient(52% 58% at 88% 86%, var(--tone-band) 0%, transparent 68%);
+      radial-gradient(62% 70% at 18% 14%, var(--tone-wash, var(--tone-band)) 0%, transparent 70%),
+      radial-gradient(52% 58% at 88% 86%, var(--tone-wash, var(--tone-band)) 0%, transparent 68%);
     filter: blur(26px);
   }
   :global([data-d='M']) .blk-title,
@@ -905,22 +1063,28 @@
     border: 0; box-shadow: none; padding: var(--d-p4); margin: var(--d-p3);
   }
   :global([data-d='M']) .dlg::before { inset: calc(-1 * var(--d-p4)); filter: blur(30px); }
+  /* Lo que carga se derrama igual que todo lo demás: bordes difusos, no
+     rectángulos grises. La forma de la fila se conserva; lo que falta es el
+     filo, que es exactamente lo que falta cuando el dato todavía no llegó. */
   :global([data-d='M']) .skel-b {
-    height: .9em; background: var(--d-neu-band);
-    border-radius: var(--d-r-pill); filter: blur(3px);
+    height: .9em; background: var(--d-neu-band); filter: blur(3px);
   }
-  :global([data-d='M']) .proc-track {
-    height: var(--d-p1); background: var(--d-sunk); border-radius: var(--d-r-pill);
-  }
+  :global([data-d='M']) .proc-track { height: var(--d-p1); background: var(--d-sunk); }
   :global([data-d='M']) .proc-fill {
-    border-radius: var(--d-r-pill);
     background: linear-gradient(90deg, transparent, var(--d-accent));
   }
   /* Misma trampa que en I: `[data-d='M'] .d-btn { background: var(--d-sunk) }`
-     tapa a `.d-btn--primary`, y el primario queda papel sobre papel — 1.08:1. */
+     tapa a `.d-btn--primary`, y el primario queda papel sobre papel, 1.08:1. */
   :global([data-d='M']) .d-btn--primary {
     background: var(--d-accent);
     color: var(--d-accent-ink);
+  }
+  /* Y al destructivo le pasaba lo mismo: quedaba igual que «Cancelar» salvo
+     por la tinta. Vuelve su banda, que acá además es la única mancha con filo
+     de toda la dirección y por eso pesa. */
+  :global([data-d='M']) .d-btn--danger {
+    background: var(--d-crit-band);
+    color: var(--d-crit);
   }
 
   /* ======================================================================
@@ -990,12 +1154,20 @@
   }
 
   /* ======================================================================
-     O · PRISMA — vidrio con la marca teñida ADENTRO. La palabra de estado no
-     es una barra opaca que parte la tarjeta (eso es Marca): es una FACETA
-     que sale del canto izquierdo y termina en punta redonda, teñida de marca
-     y de tono a la vez. Y la botonera es vidrio SEGMENTADO: una sola lámina
-     con divisiones, no tres botones sueltos.
+     O · PRISMA. Vidrio con la marca teñida ADENTRO. La palabra de estado no
+     es una barra opaca que parte la tarjeta (eso es Marca): es una FACETA que
+     sale del canto izquierdo y termina en punta redonda, teñida de marca y de
+     tono a la vez. Y la botonera es vidrio SEGMENTADO: una sola lámina con
+     divisiones, no tres botones sueltos.
+
+     Lo que cambió: el diálogo era el único vidrio de la celda SIN marca
+     adentro. Se condensaba a blanco puro para poder leerse sobre el velo, y
+     con eso perdía justo la tesis de la dirección en el momento en que más se
+     mira. Ahora la capa de marca va encima de las dos de superficie: sigue
+     siendo opaco donde tiene que serlo y vuelve a estar teñido. Y lo que carga
+     y lo que procesa también son láminas, como en Cristal.
      ====================================================================== */
+  :global([data-d='O']) .page { --cap-color: var(--d-brand); }
   :global([data-d='O']) .blk {
     --blk-bg: linear-gradient(180deg,
               color-mix(in srgb, var(--d-brand) 15%, transparent) 0%, transparent 62%),
@@ -1067,23 +1239,31 @@
     backdrop-filter: blur(14px) saturate(1.4);
     -webkit-backdrop-filter: blur(14px) saturate(1.4);
   }
-  /* Encima del velo no va otro desenfoque: el diálogo condensa el mismo
-     vidrio pintándolo dos veces. */
+  /* Encima del velo no va otro desenfoque: el diálogo condensa el mismo vidrio
+     pintándolo dos veces, y la marca va como capa de arriba para que el vidrio
+     siga teñido en vez de blanquearse justo cuando bloquea la pantalla. */
   :global([data-d='O']) .dlg {
-    --blk-bg: linear-gradient(var(--d-surface), var(--d-surface)),
+    --blk-bg: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-brand) 15%, transparent) 0%, transparent 58%),
+              linear-gradient(var(--d-surface), var(--d-surface)),
               linear-gradient(var(--d-surface), var(--d-surface));
     backdrop-filter: none; -webkit-backdrop-filter: none;
     border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg);
   }
+  :global([data-d='O']) .load, :global([data-d='O']) .proc {
+    background: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid var(--d-line); border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow); padding: var(--d-p2) var(--d-p3) var(--d-p3);
+  }
   :global([data-d='O']) .skel-b {
     background: color-mix(in srgb, var(--d-line) 62%, transparent);
-    border-radius: var(--d-r-pill);
   }
   :global([data-d='O']) .proc-track {
-    background: var(--d-sunk); border-radius: var(--d-r-pill);
+    background: var(--d-sunk);
     box-shadow: inset 0 1px 3px color-mix(in srgb, var(--d-ink) 12%, transparent);
   }
-  :global([data-d='O']) .proc-fill { border-radius: var(--d-r-pill); }
 
   /* ======================================================================
      P · ESPINA — UNA columna de marca que baja por toda la celda y de la que
@@ -1387,6 +1567,109 @@
   :global([data-d='S']) .proc-fill {
     border-radius: var(--d-r-pill);
     box-shadow: 0 2px var(--d-p2) calc(-1 * var(--d-p1)) var(--d-info);
+  }
+
+  /* ======================================================================
+     T · HALO CLARO. Halo, del otro lado de la luz.
+
+     La regla de Halo se conserva entera: nada tiene borde ni relleno de color.
+     Un aviso existe porque IRRADIA, y sobre papel eso es un anillo de 1px de
+     su propio tono más un halo del mismo tono proyectado hacia afuera.
+
+     Lo que la separa de Umbra, que también es papel con sombra teñida: en
+     Umbra la tarjeta es una tarjeta neutra y la sombra teñida es un dato
+     añadido encima. Acá el anillo y el halo son lo único que hay. Por eso las
+     píldoras pierden la banda y quedan en puro anillo, el esqueleto no es un
+     relleno gris sino un contorno de luz que respira, y el velo del diálogo no
+     es una sombra: es luz de papel que inunda la lista mientras el error quema
+     rojo a través. En Halo esa misma escena la hacía la oscuridad.
+
+     La celda pide más aire que ninguna otra por una razón física: un halo de
+     34px que se cruza con el de al lado deja de leerse como dos cosas.
+     ====================================================================== */
+  :global([data-d='T']) .page { gap: var(--d-p4); }
+  :global([data-d='T']) .sec-body { gap: var(--d-p3); }
+  :global([data-d='T']) .blk {
+    --blk-bg: var(--d-surface);
+    border: 0; border-radius: var(--d-r-lg); padding: var(--d-p3);
+    box-shadow: 0 0 0 1px var(--tone-edge),
+                0 var(--d-p2) calc(var(--d-p4) * 1.6) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* El error es lo único de la celda que hay que ver desde el otro lado del
+     taller, así que es lo único que además se enciende por dentro. El rescoldo
+     entra con radio negativo: muere contra el canto y no llega nunca al texto. */
+  :global([data-d='T']) .blk[data-tone='critical'] {
+    box-shadow: inset 0 0 var(--d-p4) calc(-1 * var(--d-p3)) var(--tone-fg),
+                0 0 0 1px var(--tone-edge),
+                0 var(--d-p2) calc(var(--d-p4) * 2.4) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* Sin relleno: la palabra de estado es tinta de su tono dentro de su propio
+     anillo. Tinta de tono sobre papel blanco pasa AA en los cinco tonos. */
+  :global([data-d='T']) .blk-kind {
+    justify-self: start;
+    padding: calc(var(--d-p1) * .5) var(--d-p2);
+    border-radius: var(--d-r-pill);
+    box-shadow: 0 0 0 1px var(--tone-edge),
+                0 2px var(--d-p2) calc(-1 * var(--d-p1)) var(--tone-fg);
+  }
+  :global([data-d='T']) .blk--toast {
+    box-shadow: 0 0 0 1px var(--tone-edge),
+                0 var(--d-p2) calc(var(--d-p4) * 2) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* Las píldoras también pierden la banda: si el estado se rellenara de color
+     acá, la dirección dejaría de ser Halo y pasaría a ser Elevación con brillo. */
+  :global([data-d='T']) .d-pill {
+    background: none;
+    box-shadow: 0 0 0 1px var(--tone-edge),
+                0 2px var(--d-p2) calc(-1 * var(--d-p1)) var(--tone-fg);
+  }
+  :global([data-d='T']) .scene {
+    border: 0; border-radius: var(--d-r-lg);
+    padding: var(--d-p1); box-shadow: var(--d-shadow);
+  }
+  /* Las filas ya vienen en cápsula con anillo desde directions.css; la línea
+     de abajo sería un segundo borde encima de un anillo. */
+  :global([data-d='T']) .scene-list .d-row { border-bottom: 0; }
+  :global([data-d='T']) .scene-list .d-row:last-child { margin-bottom: 0; }
+  /* El velo es LUZ, no sombra: el papel inunda la lista y el diálogo quema
+     rojo a través de él. Es el momento en que esta dirección se explica sola. */
+  :global([data-d='T']) .veil {
+    background:
+      radial-gradient(84% 66% at 50% 50%,
+        color-mix(in srgb, var(--d-crit) 16%, transparent) 0%, transparent 70%),
+      color-mix(in srgb, var(--d-surface) 84%, transparent);
+  }
+  :global([data-d='T']) .dlg {
+    border: 0; border-radius: var(--d-r-lg);
+    padding: var(--d-p3) var(--d-p4) var(--d-p4);
+    box-shadow: 0 0 0 1px var(--tone-edge),
+                0 var(--d-p3) calc(var(--d-p4) * 2.6) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* El esqueleto no es un relleno gris: es el contorno de una fila que todavía
+     no llegó, con la altura de fila real. Lo que late es su luz. */
+  :global([data-d='T']) .load, :global([data-d='T']) .proc {
+    background: var(--d-surface); border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3); box-shadow: var(--d-shadow);
+  }
+  :global([data-d='T']) .skel-row { min-height: var(--d-row-h); }
+  :global([data-d='T']) .skel-b {
+    background: var(--d-accent-soft);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--d-accent) 18%, transparent),
+                0 0 var(--d-p3) calc(-1 * var(--d-p2)) var(--d-accent);
+  }
+  :global([data-d='T']) .proc-track {
+    background: var(--d-accent-soft);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--d-accent) 14%, transparent);
+  }
+  :global([data-d='T']) .proc-fill {
+    box-shadow: 0 0 var(--d-p3) calc(-1 * var(--d-p1)) var(--d-accent);
+  }
+  /* El destructivo no se rellena de rojo: se enciende de rojo. La tinta queda
+     sobre papel blanco, que es donde más contraste tiene. */
+  :global([data-d='T']) .d-btn--danger {
+    background: var(--d-surface); color: var(--d-crit);
+    box-shadow: 0 0 0 1px var(--d-crit-edge),
+                0 4px var(--d-p3) calc(-1 * var(--d-p2)) var(--d-crit);
   }
 
   /* ======================================================================

@@ -74,12 +74,12 @@
       <div class="stack">
         <!-- ────────── 1 · LA TABLA ────────── -->
         <section class="spec">
-          <p class="speclabel d-cap">Tabla de equipos</p>
+          <h4 class="speclabel">Tabla de equipos</h4>
 
           <div class="d-panel tablepanel">
             <div class="d-panel-head">
-              <h3 class="d-panel-title">Equipos</h3>
-              <span class="d-cap headnote">88 en la flota</span>
+              <h5 class="d-panel-title">Equipos</h5>
+              <span class="headnote"><span class="hnum figs">88</span> en la flota</span>
             </div>
 
             <div class="tblwrap">
@@ -190,13 +190,18 @@
 
                       <td class="c-fam">{a.family}</td>
                       <td class="c-loc">{a.location}</td>
-                      <td class="c-read d-num">{a.reading}</td>
+                      <td class="c-read figs">{a.reading}</td>
 
+                      <!-- «Vencido» no dice cuánto. En las filas que urgen el
+                           retraso viaja pegado a la píldora: es el dato que
+                           decide si el técnico va hoy o el lunes, y hasta ahora
+                           había que abrir el equipo para verlo. -->
                       <td class="c-state">
                         <span class="d-pill">
                           <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf(a.tone)}</svg>
                           {a.state}
                         </span>
+                        {#if a.tone === 'critical'}<span class="due figs">{a.due}</span>{/if}
                       </td>
 
                       <td class="c-act">
@@ -212,8 +217,9 @@
             </div>
 
             <div class="d-panel-foot foot">
-              <p class="fcount d-cap d-num">
-                {from}–{to} de {sorted.length} equipos · {pickedCount} seleccionado{pickedCount === 1 ? '' : 's'}
+              <p class="fcount">
+                <span class="figs">{from} a {to}</span> de <span class="figs">{sorted.length}</span> equipos
+                · <span class="figs">{pickedCount}</span> seleccionado{pickedCount === 1 ? '' : 's'}
               </p>
               <nav class="pager" aria-label="Páginas de equipos · dirección {d.name}">
                 <button class="d-btn d-btn--sm" type="button" disabled={page === 1} on:click={() => go(page - 1)}>Anterior</button>
@@ -232,32 +238,34 @@
           </div>
 
           <p class="note">
-            Fila 1 seleccionada · fila 2 vencida, la que pide atención · fila 3 con el cursor encima, fijo para poder
-            verlo. Las acciones de fila aparecen al pasar el cursor y siempre están en el orden del tabulador.
+            Fila 1: vencida y seleccionada a la vez, y el estado se sigue leyendo por debajo de la selección. Fila 3:
+            cursor encima, fijo para poder verlo. Las acciones aparecen al pasar el cursor y nunca salen del orden del
+            tabulador.
           </p>
         </section>
 
         <!-- ────────── 2 · LA MISMA INFORMACIÓN SIN TABLA ────────── -->
         <section class="spec">
-          <p class="speclabel d-cap">La misma información sin tabla</p>
+          <h4 class="speclabel">La misma información sin tabla</h4>
 
           <div class="d-panel clistpanel">
             <div class="d-panel-head">
-              <h3 class="d-panel-title">Lista compacta</h3>
-              <span class="d-cap headnote">6 equipos</span>
+              <h5 class="d-panel-title">Lista compacta</h5>
+              <span class="headnote"><span class="hnum figs">6</span> equipos</span>
             </div>
             <ul class="clist">
               {#each sorted as a (a.code)}
                 <li class="citem d-rail" data-tone={a.tone} class:on={picked.has(a.code)} class:alert={a.tone === 'critical'}>
-                  <span class="cicode d-cap d-id">{a.code}</span>
+                  <span class="cicode d-id figs">{a.code}</span>
                   <div class="cibody">
                     <span class="cinm">{a.name}</span>
                     <span class="cimeta">{a.family} · {a.location}</span>
-                    <span class="ciread d-num">{a.reading}</span>
+                    <span class="ciread figs">{a.reading}</span>
                     <span class="d-pill">
                       <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf(a.tone)}</svg>
                       {a.state}
                     </span>
+                    {#if a.tone === 'critical'}<span class="due figs">{a.due}</span>{/if}
                     <span class="ciact d-btn-group">
                       <button class="d-btn d-btn--sm d-btn--ghost" type="button" aria-label="Registrar lectura de {a.code}">Lectura</button>
                     </span>
@@ -270,12 +278,12 @@
 
         <!-- ────────── 3 · EL MISMO CONTENEDOR, VACÍO ────────── -->
         <section class="spec">
-          <p class="speclabel d-cap">Estado vacío</p>
+          <h4 class="speclabel">Estado vacío</h4>
 
           <div class="d-panel emptypanel">
             <div class="d-panel-head">
-              <h3 class="d-panel-title">Equipos</h3>
-              <span class="d-cap headnote">ninguno cargado</span>
+              <h5 class="d-panel-title">Equipos</h5>
+              <span class="headnote">ninguno cargado</span>
             </div>
             <div class="d-panel-body empty">
               <p class="etitle">{COPY.emptyTitle}</p>
@@ -286,7 +294,7 @@
               </span>
             </div>
             <div class="d-panel-foot foot">
-              <p class="fcount d-cap d-num">0 de 0 equipos</p>
+              <p class="fcount"><span class="figs">0</span> de <span class="figs">0</span> equipos</p>
               <nav class="pager" aria-label="Páginas del listado vacío · dirección {d.name}">
                 <button class="d-btn d-btn--sm" type="button" disabled>Anterior</button>
                 <button class="d-btn d-btn--sm" type="button" disabled>Siguiente</button>
@@ -315,14 +323,30 @@
     container-name: spec;
     min-width: 0;
   }
-  .speclabel { margin: 0 0 var(--d-p1); }
+  /* El nombre de cada espécimen es un ENCABEZADO, no una versalita. Era el peor
+     error de jerarquía de la página: tres rótulos chiquitos, grises y en caja
+     alta anunciando las tres piezas que hay que mirar. Un encabezado en tinta se
+     ve de lejos y no le pide nada al lector. */
+  .speclabel {
+    margin: 0 0 var(--d-p1);
+    font-size: var(--d-t-md);
+    font-weight: var(--d-w-semi);
+    letter-spacing: -.012em;
+    color: var(--d-ink);
+  }
   .note {
     margin: var(--d-p1) 0 0;
     font-size: var(--d-t-xs);
     line-height: 1.45;
     color: var(--d-ink-3);
   }
-  .headnote { white-space: nowrap; }
+  /* La nota de cabecera es un conteo, no un rótulo: manda la cifra y la palabra
+     la acompaña. */
+  .headnote { white-space: nowrap; font-size: var(--d-t-xs); color: var(--d-ink-3); }
+  .hnum { font-weight: var(--d-w-semi); color: var(--d-ink-2); }
+  /* Cifras. Numeración tabular en las diecinueve; la monoespaciada la agregan
+     sólo las direcciones que la ganan por densidad, mucho más abajo. */
+  .figs { font-variant-numeric: var(--d-num); }
 
   /* ── Tabla ─────────────────────────────────────────────────────────────── */
   .tblwrap { overflow-x: auto; overscroll-behavior-x: contain; }
@@ -358,6 +382,15 @@
   .sub { display: none; white-space: normal; font-size: var(--d-t-2xs); color: var(--d-ink-3); font-weight: var(--d-w); }
   .cursor::before { content: ''; }
   .mk { flex: none; width: 9px; height: 9px; }
+  /* El retraso, sólo donde hay retraso. Toma el color del tono de la fila, pero
+     lo que lo hace legible es que es un número: no hay que interpretar nada. */
+  .due {
+    margin-left: var(--d-p1);
+    font-size: var(--d-t-xs);
+    font-weight: var(--d-w-semi);
+    font-variant-numeric: var(--d-num);
+    color: var(--tone-fg);
+  }
 
   /* Cabecera: la misma tipografía de etiqueta que usa la dirección. */
   .hcap {
@@ -454,7 +487,7 @@
     flex-wrap: wrap;
     gap: var(--d-p2);
   }
-  .fcount { margin: 0; min-width: 0; }
+  .fcount { margin: 0; min-width: 0; font-size: var(--d-t-xs); color: var(--d-ink-2); }
   .pager { display: flex; align-items: center; gap: var(--d-p1); flex-wrap: wrap; }
   .pnum { padding-inline: var(--d-p2); }
 
@@ -468,7 +501,15 @@
     padding: var(--d-p2) var(--d-p3);
     min-width: 0;
   }
-  .cicode { display: block; }
+  /* El código es lo primero que busca un técnico con la máquina enfrente. Estaba
+     en versalitas grises, o sea: escondido. Ahora es tinta llena, tabular y en
+     la mono de --d-id, que es donde un identificador se lee sin dudar. */
+  .cicode {
+    display: block;
+    font-size: var(--d-t-xs);
+    font-weight: var(--d-w-semi);
+    color: var(--d-ink);
+  }
   .cibody { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--d-p2); min-width: 0; }
   /* El nombre se lleva su renglón entero; el resto de los campos y la acción
      comparten el siguiente, con la acción empujada al canto derecho. */
@@ -502,9 +543,19 @@
     border: var(--d-bw) solid var(--d-line);
     border-radius: var(--d-r);
     box-shadow: var(--d-shadow);
-    transition: box-shadow 120ms ease, transform 120ms ease;
+    transition: box-shadow 140ms ease;
   }
-  :global([data-d='A']) .citem:hover { box-shadow: var(--d-shadow-lg); transform: translateY(-1px); }
+  /* El salto de 1px al pasar el cursor se fue. En una lista de seis renglones que
+     alguien recorre buscando un código, mover la fila bajo el ojo cuesta más
+     lectura de la que devuelve; la sombra sola dice lo mismo y no desalinea
+     nada. La moción se queda donde hace trabajo: en las acciones que aparecen. */
+  :global([data-d='A']) .citem:hover { box-shadow: var(--d-shadow-lg); }
+  /* La cabecera de la tabla no se va con el scroll horizontal ni con el vertical
+     de la página: en Elevación la losa es una sola pieza y su cabecera es parte
+     de la losa. */
+  :global([data-d='A']) .tbl thead th { box-shadow: inset 0 -1px 0 var(--d-edge); border-bottom-color: transparent; }
+  :global([data-d='A']) .tbl thead th[aria-sort]:not([aria-sort='none']) { box-shadow: inset 0 -2px 0 var(--d-ink); }
+  :global([data-d='A']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-ink); }
   :global([data-d='A']) .empty { padding-block: var(--d-p3); }
 
   /* ── B · INSTRUMENTO — las celdas COMPARTEN borde, fila de 30px ────────── */
@@ -519,16 +570,38 @@
   :global([data-d='B']) .pick { --pick: 12px; }
   :global([data-d='B']) .sortmark::before { content: '▴'; }
   :global([data-d='B']) .sortmark[data-dir='desc']::before { content: '▾'; }
-  /* La lista compacta también es un marco continuo con separadores internos. */
-  :global([data-d='B']) .clist { border: var(--d-bw) solid var(--d-line); border-top: 0; }
+  /* La fila vencida no se marca sólo con un fondo de color: se DIBUJA con más
+     peso de línea. En un plano técnico el grosor del trazo es el idioma, y una
+     fila trazada en tinta contra hairlines grises se ve con los ojos entornados
+     y sin distinguir un solo color. */
+  :global([data-d='B']) .tbl tbody tr.alert td { border-color: var(--d-edge); }
+  :global([data-d='B']) .tbl tbody tr.alert td.c-code { font-weight: var(--d-w-semi); }
+  /* Una botonera es un marco continuo, no tres botones sueltos: la regla ya la
+     cumplía .d-btn-group y el paginador se había quedado afuera. */
+  :global([data-d='B']) .pager { gap: 0; }
+  :global([data-d='B']) .pager > .d-btn + .d-btn { margin-left: calc(-1 * max(var(--d-bw), 1px)); }
+  :global([data-d='B']) .foot { padding-block: var(--d-p1); }
+  /* El contenedor de tarjeta sobra. La lista tenía DOS marcos, el del panel con
+     sus marcas de esquina y el suyo propio: en densidad de cabina eso es chrome
+     que no informa. Queda un solo marco y la etiqueta pasa a estar fuera de él,
+     que es la regla declarada de esta dirección. */
+  :global([data-d='B']) .d-panel.clistpanel { border: 0; box-shadow: none; }
+  :global([data-d='B']) .d-panel.clistpanel::before,
+  :global([data-d='B']) .d-panel.clistpanel::after { content: none; }
+  :global([data-d='B']) .clistpanel .d-panel-head { border-bottom: 0; padding: 0 0 var(--d-p1); }
+  :global([data-d='B']) .clist { border: var(--d-bw) solid var(--d-edge); }
   :global([data-d='B']) ul.clist > li.citem {
     grid-template-columns: 84px minmax(0, 1fr);
     gap: 0 var(--d-p2);
     align-items: center;
-    padding: var(--d-p1) var(--d-p2);
+    min-height: var(--d-row-h);
+    padding: 0 var(--d-p2);
     border-bottom: var(--d-bw) solid var(--d-line);
   }
   :global([data-d='B']) ul.clist > li.citem:last-child { border-bottom: 0; }
+  /* Un renglón por equipo, sin plegado: es una rejilla, no una pila de fichas. */
+  :global([data-d='B']) .cibody { flex-wrap: nowrap; overflow: hidden; }
+  :global([data-d='B']) .cinm { flex-basis: auto; }
   :global([data-d='B']) .empty { padding-block: var(--d-p3); }
 
   /* ── C · MARCA — la cabecera de la tabla es la del bloque, en color ────── */
@@ -543,9 +616,15 @@
   :global([data-d='C']) ul.clist > li.citem { border-bottom: var(--d-bw) solid var(--d-line); }
   :global([data-d='C']) ul.clist > li.citem:last-child { border-bottom: 0; }
   :global([data-d='C']) .cicode { color: var(--d-brand); }
-  /* La cabecera del bloque es teal lleno y .d-cap pinta en --d-brand: la nota
-     de la derecha quedaba teal sobre teal, invisible. Va en tinta de marca. */
-  :global([data-d='C']) .d-panel-head .d-cap { color: var(--d-brand-ink); }
+  /* La cabecera del bloque es teal lleno: todo lo que viva encima va en tinta de
+     marca o desaparece. Es la trampa que ya se cobró tres veces este proyecto. */
+  :global([data-d='C']) .d-panel-head .headnote,
+  :global([data-d='C']) .d-panel-head .hnum { color: var(--d-brand-ink); }
+  /* El color es estructura: la barra del bloque y la de columnas son UN macizo
+     de marca en dos tonos, y lo único que lo interrumpe es la columna ordenada.
+     Sin esta línea las dos barras se leían como dos bloques apilados. */
+  :global([data-d='C']) .tablepanel .d-panel-head { box-shadow: inset 0 -1px 0 var(--d-brand-deep); }
+  :global([data-d='C']) .tbl tbody tr.alert td.c-code { font-weight: var(--d-w-semi); }
   :global([data-d='C']) .empty { padding-block: var(--d-p3); }
 
   /* ── D · PESO — cabecera tinta, tipografía 800, el bloque cae en su sombra */
@@ -691,12 +770,22 @@
      la única forma de que la segunda capa no lo enturbie. */
   :global([data-d='I']) .tablepanel,
   :global([data-d='I']) .emptypanel { overflow: hidden; box-shadow: var(--d-shadow-lg); }
+  /* LA ESCALERA DE DENSIDAD, que estaba rota. Cabecera y fila con el cursor
+     encima pintaban las dos --d-sunk: eran indistinguibles, y en una tabla de
+     ocho columnas eso es el peor lugar donde perder el norte. Ahora hay tres
+     escalones honestos de vidrio: fila en reposo transparente (se ve el campo a
+     través), cursor encima --d-sunk, y cabecera --d-surface, el vidrio más
+     espeso porque es la pieza que no se mueve. */
   :global([data-d='I']) .tbl thead th {
-    background: var(--d-sunk);
-    border-bottom: 1px solid var(--d-line);
+    background: var(--d-surface);
+    border-bottom: 1px solid var(--d-edge);
     box-shadow: inset 0 1px 0 var(--d-line);   /* el filo especular, no una línea */
   }
-  :global([data-d='I']) .tbl thead th[aria-sort]:not([aria-sort='none']) { background: var(--d-surface); }
+  /* La columna ordenada no cambia de espesor —eso rompería la escalera— sino que
+     enciende un canto de acento y se lleva la etiqueta al mismo color. */
+  :global([data-d='I']) .tbl thead th[aria-sort]:not([aria-sort='none']) {
+    box-shadow: inset 0 1px 0 var(--d-line), inset 0 -2px 0 var(--d-accent);
+  }
   :global([data-d='I']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-accent); }
   :global([data-d='I']) .tbl tbody td { border-bottom-color: var(--d-edge); }
   /* Una fila destacada no es otro vidrio: es el mismo vidrio más denso. */
@@ -930,23 +1019,52 @@
      Cero contenedores y cero reglas horizontales: lo que separa una fila de la
      siguiente es que el color se derrama por detrás y se desvanece sin filo.
      Los titulares —el nombre del equipo incluido— van en la serif de --d-display. */
+  /* Lo que separa una fila de la siguiente es PAPEL, no una regla. Con las filas
+     pegadas los derrames se tocaban y la tabla volvía a leerse como un campo
+     rayado; con un renglón de aire entre medio cada mancha se posa sola. */
+  :global([data-d='M']) .tbl { border-spacing: 0 var(--d-p1); }
   :global([data-d='M']) .tbl th,
   :global([data-d='M']) .tbl td { border: 0; }
   :global([data-d='M']) .tbl thead th { background: transparent; padding-bottom: var(--d-p2); }
   :global([data-d='M']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-accent); }
+  /* Los titulares de la página también son serif. Antes eran versalitas, así que
+     la tesis tipográfica de esta dirección no llegaba a sus propios encabezados:
+     se veía sólo en el nombre del equipo. */
+  :global([data-d='M']) .speclabel {
+    font-family: var(--d-display);
+    font-size: var(--d-t-lg);
+    font-weight: 400;
+    letter-spacing: -.01em;
+  }
   /* El derrame va en la fila, no en la celda: una celda corta el degradado en
      su propio ancho y vuelve a leerse como una casilla. Y va en radial, no en
      lineal: un degradado recto de borde a borde sigue siendo una banda: lo que
      esta dirección quiere es una mancha que entra por el canto y se desvanece
      en las dos direcciones. */
   :global([data-d='M']) .tbl tbody tr[data-tone] { background: radial-gradient(90% 150% at 1% 50%, var(--tone-band) 0%, transparent 72%); }
+  /* La que urge no se tiñe MÁS: se derrama MÁS LEJOS. Subir el alfa habría
+     tirado el texto secundario por debajo de AA sobre la propia mancha; la misma
+     tinta llegando al otro extremo de la fila dice «esta» sin costar contraste. */
+  :global([data-d='M']) .tbl tbody tr.alert { background: radial-gradient(125% 195% at 0% 50%, var(--tone-band) 0%, transparent 90%); }
   :global([data-d='M']) .tbl tbody tr.alert td,
   :global([data-d='M']) .tbl tbody tr.on td { background: transparent; }
   :global([data-d='M']) .tbl tbody tr:hover,
   :global([data-d='M']) .tbl tbody tr.is-hover { background: radial-gradient(120% 170% at 1% 50%, var(--tone-band) 0%, transparent 82%); }
   :global([data-d='M']) .tbl tbody tr:hover td,
   :global([data-d='M']) .tbl tbody tr.is-hover td { background: transparent; }
-  :global([data-d='M']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
+  /* Un canto duro de 3px en la única dirección que no tiene ni un filo era una
+     contradicción. La selección también es un derrame, y entra por el lado
+     contrario: el estado viene de la izquierda, la selección de la derecha, y
+     una fila vencida y marcada a la vez muestra las dos sin taparse. */
+  :global([data-d='M']) .tbl tbody tr.on {
+    background: radial-gradient(70% 150% at 100% 50%, var(--d-accent-soft) 0%, transparent 80%);
+  }
+  :global([data-d='M']) .tbl tbody tr.alert.on {
+    background:
+      radial-gradient(70% 150% at 100% 50%, var(--d-accent-soft) 0%, transparent 80%),
+      radial-gradient(125% 195% at 0% 50%, var(--tone-band) 0%, transparent 90%);
+  }
+  :global([data-d='M']) .tbl tbody tr.on td.c-sel { box-shadow: none; }
   :global([data-d='M']) .nm { font-family: var(--d-display); font-size: var(--d-t-md); font-weight: 400; }
   :global([data-d='M']) .pick { border-color: var(--d-ink-3); }
   :global([data-d='M']) .clistpanel .d-panel-head { padding-inline: 0; }
@@ -960,19 +1078,30 @@
     border-bottom: 0;
     padding: var(--d-p2) 0;
   }
+  /* El token correcto es --tone-wash, no --tone-band. directions.css los separó
+     justamente para esto: la banda es para color plano, el wash está calibrado
+     para sobrevivir a 22px de desenfoque. Con la banda, la mancha de la lista se
+     disolvía hasta no decir nada y el estado se perdía. */
   :global([data-d='M']) ul.clist > li.citem::before {
     content: '';
     position: absolute; inset: -14px -24px;
     background:
-      radial-gradient(58% 76% at 14% 30%, var(--tone-band) 0%, transparent 70%),
-      radial-gradient(44% 60% at 78% 84%, var(--tone-band) 0%, transparent 66%);
+      radial-gradient(58% 76% at 14% 30%, var(--tone-wash) 0%, transparent 70%),
+      radial-gradient(44% 60% at 78% 84%, var(--tone-wash) 0%, transparent 66%);
     filter: blur(22px);
     pointer-events: none;
     z-index: -1;
   }
   :global([data-d='M']) ul.clist > li.citem.alert,
   :global([data-d='M']) ul.clist > li.citem.on { background: transparent; }
-  :global([data-d='M']) ul.clist > li.citem.on::before { opacity: 1; }
+  /* Seleccionado: una tercera mancha, de acento, entrando por la derecha. Misma
+     gramática que en la tabla. */
+  :global([data-d='M']) ul.clist > li.citem.on::before {
+    background:
+      radial-gradient(58% 76% at 14% 30%, var(--tone-wash) 0%, transparent 70%),
+      radial-gradient(44% 60% at 78% 84%, var(--tone-wash) 0%, transparent 66%),
+      radial-gradient(50% 90% at 100% 50%, var(--d-accent-soft) 0%, transparent 74%);
+  }
   :global([data-d='M']) .cinm { font-family: var(--d-display); font-size: var(--d-t-lg); font-weight: 400; letter-spacing: -.01em; }
   :global([data-d='M']) .etitle { font-family: var(--d-display); font-size: var(--d-t-xl); font-weight: 400; }
   :global([data-d='M']) .empty { padding-block: var(--d-p3) var(--d-p4); }
@@ -1067,7 +1196,11 @@
   :global([data-d='O']) .tbl tbody td { border-bottom-color: var(--d-edge); }
   :global([data-d='O']) .tbl tbody tr:hover td,
   :global([data-d='O']) .tbl tbody tr.is-hover td { background: var(--d-sunk); }
-  :global([data-d='O']) .tbl tbody tr.on td { background: var(--d-surface); }
+  /* La marca vive DENTRO del vidrio, y la selección es el sitio donde eso hace
+     trabajo de verdad: la fila marcada es el mismo vidrio teñido de marca, no un
+     vidrio más blanco. Antes se pintaba --d-surface y quedaba igual que la
+     cabecera. */
+  :global([data-d='O']) .tbl tbody tr.on td { background: var(--d-accent-soft); }
   :global([data-d='O']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-brand); }
   :global([data-d='O']) .pick { background: var(--d-sunk); border-color: var(--d-line); }
   :global([data-d='O']) .pick:checked,
@@ -1098,13 +1231,14 @@
     font-weight: var(--d-w-bold);
     box-shadow: inset 0 -2px 0 var(--d-brand);
   }
-  :global([data-d='O']) ul.clist > li.citem {
-    border-bottom: 1px solid var(--d-edge);
-    box-shadow: inset 3px 0 0 var(--tone-edge);
-  }
+  /* El canto de color se lo llevaban las seis filas, incluidas las que están al
+     día: seis barras que no distinguen nada son papel pintado, no información.
+     Queda sólo donde hay algo que decir, y así el canto de marca de la fila
+     seleccionada vuelve a significar algo. */
+  :global([data-d='O']) ul.clist > li.citem { border-bottom: 1px solid var(--d-edge); }
   :global([data-d='O']) ul.clist > li.citem:last-child { border-bottom: 0; }
-  :global([data-d='O']) ul.clist > li.citem.alert { background: var(--tone-band); }
-  :global([data-d='O']) ul.clist > li.citem.on { background: var(--d-surface); box-shadow: inset 3px 0 0 var(--d-brand); }
+  :global([data-d='O']) ul.clist > li.citem.alert { background: var(--tone-band); box-shadow: inset 3px 0 0 var(--tone-fg); }
+  :global([data-d='O']) ul.clist > li.citem.on { box-shadow: inset 3px 0 0 var(--d-brand); }
   :global([data-d='O']) .empty { padding-block: var(--d-p3); }
 
   /* ── P · ESPINA — la columna de marca, y cada fila la muerde ───────────────
@@ -1308,6 +1442,99 @@
   :global([data-d='S']) ul.clist > li.citem.on { background: var(--d-surface); box-shadow: 0 14px 36px -12px var(--tone-fg), var(--d-shadow-lg); }
   :global([data-d='S']) .empty { padding-block: var(--d-p3); }
 
+  /* ── T · HALO CLARO — ni una línea; la fila que urge irradia ───────────────
+     La regla de Halo entera, del lado del día: nada tiene borde y nada tiene
+     relleno de estado. Una fila existe porque irradia, y lo que la separa de la
+     de abajo es aire. Esto es lo que la distingue de Umbra, que es la otra
+     finalista con sombra teñida: allá la tarjeta es una tarjeta neutra y la
+     sombra es un dato añadido; acá el anillo de 1px en el propio tono ES el
+     contorno, no hay otro.
+
+     Y es lo que la hace difícil en una tabla: sin líneas de rejilla, ocho
+     columnas se pierden. La respuesta no es reponer líneas, es que cada fila sea
+     un cuerpo suelto con su propio anillo, y que la cabecera no sea una barra
+     sino una fila de etiquetas flotando sobre el papel.
+
+     HALLAZGO: T no expone el halo como token (--d-glow / --d-ring). Los radios
+     de difusión se escriben a mano, igual que ya pasa en directions.css; el
+     COLOR sale siempre de --tone-fg, --tone-edge y --d-accent. */
+  :global([data-d='T']) .tbl { border-spacing: 0 var(--d-p1); }
+  :global([data-d='T']) .tbl th,
+  :global([data-d='T']) .tbl td { border: 0; }
+  :global([data-d='T']) .tbl thead th { background: transparent; padding-bottom: var(--d-p2); }
+  /* La columna ordenada no se rellena ni se invierte: se enciende. Anillo de
+     acento más halo corto, y la etiqueta en el propio acento, que sobre este
+     papel da 5.2:1. Invertirla a tinta clara habría sido el único bloque sólido
+     de toda la dirección. */
+  :global([data-d='T']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap {
+    color: var(--d-accent);
+    padding: 3px var(--d-p1);
+    border-radius: var(--d-r);
+    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 4px 14px -6px var(--d-accent);
+  }
+  :global([data-d='T']) .tbl tbody td { background: var(--d-surface); }
+  :global([data-d='T']) .tbl tbody td.c-sel { border-radius: var(--d-r) 0 0 var(--d-r); }
+  :global([data-d='T']) .tbl tbody td.c-act { border-radius: 0 var(--d-r) var(--d-r) 0; }
+  /* Toda fila irradia en su tono; la que urge irradia el doble y sube el anillo
+     de --tone-edge a --tone-fg, así que a diez metros hay una sola fila
+     encendida en la pantalla. El campo sigue siendo papel blanco: el texto de
+     un vencido se lee exactamente igual que el de uno al día. */
+  :global([data-d='T']) .tbl tbody tr[data-tone] {
+    box-shadow: 0 0 0 1px var(--tone-edge), 0 8px 26px -12px var(--tone-fg);
+  }
+  :global([data-d='T']) .tbl tbody tr.alert {
+    box-shadow: 0 0 0 1px var(--tone-fg), 0 14px 40px -10px var(--tone-fg);
+  }
+  :global([data-d='T']) .tbl tbody tr.alert td { background: var(--d-surface); }
+  :global([data-d='T']) .tbl tbody tr:hover td,
+  :global([data-d='T']) .tbl tbody tr.is-hover td { background: var(--d-sunk); }
+  /* Seleccionada: el anillo de estado se queda donde está y por FUERA aparece un
+     segundo halo, de acento. Dos luces concéntricas, una por cada cosa que hay
+     que saber. La fila 1, vencida y marcada, muestra las dos. */
+  :global([data-d='T']) .tbl tbody tr.on {
+    box-shadow: 0 0 0 1px var(--tone-fg), 0 0 0 4px var(--d-accent-soft),
+                0 14px 40px -12px var(--tone-fg);
+  }
+  :global([data-d='T']) .tbl tbody tr.on td { background: var(--d-surface); }
+  :global([data-d='T']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
+  /* Los halos necesitan margen o el panel los recorta y quedan como bandas. */
+  :global([data-d='T']) .tblwrap { padding: var(--d-p1) var(--d-p2) var(--d-p3); }
+  /* --d-edge es transparent en toda la dirección, así que la casilla se
+     evaporaba. El anillo lo pone el tono neutro; marcada, se rellena de acento y
+     la marca pasa a --d-accent-ink sobre él, 5.2:1. Misma reposición que ya
+     hubo que hacer en I, K y L. */
+  :global([data-d='T']) .pick {
+    background: var(--d-surface);
+    border-color: transparent;
+    box-shadow: inset 0 0 0 1px var(--d-neu-edge);
+  }
+  :global([data-d='T']) .pick:checked,
+  :global([data-d='T']) .pick:indeterminate {
+    background: var(--d-accent);
+    border-color: transparent;
+    box-shadow: inset 0 0 0 1px var(--d-accent), 0 0 12px -3px var(--d-accent);
+  }
+  /* La lista: el panel se apaga y cada ítem pasa a ser el cuerpo que irradia.
+     Halo dentro de halo se vuelve niebla; halos al lado de halos, no. */
+  :global([data-d='T']) .d-panel.clistpanel { background: transparent; box-shadow: none; }
+  :global([data-d='T']) .clistpanel .d-panel-head { border-bottom: 0; padding-inline: 0; }
+  :global([data-d='T']) .clist { gap: var(--d-p2); padding-bottom: var(--d-p2); }
+  :global([data-d='T']) ul.clist > li.citem {
+    background: var(--d-surface);
+    border-radius: var(--d-r-lg);
+    box-shadow: 0 0 0 1px var(--tone-edge), 0 8px 26px -16px var(--tone-fg);
+  }
+  :global([data-d='T']) ul.clist > li.citem.alert {
+    background: var(--d-surface);
+    box-shadow: 0 0 0 1px var(--tone-fg), 0 16px 44px -14px var(--tone-fg);
+  }
+  :global([data-d='T']) ul.clist > li.citem.on {
+    background: var(--d-surface);
+    box-shadow: 0 0 0 1px var(--tone-fg), 0 0 0 4px var(--d-accent-soft),
+                0 16px 44px -14px var(--tone-fg);
+  }
+  :global([data-d='T']) .empty { padding-block: var(--d-p3); }
+
   /* ==========================================================================
      RESPONSIVE — la celda manda, no la ventana. Familia, ubicación y lectura se
      pliegan bajo el nombre del equipo; la lista compacta es la salida real.
@@ -1362,7 +1589,12 @@
     :global([data-d='N']) ul.clist > li.citem { padding-inline: var(--d-p3); }
     :global([data-d='L']) .tblwrap,
     :global([data-d='K']) .tblwrap,
-    :global([data-d='S']) .tblwrap { padding-inline: 0; }
+    :global([data-d='S']) .tblwrap,
+    :global([data-d='T']) .tblwrap { padding-inline: 0; }
+    /* En celda angosta B pliega su lista a un renglón por campo, como el resto:
+       una rejilla de dos columnas dentro de 300px deja un carácter por línea. */
+    :global([data-d='B']) .cibody { flex-wrap: wrap; overflow: visible; }
+    :global([data-d='B']) .cinm { flex-basis: 100%; }
   }
 
   /* ── Estado de fila en las direcciones que no lo repusieron ──────────────
@@ -1388,4 +1620,55 @@
   /* A no usa el patrón `ul.clist >` en su base, así que necesita además su
      propio par al mismo peso. */
   :global([data-d='A']) ul.clist > li.citem.alert { background: var(--tone-band); }
+
+  /* ==========================================================================
+     EL ESTADO NO SE PIERDE POR DEBAJO DE LA SELECCIÓN.
+
+     La fila 1 está vencida Y seleccionada, que es el caso normal: uno marca
+     justamente lo que va a atender. Hasta acá ganaba la selección, repintaba el
+     campo con el acento y el equipo más urgente de la pantalla dejaba de verse
+     urgente en el momento exacto en que alguien lo tocaba.
+
+     La regla es de jerarquía, no de estética: el estado es DATO y la selección
+     es INTERACCIÓN. El dato se queda con el campo de la fila; la interacción se
+     va al canto, a la casilla marcada y al peso del código. Las tres señales de
+     selección siguen ahí y ninguna necesita el fondo.
+
+     M y T no aparecen acá porque ya lo resuelven adentro de su propio bloque,
+     cada una con su material: M con dos derrames que entran por lados opuestos,
+     T con dos halos concéntricos. Las doce no finalistas quedan como estaban.
+     ========================================================================== */
+  :global([data-d='A']) .tbl tbody tr.alert.on td,
+  :global([data-d='B']) .tbl tbody tr.alert.on td,
+  :global([data-d='C']) .tbl tbody tr.alert.on td,
+  :global([data-d='I']) .tbl tbody tr.alert.on td,
+  :global([data-d='O']) .tbl tbody tr.alert.on td { background: var(--tone-band); }
+  :global([data-d='A']) .tbl tbody tr.alert.on td.c-sel,
+  :global([data-d='B']) .tbl tbody tr.alert.on td.c-sel,
+  :global([data-d='C']) .tbl tbody tr.alert.on td.c-sel,
+  :global([data-d='I']) .tbl tbody tr.alert.on td.c-sel,
+  :global([data-d='O']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
+  :global([data-d='A']) ul.clist > li.citem.alert.on,
+  :global([data-d='B']) ul.clist > li.citem.alert.on,
+  :global([data-d='C']) ul.clist > li.citem.alert.on,
+  :global([data-d='I']) ul.clist > li.citem.alert.on { background: var(--tone-band); }
+
+  /* ── Cifras en monoespaciada tabular ────────────────────────────────────
+     Densidad de cabina: lecturas, conteos y retrasos en una columna que alinea
+     dígito con dígito. Va en las seis finalistas que la ganan por densidad o
+     por precisión. Bruma queda afuera a propósito: es la única dirección que
+     declara exactamente dos familias tipográficas, y una tercera en cada
+     lectura le rompería la tesis. (El código de equipo sí es mono en las
+     diecinueve, porque un identificador es mono en todas partes: eso ya lo
+     resuelve .d-id.) */
+  :global([data-d='A']) .figs,
+  :global([data-d='B']) .figs,
+  :global([data-d='C']) .figs,
+  :global([data-d='I']) .figs,
+  :global([data-d='O']) .figs,
+  :global([data-d='T']) .figs {
+    font-family: var(--d-mono);
+    font-size: .94em;
+    letter-spacing: -.015em;
+  }
 </style>

@@ -58,7 +58,7 @@
 
             <!-- grupo de campos -->
             <fieldset class="fm-set">
-              <legend class="fm-leg">Nueva lectura</legend>
+              <legend class="fm-leg">Equipo y medición</legend>
 
               <div class="fm-grid">
                 <!-- equipo · select · obligatorio -->
@@ -143,7 +143,7 @@
                  M lo derrama por detrás, K lo irradia, N lo corre por el
                  carril) y las demás lo ignoran sin cambiar de aspecto. -->
             <div class="fm-opts" data-tone="info">
-              <span class="d-cap fm-cap">Al guardar</span>
+              <h5 class="fm-cap">Al guardar</h5>
               <div class="fm-stack fm-choices">
                 <label class="fm-opt" for="fm-cerrar-{d.id}">
                   <input class="fm-in d-sr" type="checkbox" id="fm-cerrar-{d.id}" name="cerrar" checked />
@@ -164,7 +164,7 @@
 
             <!-- error real + campo bloqueado -->
             <div class="fm-states" data-tone="critical">
-              <span class="d-cap fm-cap">Estados del campo</span>
+              <h5 class="fm-cap">Estados del campo</h5>
               <div class="fm-stack">
                 <div class="fm-f fm-f--bad d-rail" data-tone="critical">
                   <label class="d-label fm-lab" for="fm-bad-{d.id}">Valor</label>
@@ -253,11 +253,17 @@
 
   /* ── fieldset ───────────────────────────────────────────────────────── */
   .fm-set { min-width: 0; margin: 0; padding: 0; border: 0; }
-  .fm-leg {
+  /* EL NOMBRE DE UNA SECCIÓN ES UN ENCABEZADO, NO UNA VERSALITA.
+     Los tres bloques del cuerpo se llamaban con la MISMA versalita gris de
+     11px que llevan las ocho etiquetas de campo. Con todo en el mismo tono no
+     hay jerarquía: el ojo no distingue qué nombra una sección y qué rotula un
+     control, y hay que leer para saberlo. Ahora la sección es tinta plena en
+     caja normal y la etiqueta se queda un escalón abajo. La página no ronda
+     ni un epígrafe. */
+  .fm-leg, .fm-cap {
     display: block; padding: 0; margin: 0 0 var(--d-p2);
-    font-size: var(--d-label-size); font-weight: var(--d-label-weight);
-    letter-spacing: var(--d-label-track); text-transform: var(--d-label-case);
-    color: var(--d-label-color);
+    font-size: var(--d-t-sm); font-weight: var(--d-w-semi);
+    letter-spacing: -.01em; text-transform: none; color: var(--d-ink);
   }
 
   /* ── campos ─────────────────────────────────────────────────────────── */
@@ -285,17 +291,19 @@
   /* texto con unidad — el sufijo comparte el canto del campo */
   .fm-unit { display: flex; align-items: stretch; min-width: 0; }
   .fm-unit > .fm-inp { flex: 1 1 auto; min-width: 0; border-start-end-radius: 0; border-end-end-radius: 0; }
+  /* El sufijo lleva la UNIDAD, que es dato duro: «312» sin «h» no vale nada.
+     Iba en --d-ink-3 sobre --d-sunk, o sea gris claro sobre gris claro: 4,5:1
+     raspando en A y por debajo en varias. Sube a --d-ink-2 en las diecinueve. */
   .fm-u {
     flex: none; display: flex; align-items: center; justify-content: center;
     min-width: 34px; padding-inline: var(--d-p1);
-    font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-3);
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-2);
     background: var(--d-sunk);
     border: max(var(--d-bw), 1px) solid var(--d-edge); border-left: 0;
     border-radius: 0 var(--d-r) var(--d-r) 0;
   }
 
   /* ── casilla · radio · interruptor ──────────────────────────────────── */
-  .fm-cap { display: block; margin-bottom: var(--d-p1); }
   .fm-stack { display: grid; gap: var(--d-p1); min-width: 0; }
   .fm-radios { display: flex; flex-wrap: wrap; gap: var(--d-p1) var(--d-p3); }
   .fm-opt {
@@ -333,11 +341,12 @@
   .fm-in:checked + .fm-sw::after { transform: translateX(18px); background: var(--d-accent-ink); }
   .fm-in:focus-visible + .fm-mark,
   .fm-in:focus-visible + .fm-sw { outline: 2px solid var(--d-focus); outline-offset: 2px; }
-  /* estado del interruptor en PALABRA, nunca solo en color */
+  /* Estado del interruptor en PALABRA, nunca solo en color. Iba en versalitas
+     de 11px: la palabra que dice si el aviso sale o no sale es lo último que
+     conviene poner en caja alta y gris claro. */
   .fm-state {
-    flex: none; font-size: var(--d-t-2xs); font-weight: var(--d-w-semi);
-    color: var(--d-ink-3); letter-spacing: var(--d-label-track);
-    text-transform: var(--d-label-case);
+    flex: none; font-size: var(--d-t-xs); font-weight: var(--d-w-semi);
+    color: var(--d-ink-2); letter-spacing: normal; text-transform: none;
   }
   .fm-state::after { content: 'Desactivado'; }
   .fm-in:checked ~ .fm-state::after { content: 'Activado'; }
@@ -345,31 +354,87 @@
   /* ── error y bloqueo ────────────────────────────────────────────────── */
   .fm-f--bad .fm-inp,
   .fm-f--bad .fm-u { border-color: var(--d-crit); }
-  .fm-f--off .fm-inp[disabled] { background: var(--d-sunk); color: var(--d-ink-3); cursor: not-allowed; }
+  /* Bloqueado no es ilegible: «Salida/devolución» es la respuesta a «¿de
+     dónde salió este número?» y se lee tanto como el resto. */
+  .fm-f--off .fm-inp[disabled] { background: var(--d-sunk); color: var(--d-ink-2); cursor: not-allowed; }
 
   /* ── pie ────────────────────────────────────────────────────────────── */
   .fm-foot { justify-content: space-between; flex-wrap: wrap; gap: var(--d-p1); }
   .fm-acts { flex-wrap: wrap; justify-content: flex-end; }
 
   /* ======================================================================
-     A · ELEVACIÓN — nada se toca. Las secciones son bandejas hundidas que
-     flotan dentro del panel, separadas por aire y no por líneas.
+     A · ELEVACIÓN — la incumbente, y por eso la que hay que llevar a su mejor
+     versión antes de compararla: perderle contra un hombre de paja no sirve.
+
+     LA ALTURA ES EL DATO, no un adorno. Tres alturas y ninguna más:
+       hundido    agrupa (las bandejas de sección)
+       apoyado    no se puede operar (el campo bloqueado no proyecta nada)
+       levantado  se toca, y sube más cuando reclama la mano (foco, error)
+     Un técnico distingue bandeja de campo sin leer una palabra, y el campo
+     bloqueado se delata solo porque no tiene sombra.
+
+     Las etiquetas dejan las versalitas: en A los rótulos de campo eran ocho
+     corridas de 11px en caja alta y gris, el mismo tono que la sección.
      ====================================================================== */
   :global([data-d='A']) .fm-body { gap: var(--d-p4); }
+  :global([data-d='A']) .fm-lab {
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med);
+    letter-spacing: normal; text-transform: none; color: var(--d-ink-2);
+  }
   :global([data-d='A']) .fm-seek { transition: box-shadow 140ms ease; }
   :global([data-d='A']) .fm-seek:focus-within { box-shadow: var(--d-shadow-lg); }
+  /* Hundido: agrupa sin dibujar una sola línea. */
   :global([data-d='A']) .fm-opts,
   :global([data-d='A']) .fm-states {
     background: var(--d-sunk); border-radius: var(--d-r-lg); padding: var(--d-p3);
   }
+  /* Levantado: dentro de la bandeja, todo lo operable vuelve a subir. */
   :global([data-d='A']) .fm-states .fm-inp { background: var(--d-surface); box-shadow: var(--d-shadow); }
+  :global([data-d='A']) .fm-mark,
+  :global([data-d='A']) .fm-sw { box-shadow: var(--d-shadow); }
+  /* Y sube un escalón más lo que tiene el cursor encima. Es la única moción
+     de A y hace un trabajo: sin bordes de color, la altura dice dónde estás. */
+  :global([data-d='A']) .fm-inp { transition: box-shadow 140ms ease; }
+  :global([data-d='A']) .fm-inp:focus { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='A']) .fm-choices .fm-opt {
+    background: var(--d-surface); border-radius: var(--d-r);
+    padding-inline: var(--d-p2); box-shadow: var(--d-shadow);
+  }
+  /* El error es lo más alto de la bandeja: es lo único que reclama la mano. */
+  :global([data-d='A']) .fm-f--bad {
+    background: var(--d-surface); border-radius: var(--d-r);
+    padding: var(--d-p2); box-shadow: var(--d-shadow-lg);
+  }
+  :global([data-d='A']) .fm-f--bad .fm-inp,
+  :global([data-d='A']) .fm-f--bad .fm-u { box-shadow: none; }
+  :global([data-d='A']) .fm-f--bad .fm-inp:focus { box-shadow: var(--d-shadow); }
+  /* Apoyado: sin sombra, pegado al fondo de la bandeja. No se levanta. */
+  :global([data-d='A']) .fm-f--off .fm-inp[disabled] {
+    background: var(--d-sunk); box-shadow: none;
+  }
   :global([data-d='A']) .fm-set { padding-bottom: var(--d-p1); }
 
   /* ======================================================================
      B · INSTRUMENTO — todo es celda. El buscador es un marco continuo con
-     separadores internos; el fieldset es un marco de 1px con marcas de
-     esquina; cada campo es una celda de 27px que COMPARTE borde con la de
-     al lado; los radios son un control segmentado con bordes colapsados.
+     separadores internos; cada campo es una celda de 27px que COMPARTE borde
+     con la de al lado; los radios son un control segmentado con bordes
+     colapsados.
+
+     LO QUE CAMBIA EN ESTA RONDA, y es lo que le faltaba para ser un plano:
+     los tres bloques del cuerpo eran un marco (el fieldset) más dos cajas
+     sueltas sin marco. En un plano no hay tarjetas: hay un dibujo. Ahora los
+     tres colapsan canto contra canto en un solo marco continuo y las marcas
+     de esquina abrazan el conjunto, no el primer bloque.
+
+     Y las cifras van en monoespaciada. En un instrumento un número se lee por
+     columna: 312 sobre 180 alineados al dígito se comparan de un vistazo,
+     en proporcional hay que leerlos. Es la única dirección donde la densidad
+     es de cabina, así que es la única donde esto se paga solo.
+
+     Las versalitas se QUEDAN, pero solo en las etiquetas de campo: es la
+     silueta declarada de B («las etiquetas van fuera del marco, en
+     versalitas»), no un adorno. Los nombres de sección son encabezados como
+     en las otras dieciocho.
      ====================================================================== */
   :global([data-d='B']) .fm-seek {
     grid-template-columns: auto minmax(0, 1fr);
@@ -386,18 +451,38 @@
     grid-column: 1 / -1; padding: 3px var(--d-p2);
     border-top: 1px solid var(--d-line);
   }
-  :global([data-d='B']) .fm-set {
+  /* EL DIBUJO CONTINUO. Los tres bloques comparten canto en vez de separarse:
+     gap 0 y un pelo de solape para que las dos líneas de contacto sean una. */
+  :global([data-d='B']) .fm-body { gap: 0; }
+  :global([data-d='B']) .fm-set,
+  :global([data-d='B']) .fm-opts,
+  :global([data-d='B']) .fm-states {
     position: relative; border: 1px solid var(--d-edge);
     padding: var(--d-p1) var(--d-p2) var(--d-p2);
   }
+  :global([data-d='B']) .fm-opts,
+  :global([data-d='B']) .fm-states { margin-top: -1px; }
+  /* Las marcas de esquina abrazan el DIBUJO entero: la de arriba en el primer
+     bloque, la de abajo en el último. Antes las dos vivían en el fieldset y
+     marcaban una caja que ya no existe. */
   :global([data-d='B']) .fm-set::before,
-  :global([data-d='B']) .fm-set::after {
+  :global([data-d='B']) .fm-states::after {
     content: ''; position: absolute; width: 6px; height: 6px;
     border: 1px solid var(--d-edge); pointer-events: none;
   }
   :global([data-d='B']) .fm-set::before { top: 3px; right: 3px; border-left: 0; border-bottom: 0; }
-  :global([data-d='B']) .fm-set::after { bottom: 3px; left: 3px; border-right: 0; border-top: 0; }
-  :global([data-d='B']) .fm-leg { margin: 0; padding-inline: var(--d-p1); }
+  :global([data-d='B']) .fm-states::after { bottom: 3px; left: 3px; border-right: 0; border-top: 0; }
+  :global([data-d='B']) .fm-leg,
+  :global([data-d='B']) .fm-cap {
+    margin: 0 0 var(--d-p1); padding-inline: var(--d-p1);
+    font-size: var(--d-t-xs);
+  }
+  :global([data-d='B']) .fm-note { padding: var(--d-p2) var(--d-p2) 0; }
+  /* Etiqueta de campo: versalita, que es la silueta de B, y en --d-ink-2 para
+     que 10px en caja alta no queden en gris de segunda. */
+  :global([data-d='B']) .fm-lab { color: var(--d-ink-2); }
+  /* Cifras en monoespaciada: se comparan por columna, no por palabra. */
+  :global([data-d='B']) .d-num { font-family: var(--d-mono); }
   :global([data-d='B']) .fm-grid,
   :global([data-d='B']) .fm-stack {
     gap: 0; border-top: 1px solid var(--d-line); border-left: 1px solid var(--d-line);
@@ -430,12 +515,24 @@
   :global([data-d='B']) .fm-sw::after { width: 9px; height: 9px; top: 2px; left: 2px; border-radius: 0; }
   :global([data-d='B']) .fm-in:checked + .fm-sw::after { transform: translateX(13px); }
   :global([data-d='B']) .fm-f--bad { background: var(--d-crit-band); outline: 1px solid var(--d-crit); outline-offset: -1px; }
-  :global([data-d='B']) .fm-cap { margin: 0 0 -1px; }
 
   /* ======================================================================
-     C · MARCA — el bloque se anuncia por su cabecera. El buscador tiene su
-     etiqueta en una barra teal maciza; la leyenda del fieldset y el título
-     de cada sección son bandas de marca a sangre dentro del panel.
+     C · MARCA — el bloque se anuncia por su cabecera.
+
+     LA CORRECCIÓN DE ESTA RONDA ES DE RACIÓN, NO DE FORMA. Si el color es
+     estructura, tiene que servir para saber DÓNDE estás, y para eso hace
+     falta que no esté en todas partes. La versión anterior gastaba teal en la
+     cabecera del panel, la barra del buscador, el botón del buscador, la
+     leyenda, los dos títulos de sección, el sufijo de unidad Y las ocho
+     etiquetas de campo. Con quince piezas teal, el teal deja de identificar y
+     pasa a ser el fondo.
+
+     Quedan tres niveles y ni uno más:
+       marca maciza     identifica el bloque   (panel, buscador, leyenda)
+       marca lavada     nombra la subsección   (los dos títulos, la unidad)
+       marca de trazo   la acción secundaria   (el botón del buscador)
+     Las etiquetas de campo vuelven a tinta. Ocho rótulos teal no identifican
+     nada; el que tiene que resaltar es el bloque, no cada renglón.
      ====================================================================== */
   :global([data-d='C']) .fm-seek { padding: 0; gap: 0; overflow: hidden; }
   :global([data-d='C']) .fm-seek-lab {
@@ -444,9 +541,12 @@
   }
   :global([data-d='C']) .fm-seek-ctl { padding: var(--d-p2) var(--d-p3); }
   :global([data-d='C']) .fm-seek-hint { padding: 0 var(--d-p3) var(--d-p2); }
+  /* Trazo, no macizo: la barra de arriba ya dijo de quién es este bloque, y
+     el único primario de la celda vive en el pie. */
   :global([data-d='C']) .fm-seek-btn {
-    background: var(--d-brand); color: var(--d-brand-ink); border-color: var(--d-brand);
+    background: var(--d-surface); color: var(--d-brand); border-color: var(--d-brand);
   }
+  :global([data-d='C']) .fm-seek-btn:hover { background: var(--d-accent-soft); }
   :global([data-d='C']) .fm-leg {
     background: var(--d-brand); color: var(--d-brand-ink);
     margin: 0 calc(-1 * var(--d-p3)) var(--d-p3);
@@ -461,8 +561,19 @@
     background: var(--d-accent-soft); color: var(--d-brand);
     border-color: var(--d-accent-edge); border-left: 0;
   }
+  /* Tinta, no marca. Menos el rótulo del buscador: ese va DENTRO de la banda
+     maciza de marca y su tinta ya la fijó la regla de arriba. Sin el :not() las
+     dos reglas pesan (0,2,0), gana la última por orden de archivo, y el rótulo
+     se queda con tinta oscura sobre teal — 1.15 de contraste. */
+  :global([data-d='C']) .fm-lab:not(.fm-seek-lab) { color: var(--d-ink-2); }
+  /* El error usa la misma gramática de banda que la marca, en su propio tono:
+     así el bloque roto se anuncia igual que se anuncia un bloque de marca. */
   :global([data-d='C']) .fm-f--bad .fm-lab { color: var(--d-crit); }
-  :global([data-d='C']) .fm-msg { background: var(--d-crit-band); padding: 4px var(--d-p2); border-radius: var(--d-r); }
+  :global([data-d='C']) .fm-msg {
+    background: var(--d-crit-band); color: var(--d-crit);
+    padding: 4px var(--d-p2); border-radius: var(--d-r);
+    box-shadow: inset 3px 0 0 var(--d-crit);
+  }
 
   /* ======================================================================
      D · PESO — cada bloque es una masa: 2px de tinta y sombra sólida a 4px.
@@ -729,6 +840,18 @@
   }
   :global([data-d='I']) .fm-seek:focus-within { box-shadow: var(--d-shadow-lg); }
   :global([data-d='I']) .fm-seek-ctl { gap: var(--d-p2); }
+  /* Las etiquetas dejan las versalitas. En vidrio, la caja alta tracked de
+     11px sobre un fondo que cambia de tono cada 200px es lo primero que se
+     vuelve ilegible: el rótulo tiene que ganarle al campo de manchas por
+     tamaño y peso, no por espaciado. */
+  :global([data-d='I']) .fm-lab {
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med);
+    letter-spacing: normal; text-transform: none; color: var(--d-ink-2);
+  }
+  /* Una sola escala de radio: el pozo grande a --d-r, la casilla a la mitad.
+     Un cuadrado de 4px dentro de una dirección de 14 y 24 es de otra familia. */
+  :global([data-d='I']) .fm-mark { border-radius: calc(var(--d-r) / 2); }
+  :global([data-d='I']) .fm-mark--rd { border-radius: var(--d-r-pill); }
   /* Los pozos flotan sueltos y separados: I es vidrio DISCRETO. (O, la mezcla,
      va por el camino opuesto y los suelda en losas segmentadas.) */
   :global([data-d='I']) .fm-body { gap: var(--d-p4); }
@@ -754,6 +877,13 @@
      Sin el filo de luz, el vidrio se lee como papel translúcido. */
   :global([data-d='I']) .fm-inp {
     box-shadow: inset 0 1px 0 var(--d-line), inset 0 4px 10px -6px var(--d-edge);
+    transition: box-shadow 160ms ease;
+  }
+  /* Al enfocar, la pieza de vidrio se despega del campo y proyecta. Es la
+     única moción de I y hace falta: sobre un fondo que ya tiene tres manchas
+     de color, un borde de foco de 2px se pierde y la altura no. */
+  :global([data-d='I']) .fm-inp:focus {
+    box-shadow: inset 0 1px 0 var(--d-line), 0 8px 22px -10px var(--d-edge);
   }
   :global([data-d='I']) .fm-u {
     background: var(--d-sunk);
@@ -1088,22 +1218,40 @@
   :global([data-d='M']) .fm-note { font-family: var(--d-display); font-style: italic; }
   :global([data-d='M']) .fm-body { gap: var(--d-p4); }
   :global([data-d='M']) .fm-grid { gap: var(--d-p3); }
-  /* El subrayado se desvanece: empieza en el filo y se va sin canto. */
+  /* La sans es para lo que se opera: la etiqueta de campo es un rótulo de
+     trabajo, no un titular, así que sale de las versalitas y se queda en
+     caja normal. La serif de arriba es la que titula. Esa es la regla de las
+     dos familias, y con las versalitas puestas no se veía: caja alta tracked
+     y serif compiten por el mismo puesto. */
+  :global([data-d='M']) .fm-lab {
+    font-family: var(--d-font);
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med);
+    letter-spacing: normal; text-transform: none; color: var(--d-ink-2);
+  }
+  /* EL SUBRAYADO SE DESVANECE, PERO DESPUÉS DE DECIR DÓNDE TERMINA EL CAMPO.
+     Dos arreglos, los dos medidos:
+       · Empezaba a apagarse al 45 %. Más de la mitad del campo quedaba sin
+         canto y no se sabía dónde tocar. Ahora sostiene hasta el 72 %.
+       · Iba en --d-edge, que es un 16 % de tinta: 1,3:1 contra el papel, o
+         sea invisible. Pasa a --d-ink-3, la misma tinta de las ayudas, y da
+         6,3:1. Un trazo de tinta sobre papel es vocabulario de Bruma; un
+         canto que no se ve, no.
+     Sigue sin filo, que es lo que la dirección pide, y ya se puede usar. */
   :global([data-d='M']) .fm-inp {
     border-bottom-color: transparent;
-    background-image: linear-gradient(90deg, var(--d-edge) 0%, var(--d-edge) 45%, transparent 100%);
+    background-image: linear-gradient(90deg, var(--d-ink-3) 0%, var(--d-ink-3) 72%, transparent 100%);
     background-repeat: no-repeat;
     background-size: 100% 1px;
     background-position: 0 100%;
   }
   :global([data-d='M']) .fm-inp:focus {
-    background-image: linear-gradient(90deg, var(--d-accent) 0%, var(--d-accent) 62%, transparent 100%);
+    background-image: linear-gradient(90deg, var(--d-accent) 0%, var(--d-accent) 80%, transparent 100%);
     background-size: 100% 2px;
   }
   :global([data-d='M']) .fm-u {
     border: 0;
     background: transparent;
-    background-image: linear-gradient(90deg, var(--d-edge) 0%, transparent 100%);
+    background-image: linear-gradient(90deg, var(--d-ink-3) 0%, transparent 100%);
     background-repeat: no-repeat;
     background-size: 100% 1px;
     background-position: 0 100%;
@@ -1112,19 +1260,35 @@
     padding-left: var(--d-p1);
     justify-content: flex-start;
   }
+  /* PUESTO Y NO PUESTO TIENEN QUE SER DOS COSAS DISTINTAS.
+     La casilla marcada era --d-accent-soft y la sin marcar --d-neu-band: dos
+     lavados del 12 % sobre el mismo papel, o sea el mismo gris. La diferencia
+     quedaba solo en el glifo. Que Bruma no encajone no la exime de que un
+     control diga si está puesto: los contenedores no tienen filo, los
+     controles sí. Marcado pasa a acento macizo con el glifo en papel, y el
+     halo se queda para que el color siga derramándose. */
   :global([data-d='M']) .fm-mark {
     border: 0;
+    border-radius: calc(var(--d-r) / 2);
     background: var(--d-neu-band);
+    box-shadow: inset 0 0 0 1px var(--d-ink-3);
     color: transparent;
   }
+  :global([data-d='M']) .fm-mark--rd { border-radius: var(--d-r-pill); }
   :global([data-d='M']) .fm-in:checked + .fm-mark {
-    background: var(--d-accent-soft);
-    color: var(--d-accent);
-    box-shadow: 0 0 18px -4px var(--d-accent-soft);
+    background: var(--d-accent);
+    color: var(--d-accent-ink);
+    box-shadow: 0 0 22px -4px var(--d-accent-soft);
   }
-  :global([data-d='M']) .fm-sw { border: 0; background: var(--d-neu-band); }
-  :global([data-d='M']) .fm-in:checked + .fm-sw { background: var(--d-accent-soft); }
-  :global([data-d='M']) .fm-in:checked + .fm-sw::after { background: var(--d-accent); }
+  :global([data-d='M']) .fm-sw {
+    border: 0;
+    background: var(--d-neu-band);
+    box-shadow: inset 0 0 0 1px var(--d-ink-3);
+  }
+  :global([data-d='M']) .fm-in:checked + .fm-sw {
+    background: var(--d-accent);
+    box-shadow: 0 0 24px -5px var(--d-accent-soft);
+  }
   :global([data-d='M']) .fm-in:checked ~ .fm-state { color: var(--d-accent); }
   /* El error tampoco encajona: el subrayado se tiñe y el color se derrama. */
   :global([data-d='M']) .fm-f--bad {
@@ -1321,11 +1485,37 @@
   }
   :global([data-d='O']) .fm-opts .fm-stack,
   :global([data-d='O']) .fm-states .fm-stack { padding: 0 var(--d-p3) var(--d-p3); }
+  /* LA LOSA QUE FALTABA. El grupo de campos era el único bloque del cuerpo
+     que no estaba soldado: dos losas de vidrio con capa de marca y, entre
+     ellas, un montón de campos sueltos al aire. Ahora los tres son la misma
+     pieza y la tesis de O se lee de una: la marca no parte el contenedor en
+     dos, lo tiñe entero por dentro. */
+  :global([data-d='O']) .fm-set {
+    overflow: hidden;
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    background: var(--d-sunk);
+    box-shadow: inset 0 1px 0 var(--d-line);
+    padding: 0 0 var(--d-p3);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
   :global([data-d='O']) .fm-leg {
-    margin: 0 0 var(--d-p2);
-    padding-bottom: var(--d-p1);
+    margin: 0 0 var(--d-p3);
+    padding: var(--d-p1) var(--d-p3);
+    background: var(--d-accent-soft);
+    color: var(--d-brand);
     border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
   }
+  :global([data-d='O']) .fm-grid { padding-inline: var(--d-p3); }
+  /* La marca nombra el BLOQUE, no cada renglón: con la capa teñida arriba de
+     cada losa, ocho etiquetas también en teal dejan de señalar nada. */
+  :global([data-d='O']) .fm-lab:not(.fm-seek-lab) {
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med);
+    letter-spacing: normal; text-transform: none; color: var(--d-ink-2);
+  }
+  :global([data-d='O']) .fm-mark { border-radius: calc(var(--d-r) / 2); }
+  :global([data-d='O']) .fm-mark--rd { border-radius: var(--d-r-pill); }
   :global([data-d='O']) .fm-inp {
     box-shadow: inset 0 1px 0 var(--d-line), inset 0 4px 10px -6px var(--d-edge);
   }
@@ -1764,6 +1954,156 @@
   :global([data-d='S']) .fm-msg { color: var(--d-crit); }
   :global([data-d='S']) .fm-foot { border-top: 0; }
   :global([data-d='S']) .fm-set { padding-bottom: var(--d-p1); }
+
+  /* ======================================================================
+     T · HALO CLARO — Halo, del otro lado de la luz.
+
+     LA REGLA QUE SE IMPONE EN UN FORMULARIO: IRRADIA LO QUE SE TOCA O LO QUE
+     INFORMA. En una dirección sin un solo borde, si todo brilla no brilla
+     nada, así que la luz tiene que estar repartida por función y no por
+     gusto. Cuatro escalones y ninguno más:
+
+       papel plano   el grupo de campos. Ni anillo ni resplandor: lo que
+                     agrupa es el encabezado y el aire.
+       anillo        todo control. El campo no tiene borde, lo define un
+                     anillo interior de 1px. Ese anillo es lo único que dice
+                     dónde empieza y dónde termina la zona que se toca, así
+                     que va en --d-ink-3 y da 5,6:1 contra el papel. Con el
+                     lavado del 7 % que traen las sombras del token quedaba
+                     en 1,4:1, que sobre papel es no estar.
+       halo propio   lo marcado, lo enfocado y lo roto. Sube la luz.
+       apagado       lo bloqueado. Ni halo ni acento: se hunde en el papel.
+
+     CONTRA UMBRA, que es la hermana peligrosa: en S la tarjeta es una
+     tarjeta y la sombra teñida es un dato añadido encima. Acá no hay tarjeta.
+     El anillo del propio tono es la pieza que S no tiene, y el acento
+     (--d-accent, teal saturado) brilla por sí mismo en vez de ser tinta
+     negra. Un acento, uno solo, en toda la celda.
+
+     Una escala de radio: --d-r-lg para los bloques, --d-r para el campo y el
+     error, la mitad de --d-r para la casilla, y la píldora solo en el
+     interruptor, que es lo único con forma de riel.
+     ====================================================================== */
+  /* Sobre papel, un rótulo en versalitas grises de 11px es una mancha, no una
+     palabra. La etiqueta se lee, y el que brilla es el campo. */
+  :global([data-d='T']) .fm-lab {
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med);
+    letter-spacing: normal; text-transform: none; color: var(--d-ink-2);
+  }
+  /* El buscador se apoya en el papel con un halo bajo. Al entrar el foco, el
+     halo toma el acento: sin bordes en toda la pantalla, esto es lo único
+     que dice en qué bloque está el cursor, así que la moción trabaja. */
+  :global([data-d='T']) .fm-seek {
+    border: 0;
+    background: var(--d-surface);
+    border-radius: var(--d-r-lg);
+    padding: var(--d-p3);
+    box-shadow: var(--d-shadow);
+    transition: box-shadow 180ms ease;
+  }
+  :global([data-d='T']) .fm-seek:focus-within {
+    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 14px 44px -16px var(--d-accent);
+  }
+  :global([data-d='T']) .fm-body { gap: var(--d-p4); }
+  /* Papel plano: el grupo de campos no es un contenedor. */
+  :global([data-d='T']) .fm-set { padding-bottom: var(--d-p1); }
+  :global([data-d='T']) .fm-grid { gap: var(--d-p3) var(--d-p2); }
+  /* Los dos bloques que informan de algo sí irradian, cada uno en su tono:
+     el de «al guardar» en azul, el de estados en rojo. Es la misma regla de
+     Halo, que el estado sea el color de lo que se irradia, solo que acá se
+     irradia sobre papel y el texto se sigue leyendo en negro sobre blanco. */
+  :global([data-d='T']) .fm-opts,
+  :global([data-d='T']) .fm-states {
+    border: 0;
+    border-radius: var(--d-r-lg);
+    background: var(--d-surface);
+    padding: var(--d-p3);
+    box-shadow: 0 0 0 1px var(--tone-edge), 0 14px 40px -18px var(--tone-fg);
+  }
+  /* EL ANILLO. Se escribe una vez y lo comparten el campo, el sufijo y los
+     controles, para que todo lo tocable tenga el mismo canto. */
+  :global([data-d='T']) .fm-inp {
+    background: var(--d-surface);
+    border: 0;
+    box-shadow: inset 0 0 0 1px var(--d-ink-3);
+    transition: box-shadow 160ms ease;
+  }
+  :global([data-d='T']) .fm-inp:focus {
+    box-shadow: inset 0 0 0 1px var(--d-accent), 0 0 0 3px var(--d-accent-soft),
+                0 6px 18px -8px var(--d-accent);
+  }
+  /* El sufijo de unidad continúa el anillo por tres lados: sin la pared
+     izquierda, el par campo + unidad se lee como UNA pieza y no como dos
+     cajas pegadas con una doble línea en la costura. */
+  :global([data-d='T']) .fm-u {
+    background: var(--d-sunk);
+    border: 0;
+    border-radius: 0 var(--d-r) var(--d-r) 0;
+    color: var(--d-ink-2);
+    box-shadow: inset -1px 0 0 var(--d-ink-3),
+                inset 0 1px 0 var(--d-ink-3),
+                inset 0 -1px 0 var(--d-ink-3);
+  }
+  :global([data-d='T']) .fm-mark {
+    border: 0;
+    border-radius: calc(var(--d-r) / 2);
+    background: var(--d-surface);
+    box-shadow: inset 0 0 0 1px var(--d-ink-3);
+  }
+  :global([data-d='T']) .fm-mark--rd { border-radius: var(--d-r-pill); }
+  :global([data-d='T']) .fm-in:checked + .fm-mark {
+    background: var(--d-accent);
+    box-shadow: 0 0 0 1px var(--d-accent), 0 6px 18px -7px var(--d-accent);
+  }
+  :global([data-d='T']) .fm-sw {
+    border: 0;
+    background: var(--d-sunk);
+    box-shadow: inset 0 0 0 1px var(--d-ink-3);
+  }
+  :global([data-d='T']) .fm-sw::after { background: var(--d-ink-2); }
+  :global([data-d='T']) .fm-in:checked + .fm-sw {
+    background: var(--d-accent);
+    box-shadow: 0 0 0 1px var(--d-accent), 0 7px 22px -8px var(--d-accent);
+  }
+  :global([data-d='T']) .fm-in:checked ~ .fm-state { color: var(--d-accent); }
+  /* Marcado = irradia. Una fila con la casilla puesta se ve desde lejos sin
+     leerla, que es exactamente lo que hace falta cuando lo que se marca es
+     «cerrar la tarea» y no da lo mismo. */
+  :global([data-d='T']) .fm-choices .fm-opt {
+    border-radius: var(--d-r);
+    padding-inline: var(--d-p2);
+    transition: box-shadow 180ms ease;
+  }
+  :global([data-d='T']) .fm-choices .fm-opt:has(.fm-in:checked) {
+    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 8px 26px -14px var(--d-accent);
+  }
+  :global([data-d='T']) .fm-radios { gap: var(--d-p1) var(--d-p3); }
+  /* El error no se rellena de rojo: el campo se pone a irradiar rojo, el
+     anillo toma el tono y el texto sigue sobre papel blanco. El color nunca
+     va solo: quedan el glifo y la frase completa debajo del campo. */
+  :global([data-d='T']) .fm-f--bad {
+    background: var(--d-surface);
+    border-radius: var(--d-r);
+    padding: var(--d-p2);
+    box-shadow: 0 0 0 1px var(--tone-edge), 0 10px 30px -13px var(--tone-fg);
+  }
+  :global([data-d='T']) .fm-f--bad .fm-inp {
+    box-shadow: inset 0 0 0 1px var(--tone-fg);
+  }
+  :global([data-d='T']) .fm-f--bad .fm-u {
+    box-shadow: inset -1px 0 0 var(--tone-fg),
+                inset 0 1px 0 var(--tone-fg),
+                inset 0 -1px 0 var(--tone-fg);
+  }
+  /* Apagado: el único elemento de la celda que no irradia nada. Se hunde en
+     --d-sunk y conserva el anillo neutro, porque sigue habiendo que leerlo. */
+  :global([data-d='T']) .fm-f--off .fm-inp[disabled] {
+    background: var(--d-sunk);
+    box-shadow: inset 0 0 0 1px var(--d-neu-edge);
+  }
+  /* Ni una línea tampoco en el pie: lo que separa es un canto de luz. */
+  :global([data-d='T']) .fm-foot { border-top: 0; box-shadow: 0 -1px 0 var(--d-neu-edge); }
+  :global([data-d='T']) .fm-note { padding-top: var(--d-p2); }
 
   /* ======================================================================
      RESPONSIVE — hasta 380px. Cuando la celda se estrecha, el raíl de G y la

@@ -25,6 +25,9 @@
   const TAREAS = PLANS.slice(0, 3);
   const LECTURAS = [BAT, GEN];
   const TOTAL = KPIS[0].value + KPIS[1].value + KPIS[2].value + KPIS[3].value;
+  // Hoy hay 8 vencidos y la nota de demo.js dice "3 más que ayer": ayer eran 5.
+  // Aritmética sobre el dato real, no una cifra decorativa.
+  const AYER = KPIS[0].value - 3;
 
   // Una sola selección compartida por las ocho celdas: al elegir un KPI se ve
   // de un golpe cómo dibuja cada dirección el estado "seleccionado".
@@ -81,8 +84,8 @@
               </span>
               <span class="kpi-body">
                 <span class="kpi-fig d-num">{KPIS[0].value}</span>
-                <span class="kpi-tag d-num">+3 desde ayer</span>
-                <span class="kpi-note">Empeora · {KPIS[0].note}</span>
+                <span class="kpi-tag d-num">+3</span>
+                <span class="kpi-note d-num">ayer eran {AYER}</span>
               </span>
             </button>
 
@@ -98,10 +101,14 @@
                 <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf(COM.tone)}</svg>
                 <span class="kpi-lab-t">Horas · {COM.code}</span>
               </span>
+              <!-- La casilla de la cifra nunca se queda en blanco ni con una
+                   raya: dice qué pasó. "nunca" ocupa el mismo sitio que ocuparía
+                   el número y contesta la pregunta del rótulo, que es cuántas
+                   horas lleva la máquina. -->
               <span class="kpi-body">
-                <span class="kpi-fig d-num">{COM.metric}</span>
-                <span class="kpi-tag">Sin dato</span>
-                <span class="kpi-note">{COM.name} · lectura {COM.reading}</span>
+                <span class="kpi-fig">{COM.reading}</span>
+                <span class="kpi-tag">{COM.state}</span>
+                <span class="kpi-note">{COM.name}</span>
               </span>
             </button>
           </div>
@@ -127,7 +134,7 @@
               <dl class="ficha-meta">
                 <div class="d-rail">
                   <dt class="d-cap">Próxima tarea</dt>
-                  <dd>{BAT.plan} · {PLANS[0].every} — {PLANS[0].when}</dd>
+                  <dd>{BAT.plan}, {PLANS[0].every}. {PLANS[0].when}.</dd>
                 </div>
                 <div class="d-rail">
                   <dt class="d-cap">Última lectura</dt>
@@ -147,9 +154,12 @@
 
           <!-- AVISO LATERAL ----------------------------------------------- -->
           <div class="callout" data-tone="info" role="note">
+            <!-- El único epígrafe que queda en pie en toda la página. Sobrevive
+                 porque clasifica algo que el titular no dice: lo que sigue no es
+                 una medición, es un supuesto. -->
             <p class="callout-kicker d-cap">
               <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf('info')}</svg>
-              <span>Aviso · dato estimado</span>
+              <span>Estimado</span>
             </p>
             <div class="callout-txt">
               <p class="callout-title">{HRN.code} · {HRN.name} no reporta lectura</p>
@@ -165,7 +175,7 @@
         <section class="d-panel plan" aria-labelledby={'plan-' + d.id}>
           <header class="d-panel-head">
             <h5 class="d-panel-title" id={'plan-' + d.id}>Plan de mantenimiento</h5>
-            <span class="d-cap d-num">{TAREAS.length} de {PLANS.length} tareas</span>
+            <span class="head-meta d-num">{TAREAS.length} de {PLANS.length} tareas</span>
           </header>
 
           <ul class="plans">
@@ -187,7 +197,6 @@
             <section class="d-panel nest" aria-labelledby={'nest-' + d.id}>
               <header class="d-panel-head">
                 <h6 class="d-panel-title" id={'nest-' + d.id}>Lecturas recibidas</h6>
-                <span class="d-cap">esta semana</span>
               </header>
               <ul class="plans">
                 {#each LECTURAS as a (a.code)}
@@ -196,7 +205,7 @@
                       <span class="d-id">{a.code}</span>
                       <span class="plan-name d-num">{a.reading}</span>
                     </span>
-                    <span class="plan-src d-cap">{a.source}</span>
+                    <span class="plan-src">{a.source}</span>
                   </li>
                 {/each}
               </ul>
@@ -268,6 +277,36 @@
   }
   .mk { width: 1em; height: 1em; flex: none; color: var(--tone-fg); }
 
+  /* ----------------------------------------------------------------------
+     LA VERSALITA SE RETIRA.
+
+     Esta era la página con más versalitas del catálogo: seis rótulos de KPI,
+     tres de la ficha, dos de origen, el recuento de la cabecera y el aviso.
+     Trece marcas de agua compitiendo por el mismo tono de voz, que es
+     exactamente el ritmo templado que delata una plantilla.
+
+     El rótulo de un KPI sí es información: no se borra, se degrada a palabra.
+     Vuelve a caja normal, sube de 10-11px a --d-t-sm y toma tinta secundaria,
+     así el orden de lectura pasa a ser palabra, cifra, nota, sin que nada
+     dependa de descifrar una línea de mayúsculas espaciadas.
+
+     Dos excepciones, ambas del contrato y no del gusto:
+       B declara en su ficha de dirección que las etiquetas van en versalitas.
+         Ahí la versalita es la marca grabada del instrumento, no un epígrafe.
+       C ya trae --d-label-case: none, así que su rótulo nunca fue versalita.
+     ---------------------------------------------------------------------- */
+  :global([data-d='A']) .kpi-lab, :global([data-d='A']) .ficha-meta dt,
+  :global([data-d='I']) .kpi-lab, :global([data-d='I']) .ficha-meta dt,
+  :global([data-d='O']) .kpi-lab, :global([data-d='O']) .ficha-meta dt,
+  :global([data-d='M']) .kpi-lab, :global([data-d='M']) .ficha-meta dt,
+  :global([data-d='T']) .kpi-lab, :global([data-d='T']) .ficha-meta dt {
+    font-size: var(--d-t-sm);
+    font-weight: var(--d-w-med);
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--d-ink-2);
+  }
+
   .ficha .d-panel-title { min-width: 0; overflow-wrap: anywhere; }
   .ficha-name {
     margin: 0; font-size: var(--d-t-lg); font-weight: var(--d-w-semi);
@@ -284,13 +323,17 @@
 
   .plans { list-style: none; margin: 0; padding: 0; }
   .plan-row { flex-wrap: wrap; padding-block: calc(var(--d-p1) / 2); }
+  /* El recuento de la cabecera y el origen de una lectura son DATOS, no
+     rótulos: leídos en versalitas de 10px con tracking abierto tardan más que
+     el texto que acompañan. Bajan a texto normal y suben de tamaño. */
+  .head-meta { font-size: var(--d-t-xs); color: var(--d-ink-3); white-space: nowrap; }
   .plan-task {
     display: flex; align-items: baseline;
     row-gap: calc(var(--d-p1) * .5); column-gap: var(--d-p2);
     flex: 1 1 150px; min-width: 0; flex-wrap: wrap;
   }
   .plan-name { font-size: var(--d-t-sm); overflow-wrap: anywhere; }
-  .plan-src { white-space: nowrap; }
+  .plan-src { white-space: nowrap; font-size: var(--d-t-xs); color: var(--d-ink-3); }
   .nest-wrap { min-width: 0; }
 
   .callout {
@@ -314,21 +357,41 @@
   .aside-row { display: grid; gap: var(--d-gap); min-width: 0; }
 
   /* ======================================================================
-     A · ELEVACIÓN — la sombra contiene, el borde apenas existe. Todo se
-     separa por aire y el anidado FLOTA sobre su contenedor.
+     A · ELEVACIÓN — la incumbente, y la que llegaba peor calibrada.
+
+     Su tesis es que la altura significa algo. Hasta ahora las seis cifras,
+     la ficha y el anidado flotaban todos a --d-shadow-lg: cuando todo está
+     a la misma altura, la elevación deja de informar y queda como textura.
+
+     Acá la altura ES la jerarquía y ES el estado. En reposo la cifra apoya
+     sobre el fondo; el puntero la levanta; la elegida se queda arriba. El
+     anillo de tono confirma lo que la altura ya dijo, no lo sustituye, así
+     que el filtro puesto se reconoce en el perfil de la celda antes de leer
+     una palabra o distinguir un color.
      ====================================================================== */
-  :global([data-d='A']) .kpi { border-color: transparent; box-shadow: var(--d-shadow-lg); }
-  :global([data-d='A']) .kpi:hover { transform: translateY(-2px); }
+  :global([data-d='A']) .kpi { border-color: transparent; box-shadow: var(--d-shadow); }
+  :global([data-d='A']) .kpi:hover {
+    transform: translateY(calc(var(--d-p1) / -4));
+    box-shadow: var(--d-shadow-lg);
+  }
   :global([data-d='A']) .kpi.on {
+    transform: translateY(calc(var(--d-p1) / -3));
     box-shadow: var(--d-shadow-lg), 0 0 0 calc(var(--d-bw) * 2) var(--tone-fg);
   }
   :global([data-d='A']) .kpi.on .kpi-lab { font-weight: var(--d-w-bold); color: var(--d-ink); }
-  :global([data-d='A']) .ficha { border-color: transparent; box-shadow: var(--d-shadow-lg); }
+  /* Las dos piezas grandes de la celda son las que más alto vuelan. */
+  :global([data-d='A']) .ficha,
+  :global([data-d='A']) .plan { border-color: transparent; box-shadow: var(--d-shadow-lg); }
   :global([data-d='A']) .callout { border-color: transparent; box-shadow: var(--d-shadow); }
+  /* Dentro de una tarjeta, otra tarjeta que flota MÁS que la que la sostiene
+     es física al revés. El anidado baja un escalón de sombra y otro de radio:
+     concéntrico de verdad, no dos cajas del mismo tamaño de esquina. */
   :global([data-d='A']) .nest {
-    border-color: transparent; box-shadow: var(--d-shadow-lg); border-radius: var(--d-r-lg);
+    border-color: transparent;
+    box-shadow: var(--d-shadow);
+    border-radius: var(--d-r);
   }
-  :global([data-d='A']) .sec-head { padding-bottom: var(--d-p1); }
+  :global([data-d='A']) .sec-head { padding-bottom: var(--d-p2); }
 
   /* ======================================================================
      B · INSTRUMENTO — la tira es UN marco continuo: las celdas comparten
@@ -352,11 +415,50 @@
   :global([data-d='B']) .kpis::after {
     bottom: calc(var(--d-p1) / 2); right: calc(var(--d-p1) / 2); border-left: 0; border-top: 0;
   }
-  :global([data-d='B']) .kpi { border: 0; box-shadow: none; padding: var(--d-p2); }
+  /* Un instrumento no se mueve al mirarlo: la transición se corta entera. */
+  :global([data-d='B']) .kpi {
+    border: 0; box-shadow: none; padding: var(--d-p2); transition: none;
+  }
   :global([data-d='B']) .kpi-lab {
     border-bottom: var(--d-bw) solid var(--d-line);
     padding-bottom: calc(var(--d-p1) / 2);
   }
+  /* LA CIFRA VA EN MONOESPACIADA. Es la única dirección de densidad de cabina
+     y en una cabina los números se comparan uno debajo del otro: si el 8 y el
+     62 no ocupan el mismo ancho por dígito, la columna deja de ser columna.
+     Baja de --d-t-2xl a --d-t-xl porque la mono es más ancha por carácter y a
+     28px la celda de 30px de fila se desarma. */
+  :global([data-d='B']) .kpi-fig {
+    font-family: var(--d-mono);
+    font-size: var(--d-t-xl);
+    font-weight: var(--d-w-bold);
+    letter-spacing: -.02em;
+  }
+  :global([data-d='B']) .head-meta { font-family: var(--d-mono); font-size: var(--d-t-2xs); }
+  /* La fila del plan vuelve a los 30px del contrato: el relleno vertical extra
+     la estiraba a 36 y deshacía la única densidad real del catálogo. */
+  :global([data-d='B']) .plan-row { padding-block: 0; }
+  /* LA FICHA ES UNA TABLA, NO TRES PÁRRAFOS. Rótulo y valor comparten columna
+     entre las tres filas, así que los tres valores arrancan alineados y el ojo
+     baja por una sola vertical. `display: contents` disuelve cada .d-rail para
+     que las seis celdas caigan en la MISMA rejilla; una rejilla por fila
+     alinearía cada fila con la longitud de su propio rótulo, que es no
+     alinear nada. */
+  :global([data-d='B']) .ficha-meta {
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: var(--d-p3);
+    row-gap: 0;
+  }
+  :global([data-d='B']) .ficha-meta > .d-rail { display: contents; }
+  :global([data-d='B']) .ficha-meta dt,
+  :global([data-d='B']) .ficha-meta dd {
+    padding-block: calc(var(--d-p1) / 2);
+    border-bottom: var(--d-bw) solid var(--d-line);
+  }
+  /* La última corrida cierra contra el filo del pie: dos líneas a un pelo una
+     de otra son un error de dibujo, no un cierre. */
+  :global([data-d='B']) .ficha-meta > .d-rail:last-child dt,
+  :global([data-d='B']) .ficha-meta > .d-rail:last-child dd { border-bottom: 0; }
   :global([data-d='B']) .kpi.on { background: var(--d-sunk); }
   :global([data-d='B']) .kpi.on .kpi-lab {
     background: var(--d-edge); color: var(--d-ink-on);
@@ -388,36 +490,62 @@
   :global([data-d='B']) .d-panel-foot .d-btn + .d-btn { margin-left: calc(-1 * var(--d-bw)); }
 
   /* ======================================================================
-     C · MARCA — cada cifra se anuncia por su cabecera llena de teal; el
-     borde no identifica nada.
+     C · MARCA — el color identifica el bloque; no lo decora.
+
+     Esa frase es la ficha de la dirección y era justo lo que la celda no
+     cumplía: nueve barras de teal lleno por pantalla (cuatro cifras, dos
+     variantes, ficha, plan, anidado, aviso) convierten el color de marca en
+     papel pintado. Cuando todo es teal, el teal no identifica nada.
+
+     Acá el teal tiene tres volúmenes y cada uno significa algo distinto:
+       lleno       el contenedor se anuncia (ficha y plan) y la cifra ACTIVA
+       tinte pálido las cifras en reposo y el anidado, que es un nivel abajo
+       tinta       titulares y rótulos sobre papel
+     Así el bloque de color más fuerte de la celda está diciendo cuál es el
+     filtro puesto, en vez de repetir nueve veces quién fabrica el software.
      ====================================================================== */
   :global([data-d='C']) .kpi { padding: 0; gap: 0; overflow: hidden; }
   :global([data-d='C']) .kpi-lab {
-    background: var(--d-brand); color: var(--d-brand-ink);
+    background: var(--d-accent-soft); color: var(--d-brand);
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-accent-edge);
     padding: var(--d-p1) var(--d-p2);
   }
-  /* Cabecera teal llena: la marca iba en color de tono (verde, ámbar, rojo)
-     sobre teal y era ilegible. Toma la tinta de marca, como la etiqueta. */
-  :global([data-d='C']) .kpi-lab .mk { color: var(--d-brand-ink); }
+  :global([data-d='C']) .kpi-lab .mk { color: var(--d-brand); }
   :global([data-d='C']) .kpi-body { margin-top: 0; padding: var(--d-p2) var(--d-p2) var(--d-p3); }
   :global([data-d='C']) .kpi.on { border-color: var(--d-brand); box-shadow: var(--d-shadow-lg); }
-  :global([data-d='C']) .kpi.on .kpi-lab { background: var(--d-brand-deep); }
+  /* El teal lleno aparece UNA vez en la tira, y aparece donde hay una decisión
+     tomada. Tinta de marca sobre tinte pálido y tinta clara sobre teal lleno:
+     las dos combinaciones pasan AA con holgura. */
+  :global([data-d='C']) .kpi.on .kpi-lab {
+    background: var(--d-brand); color: var(--d-brand-ink);
+    border-bottom-color: var(--d-brand);
+    font-weight: var(--d-w-bold);
+  }
+  :global([data-d='C']) .kpi.on .kpi-lab .mk { color: var(--d-brand-ink); }
   :global([data-d='C']) .sec-title { color: var(--d-brand); }
   :global([data-d='C']) .sec-head {
     border-bottom: max(var(--d-bw), 1px) solid var(--d-accent-edge); padding-bottom: var(--d-p1);
   }
+  /* Dos cabeceras de teal lleno apiladas se leen como dos bloques hermanos,
+     no como uno DENTRO de otro. El anidado baja de volumen: mismo color,
+     menos peso. El color pasa a codificar profundidad. */
+  :global([data-d='C']) .nest > .d-panel-head {
+    background: var(--d-accent-soft);
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-accent-edge);
+  }
+  :global([data-d='C']) .nest > .d-panel-head .d-panel-title { color: var(--d-brand); }
   :global([data-d='C']) .callout { background: var(--d-surface); border-color: var(--d-line); padding: 0; }
+  /* El tono de aviso en C es el mismo teal que la marca, así que una barra
+     llena acá sería una décima cabecera de marca. Se queda en el tinte. */
   :global([data-d='C']) .callout-kicker {
-    background: var(--tone-fg); color: var(--d-ink-on);
+    background: var(--tone-band); color: var(--tone-fg);
+    border-bottom: max(var(--d-bw), 1px) solid var(--tone-edge);
     padding: var(--d-p1) var(--d-p3);
   }
-  /* El kicker se llena con el propio color de tono: la marca, que también va
-     en ese color, desaparecía. Toma la tinta invertida del kicker. */
-  :global([data-d='C']) .callout-kicker .mk { color: var(--d-ink-on); }
   :global([data-d='C']) .callout-txt { padding: 0 var(--d-p3) var(--d-p3); }
-  /* La cabecera del bloque es teal lleno y .d-cap pinta en --d-brand: la nota
-     de la derecha quedaba teal sobre teal, invisible. Va en tinta de marca. */
-  :global([data-d='C']) .d-panel-head .d-cap { color: var(--d-brand-ink); }
+  /* La cabecera del plan sigue siendo teal lleno: el recuento va en tinta
+     clara o se pierde teal sobre teal. */
+  :global([data-d='C']) .d-panel-head .head-meta { color: var(--d-brand-ink); }
 
   /* ======================================================================
      D · PESO — la cifra ocupa la celda a 800, la etiqueta es una franja de
@@ -645,12 +773,18 @@
     border-radius: 0;
     box-shadow: inset 0 var(--d-bw) 0 var(--d-line);
   }
+  /* EL VIDRIO SE ESPESA. I tiene tres opacidades de blanco y estaban usadas al
+     revés: la celda apuntada bajaba a --d-sunk (30 %) y quedaba MÁS translúcida
+     que en reposo, o sea que apuntar apagaba la celda. La escala real es
+     sunk 30 < surface 56 < line 68, así que el gesto correcto es subir por
+     ella: apoyada transparente, apuntada opaca, elegida la lámina más gruesa
+     que la dirección tiene. */
+  :global([data-d='I']) .kpi:hover { background: var(--d-surface); }
   :global([data-d='I']) .kpi.on {
-    background: var(--d-surface);
+    background: var(--d-line);
     box-shadow: inset 0 var(--d-bw) 0 var(--d-line),
-                inset 0 0 0 var(--d-bw) var(--tone-edge);
+                inset 0 0 0 calc(var(--d-bw) * 2) var(--tone-edge);
   }
-  :global([data-d='I']) .kpi:hover { background: var(--d-sunk); }
   :global([data-d='I']) .kpi.on .kpi-lab { color: var(--d-ink); font-weight: var(--d-w-bold); }
   /* La tira recorta: sin esto el anillo de foco se pierde bajo el overflow. */
   :global([data-d='I']) .kpi:focus-visible { outline-offset: calc(-1 * var(--d-p1)); }
@@ -863,13 +997,22 @@
       radial-gradient(58% 66% at 20% 16%, var(--tone-band) 0%, transparent 70%),
       radial-gradient(46% 54% at 86% 88%, var(--tone-band) 0%, transparent 68%);
     filter: blur(var(--d-p4));
-    opacity: .5;
+    opacity: .34;
     pointer-events: none;
     z-index: -1;
     transition: opacity 160ms ease;
   }
+  /* La mancha es lo ÚNICO que agrupa en esta dirección, así que también tiene
+     que ser lo único que marca la selección. Con .5 contra 1 la diferencia
+     entre puesta y sin poner era medio tono de niebla; con .34 contra 1 la
+     mancha elegida aterriza y las otras cinco se quedan en el papel. */
   :global([data-d='M']) .kpi.on::before { opacity: 1; }
   :global([data-d='M']) .kpi.on .kpi-lab { color: var(--d-ink); font-weight: var(--d-w-bold); }
+  :global([data-d='M']) .kpi.on .kpi-note { color: var(--d-ink-2); }
+  /* Seis manchas de 28px de desenfoque a 26px de separación se tocan entre
+     vecinas y el conjunto vuelve a leerse como una sola nube. Bruma paga su
+     falta de contenedor en aire, igual que E y K. */
+  :global([data-d='M']) .kpis { gap: calc(var(--d-gap) * 1.4); }
   :global([data-d='M']) .kpi-fig {
     font-family: var(--d-display);
     font-weight: 400;
@@ -988,6 +1131,7 @@
   :global([data-d='O']) .kpi-lab {
     background: linear-gradient(180deg, var(--d-accent-edge), var(--d-accent-soft));
     color: var(--d-brand-ink);
+    font-weight: var(--d-w-semi);
     border-bottom: var(--d-bw) solid var(--d-accent-soft);
     padding: var(--d-p1) var(--d-p2);
   }
@@ -999,10 +1143,16 @@
   :global([data-d='O']) .kpi:hover { transform: translateY(calc(-1 * var(--d-bw) * 2)); box-shadow: var(--d-shadow-lg); }
   /* Elegido: el vidrio se aclara (--d-line es el blanco al 72 %, el único
      token de O más claro que --d-surface) y el tinte de marca de la cabecera
-     se duplica. Sigue siendo capa translúcida, nunca barra opaca. */
+     se duplica. Sigue siendo capa translúcida, nunca barra opaca.
+
+     EL ANILLO ES DE TONO, NO DE MARCA. Es la prueba que O tiene que pasar:
+     tres colores conviviendo sin ensuciarse. La marca dice QUÉ es el bloque y
+     vive en la cabecera; el tono dice CÓMO está y vive en el filo y en la
+     cifra. Con el anillo también teal, los dos colores dirían lo mismo dos
+     veces y la mezcla no demostraría nada. */
   :global([data-d='O']) .kpi.on {
     background: var(--d-line);
-    box-shadow: var(--d-shadow-lg), 0 0 0 var(--d-bw) var(--d-accent-edge);
+    box-shadow: var(--d-shadow-lg), 0 0 0 calc(var(--d-bw) * 2) var(--tone-edge);
   }
   :global([data-d='O']) .kpi.on .kpi-lab {
     background: linear-gradient(180deg, var(--d-accent-edge), var(--d-accent-edge));
@@ -1032,14 +1182,21 @@
   }
   :global([data-d='O']) .d-panel-foot .d-btn + .d-btn { box-shadow: inset var(--d-bw) 0 0 var(--d-line); }
   :global([data-d='O']) .d-panel-foot .d-btn:hover { background: var(--d-surface); }
-  /* El segmento primario se tiñe de marca en vez de volverse una placa opaca:
-     tinta oscura de marca sobre tinte claro, que es lo que sostiene el AA. */
+  /* El segmento primario se tiñe de marca en vez de volverse una placa opaca.
+     Iba en --d-accent-soft (14 %) y contra el vidrio blanco del segmento vecino
+     el vidrio ganaba: la acción principal era la que MENOS se veía del pie.
+     Sube al tinte saturado, que sigue dejando pasar el campo pero ya es
+     claramente el bloque de color de la barra. Tinta oscura de marca encima:
+     7,8:1, muy por encima de AA. */
   :global([data-d='O']) .d-panel-foot .d-btn--primary {
-    background: var(--d-accent-soft);
+    background: var(--d-accent-edge);
     color: var(--d-brand-ink);
     font-weight: var(--d-w-bold);
   }
-  :global([data-d='O']) .d-panel-foot .d-btn--primary:hover { background: var(--d-accent-edge); }
+  :global([data-d='O']) .d-panel-foot .d-btn--primary:hover {
+    background: var(--d-accent-edge);
+    box-shadow: inset 0 0 0 max(var(--d-bw), 1px) var(--d-accent);
+  }
   :global([data-d='O']) .callout {
     border-color: var(--d-line);
     box-shadow: var(--d-shadow);
@@ -1053,6 +1210,13 @@
     background: var(--d-sunk);
     box-shadow: inset 0 var(--d-bw) 0 var(--d-line);
   }
+  /* El tinte de marca también se atenúa un nivel al anidar, por la misma razón
+     que en C: dos cabeceras teñidas igual son hermanas, no madre e hija. */
+  :global([data-d='O']) .nest > .d-panel-head {
+    background: linear-gradient(180deg, var(--d-accent-soft), transparent);
+    border-bottom-color: var(--d-accent-soft);
+  }
+  :global([data-d='O']) .d-panel-head .head-meta { color: var(--d-brand-ink); }
 
   /* ======================================================================
      P · ESPINA — una columna de marca a la izquierda de la que cuelga todo.
@@ -1377,6 +1541,82 @@
   :global([data-d='S']) .sec-title { font-weight: var(--d-w-semi); }
 
   /* ======================================================================
+     T · HALO CLARO — la dirección nueva, y la que no tenía ni una regla.
+
+     Conserva la de Halo entera: nada tiene borde ni relleno sólido, y una
+     cosa existe porque IRRADIA. Lo único que cambia es de qué lado está la
+     luz. Sobre papel, un anillo de 1px del propio tono más un halo proyectado
+     hacia afuera.
+
+     DÓNDE SE SEPARA DE UMBRA, que es la vecina peligrosa: en S la tarjeta es
+     una tarjeta blanca, opaca, y la sombra teñida es un dato que se le añade.
+     Acá la celda en reposo no tiene fondo propio: es papel, y lo único que la
+     delimita son el anillo y el halo. Al elegirla el papel se levanta a blanco
+     y el anillo engorda al doble, así que la selección se reconoce por FORMA
+     antes que por color: sirve igual para quien no distingue el rojo del
+     ámbar y para quien mira la pantalla al sol.
+
+     EL BLOOM DE TEXTO DE HALO NO CRUZA. Sobre negro una cifra clara emite de
+     verdad; sobre papel, un resplandor detrás de tinta oscura solo la
+     emborrona. Acá la luz la proyecta el objeto, nunca la letra.
+     ====================================================================== */
+  :global([data-d='T']) .kpi {
+    background: transparent;
+    border: 0;
+    box-shadow: 0 0 0 max(var(--d-bw), 1px) var(--tone-edge),
+                0 var(--d-p1) calc(var(--d-p4) * 1.6) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  :global([data-d='T']) .kpi:hover {
+    background: var(--d-surface);
+    box-shadow: 0 0 0 max(var(--d-bw), 1px) var(--tone-fg),
+                0 var(--d-p2) calc(var(--d-p4) * 1.9) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  :global([data-d='T']) .kpi.on {
+    background: var(--d-surface);
+    box-shadow: 0 0 0 max(var(--d-bw), 2px) var(--tone-fg),
+                0 var(--d-p2) calc(var(--d-p4) * 2.2) calc(-1 * var(--d-p1)) var(--tone-fg);
+  }
+  :global([data-d='T']) .kpi.on .kpi-lab { color: var(--d-ink); font-weight: var(--d-w-bold); }
+  /* La etiqueta de dato ausente tampoco se rellena: se apoya en su propio
+     anillo. Tinta de tono sobre papel, que es donde el AA sale holgado. */
+  :global([data-d='T']) .kpi-tag {
+    background: transparent;
+    border: 0;
+    color: var(--tone-fg);
+    box-shadow: 0 0 0 max(var(--d-bw), 1px) var(--tone-edge),
+                0 calc(var(--d-p1) / 2) var(--d-p2) calc(var(--d-p1) / -2) var(--tone-fg);
+  }
+  :global([data-d='T']) .callout {
+    background: transparent;
+    border: 0;
+    box-shadow: 0 0 0 max(var(--d-bw), 1px) var(--tone-edge),
+                0 var(--d-p1) calc(var(--d-p4) * 1.6) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  /* Sin bordes quiere decir sin bordes. La primitiva deja hairlines de cortesía
+     en cabecera, pie y fila; acá se retiran y la separación pasa a ser aire,
+     que es lo que la dirección declara. */
+  :global([data-d='T']) .ficha > .d-panel-head,
+  :global([data-d='T']) .nest > .d-panel-head { border-bottom: 0; padding-bottom: 0; }
+  :global([data-d='T']) .plan > .d-panel-head { border-bottom: 0; padding-bottom: var(--d-p1); }
+  :global([data-d='T']) .d-panel-foot { border-top: 0; padding-top: var(--d-p3); }
+  :global([data-d='T']) .sec-head { padding-bottom: var(--d-p2); }
+  :global([data-d='T']) .ficha-meta { gap: var(--d-p2); }
+  /* Cada tarea del plan ya flota con su propio anillo y su propia luz: la línea
+     de abajo la ataba al listado y deshacía justo esa separación. El listado
+     recupera el margen que los halos necesitan para no cortarse contra el
+     canto del panel. */
+  :global([data-d='T']) .plan-row { border-bottom: 0; padding-inline: var(--d-p2); }
+  :global([data-d='T']) .plans { padding: var(--d-p1) var(--d-p3); }
+  /* Dos halos concéntricos se leen como una mancha, no como dos cosas. El
+     anidado deja de irradiar hacia afuera y se ilumina hacia adentro: es la
+     misma regla que en K, del otro lado de la luz. */
+  :global([data-d='T']) .nest {
+    background: transparent;
+    border-radius: var(--d-r);
+    box-shadow: inset 0 0 0 max(var(--d-bw), 1px) var(--d-accent-edge);
+  }
+
+  /* ======================================================================
      RESPONSIVE — hasta 380px. La celda manda, no la ventana: el contenedor
      es .root, así que una celda angosta se comporta igual esté sola o en
      una rejilla de ocho.
@@ -1399,11 +1639,15 @@
     :global([data-d='R']) .kpis { grid-template-columns: minmax(0, 1fr); }
     :global([data-d='N']) .aside-row,
     :global([data-d='P']) .aside-row { grid-template-columns: minmax(0, 1fr); }
-    /* K, L y M pagan lo mismo que E: halo, guijarro y bruma necesitan aire
-       alrededor o los resplandores y las manchas se pisan entre vecinos. */
+    /* K, L, M y T pagan lo mismo que E: halo, guijarro y bruma necesitan aire
+       alrededor o los resplandores y las manchas se pisan entre vecinos. En T
+       el halo se derrama 38px hacia afuera, así que a cuatro columnas en una
+       celda angosta los seis resplandores se suman y el color deja de ser
+       legible como estado. */
     :global([data-d='K']) .kpis,
     :global([data-d='L']) .kpis,
-    :global([data-d='M']) .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    :global([data-d='M']) .kpis,
+    :global([data-d='T']) .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     /* El raíl de 152px vuelve donde hay ancho de verdad: la ficha ocupa toda
        la franja en P, así que la columna de etiquetas cabe sin ahogar el dato. */
     :global([data-d='P']) .ficha-meta > .d-rail {
@@ -1418,10 +1662,12 @@
     :global([data-d='E']) .kpis--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     :global([data-d='K']) .kpis,
     :global([data-d='L']) .kpis,
-    :global([data-d='M']) .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    :global([data-d='M']) .kpis,
+    :global([data-d='T']) .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     :global([data-d='K']) .kpis--pair,
     :global([data-d='L']) .kpis--pair,
-    :global([data-d='M']) .kpis--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    :global([data-d='M']) .kpis--pair,
+    :global([data-d='T']) .kpis--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
   /* El raíl de P no se aplica a ciegas: por debajo de este ancho la cifra deja
      de tener sus 152px y la franja se pliega a una sola columna. Es exactamente

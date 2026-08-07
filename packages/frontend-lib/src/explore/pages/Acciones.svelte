@@ -129,7 +129,7 @@
           data-tone={asset.tone}
           aria-labelledby="cap-bar-{d.id}"
         >
-          <h4 class="sec-cap d-cap" id="cap-bar-{d.id}">Barra del equipo</h4>
+          <h4 class="sec-cap" id="cap-bar-{d.id}">Barra del equipo</h4>
           <div class="sec-body">
             <p class="ctx">
               <span class="ctx-code d-id">{asset.code}</span>
@@ -175,9 +175,13 @@
           </div>
         </section>
 
-        <!-- 2 · JERARQUÍA COMPLETA -->
-        <section class="sec" class:d-rail={d.id === 'G'} aria-labelledby="cap-jer-{d.id}">
-          <h4 class="sec-cap d-cap" id="cap-jer-{d.id}">Jerarquía</h4>
+        <!-- 2 · LA ESCALA: RANGO Y TAMAÑO EN UN SOLO BLOQUE -->
+        <!-- Eran dos secciones rotuladas. Rango y tamaño son la misma pregunta
+             («cuánto pesa este botón»), y partirla en dos obligaba a comparar
+             de memoria entre bloques. Los dos tamaños ahora van uno al lado del
+             otro, que es la única forma de ver una diferencia de 9px. -->
+        <section class="sec" class:d-rail={d.id === 'G'} aria-labelledby="cap-esc-{d.id}">
+          <h4 class="sec-cap" id="cap-esc-{d.id}">La escala de acción</h4>
           <div class="sec-body">
             <div class="row">
               <span class="cell">
@@ -205,29 +209,17 @@
               «Marcar hecho» está deshabilitado: {noRead.code} · {noRead.name} no registró
               lectura {noRead.reading}.
             </p>
-          </div>
-        </section>
-
-        <!-- 3 · DOS TAMAÑOS -->
-        <section class="sec" class:d-rail={d.id === 'G'} aria-labelledby="cap-tam-{d.id}">
-          <h4 class="sec-cap d-cap" id="cap-tam-{d.id}">Dos tamaños</h4>
-          <div class="sec-body">
             <div class="row">
               <button type="button" class="d-btn d-btn--primary">Registrar lectura</button>
-              <button type="button" class="d-btn">Posponer</button>
-              <span class="sub">normal · cabecera del equipo</span>
-            </div>
-            <div class="row">
               <button type="button" class="d-btn d-btn--primary d-btn--sm">Registrar lectura</button>
-              <button type="button" class="d-btn d-btn--sm">Posponer</button>
-              <span class="sub">pequeño · dentro de una fila de la tabla de planes</span>
+              <span class="sub">normal en la cabecera del equipo, pequeño dentro de una fila de la tabla de planes</span>
             </div>
           </div>
         </section>
 
-        <!-- 4 · GRUPO DE BOTONES -->
+        <!-- 3 · GRUPO DE BOTONES -->
         <section class="sec" class:d-rail={d.id === 'G'} aria-labelledby="cap-grp-{d.id}">
-          <h4 class="sec-cap d-cap" id="cap-grp-{d.id}">Grupo</h4>
+          <h4 class="sec-cap" id="cap-grp-{d.id}">Sobre la selección</h4>
           <div class="sec-body">
             <div class="row">
               <span
@@ -264,9 +256,9 @@
           </div>
         </section>
 
-        <!-- 5 · BOTÓN DIVIDIDO -->
+        <!-- 4 · BOTÓN DIVIDIDO -->
         <section class="sec" class:d-rail={d.id === 'G'} aria-labelledby="cap-div-{d.id}">
-          <h4 class="sec-cap d-cap" id="cap-div-{d.id}">Acción dividida</h4>
+          <h4 class="sec-cap" id="cap-div-{d.id}">Acción dividida</h4>
           <div class="sec-body">
             <div class="split-wrap" on:focusout={(e) => leave(e, d.id)}>
               <span class="split">
@@ -316,9 +308,9 @@
           </div>
         </section>
 
-        <!-- 6 · CARGA Y ENLACE -->
+        <!-- 5 · CARGA Y ENLACE -->
         <section class="sec" class:d-rail={d.id === 'G'} aria-labelledby="cap-car-{d.id}">
-          <h4 class="sec-cap d-cap" id="cap-car-{d.id}">Carga y enlace</h4>
+          <h4 class="sec-cap" id="cap-car-{d.id}">Mientras guarda</h4>
           <div class="sec-body">
             <div class="row">
               <button
@@ -355,14 +347,29 @@
      ====================================================================== */
   .spec { display: grid; gap: var(--d-gap); align-content: start; min-width: 0; }
   .sec { position: relative; min-width: 0; }
-  .sec-cap { margin: 0 0 var(--d-p2); }
+  /* El rótulo de sección era una versalita —.d-cap— en las seis secciones, y
+     seis versalitas seguidas no son jerarquía: son un ritmo parejo que tapa lo
+     que sí importa (el nombre del equipo, el botón que hay que apretar). Ahora
+     es un encabezado de verdad, con el mismo tratamiento que .d-panel-title de
+     la librería, y ninguna sección lleva epígrafe. La única dirección que
+     recupera la versalita es B, porque en Instrumento la chapa grabada ES la
+     forma declarada, no un adorno heredado. */
+  .sec-cap {
+    margin: 0 0 var(--d-p2);
+    font-size: var(--d-t-sm);
+    font-weight: var(--d-w-semi);
+    letter-spacing: -.01em;
+    color: var(--d-ink);
+  }
   .sec-body { display: grid; gap: var(--d-p2); min-width: 0; }
 
   .row { display: flex; align-items: center; flex-wrap: wrap; gap: var(--d-p1); min-width: 0; }
   .cell { display: inline-grid; justify-items: start; gap: calc(var(--d-p1) / 2); }
   .ctx { display: flex; align-items: baseline; flex-wrap: wrap; gap: var(--d-p1); margin: 0; min-width: 0; }
   .ctx-code { color: var(--d-ink-3); font-size: var(--d-t-xs); }
-  .ctx-name { font-weight: var(--d-w-semi); font-size: var(--d-t-sm); }
+  /* Lo más grande del bloque es el nombre de la máquina, no el rótulo de la
+     sección: con el equipo enfrente, eso es lo que se busca primero. */
+  .ctx-name { font-weight: var(--d-w-semi); font-size: var(--d-t-md); letter-spacing: -.01em; }
   .hint { margin: 0; font-size: var(--d-t-xs); color: var(--d-ink-3); min-width: 0; }
   .sub { font-size: var(--d-t-2xs); color: var(--d-ink-3); }
 
@@ -437,30 +444,65 @@
   @keyframes d-blink { 50% { opacity: 0; } }
 
   /* ======================================================================
-     A · ELEVACIÓN — cada sección es una tarjeta que flota, y el aire (no una
-     línea) es lo que separa las acciones.
+     A · ELEVACIÓN — la altura ES el rango.
+     Antes todas las tarjetas flotaban a la misma altura y TODOS los botones
+     traían sombra: una dirección cuya tesis es la elevación gastada en repartir
+     la misma cantidad a todo el mundo. Ahora hay un escalón y significa algo.
+     Arriba: el espécimen (la barra real del equipo) sube un escalón sobre las
+     secciones de referencia. Abajo: dentro de una tarjeta, lo único levantado
+     es el primario; el resto apoya plano y sube sólo cuando lo tocás. Con la
+     vista borrosa, en cada tarjeta hay UNA cosa que flota.
+     Y el separador de la barra vuelve a ser lo que esta dirección dice que es:
+     aire. Una línea de 1px contradecía la única regla de A.
      ====================================================================== */
   :global([data-d='A']) .spec { gap: var(--d-p4); }
   :global([data-d='A']) .sec {
     background: var(--d-surface);
     border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow-lg);
+    box-shadow: var(--d-shadow);
     padding: var(--d-p3);
   }
+  :global([data-d='A']) .sec:first-child { box-shadow: var(--d-shadow-lg); }
   :global([data-d='A']) .sec-body { gap: var(--d-p3); }
   :global([data-d='A']) .bar { gap: var(--d-p2); }
+  :global([data-d='A']) .bar-sep {
+    border-left: 0; width: var(--d-p3); min-height: 0; margin-inline: 0;
+  }
   :global([data-d='A']) .menu { border-radius: var(--d-r-lg); }
   :global([data-d='A']) .link { text-underline-offset: 3px; }
-  /* Aquí el feedback también es altura: al pasar sube, al presionar baja. */
-  :global([data-d='A']) .d-btn:hover { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='A']) .d-btn:active { box-shadow: var(--d-shadow); transform: translateY(1px); }
-  :global([data-d='A']) .d-btn--ghost:hover,
-  :global([data-d='A']) .d-btn[disabled]:hover { box-shadow: none; }
+  :global([data-d='A']) .d-btn { box-shadow: none; }
+  :global([data-d='A']) .d-btn:hover { box-shadow: var(--d-shadow); }
+  :global([data-d='A']) .d-btn:active { box-shadow: none; transform: translateY(1px); }
+  :global([data-d='A']) .d-btn--primary { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='A']) .d-btn--primary:hover { box-shadow: var(--d-shadow-lg); transform: translateY(-1px); }
+  :global([data-d='A']) .d-btn--primary:active { box-shadow: var(--d-shadow); transform: translateY(1px); }
+  :global([data-d='A']) .d-btn--ghost:hover { box-shadow: none; }
+  :global([data-d='A']) .d-btn[disabled],
+  :global([data-d='A']) .d-btn[disabled]:hover { box-shadow: none; transform: none; }
+  /* El dividido es UN objeto sobre la mesa: una sombra, no dos pegadas. */
+  :global([data-d='A']) .split { border-radius: var(--d-r); box-shadow: var(--d-shadow-lg); }
+  :global([data-d='A']) .d-btn.split-main,
+  :global([data-d='A']) .d-btn.split-toggle { box-shadow: none; }
+  :global([data-d='A']) .d-btn.split-main:hover,
+  :global([data-d='A']) .d-btn.split-toggle:hover { box-shadow: none; transform: none; }
 
   /* ======================================================================
-     B · INSTRUMENTO — un solo marco continuo con marcas de esquina. Las
-     secciones comparten borde y la barra es UN marco con separadores
-     internos, no tres botones sueltos.
+     B · INSTRUMENTO — un solo marco continuo, y densidad de cabina de verdad.
+     Cambia tres cosas respecto de la ronda anterior:
+
+     1. El marco se CIERRA. Tenía dos marcas de esquina de cuatro, que en un
+        plano técnico es un marco a medio dibujar. Las dos que faltaban cuelgan
+        de la primera y la última sección, porque esos bordes son literalmente
+        los del marco.
+     2. Las cifras van en monoespaciada tabular. En esta dirección los pies de
+        nota no son prosa: son lecturas («312 h · 2 ago», «cada 250 h»), y
+        alineadas en la rejilla del carácter se comparan sin leerlas.
+     3. El botón se alinea a la fila del instrumento (30px) y el tamaño pequeño
+        vuelve a ser pequeño: `.d-btn--sm` medía 27px igual que el normal, así
+        que la sección de dos tamaños mostraba dos veces el mismo botón.
+
+     La versalita se queda SÓLO aquí. En Instrumento la chapa grabada es la
+     forma declarada de la dirección; en las otras seis era ritmo heredado.
      ====================================================================== */
   :global([data-d='B']) .spec {
     gap: 0;
@@ -469,38 +511,77 @@
     border: 1px solid var(--d-edge);
   }
   :global([data-d='B']) .spec::before,
-  :global([data-d='B']) .spec::after {
-    content: ''; position: absolute; width: 7px; height: 7px;
+  :global([data-d='B']) .spec::after,
+  :global([data-d='B']) .sec:first-child::after,
+  :global([data-d='B']) .sec:last-child::before {
+    content: ''; position: absolute; width: 7px; height: 7px; z-index: 1;
     border: 1px solid var(--d-edge); pointer-events: none;
   }
   :global([data-d='B']) .spec::before { top: 3px; left: 3px; border-right: 0; border-bottom: 0; }
+  :global([data-d='B']) .sec:first-child::after { top: 3px; right: 3px; border-left: 0; border-bottom: 0; }
+  :global([data-d='B']) .sec:last-child::before { bottom: 3px; left: 3px; border-right: 0; border-top: 0; }
   :global([data-d='B']) .spec::after { bottom: 3px; right: 3px; border-left: 0; border-top: 0; }
   :global([data-d='B']) .sec { border-bottom: 1px solid var(--d-line); }
   :global([data-d='B']) .sec:last-child { border-bottom: 0; }
   :global([data-d='B']) .sec-cap {
-    margin: 0; padding: calc(var(--d-p1) / 2) var(--d-p3);
+    margin: 0; padding: calc(var(--d-p1) / 2) var(--d-p2);
+    font-size: var(--d-t-2xs); font-weight: var(--d-w-semi);
+    letter-spacing: .11em; text-transform: uppercase;
+    color: var(--d-ink-3);
     background: var(--d-sunk);
     border-bottom: 1px solid var(--d-line);
   }
-  :global([data-d='B']) .sec-body { padding: var(--d-p2) var(--d-p3) var(--d-p3); }
+  :global([data-d='B']) .sec-body { padding: var(--d-p1) var(--d-p2) var(--d-p2); gap: var(--d-p1); }
+  :global([data-d='B']) .row { gap: calc(var(--d-p1) / 2) var(--d-p1); }
+  :global([data-d='B']) .ctx-name { font-size: var(--d-t-sm); }
+  :global([data-d='B']) .hint,
+  :global([data-d='B']) .sub {
+    font-family: var(--d-mono); font-size: var(--d-t-2xs);
+    font-variant-numeric: var(--d-num); letter-spacing: -.015em;
+  }
+  :global([data-d='B']) .d-btn { min-height: var(--d-row-h); }
+  :global([data-d='B']) .d-btn--sm {
+    min-height: 21px; padding-inline: var(--d-p1); font-size: var(--d-t-2xs);
+  }
   :global([data-d='B']) .bar { gap: 0; border: 1px solid var(--d-edge); }
   :global([data-d='B']) .bar > .d-btn {
     border: 0; border-right: 1px solid var(--d-line); border-radius: 0; box-shadow: none;
   }
+  /* Dentro del marco, lo único relleno es el primario: en un mundo de líneas de
+     1px, una superficie sólida se ve desde la otra punta del taller. */
+  :global([data-d='B']) .bar > .d-btn:not(.d-btn--primary):not(.d-btn--danger) { background: transparent; }
+  :global([data-d='B']) .bar > .d-btn:not(.d-btn--primary):not(.d-btn--danger):hover { background: var(--d-sunk); }
   :global([data-d='B']) .bar > .d-btn:last-child { border-right: 0; }
   :global([data-d='B']) .bar-sep { margin-inline: 0; min-height: 0; border-left-color: var(--d-edge); }
   :global([data-d='B']) .bar-push { border-left: 1px solid var(--d-edge); }
+  /* Un instrumento no rebota: el contacto se confirma invirtiendo la tecla. */
+  :global([data-d='B']) .d-btn:not([disabled]):active {
+    background: var(--d-accent); color: var(--d-accent-ink);
+  }
   :global([data-d='B']) .menu { border-color: var(--d-edge); padding: 0; gap: 0; }
-  :global([data-d='B']) .menu-item { border-bottom: 1px solid var(--d-line); border-radius: 0; }
+  :global([data-d='B']) .menu-item {
+    border-bottom: 1px solid var(--d-line); border-radius: 0; min-height: var(--d-row-h);
+  }
   :global([data-d='B']) .menu li:last-child .menu-item { border-bottom: 0; }
 
   /* ======================================================================
-     C · MARCA — la cabecera teal identifica cada bloque, y la barra de
-     acciones es una franja de marca con las acciones encima.
+     C · MARCA — el color es estructura, y por eso aparece en un solo sitio.
+     La versión anterior tenía DOS franjas teal por bloque: la cabecera y la
+     botonera. Con cinco bloques por celda eso son diez piezas de marca en
+     pantalla, que es exactamente cómo un color de identidad se convierte en
+     ruido. Peor: dentro de la franja teal, el primario quedaba blanco y los
+     secundarios eran contornos blancos, así que la acción principal competía
+     contra su propio fondo en vez de destacar.
+
+     Ahora el teal está en la cabecera del bloque y en el botón primario, y en
+     ningún otro lugar. La botonera pasa a ser una bandeja hundida con tabiques
+     de un pelo, y el grupo es la MISMA bandeja: una sola idea de agrupador
+     usada dos veces. El borde de la tarjeta se va: si el contenedor se anuncia
+     por su cabecera, un borde alrededor es decir lo mismo dos veces.
      ====================================================================== */
   :global([data-d='C']) .sec {
     background: var(--d-surface);
-    border: 1px solid var(--d-line);
+    border: 0;
     border-radius: var(--d-r-lg);
     box-shadow: var(--d-shadow);
     /* Sin overflow:hidden: recortaría el menú del botón dividido. La cabecera
@@ -509,32 +590,35 @@
   :global([data-d='C']) .sec-cap {
     margin: 0; padding: var(--d-p1) var(--d-p3);
     background: var(--d-brand); color: var(--d-brand-ink);
-    border-radius: calc(var(--d-r-lg) - 1px) calc(var(--d-r-lg) - 1px) 0 0;
-    font-size: var(--d-t-xs); font-weight: var(--d-w-semi);
+    border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
+    letter-spacing: 0;
   }
   :global([data-d='C']) .sec-body { padding: var(--d-p3); }
-  :global([data-d='C']) .bar {
-    background: var(--d-brand);
-    border-radius: var(--d-r);
-    padding: var(--d-p1) var(--d-p2);
+  :global([data-d='C']) .bar,
+  :global([data-d='C']) .grp {
+    gap: 0;
+    background: var(--d-sunk);
+    border-radius: var(--d-r-lg);
+    padding: calc(var(--d-p1) / 2);
   }
-  :global([data-d='C']) .bar > .d-btn {
-    background: transparent; color: var(--d-brand-ink); box-shadow: none;
-    border-color: color-mix(in srgb, var(--d-brand-ink) 42%, transparent);
+  :global([data-d='C']) .bar > .d-btn,
+  :global([data-d='C']) .grp > .d-btn {
+    border: 0; border-radius: var(--d-r); box-shadow: none;
   }
-  :global([data-d='C']) .bar > .d-btn:not(.d-btn--primary):not(.d-btn--danger):hover {
-    background: color-mix(in srgb, var(--d-brand-ink) 16%, transparent);
+  :global([data-d='C']) .bar > .d-btn:not(.d-btn--primary):not(.d-btn--danger),
+  :global([data-d='C']) .grp > .d-btn { background: transparent; }
+  :global([data-d='C']) .bar > .d-btn:not(.d-btn--primary):not(.d-btn--danger):hover,
+  :global([data-d='C']) .grp > .d-btn:hover { background: var(--d-surface); }
+  :global([data-d='C']) .bar > .d-btn + .d-btn,
+  :global([data-d='C']) .grp > .d-btn + .d-btn { border-left: 1px solid var(--d-line); }
+  /* El destructivo se fue al otro extremo de la bandeja: un tabique suelto en
+     medio del aire no separa nada. */
+  :global([data-d='C']) .bar > .d-btn.bar-push { border-left: 0; }
+  :global([data-d='C']) .bar-sep {
+    margin-inline: 0; min-height: 0; align-self: stretch; border-left-color: var(--d-edge);
   }
-  :global([data-d='C']) .bar > .d-btn--primary:hover { filter: brightness(.93); }
-  :global([data-d='C']) .bar > .d-btn--primary {
-    background: var(--d-brand-ink); color: var(--d-brand); border-color: var(--d-brand-ink);
-  }
-  :global([data-d='C']) .bar > .d-btn--danger {
-    background: var(--d-crit-band); color: var(--d-crit); border-color: var(--d-crit-band);
-  }
-  :global([data-d='C']) .bar > .d-btn:focus-visible { outline-color: var(--d-brand-ink); }
-  :global([data-d='C']) .bar-sep { border-left-color: color-mix(in srgb, var(--d-brand-ink) 45%, transparent); }
-  :global([data-d='C']) .menu { border-top: calc(var(--d-bw) * 3) solid var(--d-brand); }
+  :global([data-d='C']) .menu { border-color: var(--d-line); }
+  :global([data-d='C']) .menu-item:hover { background: var(--d-accent-soft); }
   :global([data-d='C']) .link { color: var(--d-brand); }
 
   /* ======================================================================
@@ -750,9 +834,14 @@
     padding: var(--d-p3);
   }
   :global([data-d='I']) .sec-body { gap: var(--d-p3); }
-  /* La botonera: UNA losa de vidrio segmentada. Los tabiques son luz
+  /* UNA sola escala de radio, que es lo que faltaba: la losa toma --d-r-lg y
+     los gajos --d-r. Antes el grupo era una pastilla de 999px metida entre
+     paneles de 24px, o sea dos formas distintas para el mismo objeto, que es
+     el error que delata un sistema sin bloqueo de forma.
+     Barra y grupo son ahora la misma losa segmentada. Los tabiques son luz
      (--d-line es blanco al 68 %), no líneas de tinta. */
-  :global([data-d='I']) .bar {
+  :global([data-d='I']) .bar,
+  :global([data-d='I']) .grp {
     gap: 0;
     background: var(--d-sunk);
     border: max(var(--d-bw), 1px) solid var(--d-line);
@@ -773,33 +862,33 @@
   :global([data-d='I']) .grp > .d-btn + .d-btn {
     border-left: max(var(--d-bw), 1px) solid var(--d-line);
   }
+  :global([data-d='I']) .bar > .d-btn.bar-push { border-left: 0; }
+  /* Lo único opaco del cristal es lo que se pulsa, así que el primario conserva
+     su sombra y su filo especular: se lee SOBRE la losa, no dentro de ella. */
+  :global([data-d='I']) .bar > .d-btn--primary { box-shadow: var(--d-shadow); }
   :global([data-d='I']) .bar-sep {
     margin-inline: 0; min-height: 0; align-self: stretch;
     border-left-color: var(--d-line);
   }
-  /* El grupo es la misma losa en pastilla: segmentada, no tres botones sueltos. */
-  :global([data-d='I']) .grp {
-    gap: 0;
-    background: var(--d-sunk);
-    border: max(var(--d-bw), 1px) solid var(--d-line);
-    border-radius: var(--d-r-pill);
-    box-shadow: var(--d-shadow);
-    padding: var(--d-p1);
-  }
-  :global([data-d='I']) .grp > .d-btn { border-radius: var(--d-r-pill); }
-  :global([data-d='I']) .split { border-radius: var(--d-r-lg); box-shadow: var(--d-shadow); }
+  :global([data-d='I']) .split { border-radius: var(--d-r); box-shadow: var(--d-shadow); }
   :global([data-d='I']) .d-btn.split-toggle { border-inline-start-color: var(--d-line); }
   /* HALLAZGO: I no tiene superficie opaca. El menú flota SOBRE el vidrio de la
      sección; darle su propio desenfoque sería vidrio sobre vidrio. Se anida con
-     transparencia —la misma --d-surface, sin desenfoque nuevo— y lo que lo
-     despega es la sombra larga. Un --d-surface-solid haría esto sin trampa. */
+     transparencia y sin desenfoque nuevo, pero con --d-surface una sola vez
+     (blanco al 56 %) el texto de abajo se leía a través del menú, que es lo
+     único de la página que TIENE que tapar. Dos capas de la misma --d-surface
+     dan .81 de opacidad efectiva sin inventar un color: sigue siendo vidrio, ya
+     no es una ventana. Un --d-surface-solid en los tokens lo resolvería sin
+     apilar capas. */
   :global([data-d='I']) .menu {
-    background: var(--d-surface);
+    background-color: var(--d-surface);
+    background-image: linear-gradient(var(--d-surface), var(--d-surface));
     backdrop-filter: none; -webkit-backdrop-filter: none;
     border-color: var(--d-line);
     border-radius: var(--d-r-lg);
     box-shadow: var(--d-shadow-lg);
   }
+  :global([data-d='I']) .menu-item { border-radius: var(--d-r); }
   :global([data-d='I']) .menu-item:hover { background: var(--d-surface); }
   :global([data-d='I']) .link { color: var(--d-accent); }
   /* HALLAZGO, y es el más caro de los tres: en directions.css la regla
@@ -1032,9 +1121,13 @@
   :global([data-d='M']) .sec::before {
     content: ''; position: absolute;
     inset: calc(-1 * var(--d-p3)) calc(-1 * var(--d-p4));
+    /* --tone-wash, no --tone-band: directions.css separa los dos tokens
+       justamente porque a 26px de desenfoque la banda de la píldora se
+       desvanece hasta no agrupar nada. Esta página usaba el token equivocado y
+       las manchas casi no se veían. */
     background:
-      radial-gradient(58% 68% at 16% 12%, var(--tone-band, var(--d-neu-band)) 0%, transparent 70%),
-      radial-gradient(50% 56% at 86% 88%, var(--tone-band, var(--d-neu-band)) 0%, transparent 68%);
+      radial-gradient(58% 68% at 16% 12%, var(--tone-wash, var(--d-neu-wash)) 0%, transparent 70%),
+      radial-gradient(50% 56% at 86% 88%, var(--tone-wash, var(--d-neu-wash)) 0%, transparent 68%);
     filter: blur(26px);
     pointer-events: none;
     z-index: -1;
@@ -1065,12 +1158,14 @@
     width: max(var(--d-bw), 2px); min-height: 1.2em; align-self: center;
     background: var(--d-neu-band); filter: blur(2px);
   }
-  /* El grupo no se encierra: se posa sobre su propia mancha. */
+  /* El grupo no se encierra: se posa sobre su propia mancha. Y esa mancha es
+     NEUTRA, no de acento: el único color de la celda tiene que ser el del
+     primario, o dejan de distinguirse a un metro de distancia. */
   :global([data-d='M']) .grp { isolation: isolate; gap: var(--d-p2); position: relative; }
   :global([data-d='M']) .grp::before {
     content: ''; position: absolute;
     inset: calc(-1 * var(--d-p2)) calc(-1 * var(--d-p3));
-    background: radial-gradient(60% 100% at 50% 50%, var(--d-accent-soft) 0%, transparent 72%);
+    background: radial-gradient(60% 100% at 50% 50%, var(--d-neu-wash) 0%, transparent 72%);
     filter: blur(14px);
     pointer-events: none;
     z-index: -1;
@@ -1092,16 +1187,60 @@
     box-shadow: 0 var(--d-p2) var(--d-p4) calc(-1 * var(--d-p2)) var(--d-neu);
   }
   :global([data-d='M']) .menu-item { border-radius: var(--d-r); }
-  :global([data-d='M']) .link { text-decoration-color: var(--d-edge); text-underline-offset: 4px; }
-  /* Mismo choque de peso que en Cristal: `[data-d='M'] .d-btn { background:
-     var(--d-sunk) }` (0,2,0) tapa a `.d-btn--primary` (0,1,0), y el primario de
-     Bruma queda con tinta casi blanca sobre un lavado casi blanco. Aquí el
-     relleno del primario es una mancha, no una placa: es lo único de la
-     dirección que tiene derecho a ser sólido, porque es lo único que se pulsa. */
+  /* --d-edge en Bruma es tinta al 16 %: el subrayado desaparecía y el enlace
+     quedaba indistinguible de un pie de nota. */
+  :global([data-d='M']) .link { text-decoration-color: var(--d-ink-3); text-underline-offset: 4px; }
+  /* EL PRIMARIO DE BRUMA NO TIENE CAJA.
+     Hay dos cosas que arreglar acá y la ronda anterior sólo arregló una. La
+     primera es de peso: `[data-d='M'] .d-btn { background: var(--d-sunk) }`
+     (0,2,0) tapa a `.d-btn--primary` (0,1,0), así que el primario salía con
+     tinta casi blanca sobre un lavado casi blanco. La segunda es de dirección:
+     devolverle una placa sólida de acento lo arreglaba pintando en Bruma el
+     único rectángulo relleno de toda la celda, o sea contradiciendo la regla
+     que define la dirección.
+     Lo que se pulsa es el texto del acento sobre su propio derrame: una mancha
+     sin filo, más ancha que el botón, que es la misma técnica que agrupa las
+     secciones aplicada al elemento más chico. Al 34 % de acento el texto queda
+     en 4.9:1 contra el centro de la mancha, y en el borde sube. Es lo único
+     con color en toda la celda, y por eso se encuentra sin leer nada.
+
+     Y para que se lea como el primero de una escalera y no como un botón raro,
+     lo de al lado tuvo que ceder: `[data-d='M'] .d-btn { background:
+     var(--d-sunk) }` le daba una placa gris a CADA botón, o sea que en la
+     dirección que declara «ningún panel tiene relleno ni borde» todos los
+     controles eran placas menos el importante. Ahora el relleno existe una vez
+     por celda y es el derrame del primario. */
+  :global([data-d='M']) .d-btn { background: transparent; }
+  :global([data-d='M']) .d-btn:hover { background: var(--d-sunk); }
+  :global([data-d='M']) .d-btn--ghost { color: var(--d-ink-3); }
+  /* Misma excepción que en Halo claro: sin rótulo del que agarrarse, un botón
+     de sólo icono necesita conservar su lavado o deja de leerse como control. */
+  :global([data-d='M']) .d-btn.only { background: var(--d-sunk); }
   :global([data-d='M']) .d-btn--primary {
-    background: var(--d-accent); color: var(--d-accent-ink);
+    position: relative; isolation: isolate;
+    background: transparent;
+    color: var(--d-accent); font-weight: var(--d-w-bold);
   }
-  :global([data-d='M']) .d-btn--danger { background: var(--d-crit-band); color: var(--d-crit); }
+  :global([data-d='M']) .d-btn--primary::before {
+    content: ''; position: absolute;
+    inset: calc(-1 * var(--d-p2)) calc(-1 * var(--d-p3));
+    background: radial-gradient(56% 100% at 50% 50%,
+                color-mix(in srgb, var(--d-accent) 34%, transparent) 0%, transparent 74%);
+    filter: blur(12px);
+    pointer-events: none;
+    z-index: -1;
+    transition: filter 160ms ease, opacity 160ms ease;
+  }
+  /* El único gesto de la dirección: al tocarlo, el color se derrama más lejos;
+     al soltarlo, se recoge. Se mueve la mancha, no el botón. */
+  :global([data-d='M']) .d-btn--primary:hover { background: transparent; }
+  :global([data-d='M']) .d-btn--primary:hover::before { filter: blur(14px); }
+  :global([data-d='M']) .d-btn--primary:active::before { filter: blur(6px); }
+  /* El destructivo es lo contrario del primario: en una dirección sin cajas,
+     lo que no querés que se pulse por error no se pinta. Dice lo que hace y
+     lleva el rojo en la tinta, no debajo. */
+  :global([data-d='M']) .d-btn--danger { background: transparent; color: var(--d-crit); }
+  :global([data-d='M']) .d-btn--danger:hover { background: var(--d-crit-band); }
 
   /* ======================================================================
      N · CINTA — carriles de puntas redondas que se montan uno sobre otro.
@@ -1213,28 +1352,39 @@
     box-shadow: var(--d-shadow-lg);
     padding: 0 var(--d-p3) var(--d-p3);
   }
+  /* La marca teñida ADENTRO del vidrio es la tesis entera de la dirección, y a
+     --d-accent-soft (14 %) plano no se veía: la cabecera parecía vidrio neutro.
+     El degradado de 22 % a 10 % es la misma receta que usa .d-panel-head en
+     directions.css, escrita con el token en vez de con el color a mano, así que
+     un cliente que rebindea --d-brand se lleva la cabecera con él. */
   :global([data-d='O']) .sec-cap {
     margin: 0 calc(-1 * var(--d-p3)) var(--d-p3);
     padding: var(--d-p2) var(--d-p3);
-    background: var(--d-accent-soft);
+    background: linear-gradient(180deg,
+                color-mix(in srgb, var(--d-accent) 22%, transparent),
+                color-mix(in srgb, var(--d-accent) 10%, transparent));
     color: var(--d-brand-ink);
     border-bottom: max(var(--d-bw), 1px) solid var(--d-accent-edge);
     border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
   }
   :global([data-d='O']) .sec-body { gap: var(--d-p3); }
+  /* Misma escala de radio que los paneles: losa en --d-r-lg, gajos en --d-r.
+     La pastilla de 999px de la ronda anterior era la única forma de 999px en
+     una celda construida sobre 22px; lo que separa a Prisma de Cristal no es
+     ese radio suelto, son los tabiques teñidos y la cabecera de marca. */
   :global([data-d='O']) .bar,
   :global([data-d='O']) .grp {
     gap: 0;
     background: var(--d-accent-soft);
     border: max(var(--d-bw), 1px) solid var(--d-line);
-    border-radius: var(--d-r-pill);
+    border-radius: var(--d-r-lg);
     box-shadow: var(--d-shadow);
     padding: calc(var(--d-p1) / 2);
   }
   :global([data-d='O']) .bar > .d-btn,
   :global([data-d='O']) .grp > .d-btn {
     backdrop-filter: none; -webkit-backdrop-filter: none;
-    border: 0; border-radius: var(--d-r-pill); box-shadow: none;
+    border: 0; border-radius: var(--d-r); box-shadow: none;
   }
   :global([data-d='O']) .bar > .d-btn:not(.d-btn--primary):not(.d-btn--danger),
   :global([data-d='O']) .grp > .d-btn { background: transparent; }
@@ -1246,29 +1396,37 @@
   :global([data-d='O']) .grp > .d-btn + .d-btn {
     border-left: max(var(--d-bw), 1px) solid var(--d-accent-edge);
   }
+  :global([data-d='O']) .bar > .d-btn.bar-push { border-left: 0; }
+  :global([data-d='O']) .bar > .d-btn--primary { box-shadow: var(--d-shadow); }
   :global([data-d='O']) .bar-sep {
     margin-inline: 0; min-height: 0; align-self: stretch;
     border-left-color: var(--d-accent-edge);
   }
-  :global([data-d='O']) .split {
-    border-radius: var(--d-r-pill);
-    box-shadow: var(--d-shadow);
+  :global([data-d='O']) .split { border-radius: var(--d-r); box-shadow: var(--d-shadow); }
+  :global([data-d='O']) .d-btn.split-toggle { border-inline-start-color: var(--d-accent-edge); }
+  /* HALLAZGO, y es el mismo choque de peso que ya estaba documentado para
+     Cristal y Bruma pero que a Prisma no se le había aplicado: en
+     directions.css `[data-d='O'] .d-btn { background: rgba(255,255,255,.58) }`
+     pesa (0,2,0) y `.d-btn--danger` pesa (0,1,0). Hoy «Eliminar equipo» en
+     Prisma es vidrio blanco con borde blanco: pierde la banda y queda idéntico
+     a un secundario. Se restituye con los tokens de la dirección. */
+  :global([data-d='O']) .d-btn--danger {
+    background: var(--d-crit-band); color: var(--d-crit); border-color: var(--d-crit-edge);
   }
-  :global([data-d='O']) .d-btn.split-main {
-    border-start-start-radius: var(--d-r-pill); border-end-start-radius: var(--d-r-pill);
-  }
-  :global([data-d='O']) .d-btn.split-toggle {
-    border-start-end-radius: var(--d-r-pill); border-end-end-radius: var(--d-r-pill);
-  }
-  /* Igual que en I: el menú anida por transparencia, sin desenfoque nuevo. */
+  /* Menú: mismas dos capas que en Cristal para que tape de verdad, más la
+     misma cabecera teñida que llevan los bloques. Un borde superior de color no
+     dice nada que la marca no diga mejor derramada sobre el primer renglón. */
   :global([data-d='O']) .menu {
-    background: var(--d-surface);
+    background-color: var(--d-surface);
+    background-image:
+      linear-gradient(180deg, color-mix(in srgb, var(--d-accent) 16%, transparent) 0, transparent var(--d-p4)),
+      linear-gradient(var(--d-surface), var(--d-surface));
     backdrop-filter: none; -webkit-backdrop-filter: none;
     border-color: var(--d-line);
     border-radius: var(--d-r-lg);
-    border-top: calc(max(var(--d-bw), 1px) * 2) solid var(--d-accent-edge);
     box-shadow: var(--d-shadow-lg);
   }
+  :global([data-d='O']) .menu-item { border-radius: var(--d-r); }
   :global([data-d='O']) .menu-item:hover { background: var(--d-accent-soft); }
   :global([data-d='O']) .link { color: var(--d-brand); }
 
@@ -1593,9 +1751,158 @@
   :global([data-d='S']) .menu-item { border-radius: var(--d-r); }
   :global([data-d='S']) .link { text-decoration-color: var(--d-ink-3); text-underline-offset: 4px; }
 
+  /* ======================================================================
+     T · HALO CLARO — el rango es cuánta luz tira cada cosa.
+     Esta página es la de las acciones, así que la regla de Halo («nada tiene
+     borde ni relleno sólido; un elemento existe porque IRRADIA») se gasta
+     entera en una sola escalera, que además es la única pregunta que importa
+     en una botonera:
+
+       primario      anillo de acento + resplandor grande      la única fuente
+       secundario    anillo neutro de 1px + resplandor corto
+       fantasma      no irradia hasta que lo tocás
+       destructivo   anillo y resplandor en rojo
+       deshabilitado NO IRRADIA, y eso es todo lo que hace falta decir
+
+     El deshabilitado es donde la dirección se paga sola. En las otras
+     diecinueve es una opacidad al 45 % que deja el rótulo a media asta y falla
+     contraste; acá es la ausencia de luz, que es exactamente lo que significa,
+     y el texto puede quedarse legible (5.3:1) porque no necesita atenuarse para
+     leerse apagado.
+
+     Se separa de Umbra, que es la otra dirección clara con sombra de color, en
+     que Umbra tiñe la sombra de una tarjeta que sigue siendo una tarjeta
+     neutra; acá el anillo de 1px ES el contorno, no hay ninguno más, y el
+     acento es un color que brilla en vez de ser tinta.
+     ====================================================================== */
+  :global([data-d='T']) .spec { gap: var(--d-p4); }
+  :global([data-d='T']) .sec {
+    background: var(--d-surface);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p3);
+  }
+  /* El estado no se pinta: se irradia. La sección del equipo vencido lleva el
+     anillo y el halo en rojo, y el texto sigue leyéndose sobre blanco puro. */
+  :global([data-d='T']) .sec[data-tone] {
+    box-shadow:
+      0 0 0 1px var(--tone-edge),
+      0 var(--d-p2) var(--d-p4) calc(-1 * var(--d-p2)) var(--tone-fg);
+  }
+  :global([data-d='T']) .sec-body { gap: var(--d-p3); }
+  /* Sin cajas: la botonera no existe como objeto. Lo que agrupa es que las tres
+     acciones nombradas irradian igual, y lo que separa al destructivo es el
+     aire más el color de su propia luz. Un tabique de 1px sería la única línea
+     de la dirección. */
+  :global([data-d='T']) .bar { gap: var(--d-p2); }
+  :global([data-d='T']) .bar-sep {
+    border-left: 0; width: var(--d-p3); min-height: 0; margin-inline: 0;
+  }
+  :global([data-d='T']) .d-btn:hover {
+    background: var(--d-sunk);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--d-ink) 16%, transparent),
+      0 var(--d-p1) var(--d-p3) calc(-1 * var(--d-p1)) color-mix(in srgb, var(--d-accent) 42%, transparent);
+  }
+  /* El primario es la única fuente de luz de la celda. Al tocarlo el halo se
+     abre, al presionarlo se recoge: el gesto de la dirección es la luz, no el
+     desplazamiento. */
+  :global([data-d='T']) .d-btn--primary {
+    box-shadow:
+      0 0 0 1px var(--d-accent),
+      0 var(--d-p1) var(--d-p4) calc(-1 * var(--d-p1)) color-mix(in srgb, var(--d-accent) 62%, transparent);
+  }
+  :global([data-d='T']) .d-btn--primary:hover {
+    background: var(--d-accent);
+    box-shadow:
+      0 0 0 1px var(--d-accent),
+      0 var(--d-p2) calc(var(--d-p4) * 1.3) calc(-1 * var(--d-p1)) color-mix(in srgb, var(--d-accent) 78%, transparent);
+  }
+  :global([data-d='T']) .d-btn--primary:active {
+    background: var(--d-accent);
+    box-shadow:
+      0 0 0 1px var(--d-accent),
+      0 calc(var(--d-p1) / 2) var(--d-p2) calc(-1 * var(--d-p1)) var(--d-accent);
+  }
+  :global([data-d='T']) .d-btn--danger {
+    background: var(--d-surface); color: var(--d-crit);
+    box-shadow:
+      0 0 0 1px var(--d-crit-edge),
+      0 var(--d-p1) var(--d-p3) calc(-1 * var(--d-p1)) color-mix(in srgb, var(--d-crit) 50%, transparent);
+  }
+  :global([data-d='T']) .d-btn--danger:hover {
+    background: var(--d-crit-band);
+    box-shadow:
+      0 0 0 1px var(--d-crit),
+      0 var(--d-p2) var(--d-p4) calc(-1 * var(--d-p1)) color-mix(in srgb, var(--d-crit) 60%, transparent);
+  }
+  /* HALLAZGO: `.d-btn[disabled] { box-shadow: none }` vive en directions.css
+     ANTES de `[data-d='T'] .d-btn { box-shadow: <anillo + halo> }`, y las dos
+     pesan (0,2,0). Gana la de la dirección: hoy un botón deshabilitado en Halo
+     claro sigue irradiando igual que uno vivo, sólo que al 45 % de opacidad. */
+  :global([data-d='T']) .d-btn[disabled],
+  :global([data-d='T']) .d-btn[disabled]:hover {
+    opacity: 1;
+    background: var(--d-sunk);
+    color: var(--d-ink-3);
+    box-shadow: none;
+  }
+  :global([data-d='T']) .d-btn--ghost { background: transparent; box-shadow: none; }
+  /* Excepción con motivo: un botón de sólo icono no tiene rótulo del que
+     agarrarse, así que en una dirección sin bordes es lo único que se vuelve
+     invisible. El anillo de 1px es el mínimo para que se lea como un control. */
+  :global([data-d='T']) .d-btn--ghost.only:not(:hover) {
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--d-ink) 10%, transparent);
+  }
+  /* El grupo es una sola charca de luz con las tres acciones adentro; los gajos
+     dejan de irradiar por su cuenta porque ya están dentro del halo. */
+  :global([data-d='T']) .grp {
+    gap: 0;
+    background: var(--d-surface);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+    padding: calc(var(--d-p1) / 2);
+  }
+  :global([data-d='T']) .grp > .d-btn {
+    background: transparent; border-radius: var(--d-r); box-shadow: none;
+  }
+  :global([data-d='T']) .grp > .d-btn:hover { background: var(--d-sunk); box-shadow: none; }
+  /* El dividido es UNA luz partida: el halo lo lleva la pieza entera y la
+     costura es la rendija por donde se ve el filo del acento. */
+  :global([data-d='T']) .split {
+    border-radius: var(--d-r);
+    box-shadow:
+      0 0 0 1px var(--d-accent),
+      0 var(--d-p1) var(--d-p4) calc(-1 * var(--d-p1)) color-mix(in srgb, var(--d-accent) 62%, transparent);
+  }
+  :global([data-d='T']) .d-btn.split-main,
+  :global([data-d='T']) .d-btn.split-main:hover { box-shadow: none; background: var(--d-accent); }
+  :global([data-d='T']) .d-btn.split-toggle,
+  :global([data-d='T']) .d-btn.split-toggle:hover {
+    margin-left: 0; background: var(--d-accent);
+    box-shadow: inset 1px 0 0 color-mix(in srgb, var(--d-accent-ink) 40%, transparent);
+  }
+  :global([data-d='T']) .menu {
+    background: var(--d-surface);
+    border-color: transparent;
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow-lg);
+  }
+  :global([data-d='T']) .menu-item { border-radius: var(--d-r); }
+  /* Hover en un menú también es encender, pero el renglón se queda en tinta:
+     el acento sobre su propio lavado deja el texto en 4.6:1 y no vale gastar
+     el margen entero para colorear una fila que ya se señala con el anillo. */
+  :global([data-d='T']) .menu-item:hover {
+    background: var(--d-accent-soft);
+    box-shadow: 0 0 0 1px var(--d-accent-edge);
+  }
+  :global([data-d='T']) .link { color: var(--d-accent); text-decoration-color: var(--d-accent-edge); }
+  :global([data-d='T']) .spin { border-color: currentColor; border-top-color: transparent; }
+
   /* Al final del todo, para ganarle en orden a las variaciones por dirección. */
   @media (prefers-reduced-motion: reduce) {
     .spin,
     :global([data-d='F']) .spin { animation: none; opacity: .6; }
+    :global([data-d='M']) .d-btn--primary::before { transition: none; }
   }
 </style>

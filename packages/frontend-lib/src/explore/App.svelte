@@ -39,7 +39,15 @@
     .split(',')
     .map((x) => x.trim().toUpperCase())
     .filter((x) => DIRECTIONS.some((d) => d.id === x));
-  let live = new Set(pedidas.length ? pedidas : DIRECTIONS.map((d) => d.id));
+  // Por defecto se abren solo las FINALISTAS. Veinte direcciones a la vez ya no
+  // ayudan a decidir: ayudan a no decidir. Las otras trece siguen a un clic, y
+  // ?d=todas las trae de vuelta.
+  const finalistas = DIRECTIONS.filter((d) => d.finalista).map((d) => d.id);
+  let live = new Set(
+    pedidas.length ? pedidas
+    : params.get('d') === 'todas' ? DIRECTIONS.map((d) => d.id)
+    : finalistas
+  );
   let solo = null;
 
   const toggle = (id) => {
@@ -55,7 +63,7 @@
   <header class="top">
     <div class="brand">
       <strong>Strix · direcciones</strong>
-      <span>Mismo contenido, {DIRECTIONS.length} formas. Elegí una y el sistema se reconstruye sobre ella.</span>
+      <span>{finalistas.length} finalistas de {DIRECTIONS.length}. Elegí una y el sistema se reconstruye sobre ella.</span>
     </div>
     <nav class="pages" aria-label="Familias de elementos">
       {#each PAGES as p}

@@ -34,16 +34,21 @@
 
   /* ── Qué familia de dibujo le toca a cada dirección ──────────────────────
      Tres reparticiones, y ninguna es de paleta: cambian el DIBUJO.
-       · celdas de carácter — F y R. R es Terminal + Cristal: su densidad
+       · celdas de carácter, F y R. R es Terminal + Cristal: su densidad
          (fila de 26px, monoespaciada) sale de la misma rejilla de caracteres
          que F, solo que apoyada sobre vidrio oscuro.
-       · dial de dos arcos — A, C, E, H y K. K entra porque dos arcos que
+       · dial de dos arcos, A, C, E, H, K y T. K entra porque dos arcos que
          irradian sobre negro es exactamente lo que Halo tiene para decir de
-         un medidor; en carriles rectos ese resplandor se pierde.
-       · barras macizas en el minigráfico — D y Q. Q es Peso + Laca: la misma
+         un medidor; en carriles rectos ese resplandor se pierde. T entra por
+         la misma razón y del otro lado de la luz: es Halo sobre papel, y si
+         su tesis es que una cosa existe porque irradia, el medidor es donde
+         esa tesis se puede probar. Es además lo que la separa de S, que con
+         el mismo material claro se queda en carriles.
+       · barras macizas en el minigráfico, D y Q. Q es Peso + Laca: la misma
          columna sólida, con el barrido húmedo encima. */
   const isMono = (id) => id === 'F' || id === 'R';
-  const isDial = (id) => id === 'A' || id === 'C' || id === 'E' || id === 'H' || id === 'K';
+  const isDial = (id) =>
+    id === 'A' || id === 'C' || id === 'E' || id === 'H' || id === 'K' || id === 'T';
   const isBarChart = (id) => id === 'D' || id === 'Q';
 
   /* ── Eje de días ─────────────────────────────────────────────────────── */
@@ -53,9 +58,19 @@
   const shift = (t, fwd) => (t <= -BACK ? '0%' : t >= fwd ? '-100%' : '-50%');
   const tickLab = (t) => (t === 0 ? 'hoy' : t > 0 ? '+' + t + ' d' : t + ' d');
 
+  /* El tramo pintado de una fila iba del borde izquierdo del eje hasta el
+     vencimiento, y eso se leía AL REVÉS: el plan que vence en 47 días pintaba
+     una barra larguísima y el que venció hace 12 pintaba una corta, o sea que
+     el que menos urge parecía el más lleno. Medido contra hoy, el largo ES la
+     distancia y el lado dice si falta o si ya pasó, que es lo que un técnico
+     necesita leer sin contar marcas. */
+  const spanL = (day, fwd) => Math.min(px(0, fwd), px(day, fwd));
+  const spanW = (day, fwd) => Math.abs(px(day, fwd) - px(0, fwd));
+
   // Días hasta el vencimiento, leídos del "when" de cada plan de demo.js.
   const DAY = { 'BAT-014': -12, HRN001: 5, 'CAM-03': 47, 'MEZ-021': -3, 'GEN-02': 9, 'COM-07': null };
   const TL = PLANS.map((p) => ({ ...p, day: DAY[p.asset] }));
+  const TL_LATE = TL.filter((p) => p.tone === 'critical').length;
 
   // La misma línea de tiempo, dibujada con celdas de carácter para F.
   const tlCells = (day, fwd, n) =>
@@ -77,11 +92,11 @@
   const pp = (v) => Math.min(100, (v / PMAX) * 100);
   const BARS = [
     { asset: 'CAM-03', task: 'Servicio 10 000 km', every: 'cada 10 000 km', at: 72,
-      tone: 'positive', read: '7 210 km · lectura 4 ago', when: 'en 47 d' },
+      tone: 'positive', read: 'lectura 7 210 km, 4 ago', when: 'en 47 d' },
     { asset: 'HRN001', task: 'Revisión de quemador', every: 'cada 2 000 h', at: 88,
-      tone: 'attention', read: 'sin lectura · 14 h/día declaradas', when: 'en 5 d' },
+      tone: 'attention', read: 'sin lectura, 14 h/día declaradas', when: 'en 5 d' },
     { asset: 'BAT-014', task: 'Cambio de aceite', every: 'cada 250 h', at: 118,
-      tone: 'critical', read: '312 h · lectura 2 ago', when: 'venció hace 12 d' }
+      tone: 'critical', read: 'lectura 312 h, 2 ago', when: 'venció hace 12 d' }
   ];
 
   // La misma barra, en celdas de carácter para F.
@@ -108,12 +123,14 @@
       use: { key: 'uso', label: 'Uso', at: 81, tone: 'attention', left: 'faltan 570 h · 2 430 h leídas' },
       verdict: 'Llega primero el uso · en 9 d al ritmo de 62 h por semana'
     },
+    /* Los dos veredictos abren con el mismo verbo a propósito: el técnico
+       aprende una sola frase y la reconoce en las seis celdas. */
     {
       asset: 'MEZ-021', name: 'Mezcladora Baumax BM-160', task: 'Engrase general',
       every: 'cada 90 d', first: 'calendario',
       cal: { key: 'cal', label: 'Calendario', at: 104, tone: 'critical', left: 'venció hace 3 d · último 18 jul' },
       use: { key: 'uso', label: 'Uso', at: 0, tone: 'neutral', left: 'sin horómetro: este plan no corre por uso' },
-      verdict: 'Ganó el calendario · venció hace 3 d y el reloj de uso ni cuenta'
+      verdict: 'Llegó primero el calendario · venció hace 3 d y el reloj de uso no corre'
     }
   ];
 
@@ -160,29 +177,35 @@
     });
   };
 
-  /* ── 6 · Próximos 14 días ────────────────────────────────────────────── */
+  /* ── 6 · Próximos 14 días ──────────────────────────────────────────────
+     Cada vencimiento es equipo, tarea y plazo en campos separados, no una
+     tira de texto con puntos en el medio: así el equipo va en monoespaciada,
+     el plazo se alinea a la derecha y el ojo baja por una columna en vez de
+     leer tres frases. */
   const CAL = [
     { n: 6, dow: 'ju', full: 'jueves 6 de agosto', hoy: true, tone: 'critical', count: 2,
       items: [
-        { t: 'critical', s: 'BAT-014 · Cambio de aceite · venció hace 12 d' },
-        { t: 'critical', s: 'MEZ-021 · Engrase general · venció hace 3 d' }
+        { t: 'critical', id: 'BAT-014', task: 'Cambio de aceite', when: 'venció hace 12 d' },
+        { t: 'critical', id: 'MEZ-021', task: 'Engrase general', when: 'venció hace 3 d' }
       ], note: 'arrastrados de semanas anteriores' },
     { n: 7, dow: 'vi', full: 'viernes 7 de agosto', items: [] },
     { n: 8, dow: 'sá', full: 'sábado 8 de agosto', wknd: true, items: [] },
     { n: 9, dow: 'do', full: 'domingo 9 de agosto', wknd: true, items: [] },
     { n: 10, dow: 'lu', full: 'lunes 10 de agosto', items: [] },
     { n: 11, dow: 'ma', full: 'martes 11 de agosto', tone: 'attention', count: 1,
-      items: [{ t: 'attention', s: 'HRN001 · Revisión de quemador · en 5 d' }] },
+      items: [{ t: 'attention', id: 'HRN001', task: 'Revisión de quemador', when: 'en 5 d' }] },
     { n: 12, dow: 'mi', full: 'miércoles 12 de agosto', items: [] },
     { n: 13, dow: 'ju', full: 'jueves 13 de agosto', items: [] },
     { n: 14, dow: 'vi', full: 'viernes 14 de agosto', items: [] },
     { n: 15, dow: 'sá', full: 'sábado 15 de agosto', wknd: true, tone: 'attention', count: 1,
-      items: [{ t: 'attention', s: 'GEN-02 · Cambio de refrigerante · en 9 d' }], note: 'cae sábado' },
+      items: [{ t: 'attention', id: 'GEN-02', task: 'Cambio de refrigerante', when: 'en 9 d' }],
+      note: 'cae sábado' },
     { n: 16, dow: 'do', full: 'domingo 16 de agosto', wknd: true, items: [] },
     { n: 17, dow: 'lu', full: 'lunes 17 de agosto', items: [] },
     { n: 18, dow: 'ma', full: 'martes 18 de agosto', items: [] },
     { n: 19, dow: 'mi', full: 'miércoles 19 de agosto', items: [] }
   ];
+  const CAL_HITS = CAL.reduce((s, c) => s + (c.count ?? 0), 0);
   const calLab = (c) =>
     c.full + (c.hoy ? ', hoy' : '') + ', ' +
     (c.count ? c.count + (c.count === 1 ? ' vencimiento' : ' vencimientos') : 'sin vencimientos');
@@ -196,7 +219,16 @@
     <Direction id={d.id} flush={d.id === 'G' || d.id === 'F' || d.id === 'P'}>
       <div class="dv">
 
-        <!-- ══ Barra de vista ══ -->
+        <!-- ══ Barra de vista ══
+             El ÚNICO epígrafe de la página: «Ventana» nombra el grupo de
+             controles y es además el gancho del que cuelgan el raíl de G y P
+             y el prompt de F y R. Los otros nueve se fueron: una versalita
+             sobre cada encabezado producía seis veces el mismo compás y no
+             contestaba ninguna pregunta que el dibujo de abajo no contestara.
+             El botón conserva una sola etiqueta, «Zonas», porque cambiarle el
+             texto Y el aria-pressed a la vez lo anuncia dos veces y al revés;
+             el estado lo dice la marca, que es el mismo par de formas que el
+             resto de la página ya enseñó. -->
         <div class="dv-bar" role="group" aria-label="Ajustes de la vista de datos">
           <span class="dv-rail d-cap">Ventana</span>
           <span class="dv-fld">
@@ -215,16 +247,15 @@
           >
             <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false"
               >{@html markOf(zones ? 'positive' : 'neutral')}</svg
-            >Zonas {zones ? 'a la vista' : 'ocultas'}
+            >Zonas
           </button>
-          <span class="dv-note d-cap">Corte 6 ago · 09:12</span>
+          <span class="dv-note d-num">Corte 6 ago · 09:12</span>
         </div>
 
         <!-- ══ 1 · Progreso con umbral ══ -->
         <section class="d-panel">
           <header class="d-panel-head">
             <h4 class="d-panel-title">Consumo del plan</h4>
-            <span class="d-cap">umbral 100 %</span>
           </header>
           <div class="d-panel-body dv-body dv-stack dv-bleed">
             {#if isMono(d.id)}
@@ -260,19 +291,24 @@
                     <span class="pb-fill" style="width:{pp(g.at)}%"></span>
                     <span class="pb-thr pb-thr--soft" style="left:{pp(85)}%"></span>
                     <span class="pb-thr" style="left:{pp(100)}%"></span>
-                    <span class="pb-thr-lab d-cap d-num" style="left:{pp(100)}%">100</span>
+                    <span class="pb-thr-lab d-num" style="left:{pp(100)}%">100</span>
                   </div>
+                  <!-- Estado y magnitud son dos cosas: la píldora dice QUÉ es
+                       y el plazo dice CUÁNTO. Juntos y en ese orden contestan
+                       la pregunta de los tres segundos; la procedencia de la
+                       lectura baja a la línea terciaria. -->
                   <div class="pb-foot">
                     <span class="d-pill" data-tone={g.tone}
                       ><svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false"
                         >{@html markOf(g.tone)}</svg
                       >{WORD[g.tone]}</span
                     >
-                    <span class="pb-note">{g.read} · {g.every} · {g.when}</span>
+                    <span class="pb-when">{g.when}</span>
+                    <span class="pb-note">{g.every} · {g.read}</span>
                   </div>
                 </div>
               {/each}
-              <p class="dv-foot">85 % avisa · 100 % vence · el eje corre hasta 130 %</p>
+              <p class="dv-foot">Avisa en 85 %, vence en 100 %, el eje corre hasta 130 %.</p>
             {/if}
           </div>
         </section>
@@ -281,7 +317,6 @@
         <section class="d-panel">
           <header class="d-panel-head">
             <h4 class="d-panel-title">Dos relojes</h4>
-            <span class="d-cap">cuál llega primero</span>
           </header>
           <div class="d-panel-body dv-body dv-stack dv-bleed">
             {#each CLOCKS as c}
@@ -361,7 +396,7 @@
                   <div class="ck-lanes">
                     {#each [c.cal, c.use] as k}
                       <div class="ck-lane" data-tone={k.tone}>
-                        <span class="ck-lane-lab d-cap">{k.label}</span>
+                        <span class="ck-lane-lab">{k.label}</span>
                         <span class="ck-trklane" role="img" aria-label="{k.label}: {k.at} por ciento del intervalo">
                           <span class="ck-fill" style="width:{lane(k.at)}%"></span>
                           <span class="ck-fin" style="left:{lane(100)}%"></span>
@@ -391,7 +426,7 @@
         <section class="d-panel">
           <header class="d-panel-head">
             <h4 class="d-panel-title">Línea de tiempo de planes</h4>
-            <span class="d-cap">hoy · 6 ago</span>
+            <span class="dv-fig d-num">{TL_LATE} vencidos de {TL.length}</span>
           </header>
           <div class="d-panel-body dv-body dv-bleed">
             {#if isMono(d.id)}
@@ -444,7 +479,10 @@
                         {#if p.day === null}
                           <span class="tl-hatch"></span>
                         {:else}
-                          <span class="tl-elapsed" style="width:{px(p.day, scale)}%"></span>
+                          <span
+                            class="tl-elapsed"
+                            style="left:{spanL(p.day, scale)}%;width:{spanW(p.day, scale)}%"
+                          ></span>
                         {/if}
                         <span class="tl-now" style="left:{px(0, scale)}%"></span>
                         {#if p.day !== null && p.day <= scale}
@@ -480,7 +518,6 @@
         <section class="d-panel">
           <header class="d-panel-head">
             <h4 class="d-panel-title">Consumo · BAT-014</h4>
-            <span class="d-cap">12 semanas</span>
           </header>
           <div class="d-panel-body dv-body dv-bleed">
             <p class="d-sr">
@@ -522,7 +559,7 @@
             {/if}
             <p class="sp-caps">
               <span>17 may</span>
-              <span class="sp-mid">{SP_TOTAL} h en 12 semanas · pico {SP_TOP} h · 1 semana en cero</span>
+              <span class="sp-mid">{SP_TOTAL} h en 12 semanas · pico {SP_TOP} h, una en cero</span>
               <span>2 ago</span>
             </p>
           </div>
@@ -532,7 +569,7 @@
         <section class="d-panel">
           <header class="d-panel-head">
             <h4 class="d-panel-title">Flota por estado</h4>
-            <span class="d-cap d-num">{FLEET_N} equipos</span>
+            <span class="dv-fig d-num">{FLEET_N} equipos</span>
           </header>
           <div class="d-panel-body dv-body dv-bleed">
             {#if isMono(d.id)}
@@ -568,7 +605,7 @@
         <section class="d-panel">
           <header class="d-panel-head">
             <h4 class="d-panel-title">Próximos 14 días</h4>
-            <span class="d-cap">3 días con vencimiento</span>
+            <span class="dv-fig d-num">{CAL_HITS} vencimientos</span>
           </header>
           <div class="d-panel-body dv-body dv-bleed">
             <div class="cal-strip" role="group" aria-label="Del 6 al 19 de agosto">
@@ -593,21 +630,27 @@
                       >{#if c.count > 1}<b class="d-num">{c.count}</b>{/if}
                     </span>
                   {:else}
-                    <span class="cal-mk cal-mk--void" aria-hidden="true">·</span>
+                    <!-- Un día sin vencimiento se queda VACÍO. El punto gris
+                         que había acá reservaba el alto, sí, pero también
+                         ponía once manchitas compitiendo con las tres marcas
+                         que sí quieren decir algo. El hueco reserva igual. -->
+                    <span class="cal-mk cal-mk--void" aria-hidden="true"></span>
                   {/if}
                 </button>
               {/each}
             </div>
             <div class="cal-detail">
               <p class="cal-day-name">
-                <b>{CAL[pick].full}</b>{#if CAL[pick].hoy} · hoy{/if}{#if CAL[pick].note} · {CAL[pick].note}{/if}
+                <b>{CAL[pick].full}</b>{#if CAL[pick].hoy}, hoy{/if}{#if CAL[pick].note} · {CAL[pick].note}{/if}
               </p>
               {#if CAL[pick].items.length}
                 <ul class="cal-list">
                   {#each CAL[pick].items as it}
                     <li data-tone={it.t}>
                       <svg class="mk" viewBox="0 0 12 12" aria-hidden="true" focusable="false">{@html markOf(it.t)}</svg>
-                      {it.s}
+                      <b class="cal-id d-id">{it.id}</b>
+                      <span class="cal-task">{it.task}</span>
+                      <span class="cal-when">{it.when}</span>
                     </li>
                   {/each}
                 </ul>
@@ -617,7 +660,7 @@
                 </p>
               {/if}
             </div>
-            <p class="dv-foot">Después de la tira: CAM-03 · Servicio 10 000 km · 22 sep</p>
+            <p class="dv-foot">Después del 19 de agosto: CAM-03, Servicio 10 000 km, el 22 de setiembre.</p>
           </div>
         </section>
       </div>
@@ -643,6 +686,18 @@
   .dv-foot { margin: var(--d-p2) 0 0; font-size: var(--d-t-2xs); color: var(--d-ink-3); }
   .dv-body { display: grid; gap: var(--d-p2); min-width: 0; }
 
+  /* Una CIFRA en la cabecera, no una versalita. La versalita chiquita sobre
+     cada encabezado repetía el mismo compás seis veces y no contestaba nada
+     que el dibujo de abajo no contestara. Solo la llevan los tres paneles
+     cuya respuesta ES un conteo: cuántos vencidos, cuántos equipos, cuántos
+     vencimientos. Los otros tres se leen fila por fila y no tienen un número
+     que resuma, así que su cabecera va sola. */
+  .dv-fig {
+    font-size: var(--d-t-2xs); font-weight: var(--d-w-med);
+    color: var(--d-ink-2); font-variant-numeric: var(--d-num);
+    white-space: nowrap;
+  }
+
   /* ── Barra de vista ─────────────────────────────────────────────────── */
   .dv-bar {
     display: flex; align-items: center; flex-wrap: wrap;
@@ -658,7 +713,13 @@
   .dv-fld-lab { white-space: nowrap; }
   .dv-sel { width: auto; min-width: 96px; }
   .dv-tog { gap: var(--d-p1); }
-  .dv-note { margin-left: auto; white-space: nowrap; }
+  /* La hora del corte es un dato, no una etiqueta: en versalitas de 10px con
+     .11em de tracking, «09:12» se lee peor que en cifra tabular. */
+  .dv-note {
+    margin-left: auto; white-space: nowrap;
+    font-size: var(--d-t-2xs); color: var(--d-ink-3);
+    font-variant-numeric: var(--d-num);
+  }
   .dv-rail { white-space: nowrap; }
 
   /* ── 1 · Progreso con umbral ────────────────────────────────────────── */
@@ -678,8 +739,15 @@
   .pb-fill { position: absolute; inset-block: 0; left: 0; background: var(--tone-fg); }
   .pb-thr { position: absolute; inset-block: 0; width: 2px; background: var(--d-ink); opacity: .5; }
   .pb-thr--soft { opacity: .22; }
-  .pb-thr-lab { position: absolute; bottom: 100%; margin-left: 3px; display: none; }
+  .pb-thr-lab {
+    position: absolute; bottom: 100%; margin-left: 3px; display: none;
+    font-size: var(--d-t-2xs); color: var(--d-ink-3);
+    font-variant-numeric: var(--d-num);
+  }
   .pb-foot { display: flex; align-items: center; gap: var(--d-p1) var(--d-p2); flex-wrap: wrap; }
+  /* El plazo va en segunda posición y en tinta de lectura: la píldora dice el
+     estado, esto dice cuánto. Es la respuesta de los tres segundos. */
+  .pb-when { font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-2); white-space: nowrap; }
   .pb-note { font-size: var(--d-t-2xs); color: var(--d-ink-3); min-width: 0; overflow-wrap: anywhere; }
 
   /* ── 2 · Dos relojes ────────────────────────────────────────────────── */
@@ -702,7 +770,14 @@
   .ck-lf { color: var(--d-ink-3); font-size: var(--d-t-2xs); min-width: 0; overflow-wrap: anywhere; }
   .ck-lanes { display: grid; gap: var(--d-p1); }
   .ck-lane { display: grid; grid-template-columns: var(--dv-lane) minmax(0, 1fr) auto; align-items: center; gap: 3px var(--d-p2); }
-  .ck-lane-lab { grid-column: 1; grid-row: 1; min-width: 0; overflow-wrap: anywhere; }
+  /* «Calendario» y «Uso» son los nombres de los dos carriles, o sea lo que hay
+     que reconocer de un vistazo. En versalitas de 10px tracked eran lo más
+     lento de leer del panel; en caja normal y peso medio se reconocen sin
+     deletrear. */
+  .ck-lane-lab {
+    grid-column: 1; grid-row: 1; min-width: 0; overflow-wrap: anywhere;
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med); color: var(--d-ink-2);
+  }
   .ck-trklane { position: relative; grid-column: 2; grid-row: 1; height: var(--dv-h); background: var(--d-sunk); }
   .ck-fill { position: absolute; inset-block: 0; left: 0; background: var(--tone-fg); }
   .ck-fin { position: absolute; inset-block: -3px; width: 2px; background: var(--d-ink); }
@@ -725,6 +800,12 @@
   .tl-tick { position: absolute; top: 0; font-size: var(--d-t-2xs); color: var(--d-ink-3); white-space: nowrap; font-variant-numeric: var(--d-num); }
   .tl-track { position: relative; height: var(--dv-h); background: var(--d-sunk); border-radius: var(--d-r-pill); }
   .tl-zone { position: absolute; inset-block: 0; background: var(--tone-band); }
+  /* El tramo va de HOY al vencimiento, no del borde del eje al vencimiento.
+     Antes el plan de +47 d pintaba la barra más larga y el vencido hace 12
+     la más corta: al lado de tres barras donde «más lleno» significa «más
+     urgente», eso enseñaba lo contrario. Ahora el largo es la distancia y el
+     lado dice si falta o si ya pasó. Las direcciones que lo repintan siguen
+     mandando: solo cambió de dónde a dónde va. */
   .tl-elapsed { position: absolute; inset-block: 35%; left: 0; background: var(--tone-fg); opacity: .5; }
   .tl-hatch {
     position: absolute; inset: 0;
@@ -745,6 +826,19 @@
   .tl-key li { display: flex; align-items: center; gap: 4px; font-size: var(--d-t-2xs); color: var(--tone-fg, var(--d-ink-3)); }
   .tl-key-now { color: var(--d-ink-3); }
   .tl-key-rule { width: 1px; height: 10px; background: var(--d-ink); display: inline-block; }
+
+  /* LA ÚNICA ANIMACIÓN DE LA PÁGINA, y la frase que la justifica: cuando
+     cambiás el eje de 30 a 90 días, los seis vencimientos se reacomodan sobre
+     la misma pista, y si saltan de golpe hay que volver a buscar cuál era
+     cuál. Deslizándose, el ojo sigue el punto rojo hasta su nueva posición y
+     entiende que es la misma lista vista más lejos. Nada más se mueve: ni los
+     paneles al entrar, ni las barras al cargar, ni una sola pulsación. */
+  @media (prefers-reduced-motion: no-preference) {
+    .tl-tick, .tl-zone, .tl-elapsed, .tl-now, .tl-dot {
+      transition: left 240ms cubic-bezier(.22, .68, .28, 1),
+                  width 240ms cubic-bezier(.22, .68, .28, 1);
+    }
+  }
 
   /* ── 4 · Consumo semanal ────────────────────────────────────────────── */
   .sp-svg { width: 100%; height: 56px; display: block; }
@@ -809,12 +903,26 @@
   .cal-n { font-size: var(--d-t-xs); font-weight: var(--d-w-semi); line-height: 1.1; font-variant-numeric: var(--d-num); }
   .cal-mk { display: flex; align-items: center; gap: 1px; height: 10px; color: var(--tone-fg); }
   .cal-mk b { font-size: var(--d-t-2xs); font-weight: var(--d-w-bold); line-height: 1; }
-  .cal-mk--void { color: var(--d-ink-3); opacity: .4; font-size: var(--d-t-2xs); line-height: 10px; }
+  /* Reserva de alto, sin glifo: ver el comentario del marcado. */
+  .cal-mk--void { height: 10px; }
   .cal-detail { margin-top: var(--d-p2); min-width: 0; }
   .cal-day-name { margin: 0 0 3px; font-size: var(--d-t-sm); color: var(--d-ink-3); }
   .cal-day-name b { color: var(--d-ink); font-weight: var(--d-w-semi); }
-  .cal-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-  .cal-list li { display: flex; align-items: baseline; gap: var(--d-p1); font-size: var(--d-t-xs); color: var(--tone-fg); overflow-wrap: anywhere; }
+  .cal-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+  /* Tres columnas, no una frase: equipo, tarea y plazo. El plazo se ancla a
+     la derecha para que dos vencimientos del mismo día se comparen bajando
+     por una columna. Bajo 330px la fila se desarma y el plazo pasa abajo. */
+  .cal-list li {
+    display: grid; grid-template-columns: 9px auto minmax(0, 1fr) auto;
+    align-items: baseline; gap: var(--d-p1);
+    font-size: var(--d-t-xs); color: var(--tone-fg); min-width: 0;
+  }
+  .cal-list .mk { align-self: center; }
+  /* El código es identidad, no estado: va en tinta. El tono se lo quedan la
+     marca y el plazo, que son las dos piezas que sí dicen cómo está. */
+  .cal-id { font-weight: var(--d-w-semi); color: var(--d-ink); }
+  .cal-task { color: var(--d-ink-2); min-width: 0; overflow-wrap: anywhere; }
+  .cal-when { font-size: var(--d-t-2xs); white-space: nowrap; }
   .cal-none { margin: 0; font-size: var(--d-t-xs); color: var(--d-ink-3); }
 
   /* ── Piezas de carácter (solo F las usa) ────────────────────────────── */
@@ -844,18 +952,71 @@
      la variación se pierde en silencio.
      ══════════════════════════════════════════════════════════════════════ */
 
-  /* ── A · ELEVACIÓN — todo flota, nada se toca ───────────────────────── */
+  /* ── A · ELEVACIÓN — todo flota, nada se toca ─────────────────────────
+     La incumbente entra a esta ronda con una defensa de verdad, no con tres
+     sombras. Dos decisiones la definen acá:
+
+     1. NADA DE TARJETAS DENTRO DE TARJETAS. Es la tentación obvia de esta
+        dirección (poner cada plan en su propia tarjetita flotante) y es
+        exactamente lo que la rompe: dos niveles de sombra y ya no se sabe
+        cuál es el contenedor. Cuando un grupo necesita contenerse, A lo
+        HUNDE en vez de levantarlo: el surco de una barra, el pozo del
+        detalle del día. Levantado hay uno solo por celda, el panel.
+     2. LO QUE SEPARA ES AIRE. Ninguna línea entre planes, entre filas de la
+        línea de tiempo ni bajo las leyendas: solo espacio, que es lo que la
+        silueta de esta dirección promete.
+
+     Y una escala de radio sola: 7px en las piezas chicas, 11px en las que
+     contienen. Los surcos de barra estaban en pastilla, que es otra escala;
+     ahora comparten los 7px con los días y con los botones. */
+  :global([data-d='A']) .dv { --dv-lab: 112px; }
   :global([data-d='A']) .dv-bar { border-radius: var(--d-r-lg); box-shadow: var(--d-shadow-lg); }
   :global([data-d='A']) .dv-body { gap: var(--d-p3); }
+  :global([data-d='A']) .dv-stack { gap: var(--d-p3); }
+  :global([data-d='A']) .pb-track, :global([data-d='A']) .ck-trklane,
+  :global([data-d='A']) .tl-track, :global([data-d='A']) .ds-bar { border-radius: var(--d-r); }
+  /* El surco hundido es el «contenedor» de A que no agrega una tarjeta. */
+  :global([data-d='A']) .pb-track, :global([data-d='A']) .ck-trklane, :global([data-d='A']) .tl-track {
+    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--d-ink) 10%, transparent);
+  }
+  :global([data-d='A']) .tl { gap: var(--d-p1); }
+  :global([data-d='A']) .tl-row { padding-block: var(--d-p1); }
+  /* El tramo hasta hoy es un carril fino: informa la distancia sin competir
+     con la marca de vencimiento, que es lo que hay que encontrar. */
+  :global([data-d='A']) .tl-elapsed { inset-block: 40%; opacity: .42; border-radius: var(--d-r-pill); }
+  :global([data-d='A']) .tl-key, :global([data-d='A']) .ds-key { margin-top: var(--d-p2); }
   :global([data-d='A']) .cal-strip { gap: 3px; }
   :global([data-d='A']) .cal-day { box-shadow: var(--d-shadow); }
+  /* Al presionar, la tarjeta baja a tocar la superficie. Es el único gesto de
+     A y es respuesta a una acción, no adorno. */
+  :global([data-d='A']) .cal-day:active { transform: translateY(1px); box-shadow: none; }
   :global([data-d='A']) .cal-day--hoy { box-shadow: var(--d-shadow), inset 0 0 0 1px var(--d-ink); }
+  /* Hundido sigue siendo hoy: el anillo no se va con la pulsación. */
+  :global([data-d='A']) .cal-day--hoy:active { box-shadow: inset 0 0 0 1px var(--d-ink); }
   :global([data-d='A']) .cal-detail { padding: var(--d-p2) var(--d-p3); background: var(--d-sunk); border-radius: var(--d-r-lg); }
   :global([data-d='A']) .ds-bar { box-shadow: var(--d-shadow); }
+  :global([data-d='A']) .sp-svg { border-radius: var(--d-r); }
   :global([data-d='A']) .tl-dot { box-shadow: 0 0 0 1px var(--tone-fg), var(--d-shadow); }
 
-  /* ── B · INSTRUMENTO — marcos rectos, bordes compartidos, regla ─────── */
+  /* ── B · INSTRUMENTO — marcos rectos, bordes compartidos, regla ───────
+     Acá es donde la densidad de cabina se paga o no se paga. Tres reglas:
+
+     1. TODA CIFRA EN MONOESPACIADA. Es la dirección de un plano técnico: los
+        porcentajes, los conteos, los días del eje y los números del mes se
+        alinean por columna y se comparan sin leerlos. Con la sans tabular se
+        alineaban los dígitos pero no los signos ni el «%», y en una fila de
+        30px eso es la mitad de la ventaja.
+     2. LA LEYENDA DE FLOTA ES UNA TABLA. Cuatro estados con nombre, conteo,
+        porcentaje y nota tienen columnas de verdad, no una fila que fluye.
+     3. EL EJE LLEVA MARCAS. Una etiqueta de día flotando sobre la pista no
+        dice a qué punto corresponde; una marca de 4px sí. Es la diferencia
+        entre un rótulo y un instrumento. */
   :global([data-d='B']) .dv { --dv-h: 7px; --dv-lab: 92px; --dv-dot: 11px; }
+  :global([data-d='B']) .pb-val, :global([data-d='B']) .ck-pc, :global([data-d='B']) .ds-v,
+  :global([data-d='B']) .ds-pc, :global([data-d='B']) .cal-n, :global([data-d='B']) .tl-tick,
+  :global([data-d='B']) .tl-off, :global([data-d='B']) .dv-fig, :global([data-d='B']) .dv-note,
+  :global([data-d='B']) .pb-thr-lab { font-family: var(--d-mono); letter-spacing: -.02em; }
+  :global([data-d='B']) .dv-body { gap: var(--d-p2); }
   :global([data-d='B']) .dv-bar { padding: 0; gap: 0; border-color: var(--d-edge); }
   :global([data-d='B']) .dv-bar > * { display: flex; align-items: center; align-self: stretch; padding: var(--d-p1) var(--d-p2); border-right: 1px solid var(--d-line); }
   :global([data-d='B']) .dv-bar > :last-child { border-right: 0; }
@@ -879,27 +1040,88 @@
   }
   :global([data-d='B']) .tl-now { inset-block: -5px; }
   :global([data-d='B']) .tl-dot { border-radius: 0; background: var(--d-surface); box-shadow: 0 0 0 1px var(--tone-fg); }
+  /* Marca de eje: un pie de 5px que baja de cada etiqueta hasta la pista.
+     El pie NO va siempre al centro: la etiqueta se corre con translateX para
+     no salirse del gráfico, así que el punto de dato queda en su borde
+     izquierdo en el primer tramo, en el derecho en el último y en el centro
+     en los del medio. Poner los tres al 50 % desplazaría las marcas de los
+     extremos media etiqueta, que en un eje de 80px es media semana. */
+  :global([data-d='B']) .tl-plot--axis { min-height: 1.8em; }
+  :global([data-d='B']) .tl-tick { padding-bottom: 6px; }
+  :global([data-d='B']) .tl-tick::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; width: 1px; height: 5px;
+    background: var(--d-ink-3);
+  }
+  :global([data-d='B']) .tl-tick:first-child::after { left: 0; }
+  :global([data-d='B']) .tl-tick:last-child::after { left: auto; right: 0; }
+  :global([data-d='B']) .tl-elapsed { inset-block: 0; opacity: .34; }
   :global([data-d='B']) .sp-svg { border: 1px solid var(--d-line); }
   :global([data-d='B']) .ds-bar { border-radius: 0; border: 1px solid var(--d-edge); }
+  /* La leyenda como lectura tabulada: nombre, conteo, porcentaje, nota. */
+  :global([data-d='B']) .ds-key { gap: 0; margin-top: var(--d-p2); border-top: 1px solid var(--d-line); }
+  :global([data-d='B']) .ds-key li {
+    display: grid; grid-template-columns: 9px minmax(0, 1fr) 3.5ch 4.5ch minmax(0, 1.2fr);
+    align-items: center; gap: var(--d-p2);
+    min-height: 22px; border-bottom: 1px solid var(--d-line);
+  }
+  :global([data-d='B']) .ds-v, :global([data-d='B']) .ds-pc { text-align: right; }
+  :global([data-d='B']) .ds-note { margin-left: 0; text-align: right; }
+  :global([data-d='B']) .tl-key { margin-top: var(--d-p2); }
   :global([data-d='B']) .cal-strip { gap: 0; }
   :global([data-d='B']) .cal-day { min-height: 38px; border-radius: 0; margin-left: -1px; }
   :global([data-d='B']) .cal-day:first-child { margin-left: 0; }
   :global([data-d='B']) .cal-day--hoy { z-index: 1; }
+  :global([data-d='B']) .cal-detail { margin-top: var(--d-p2); padding-top: var(--d-p2); border-top: 1px solid var(--d-line); }
+  :global([data-d='B']) .cal-list li { min-height: 20px; }
 
-  /* ── C · MARCA — el teal es la estructura, no el adorno ─────────────── */
+  /* ── C · MARCA — el teal es la estructura, no el adorno ───────────────
+     La cabecera llena de color ya la da el contrato. Lo que faltaba acá
+     adentro: el teal no hacía NADA en el cuerpo, así que un panel de C era un
+     panel de A con sombrero. La regla que lo arregla es una sola y se puede
+     decir en una frase: EL COLOR DE MARCA ES LA REFERENCIA CONTRA LA QUE SE
+     MIDE TODO. El 100 % del plan, la línea de hoy, el fin del carril, el eje
+     de días. Nada de eso es un estado (los estados ya tienen sus cuatro
+     tonos): son el cero del instrumento, y en esta dirección el cero es la
+     marca. Un cliente rebindea --d-brand y se le mueve la referencia entera.
+
+     Y una segunda: si la cabecera se anuncia rellenándose de color, el día
+     elegido de la tira también. Elegido = relleno, en toda la dirección. */
   :global([data-d='C']) .dv { --dv-h: 12px; }
   :global([data-d='C']) .dv-bar { background: var(--d-brand); border-color: var(--d-brand); }
-  /* En C, .d-cap va en teal por token; sobre la cabecera teal desaparecería.
-     La cabecera manda: dentro de ella, la etiqueta va en tinta clara. */
-  :global([data-d='C']) .d-panel-head .d-cap,
+  /* Sobre la cabecera teal, TODO lo secundario pasa a tinta clara. La cifra y
+     la hora de corte perdieron su .d-cap en esta ronda, así que si no se
+     nombran acá quedan en --d-ink-3 sobre el teal: 1.52:1, ilegible. Es la
+     misma falla de contraste que este proyecto ya arregló tres veces. */
   :global([data-d='C']) .dv-bar .d-cap,
+  :global([data-d='C']) .dv-bar .dv-note,
   :global([data-d='C']) .dv-bar .dv-fld-lab { color: var(--d-brand-ink); }
+  :global([data-d='C']) .d-panel-head .dv-fig { color: inherit; }
   :global([data-d='C']) .dv-sel { border-color: transparent; }
   :global([data-d='C']) .pb-name b, :global([data-d='C']) .tl-lab b,
-  :global([data-d='C']) .ck-title b, :global([data-d='C']) .cal-day-name b { color: var(--d-brand); }
+  :global([data-d='C']) .ck-title b, :global([data-d='C']) .cal-day-name b,
+  :global([data-d='C']) .cal-id { color: var(--d-brand); }
+  /* La referencia, en marca: umbral de 100 %, fin del carril, línea de hoy. */
+  :global([data-d='C']) .pb-thr, :global([data-d='C']) .ck-fin, :global([data-d='C']) .tl-now {
+    background: var(--d-brand); opacity: 1; width: 2px;
+  }
+  :global([data-d='C']) .pb-thr--soft { background: var(--d-ink-3); opacity: .3; width: 1px; }
   :global([data-d='C']) .tl-axis { background: var(--d-accent-soft); border-radius: var(--d-r); padding: 2px 0; }
+  :global([data-d='C']) .tl-tick { color: var(--d-brand); font-weight: var(--d-w-med); }
+  :global([data-d='C']) .tl-elapsed { inset-block: 38%; opacity: .45; }
   :global([data-d='C']) .tl-key, :global([data-d='C']) .ds-key { padding-top: var(--d-p1); border-top: 1px solid var(--d-line); }
   :global([data-d='C']) .cal-day--hoy { box-shadow: inset 0 0 0 2px var(--d-brand); }
+  /* Elegido = relleno de marca, igual que la cabecera. El tono del día no se
+     pierde: lo sigue llevando la FORMA de la marca de demo.js (cuadrado =
+     vencido, triángulo = por vencer), que es lo único que no depende del
+     color. Pintar el conteo en --tone-fg sobre teal daría 1.6:1. */
+  :global([data-d='C']) .cal-day--on { background: var(--d-brand); }
+  :global([data-d='C']) .cal-day--on .cal-dow, :global([data-d='C']) .cal-day--on .cal-n,
+  :global([data-d='C']) .cal-day--on .cal-mk { color: var(--d-brand-ink); }
+  :global([data-d='C']) .cal-day--on::after { display: none; }
+  /* Hoy Y elegido a la vez es el estado de arranque, así que tiene que
+     resolverse bien: el anillo de hoy pasa a tinta clara para verse contra el
+     relleno de marca en vez de perderse en un teal apenas más oscuro. */
+  :global([data-d='C']) .cal-day--on.cal-day--hoy { box-shadow: inset 0 0 0 2px var(--d-brand-ink); }
   :global([data-d='C']) .sp-mid { color: var(--d-brand); }
 
   /* ── D · PESO — 2px de tinta, bloques macizos, nada difuso ──────────── */
@@ -1099,14 +1321,37 @@
   }
   :global([data-d='I']) .sp-line { stroke-width: 2; }
   :global([data-d='I']) .sp-end { stroke: var(--d-line); stroke-width: 1.5; }
+  /* La lámina del minigráfico es vidrio más fino que el panel, nunca un
+     segundo desenfoque: transparencia anidada, que es la regla de arriba. */
+  :global([data-d='I']) .sp-svg {
+    background: color-mix(in srgb, var(--d-surface) 42%, transparent);
+    border-radius: var(--d-r); box-shadow: inset 0 1px 0 var(--d-line);
+  }
   :global([data-d='I']) .cal-strip { gap: 3px; }
+  /* Catorce días eran catorce vidrios al 56 %, y apilado sobre el vidrio del
+     panel el campo de manchas desaparecía: la tira quedaba gris plástico y
+     los tres días que importan tenían que competir con once cristales llenos.
+     Bajando el día vacío a un velo del 22 %, el fondo teñido pasa a través, y
+     el día con vencimiento es lo único con cuerpo. Se encuentra de lejos. */
   :global([data-d='I']) .cal-day {
-    background: var(--d-surface); border-color: var(--d-line);
+    background: color-mix(in srgb, var(--d-surface) 34%, transparent);
+    border-color: transparent;
     box-shadow: inset 0 1px 0 var(--d-line);
   }
   :global([data-d='I']) .cal-day[data-tone] { background: var(--tone-band); border-color: var(--tone-edge); }
-  :global([data-d='I']) .cal-day--wknd { background: var(--d-sunk); }
+  /* El fin de semana no se borra: se hunde. Un velo de tinta lo mete detrás
+     del vidrio del día hábil, y quedan tres niveles en el orden correcto:
+     hundido, vidrio, tono. */
+  :global([data-d='I']) .cal-day--wknd {
+    background: color-mix(in srgb, var(--d-ink) 6%, transparent);
+    box-shadow: none;
+  }
   :global([data-d='I']) .cal-day--hoy { box-shadow: inset 0 0 0 1px var(--d-accent), inset 0 1px 0 var(--d-line); }
+  /* El vidrio no se hunde al pasarle por encima: sube el filo especular. */
+  :global([data-d='I']) .cal-day:not([data-tone]):hover {
+    filter: none;
+    background: color-mix(in srgb, var(--d-surface) 62%, transparent);
+  }
   :global([data-d='I']) .cal-day--on::after { background: var(--d-accent); }
   :global([data-d='I']) .cal-detail {
     background: var(--d-sunk); border-radius: var(--d-r-lg);
@@ -1303,13 +1548,25 @@
      Los titulares y las cifras pasan a la serif de --d-display: en una página
      de datos, el número en serif es la mitad de la firma de esta dirección. */
   :global([data-d='M']) .dv { --dv-h: 14px; --dv-dot: 16px; }
-  :global([data-d='M']) .dv-bar { background: none; border: 0; box-shadow: none; padding-inline: 0; }
+  /* Sin contenedores, lo único que agrupa es una mancha. La barra de vista es
+     un grupo de controles y necesitaba leerse como uno: sin la mancha eran
+     tres cosas sueltas flotando arriba de la página. */
+  :global([data-d='M']) .dv-bar {
+    background: radial-gradient(72% 150% at 14% 50%, var(--d-neu-wash) 0%, transparent 72%);
+    border: 0; box-shadow: none; padding-inline: 0;
+  }
   :global([data-d='M']) .pb-name, :global([data-d='M']) .ck-title,
   :global([data-d='M']) .cal-day-name, :global([data-d='M']) .sp-mid {
     font-family: var(--d-display);
   }
+  /* Las cifras en serif son la mitad de la firma de esta dirección: en una
+     página de datos, un 118 % en Georgia es lo que dice que acá el número no
+     es un instrumento sino una lectura. Entran también las del eje y las de
+     las cabeceras, que antes se quedaban en sans y partían la voz. */
   :global([data-d='M']) .pb-val, :global([data-d='M']) .ck-pc,
-  :global([data-d='M']) .ds-v, :global([data-d='M']) .cal-n {
+  :global([data-d='M']) .ds-v, :global([data-d='M']) .cal-n,
+  :global([data-d='M']) .tl-tick, :global([data-d='M']) .dv-fig,
+  :global([data-d='M']) .ds-pc, :global([data-d='M']) .pb-thr-lab {
     font-family: var(--d-display); font-weight: 400;
   }
   :global([data-d='M']) .pb-track, :global([data-d='M']) .ck-trklane, :global([data-d='M']) .tl-track {
@@ -1330,6 +1587,20 @@
     width: var(--d-p2); margin-left: calc(var(--d-p2) / -2); opacity: .35;
     background: radial-gradient(closest-side, var(--d-ink) 0%, transparent 74%);
   }
+  /* LO QUE LE FALTABA A M EN ESTA FAMILIA. Sin panel, sin borde y sin fila
+     rayada, seis planes eran seis renglones de texto suelto y encontrar los
+     dos vencidos costaba leerlos todos. La respuesta no es meterles una caja
+     (eso deja de ser Bruma): es que el estado SE DERRAME por detrás de la
+     fila, entrando por la izquierda y muriendo antes del texto. La mancha va
+     de radial-gradient y no de blur porque el desenfoque de un filtro también
+     desenfoca la letra que tiene encima; el degradado no toca la letra.
+     Los planes al día no manchan nada. Eso es lo que hace que los dos que
+     manchan se vean desde el otro lado del taller. */
+  :global([data-d='M']) .pb[data-tone='critical'], :global([data-d='M']) .pb[data-tone='attention'],
+  :global([data-d='M']) .tl-row[data-tone='critical'], :global([data-d='M']) .tl-row[data-tone='attention'] {
+    background: radial-gradient(56% 130% at 4% 50%, var(--tone-band) 0%, transparent 70%);
+  }
+  :global([data-d='M']) .pb { padding-block: var(--d-p1); }
   :global([data-d='M']) .tl-elapsed { filter: blur(3px); opacity: .4; }
   :global([data-d='M']) .tl-dot {
     background: radial-gradient(closest-side, var(--tone-band) 0%, transparent 76%);
@@ -1456,7 +1727,16 @@
     box-shadow: var(--d-shadow-lg);
   }
   :global([data-d='O']) .pb-name b, :global([data-d='O']) .tl-lab b,
-  :global([data-d='O']) .ck-title b, :global([data-d='O']) .cal-day-name b { color: var(--d-brand); }
+  :global([data-d='O']) .ck-title b, :global([data-d='O']) .cal-day-name b,
+  :global([data-d='O']) .cal-id { color: var(--d-brand); }
+  /* La cifra de la cabecera vive sobre el vidrio teñido, así que hereda la
+     tinta de marca de esa capa en vez de traer la suya. */
+  :global([data-d='O']) .d-panel-head .dv-fig { color: inherit; }
+  /* Igual que en C, el teal es la referencia contra la que se mide: el 100 %,
+     el fin del carril, la línea de hoy y las marcas del eje. La diferencia es
+     de dónde sale el color: en C es una barra opaca, acá es la misma capa
+     translúcida que tiñe el vidrio entero. */
+  :global([data-d='O']) .tl-tick { color: var(--d-brand); }
   :global([data-d='O']) .pb-track, :global([data-d='O']) .tl-track,
   :global([data-d='O']) .ck-trklane, :global([data-d='O']) .ds-bar {
     background: color-mix(in srgb, var(--d-brand) 9%, transparent);
@@ -1497,8 +1777,23 @@
   :global([data-d='O']) .cal-day[data-tone] { background: var(--tone-band); }
   :global([data-d='O']) .cal-day--wknd { background: color-mix(in srgb, var(--d-ink) 5%, transparent); }
   :global([data-d='O']) .cal-day--hoy { box-shadow: inset 0 0 0 1px var(--d-brand); }
-  :global([data-d='O']) .cal-day--on { background: color-mix(in srgb, var(--d-brand) 16%, transparent); }
-  :global([data-d='O']) .cal-day--on::after { background: var(--d-brand); }
+  /* Dentro de un panel segmentado, el puntero mueve LUZ debajo del vidrio: no
+     hunde la pieza ni la levanta, porque no hay piezas. */
+  :global([data-d='O']) .cal-day:not([data-tone]):hover {
+    filter: none;
+    background: color-mix(in srgb, var(--d-surface) 45%, transparent);
+  }
+  /* Elegido = un pie de marca a todo el ancho del tramo, no un relleno.
+     El relleno teñido que había acá NO se veía en los tres días que tienen
+     estado, porque el tono los pinta con más peso de selector, y justo el día
+     que arranca elegido es uno de esos: la tira abría sin marca de selección.
+     El pie va por debajo del tono y funciona igual en los catorce. Una sola
+     señal, y la que no puede taparse. */
+  :global([data-d='O']) .cal-day--on::after {
+    left: 0; right: 0; bottom: 0; height: 3px;
+    background: var(--d-brand);
+  }
+  :global([data-d='O']) .tl-elapsed { inset-block: 38%; opacity: .42; }
   :global([data-d='O']) .cal-detail {
     background: color-mix(in srgb, var(--d-surface) 60%, transparent);
     border-radius: var(--d-r-lg); padding: var(--d-p2) var(--d-p3);
@@ -1788,6 +2083,132 @@
     padding: var(--d-p2) var(--d-p3); box-shadow: var(--d-shadow);
   }
 
+  /* ── T · HALO CLARO — nada tiene borde: existe lo que irradia ──────────
+     Halo, del otro lado de la luz, y la traducción a datos y tiempo es una
+     sola decisión repetida en las seis piezas: NINGÚN SURCO SE RELLENA.
+     El carril vacío es papel con un anillo de 1px, y lo consumido es lo único
+     que tiene luz. Una barra al 118 % no se ve porque esté pintada de rojo:
+     se ve porque irradia rojo, y eso funciona a tres metros.
+
+     DE QUÉ LADO ESTÁ LA LUZ. Es lo único que cambia contra K y es lo que hace
+     que acá no parezca un neón apagado: sobre papel la luz viene de arriba,
+     así que el halo CAE. Todo resplandor de esta dirección lleva
+     desplazamiento hacia abajo; lo único a cero es el anillo, porque un
+     anillo es contorno y no sombra. Un halo centrado sin desplazamiento es
+     decoración, y esa es exactamente la trampa de esta dirección.
+
+     Y LO QUE LA SEPARA DE UMBRA, que en esta página es su vecina peligrosa:
+     S es una tarjeta blanca, neutra, con la sombra teñida encima como dato
+     agregado. Acá no hay tarjeta. El anillo en el propio tono es el contorno,
+     y el acento es un color que brilla por sí mismo en vez de ser tinta.
+
+     HALLAZGO: el contrato no tiene token de halo por tono. Se arma acá con
+     color-mix sobre --tone-fg, con fallback a --d-accent para las piezas sin
+     estado: sin ese fallback, un var indefinido invalida la lista de
+     box-shadow entera y se cae también el anillo. */
+  :global([data-d='T']) .dv {
+    --dv-h: 12px; --dv-dot: 15px;
+    /* El anillo va POR FUERA, no inset: las bandas de zona son hijas del
+       surco y pintan encima de una sombra interior, y el contorno de la
+       dirección no puede depender de que las zonas estén apagadas. */
+    --dv-ring: 0 0 0 1px color-mix(in srgb, var(--d-ink) 10%, transparent);
+    --dv-halo: 0 4px 12px -4px color-mix(in srgb, var(--tone-fg, var(--d-accent)) 50%, transparent);
+    --dv-halo-lg: 0 7px 22px -7px color-mix(in srgb, var(--tone-fg, var(--d-accent)) 55%, transparent);
+  }
+  :global([data-d='T']) .dv-bar { border: 0; border-radius: var(--d-r-lg); box-shadow: var(--d-shadow); }
+  :global([data-d='T']) .dv-body, :global([data-d='T']) .dv-stack { gap: var(--d-p3); }
+  /* El carril es aire con un anillo. Nada de --d-sunk: eso es relleno. */
+  :global([data-d='T']) .pb-track, :global([data-d='T']) .ck-trklane, :global([data-d='T']) .tl-track {
+    background: none; box-shadow: var(--dv-ring);
+    border-radius: var(--d-r-pill); overflow: visible;
+  }
+  /* Lo consumido no es un bloque de color: es luz que se junta hacia el final
+     del recorrido. Empieza en un 30 % del tono y llega entero al filo. */
+  :global([data-d='T']) .pb-fill, :global([data-d='T']) .ck-fill {
+    border-radius: var(--d-r-pill);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--tone-fg) 30%, transparent), var(--tone-fg));
+    box-shadow: var(--dv-halo);
+  }
+  /* El umbral es la única brasa de acento de la celda, y también cae. */
+  :global([data-d='T']) .pb-thr, :global([data-d='T']) .ck-fin {
+    background: var(--d-accent); opacity: 1; inset-block: -4px; width: 2px;
+    box-shadow: 0 3px 9px -2px color-mix(in srgb, var(--d-accent) 55%, transparent);
+  }
+  :global([data-d='T']) .pb-thr--soft { background: var(--d-ink-3); opacity: .3; inset-block: 0; width: 1px; box-shadow: none; }
+  :global([data-d='T']) .tl-now {
+    background: var(--d-accent); inset-block: -4px;
+    box-shadow: 0 3px 10px -2px color-mix(in srgb, var(--d-accent) 55%, transparent);
+  }
+  :global([data-d='T']) .tl-elapsed {
+    inset-block: 36%; opacity: 1; border-radius: var(--d-r-pill);
+    background: color-mix(in srgb, var(--tone-fg) 55%, transparent);
+  }
+  :global([data-d='T']) .tl-dot {
+    background: var(--d-surface);
+    box-shadow: 0 0 0 1px var(--tone-edge), var(--dv-halo);
+  }
+  /* El dial: dos arcos que caen. T entra en la familia de arcos por la misma
+     razón que K, y con la pista a un 8 % de tinta el arco es lo único que
+     emite: se lee cuál de los dos relojes va adelante sin mirar la leyenda. */
+  :global([data-d='T']) .ck-trk { stroke: color-mix(in srgb, var(--d-ink) 8%, transparent); }
+  :global([data-d='T']) .ck-arc {
+    stroke-linecap: round;
+    filter: drop-shadow(0 3px 6px color-mix(in srgb, var(--tone-fg) 45%, transparent));
+  }
+  :global([data-d='T']) .ck-over { filter: drop-shadow(0 2px 5px color-mix(in srgb, var(--tone-fg) 45%, transparent)); }
+  /* La flota: un riel de cuatro lozanges de luz. Sin gap, porque el ancho de
+     cada tramo ES el dato y tres huecos de 3px corren el reparto; lo que
+     separa es un filo de papel pintado hacia adentro. */
+  :global([data-d='T']) .ds-bar {
+    background: none; box-shadow: none; overflow: visible;
+    height: calc(var(--dv-h) * 1.5);
+  }
+  :global([data-d='T']) .ds-seg {
+    background: color-mix(in srgb, var(--tone-fg) 88%, transparent);
+    box-shadow: var(--dv-halo);
+  }
+  :global([data-d='T']) .ds-seg + .ds-seg { box-shadow: var(--dv-halo), inset 2px 0 0 var(--d-surface); }
+  :global([data-d='T']) .ds-seg:first-child { border-radius: var(--d-r-pill) 0 0 var(--d-r-pill); }
+  :global([data-d='T']) .ds-seg:last-child { border-radius: 0 var(--d-r-pill) var(--d-r-pill) 0; }
+  :global([data-d='T']) .sp-base, :global([data-d='T']) .sp-grid { display: none; }
+  :global([data-d='T']) .sp-line {
+    stroke-width: 2;
+    filter: drop-shadow(0 3px 5px color-mix(in srgb, var(--tone-fg) 45%, transparent));
+  }
+  :global([data-d='T']) .sp-end { filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--tone-fg) 50%, transparent)); }
+  /* La tira de catorce días es donde esta dirección se gana el puesto: un día
+     sin vencimiento es papel liso y no dibuja nada, así que los tres que
+     tienen trabajo son lo único que emite luz en toda la fila. Encontrar el
+     próximo vencimiento no es leer catorce números, es mirar dónde brilla. */
+  :global([data-d='T']) .cal-strip { gap: 3px; }
+  :global([data-d='T']) .cal-day { background: none; border: 0; box-shadow: none; }
+  :global([data-d='T']) .cal-day[data-tone] {
+    background: var(--tone-band);
+    box-shadow: 0 0 0 1px var(--tone-edge), var(--dv-halo-lg);
+  }
+  /* El fin de semana no se rellena de gris: se apaga. Es la única forma de
+     decirlo que no contradice la regla de la dirección, y de paso deja la
+     tira con un solo material, el papel. Si ese sábado tiene trabajo manda el
+     tono, que para eso está. */
+  :global([data-d='T']) .cal-day--wknd:not([data-tone]) { background: none; color: var(--d-ink-3); }
+  /* Hoy lleva el anillo de acento y conserva el halo de su propio tono: hoy
+     ES el 6 de agosto y el 6 de agosto está vencido, así que las dos cosas
+     tienen que verse a la vez. */
+  :global([data-d='T']) .cal-day--hoy,
+  :global([data-d='T']) .cal-day--hoy[data-tone] { box-shadow: 0 0 0 1px var(--d-accent), var(--dv-halo-lg); }
+  :global([data-d='T']) .cal-day:not([data-tone]):hover {
+    filter: none;
+    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 5px 14px -5px color-mix(in srgb, var(--d-accent) 40%, transparent);
+  }
+  :global([data-d='T']) .cal-day--on::after {
+    background: var(--d-accent);
+    box-shadow: 0 2px 6px -1px color-mix(in srgb, var(--d-accent) 60%, transparent);
+  }
+  :global([data-d='T']) .cal-detail {
+    border-radius: var(--d-r-lg); padding: var(--d-p2) var(--d-p3);
+    box-shadow: var(--d-shadow);
+  }
+
   /* ══════════════════════════════════════════════════════════════════════
      ESTRECHO — manda el ancho de la CELDA, no el de la ventana. Por eso
      container queries: dos celdas de 400px en un monitor de 1600 también
@@ -1808,6 +2229,10 @@
   }
   @container (max-width: 330px) {
     .tl, .pb { --dv-lab: 0px; }
+    /* La fila del detalle deja de ser una tabla: acá el plazo no entra en la
+       misma línea y truncarlo sería perder el único dato urgente. */
+    .cal-list li { grid-template-columns: 9px auto minmax(0, 1fr); }
+    .cal-when { grid-column: 2 / -1; }
     .tl-axis, .tl-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
     .tl-axis .tl-lab { display: none; }
     .tl-lab { text-align: left; justify-items: start; }

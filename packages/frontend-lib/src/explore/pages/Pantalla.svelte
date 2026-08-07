@@ -86,7 +86,6 @@
         <!-- BARRA DEL MÓDULO ------------------------------------------------->
         <header class="topbar">
           <div class="mod">
-            <span class="d-cap kicker">Mantenimiento</span>
             <h2 class="title">Flota</h2>
           </div>
           <div class="search" role="search">
@@ -103,17 +102,20 @@
         </header>
 
         <div class="scroll">
-          <!-- VEREDICTO: lo primero que se lee ------------------------------->
+          <!-- VEREDICTO: lo primero que se lee.
+               Llevaba una versalita «Hoy» encima, y la frase ya dice hoy: el
+               epígrafe sobraba. Queda la marca de severidad, que es el mismo
+               vocabulario de las píldoras y no una etiqueta que haya que leer. -->
           <div class="verdict d-rail" data-tone="critical">
-            <span class="d-cap vk">
+            <span class="vk">
               <svg class="mk" viewBox="0 0 12 12" aria-hidden="true">{@html markOf('critical')}</svg>
-              Hoy
+              <span class="d-sr">Crítico</span>
             </span>
             <p class="vt">{COPY.verdict}</p>
           </div>
 
           <!-- TIRA DE KPIS: además de contar, filtran ------------------------>
-          <div class="kpis" role="group" aria-label="Resumen de la flota — filtrar por estado">
+          <div class="kpis" role="group" aria-label="Resumen de la flota: filtrar por estado">
             {#each KPIS as k}
               <button
                 type="button"
@@ -134,7 +136,7 @@
 
           <!-- BARRA DE FILTROS ---------------------------------------------->
           <div class="filters d-rail">
-            <label class="d-cap flab" for={'g-' + d.id}>Agrupar por</label>
+            <label class="flab" for={'g-' + d.id}>Agrupar por</label>
             <div class="fbody">
               <select class="d-select gsel" id={'g-' + d.id} bind:value={group[d.id]}>
                 <option value="urgencia">Urgencia</option>
@@ -169,7 +171,7 @@
           <section class="sect d-panel list" aria-labelledby={'lt-' + d.id}>
             <div class="d-panel-head">
               <h3 class="d-panel-title" id={'lt-' + d.id}>Equipos</h3>
-              <span class="d-cap cnt d-num">{view[d.id].length} de {ASSETS.length}</span>
+              <span class="cnt d-num">{view[d.id].length} de {ASSETS.length}</span>
             </div>
 
             <div class="lhead" aria-hidden="true">
@@ -182,8 +184,13 @@
 
             <div class="rows">
               {#each grouped[d.id] as g (g.name)}
+                <!-- el encabezado de grupo lleva la marca semántica: a treinta
+                     segundos se ve DÓNDE está lo vencido sin leer la palabra -->
                 <div class="ghead" data-tone={g.tone}>
-                  <span class="gn">{g.name}</span>
+                  <span class="gn">
+                    <svg class="mk" viewBox="0 0 12 12" aria-hidden="true">{@html markOf(g.tone)}</svg>
+                    {g.name}
+                  </span>
                   <span class="gc d-num">{g.items.length}</span>
                 </div>
                 {#each g.items as a (a.code)}
@@ -224,12 +231,12 @@
           <section class="sect d-panel tl" aria-labelledby={'tt-' + d.id}>
             <div class="d-panel-head">
               <h3 class="d-panel-title" id={'tt-' + d.id}>Próximos vencimientos</h3>
-              <span class="d-cap cnt">escala 0–120 %</span>
+              <span class="cnt d-num">la marca es el 100 %</span>
             </div>
             <div class="tlb">
               {#each PLANS.filter((p) => view[d.id].some((a) => a.code === p.asset)).slice(0, 3) as p (p.asset)}
                 <div class="tlr d-rail" data-tone={p.tone}>
-                  <span class="d-cap d-id tlid">
+                  <span class="d-id tlid">
                     {p.asset}
                     <span class="tlev">{p.every} · reloj de {p.clock}</span>
                   </span>
@@ -322,7 +329,6 @@
     border-bottom: var(--d-bw) solid var(--d-line);
   }
   .mod { display: flex; flex-direction: column; min-width: 0; }
-  .kicker { line-height: 1.1; }
   .title {
     margin: 0;
     font-size: var(--d-t-lg);
@@ -351,6 +357,8 @@
   }
   .vk { display: flex; align-items: center; gap: .35em; }
   .mk { width: .82em; height: .82em; flex: none; vertical-align: -.04em; color: var(--tone-fg); }
+  /* la marca del veredicto es la señal, no un adorno: se lee de lejos */
+  .vk .mk { width: 1.15em; height: 1.15em; }
 
   /* ── tira de KPIs ─────────────────────────────────────────────────── */
   .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--d-gap); }
@@ -386,12 +394,21 @@
     font-weight: var(--d-w-med);
     white-space: nowrap;
   }
-  .kn { font-size: var(--d-t-2xs); color: var(--d-ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+  /* la nota va en ink-2, no en ink-3: a 11px sobre la banda del estado pulsado
+     el gris terciario caía a 4.4:1, justo por debajo de AA. */
+  .kn { font-size: var(--d-t-2xs); color: var(--d-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
   .kpi[aria-pressed='true'] { background: var(--tone-band); border-color: var(--tone-edge); }
 
   /* ── barra de filtros ─────────────────────────────────────────────── */
   .filters { padding: 0; }
-  .flab { align-self: center; }
+  /* «Agrupar por» es la etiqueta de un campo, no un epígrafe: sale de las
+     versalitas y se escribe como se escribe una etiqueta de formulario. */
+  .flab {
+    align-self: center;
+    font-size: var(--d-t-xs);
+    font-weight: var(--d-w-med);
+    color: var(--d-ink-2);
+  }
   .fbody { display: flex; align-items: center; gap: var(--d-p2); flex-wrap: wrap; min-width: 0; }
   .gsel { width: auto; min-width: 130px; }
   .fams { display: flex; align-items: center; gap: var(--d-p1); flex-wrap: wrap; min-width: 0; }
@@ -420,7 +437,14 @@
   .fam[aria-pressed='true'] .ct { color: inherit; }
 
   /* ── tabla ────────────────────────────────────────────────────────── */
-  .cnt { white-space: nowrap; }
+  /* la nota de la derecha de una cabecera es un dato (un conteo, una escala),
+     así que se escribe como dato y no en versalitas. */
+  .cnt {
+    white-space: nowrap;
+    font-size: var(--d-t-xs);
+    font-weight: var(--d-w-med);
+    color: var(--d-ink-3);
+  }
   .lhead, .row {
     display: grid;
     grid-template-columns: 74px minmax(0, 2fr) minmax(0, 1.3fr) 74px 104px;
@@ -447,6 +471,7 @@
     text-transform: var(--d-label-case);
     color: var(--d-ink-2);
   }
+  .gn { display: inline-flex; align-items: center; gap: .45em; min-width: 0; }
   .gc { color: var(--d-ink-3); }
   .c-code, .c-eq, .c-plan, .c-metric { min-width: 0; }
   .c-metric { text-align: right; }
@@ -475,7 +500,14 @@
 
   /* ── línea de tiempo ──────────────────────────────────────────────── */
   .tlb { padding: var(--d-p2) var(--d-p3) var(--d-p3); display: flex; flex-direction: column; gap: var(--d-p2); }
-  .tlid { line-height: 1.3; }
+  /* el código del equipo es un identificador, no un epígrafe: monoespaciada y
+     tinta legible, sin versalitas encima de algo que ya viene en caja alta. */
+  .tlid {
+    line-height: 1.3;
+    font-size: var(--d-t-xs);
+    font-weight: var(--d-w-semi);
+    color: var(--d-ink-2);
+  }
   .tlev {
     display: block;
     font-family: var(--d-font);
@@ -525,16 +557,45 @@
      así que TODO lo de aquí abajo empieza por :global([data-d='X']).
      ====================================================================== */
 
-  /* ── A · ELEVACIÓN — todo flota y se separa por aire, nunca por líneas ─ */
+  /* EL VEREDICTO, EN LAS QUE NO TIENEN RAÍL. Con la versalita «Hoy» fuera, la
+     marca de severidad queda sola en la primera celda de .d-rail, o sea
+     flotando encima de la frase. Donde no hay raíl de etiquetas —o sea en
+     todas menos Banda y Espina— pasa a ser lo que es: una señal a la
+     izquierda de la frase que califica. Banda y Espina la mantienen alineada
+     a la derecha del raíl, que es su propia gramática. */
+  :global([data-d='A']) .verdict,
+  :global([data-d='B']) .verdict,
+  :global([data-d='C']) .verdict,
+  :global([data-d='I']) .verdict,
+  :global([data-d='M']) .verdict,
+  :global([data-d='O']) .verdict,
+  :global([data-d='T']) .verdict {
+    display: flex; align-items: center; gap: var(--d-p3);
+  }
+
+  /* ── A · ELEVACIÓN — todo flota y se separa por aire, nunca por líneas ──
+     La incumbente llegaba a esta ronda con un problema de jerarquía y no de
+     material: todo flotaba a la misma altura, así que nada mandaba. Acá la
+     ALTURA CODIFICA PRIORIDAD, que es lo único que puede hacer una sombra
+     además de decorar: el veredicto y el listado están arriba del todo, la
+     línea de tiempo baja un plano, y el aire entre grupos hace el resto. */
   :global([data-d='A']) .topbar { border-bottom: 0; box-shadow: var(--d-shadow-lg); position: relative; z-index: 2; }
-  :global([data-d='A']) .sect { box-shadow: var(--d-shadow-lg); border-color: transparent; }
+  :global([data-d='A']) .sect { border-color: transparent; }
+  :global([data-d='A']) .list { box-shadow: var(--d-shadow-lg); }
+  :global([data-d='A']) .tl { box-shadow: var(--d-shadow); }
   :global([data-d='A']) .kpi:hover { transform: translateY(-1px); box-shadow: var(--d-shadow-lg); }
-  :global([data-d='A']) .verdict { border-color: transparent; box-shadow: var(--d-shadow); }
-  /* los grupos se separan por espacio, no por una barra */
+  :global([data-d='A']) .verdict { border-color: transparent; box-shadow: var(--d-shadow-lg); }
+  :global([data-d='A']) .vt { font-size: var(--d-t-xl); letter-spacing: -.02em; }
+  /* los grupos se separan por espacio, no por una barra. Y el nombre del grupo
+     es un encabezado de verdad: en versalitas de 11px, «Vencidos» no ganaba a
+     ninguna fila del listado y es lo primero que hay que ver. */
   :global([data-d='A']) .ghead {
     background: transparent; border-bottom: 0;
     padding-top: var(--d-p3); padding-bottom: 2px;
+    font-size: var(--d-t-sm); font-weight: var(--d-w-semi);
+    text-transform: none; letter-spacing: 0; color: var(--d-ink);
   }
+  :global([data-d='A']) .gc { font-weight: var(--d-w-med); }
   :global([data-d='A']) .fam { border-radius: var(--d-r-pill); box-shadow: var(--d-shadow); }
   :global([data-d='A']) .foot { background: var(--d-surface); border-top-color: var(--d-line); }
   :global([data-d='A']) .search .d-input { box-shadow: var(--d-shadow); }
@@ -546,7 +607,13 @@
   /* hasta la barra flota sobre su carril */
   :global([data-d='A']) .fill { box-shadow: var(--d-shadow); }
 
-  /* ── B · INSTRUMENTO — un plano: los bloques COMPARTEN borde ─────────── */
+  /* ── B · INSTRUMENTO — un plano: los bloques COMPARTEN borde ───────────
+     Densidad de cabina: TODA cifra va en monoespaciada. No es un gesto de
+     estilo, es lo que hace que 312 h, 1 840 h y 96 d se comparen columna
+     contra columna sin que el ojo tenga que recalibrar el ancho de cada
+     dígito. Es la regla que más se nota en la dirección más densa. */
+  :global([data-d='B']) .d-num { font-family: var(--d-mono); letter-spacing: -.02em; }
+  :global([data-d='B']) .kv { font-family: var(--d-mono); font-size: var(--d-t-xl); letter-spacing: -.04em; }
   :global([data-d='B']) .scroll { padding: var(--d-p2); }
   /* la pila entera se convierte en un solo marco continuo */
   :global([data-d='B']) .scroll > * + * { margin-top: -1px; }
@@ -587,11 +654,23 @@
   :global([data-d='B']) .fam + .fam { margin-left: -1px; }
   :global([data-d='B']) .fam[aria-pressed='true'] { background: var(--d-accent); color: var(--d-accent-ink); position: relative; z-index: 1; }
   :global([data-d='B']) .lhead { border-bottom-color: var(--d-edge); background: transparent; }
+  /* el grupo es una división del plano: regla de canto arriba, marca a la
+     izquierda y el conteo en la monoespaciada. Sin relleno: un plano técnico
+     no se pinta de colores, se marca. */
   :global([data-d='B']) .ghead {
     background: transparent;
     border-top: 1px solid var(--d-edge); border-bottom-color: var(--d-line);
     color: var(--d-ink);
   }
+  :global([data-d='B']) .gc { color: var(--d-ink-2); }
+  /* la etiqueta del filtro vuelve a versalitas SOLO acá: en Instrumento las
+     etiquetas fuera del marco son la silueta declarada de la dirección. */
+  :global([data-d='B']) .flab {
+    font-size: var(--d-label-size); font-weight: var(--d-label-weight);
+    letter-spacing: var(--d-label-track); text-transform: uppercase;
+    color: var(--d-ink-3);
+  }
+  :global([data-d='B']) .cnt { font-family: var(--d-mono); color: var(--d-ink-2); }
   /* fila de una sola línea: la densidad es el punto */
   :global([data-d='B']) .c-eq, :global([data-d='B']) .c-plan, :global([data-d='B']) .c-metric {
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -615,7 +694,6 @@
   :global([data-d='C']) .topbar {
     background: var(--d-brand); color: var(--d-brand-ink); border-bottom: 0;
   }
-  :global([data-d='C']) .topbar .kicker { color: var(--d-brand-ink); opacity: .72; }
   :global([data-d='C']) .topbar .act {
     background: var(--d-surface); color: var(--d-brand); border-color: var(--d-surface);
   }
@@ -627,16 +705,22 @@
   /* el KPI se identifica por su franja de cabecera, no por su borde */
   :global([data-d='C']) .kpi { border-top: 3px solid var(--tone-fg); border-radius: 0 0 var(--d-r) var(--d-r); }
   :global([data-d='C']) .kl { color: var(--d-ink-2); }
-  :global([data-d='C']) .lhead { background: var(--d-accent-soft); border-bottom-color: var(--d-accent-edge); }
+  /* EL REPARTO DEL COLOR, que es lo que decide si esta dirección aguanta un
+     ERP entero: la marca identifica CONTENEDORES (barra de módulo, cabecera
+     de bloque, pie) y el estado identifica ESTADOS. Antes el teal se gastaba
+     también en el encabezado de columnas y en el de grupo, y con quince
+     bloques por pantalla el color dejaba de señalar nada. Ahora el grupo se
+     tiñe de su tono, que es el dato que un técnico necesita a distancia. */
+  :global([data-d='C']) .lhead { background: var(--d-sunk); border-bottom-color: var(--d-line); }
   :global([data-d='C']) .ghead {
-    background: var(--d-accent-soft); color: var(--d-brand);
-    border-bottom-color: var(--d-accent-edge);
-    font-weight: var(--d-w-semi);
+    background: var(--tone-band); color: var(--d-ink);
+    border-bottom-color: var(--tone-edge);
+    font-size: var(--d-t-sm); font-weight: var(--d-w-semi);
+    text-transform: none; letter-spacing: 0;
   }
-  /* el conteo va más callado que el nombre del grupo, pero no tanto: a .7 el
-     color de marca sobre --d-accent-soft caía a 3.5:1. A .85 sigue leyéndose
-     como secundario (4.8:1 contra 6.7:1 del nombre) y pasa AA. */
-  :global([data-d='C']) .gc { color: var(--d-brand); opacity: .85; }
+  /* la tinta del grupo es ink, no el tono: el neutro (#616E6B sobre su banda)
+     se quedaba en 4.4:1. Quien lleva el color acá es la marca, no la palabra. */
+  :global([data-d='C']) .gc { color: var(--d-ink-2); }
   :global([data-d='C']) .fam[aria-pressed='true'] {
     background: var(--d-brand); color: var(--d-brand-ink); border-color: var(--d-brand);
   }
@@ -647,16 +731,16 @@
   }
   :global([data-d='C']) .foot .mk { color: var(--d-brand-ink); opacity: .8; }
   :global([data-d='C']) .track { background: var(--d-accent-soft); }
-  /* La cabecera del bloque es teal lleno y .d-cap pinta en --d-brand: la nota
-     de la derecha quedaba teal sobre teal, invisible. Va en tinta de marca. */
-  :global([data-d='C']) .d-panel-head .d-cap { color: var(--d-brand-ink); }
+  /* La cabecera del bloque es teal lleno: la nota de la derecha quedaría teal
+     sobre teal. Va en tinta de marca. */
+  :global([data-d='C']) .d-panel-head .cnt { color: var(--d-brand-ink); }
+  :global([data-d='C']) .vt { font-weight: var(--d-w-med); }
 
   /* ── D · PESO — masa, caja alta y una sombra sólida donde caer ───────── */
   :global([data-d='D']) .topbar {
     background: var(--d-ink); color: var(--d-ink-on);
     border-bottom: var(--d-bw) solid var(--d-ink);
   }
-  :global([data-d='D']) .topbar .kicker { color: var(--d-ink-on); opacity: .7; }
   :global([data-d='D']) .title { text-transform: uppercase; font-weight: var(--d-w-bold); }
   :global([data-d='D']) .topbar .d-input { border-color: var(--d-surface); }
   :global([data-d='D']) .topbar .act {
@@ -768,6 +852,9 @@
   }
   :global([data-d='F']) .lhead { background: transparent; border-bottom: var(--d-bw) dashed var(--d-line); }
   :global([data-d='F']) .ghead { background: transparent; border-bottom: 0; color: var(--d-accent); }
+  /* la regla de guiones de F es texto corrido: .gn vuelve a inline para que los
+     dos pseudos y la marca sigan siendo una sola corrida y no tres cajas */
+  :global([data-d='F']) .gn { display: inline; }
   :global([data-d='F']) .gn::before { content: '── '; color: var(--d-line); }
   :global([data-d='F']) .gn::after { content: ' ─────────────'; color: var(--d-line); }
   /* columnas separadas por regla, como una tabla de terminal */
@@ -943,12 +1030,18 @@
     -webkit-backdrop-filter: blur(18px) saturate(1.5);
     box-shadow: var(--d-shadow);
   }
+  /* EL GROSOR DEL VIDRIO CODIFICA IMPORTANCIA. Era el otro riesgo de esta
+     dirección, además del anidado: si todas las losas tienen el mismo alfa,
+     la pantalla es una sola lámina lechosa y no hay jerarquía. El veredicto
+     es la losa más gruesa y la que más levanta; los controles de filtro son
+     la más fina. */
   :global([data-d='I']) .verdict {
     border-color: var(--d-line);
     backdrop-filter: blur(18px) saturate(1.5);
     -webkit-backdrop-filter: blur(18px) saturate(1.5);
-    box-shadow: var(--d-shadow);
+    box-shadow: var(--d-shadow-lg);
   }
+  :global([data-d='I']) .vt { font-size: var(--d-t-xl); letter-spacing: -.02em; }
   /* cada KPI es su propia losa: I separa, O —que comparte material— une */
   :global([data-d='I']) .kpi {
     border-radius: var(--d-r-lg);
@@ -961,16 +1054,30 @@
   :global([data-d='I']) .kpi:hover { transform: translateY(-1px); box-shadow: var(--d-shadow-lg); }
   :global([data-d='I']) .kpi[aria-pressed='true'] { box-shadow: var(--d-shadow-lg); }
   :global([data-d='I']) .sect { box-shadow: var(--d-shadow-lg); }
-  /* DENTRO del panel no se desenfoca nada más: solo alfa */
-  :global([data-d='I']) .lhead { background: var(--d-sunk); border-bottom-color: var(--d-line); }
+  /* DENTRO del panel no se desenfoca nada más: solo alfa. Y la luz entra
+     siempre por arriba, así que todo lo que es vidrio lleva su filo especular
+     (--d-line es blanco al 68 %, o sea LUZ, no una línea de dibujo). Sin eso
+     las capas interiores se leen como papel translúcido pegado. */
+  :global([data-d='I']) .lhead {
+    background: var(--d-sunk); border-bottom-color: var(--d-line);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
   :global([data-d='I']) .ghead {
     background: var(--tone-band); border-bottom-color: var(--d-line); color: var(--d-ink);
+    box-shadow: inset 0 1px 0 var(--d-line);
+    font-size: var(--d-t-sm); font-weight: var(--d-w-semi);
+    text-transform: none; letter-spacing: 0;
   }
+  :global([data-d='I']) .gc { color: var(--d-ink-2); }
   :global([data-d='I']) .row:hover { background: var(--d-sunk); }
+  /* la lámina más fina de la pantalla: un filtro no compite con un veredicto */
   :global([data-d='I']) .fam {
-    border-radius: var(--d-r-pill); border-color: var(--d-line); background: var(--d-surface);
+    border-radius: var(--d-r-pill); border-color: var(--d-line); background: var(--d-sunk);
   }
-  :global([data-d='I']) .fam[aria-pressed='true'] { border-color: var(--d-accent-edge); }
+  :global([data-d='I']) .fam[aria-pressed='true'] {
+    background: var(--d-surface); border-color: var(--d-accent-edge);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
   :global([data-d='I']) .track {
     background: var(--d-sunk); box-shadow: inset 0 0 0 1px var(--d-line);
   }
@@ -981,6 +1088,7 @@
   :global([data-d='I']) .tlr {
     background: var(--d-sunk); border-radius: var(--d-r);
     padding: var(--d-p2) var(--d-p3);
+    box-shadow: inset 0 1px 0 var(--d-line);
   }
   /* .d-pill trae backdrop-filter propio del primitivo, y dentro del panel eso
      ya es vidrio sobre vidrio sobre vidrio: se apaga, el alfa alcanza */
@@ -1248,11 +1356,18 @@
     background: none; border: 0; border-radius: 0;
     padding: var(--d-p2) 0 var(--d-p3);
   }
+  /* CORRECCIÓN DE TOKEN, y es la que hacía que esta pantalla no se pareciera a
+     su propia dirección: directions.css publica DOS familias de tono para M
+     porque son dos cosas distintas. --tone-band es para lo que NO se
+     desenfoca (la píldora), y --tone-wash —bastante más saturado— es para el
+     derrame, porque a 26px de blur el band se evapora. La página derramaba
+     con band, así que sus manchas eran mucho más pálidas que las del
+     primitivo y las dos nieblas se leían como dos materiales. */
   :global([data-d='M']) .verdict::before {
     content: ''; position: absolute; inset: -22px -30px; z-index: -1; pointer-events: none;
     background:
-      radial-gradient(62% 70% at 16% 20%, var(--tone-band) 0%, transparent 70%),
-      radial-gradient(52% 58% at 86% 84%, var(--tone-band) 0%, transparent 68%);
+      radial-gradient(62% 70% at 16% 20%, var(--tone-wash) 0%, transparent 70%),
+      radial-gradient(52% 58% at 86% 84%, var(--tone-wash) 0%, transparent 68%);
     filter: blur(26px);
   }
   /* el veredicto es el titular de la pantalla: serif, grande, sin caja */
@@ -1277,19 +1392,30 @@
     box-shadow: inset 0 -2px 0 var(--tone-fg);
   }
   :global([data-d='M']) .sect { isolation: isolate; }
-  /* sin caja no hay borde interior que alinee: la rejilla se alinea sola */
-  :global([data-d='M']) .lhead { background: transparent; border-bottom: 0; padding-inline: 0; }
+  /* sin caja no hay borde interior que alinee: la rejilla se alinea sola. El
+     único pelo de línea de todo el listado va bajo los rótulos de columna,
+     porque las filas ya lo llevan y sin él la cabecera flotaba suelta. */
+  :global([data-d='M']) .lhead {
+    background: transparent; border-bottom: 0; padding-inline: 0;
+    box-shadow: 0 1px 0 var(--d-line);
+  }
   :global([data-d='M']) .row { padding-inline: 0; }
+  /* el encabezado de grupo es serif de 22px: a .82em la marca le pesaba más
+     que la palabra. Se baja a la altura de x de la serif y queda en su sitio. */
+  :global([data-d='M']) .ghead .mk { width: .58em; height: .58em; }
   :global([data-d='M']) .ghead {
     position: relative; isolation: isolate;
     background: transparent; border-bottom: 0; padding-inline: 0;
     font-family: var(--d-display); font-size: var(--d-t-lg); font-weight: 400;
     text-transform: none; letter-spacing: 0; color: var(--d-ink);
   }
+  /* la mancha del grupo se abre hacia la derecha y arrastra a las filas que
+     cuelgan debajo: es lo único que agrupa en una dirección sin cajas, así que
+     tiene que alcanzar más lejos que el propio encabezado. */
   :global([data-d='M']) .ghead::before {
-    content: ''; position: absolute; inset: -14px -26px; z-index: -1; pointer-events: none;
-    background: radial-gradient(58% 120% at 12% 50%, var(--tone-band) 0%, transparent 72%);
-    filter: blur(22px);
+    content: ''; position: absolute; inset: -16px -26px -22px; z-index: -1; pointer-events: none;
+    background: radial-gradient(64% 130% at 12% 40%, var(--tone-wash) 0%, transparent 74%);
+    filter: blur(24px);
   }
   :global([data-d='M']) .fam { border: 0; background: var(--d-sunk); border-radius: var(--d-r-pill); padding: 5px var(--d-p2); }
   :global([data-d='M']) .fam[aria-pressed='true'] { background: var(--d-accent-soft); }
@@ -1297,7 +1423,7 @@
   :global([data-d='M']) .tlr { position: relative; isolation: isolate; padding-block: var(--d-p1); }
   :global([data-d='M']) .tlr::before {
     content: ''; position: absolute; inset: -10px -24px; z-index: -1; pointer-events: none;
-    background: radial-gradient(52% 130% at 70% 50%, var(--tone-band) 0%, transparent 74%);
+    background: radial-gradient(52% 130% at 70% 50%, var(--tone-wash) 0%, transparent 74%);
     filter: blur(24px);
   }
   /* el carril no tiene filo: el relleno se desvanece hacia atrás */
@@ -1471,12 +1597,23 @@
     box-shadow: inset 0 -2px 0 var(--d-accent);
   }
   :global([data-d='O']) .sect { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='O']) .lhead { background: var(--d-sunk); border-bottom-color: var(--d-line); }
-  :global([data-d='O']) .ghead {
-    background: var(--d-accent-soft); color: var(--d-brand-ink);
-    border-bottom-color: var(--d-line); font-weight: var(--d-w-semi);
+  :global([data-d='O']) .lhead {
+    background: var(--d-sunk); border-bottom-color: var(--d-line);
+    box-shadow: inset 0 1px 0 var(--d-line);
   }
-  :global([data-d='O']) .gc { color: var(--d-brand-ink); opacity: .75; }
+  /* MISMO REPARTO QUE EN MARCA, y es la razón por la que esta mezcla se
+     sostiene: el teal tiñe el CONTENEDOR (la barra, la cabecera del bloque, el
+     pie) y el grupo se tiñe de su ESTADO. Cuando el grupo también era teal, la
+     pantalla entera era del mismo color y el vidrio no informaba nada. */
+  :global([data-d='O']) .ghead {
+    background: var(--tone-band); color: var(--d-ink);
+    border-bottom-color: var(--d-line);
+    box-shadow: inset 0 1px 0 var(--d-line);
+    font-size: var(--d-t-sm); font-weight: var(--d-w-semi);
+    text-transform: none; letter-spacing: 0;
+  }
+  :global([data-d='O']) .gc { color: var(--d-ink-2); }
+  :global([data-d='O']) .vt { font-size: var(--d-t-xl); letter-spacing: -.02em; }
   :global([data-d='O']) .row:hover { background: var(--d-sunk); }
   :global([data-d='O']) .track { background: var(--d-sunk); box-shadow: inset 0 0 0 1px var(--d-line); }
   :global([data-d='O']) .thr { background: var(--d-ink-3); }
@@ -1486,10 +1623,9 @@
     -webkit-backdrop-filter: blur(20px) saturate(1.5);
     border-top-color: var(--d-line);
   }
-  /* la cabecera del panel ya es vidrio teñido: la nota de la derecha, que es
-     .d-cap y pinta en --d-brand, se lleva a la tinta de marca para no quedar
-     teal sobre teal */
-  :global([data-d='O']) .d-panel-head .d-cap { color: var(--d-brand-ink); }
+  /* la cabecera del panel ya es vidrio teñido: la nota de la derecha se lleva a
+     la tinta de marca para no quedar teal sobre teal */
+  :global([data-d='O']) .d-panel-head .cnt { color: var(--d-brand-ink); }
 
   /* ── P · ESPINA — una columna de marca de la que cuelga todo ───────────
      EL RAÍL DE 152px VUELVE, pero solo donde hay ancho de verdad: el
@@ -1507,7 +1643,6 @@
     border-bottom-color: var(--d-line);
     padding-left: calc(var(--d-p3) + 6px);
   }
-  :global([data-d='P']) .kicker { color: var(--d-brand); }
   :global([data-d='P']) .scroll {
     padding: 0; gap: 0;
     background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px);
@@ -1614,7 +1749,6 @@
     box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 75%, transparent);
   }
   :global([data-d='Q']) .title { text-transform: uppercase; font-weight: var(--d-w-bold); }
-  :global([data-d='Q']) .kicker { color: var(--d-accent-ink); }
   /* crimson sobre crimson no se ve: la acción se invierte a placa clara */
   :global([data-d='Q']) .topbar .act {
     background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%), var(--d-surface-fill);
@@ -1838,6 +1972,124 @@
   :global([data-d='S']) .foot {
     background: var(--d-surface); border-top: 0;
     box-shadow: 0 -8px 24px -14px color-mix(in srgb, var(--d-ink) 55%, transparent);
+  }
+
+  /* ── T · HALO CLARO — nada se rellena: existe lo que irradia, sobre papel ─
+     La regla de Halo entera, del lado claro de la luz. La prueba de que está
+     bien traída no es que brille: es que en toda la celda no hay UNA sola
+     superficie sólida. La barra de módulo, el listado, el pie, los KPIs y los
+     filtros son contornos de luz sobre el papel tibio del fondo, y el anillo
+     de 1px toma el color del estado de lo que rodea. Eso es lo que la separa
+     de Umbra, que es una tarjeta blanca de toda la vida con la sombra teñida:
+     acá no hay tarjeta.
+
+     LO QUE SE ATA CORTO. Un halo por fila son seis resplandores apilados y el
+     listado se convierte en una nube. Así que irradia el GRUPO, no la fila:
+     el encabezado de grupo es una pastilla de luz del color de su estado y
+     debajo cuelgan filas calladas. A treinta segundos se ven dos anillos rojos
+     y uno ámbar, y ahí está la respuesta a qué máquina atender.
+
+     HALLAZGO: T no publica ningún token de resplandor (ni radio, ni
+     dispersión) ni un anillo neutro. Los desenfoques van a mano; el anillo
+     neutro se compone con color-mix desde --d-ink, y el color, siempre de
+     token. Un --d-glow y un --d-ring lo resolverían en un solo lugar. */
+  :global([data-d='T']) .screen {
+    /* fuerte, para lo que manda: veredicto y encabezado de grupo */
+    --pg-halo: 0 0 0 1px var(--tone-edge), 0 14px 36px -16px var(--tone-fg);
+    /* suave, para lo que acompaña: KPIs y líneas del plan */
+    --pg-lit: 0 0 0 1px var(--tone-edge), 0 8px 22px -14px var(--tone-fg);
+    --pg-ring: 0 0 0 1px color-mix(in srgb, var(--d-ink) 9%, transparent);
+  }
+  /* la barra no se separa con una línea: se separa con la luz que deja caer.
+     Sobre papel un resplandor tiene que ser mucho más corto que sobre negro:
+     con la dispersión de Halo (-34px) acá no se veía absolutamente nada. */
+  :global([data-d='T']) .topbar {
+    background: transparent; border-bottom: 0;
+    box-shadow: 0 12px 28px -18px var(--d-accent);
+  }
+  :global([data-d='T']) .title { font-weight: var(--d-w-semi); }
+  :global([data-d='T']) .search .d-input { background: transparent; }
+  /* «Registrar lectura» es la ÚNICA superficie llena de toda la celda, y es a
+     propósito: en una pantalla donde nada se rellena, lo único macizo es lo
+     único que hay que tocar. Teal sobre blanco, 5.2:1. */
+  :global([data-d='T']) .act { background: var(--d-accent); color: var(--d-accent-ink); }
+  :global([data-d='T']) .verdict {
+    background: transparent; border: 0;
+    box-shadow: var(--pg-halo);
+  }
+  :global([data-d='T']) .vt { font-size: var(--d-t-xl); font-weight: var(--d-w); letter-spacing: -.02em; }
+  /* cuatro luces, cada una del color de lo que cuenta */
+  :global([data-d='T']) .kpi {
+    background: transparent; border: 0; border-radius: var(--d-r-lg);
+    padding: var(--d-p2) var(--d-p3) var(--d-p3);
+    box-shadow: var(--pg-lit);
+  }
+  :global([data-d='T']) .kpi:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 1px var(--tone-fg), 0 12px 32px -12px var(--tone-fg);
+  }
+  /* pulsado: el anillo se enciende entero. El relleno sigue siendo un velo del
+     tono al 10 %, no una superficie: la tinta se lee sobre papel igual. */
+  :global([data-d='T']) .kpi[aria-pressed='true'] {
+    background: var(--tone-band);
+    box-shadow: 0 0 0 2px var(--tone-fg), 0 16px 44px -12px var(--tone-fg);
+  }
+  :global([data-d='T']) .filters { padding-block: var(--d-p1); }
+  :global([data-d='T']) .fam {
+    background: transparent; border: 0; border-radius: var(--d-r-pill);
+    padding: 5px var(--d-p2);
+    box-shadow: var(--pg-ring);
+  }
+  :global([data-d='T']) .fam:hover {
+    background: transparent;
+    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 5px 16px -8px var(--d-accent);
+  }
+  :global([data-d='T']) .fam[aria-pressed='true'] {
+    background: var(--d-accent-soft); color: var(--d-ink);
+    box-shadow: 0 0 0 1px var(--d-accent), 0 6px 18px -8px var(--d-accent);
+  }
+  /* el listado tampoco es una tarjeta: es un contorno. Sin fondo blanco, lo
+     que se ve es el anillo y el resplandor, y el papel del fondo pasa entero
+     por debajo de las filas. */
+  :global([data-d='T']) .sect { background: transparent; box-shadow: var(--d-shadow-lg); }
+  :global([data-d='T']) .lhead {
+    background: transparent; border-bottom: 0;
+    box-shadow: 0 1px 0 var(--d-neu-edge);
+  }
+  :global([data-d='T']) .ghead {
+    width: fit-content; max-width: 100%;
+    background: transparent; border-bottom: 0; border-radius: var(--d-r-pill);
+    margin: var(--d-p2) var(--d-p3) var(--d-p1);
+    padding: var(--d-p1) var(--d-p3);
+    font-size: var(--d-t-sm); font-weight: var(--d-w-semi);
+    text-transform: none; letter-spacing: 0; color: var(--d-ink);
+    box-shadow: var(--pg-halo);
+  }
+  :global([data-d='T']) .gc { color: var(--d-ink-2); }
+  /* la fila se calla. directions.css le da a toda .d-row con tono el anillo y
+     el halo del primitivo, y con seis filas eso es una sopa: acá pesa
+     (0,4,0) para ganarle sin depender del orden de las hojas de estilo. */
+  :global([data-d='T']) .row[data-tone] {
+    box-shadow: none; margin-bottom: 0; border-radius: 0;
+  }
+  :global([data-d='T']) .row:hover { background: var(--d-sunk); }
+  :global([data-d='T']) .track {
+    height: 8px; background: transparent;
+    box-shadow: inset 0 0 0 1px var(--d-neu-edge);
+  }
+  :global([data-d='T']) .fill { box-shadow: 0 0 14px -3px var(--tone-fg); }
+  :global([data-d='T']) .thr { background: var(--d-ink-3); }
+  /* cada plan es otra luz suelta, y necesitan aire entre ellas o los halos se
+     tocan y se vuelven una mancha */
+  :global([data-d='T']) .tlb { gap: var(--d-p3); }
+  :global([data-d='T']) .tlr {
+    border-radius: var(--d-r); padding: var(--d-p2) var(--d-p3);
+    box-shadow: var(--pg-lit);
+  }
+  :global([data-d='T']) .tlid { color: var(--d-accent); }
+  :global([data-d='T']) .foot {
+    background: transparent; border-top: 0;
+    box-shadow: 0 -12px 28px -18px var(--d-accent);
   }
 
   /* ======================================================================

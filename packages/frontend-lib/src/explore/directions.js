@@ -16,6 +16,7 @@
 export const DIRECTIONS = [
   {
     id: 'A',
+    finalista: true,
     name: 'Elevación',
     tagline: 'Tarjetas que flotan sobre el fondo.',
     silhouette: 'Rectángulos redondeados separados por aire. La sombra contiene, el borde apenas existe.',
@@ -26,6 +27,7 @@ export const DIRECTIONS = [
   },
   {
     id: 'B',
+    finalista: true,
     name: 'Instrumento',
     tagline: 'Un plano técnico. Todo contenido por líneas.',
     silhouette: 'Marcos rectos de 1px con marcas de esquina. Los elementos comparten borde en vez de separarse.',
@@ -33,6 +35,7 @@ export const DIRECTIONS = [
   },
   {
     id: 'C',
+    finalista: true,
     name: 'Marca',
     tagline: 'Un color de marca sostiene la estructura.',
     silhouette: 'Bloques con cabecera llena de color. El contenedor se anuncia por su cabecera, no por su borde.',
@@ -76,6 +79,7 @@ export const DIRECTIONS = [
     form: 'Fondo manila, ficha blanca. La pestaña ES la cabecera: nada de barra de título dentro. Radio 2px en la ficha, 4px arriba en la pestaña. Regla doble bajo el encabezado.'  },
   {
     id: 'I',
+    finalista: true,
     name: 'Cristal',
     tagline: 'Vidrio líquido sobre un campo de color.',
     silhouette: 'Paneles translúcidos que dejan pasar el fondo teñido, con un filo especular arriba. Nada opaco.',
@@ -105,6 +109,7 @@ export const DIRECTIONS = [
   },
   {
     id: 'M',
+    finalista: true,
     name: 'Bruma',
     tagline: 'El color se derrama en vez de encajonarse.',
     silhouette: 'Sin contenedores. Manchas de color desenfocadas que se posan detrás del contenido y se desvanecen sin filo.',
@@ -118,6 +123,7 @@ export const DIRECTIONS = [
     form: 'El contenedor no es una caja: es un carril de 999px de radio en las puntas, con degradado longitudinal y brillo arriba. Los carriles se montan unos milímetros entre sí, así que hay orden de apilado y sombra de contacto.'  },
   {
     id: 'O',
+    finalista: true,
     name: 'Prisma',
     tagline: 'Elevación + Marca + Cristal. El color de marca vive DENTRO del vidrio.',
     silhouette: 'Tarjetas de vidrio que flotan de verdad, con la cabecera teñida del color de marca y un filo especular arriba.',
@@ -156,6 +162,15 @@ export const DIRECTIONS = [
     silhouette: 'Tarjetas blancas y limpias cuya sombra está teñida del color del estado. El color no toca el contenido.',
     form: 'La tarjeta es blanca, sin banda ni borde de color: lo que informa es la luz de abajo. Un equipo vencido proyecta rojo, uno al día proyecta verde. Es la manera más silenciosa de que el color cargue información sin ensuciar la lectura.',
     mezcla: 'A + M'
+  },
+  {
+    id: 'T',
+    name: 'Halo claro',
+    tagline: 'Halo, pero de día. La luz define las cosas sobre papel.',
+    silhouette: 'Formas sin un solo borde sobre blanco tibio, cada una con un anillo de color y un resplandor propio.',
+    form: 'La regla de Halo se conserva entera: nada tiene borde ni relleno sólido, un elemento existe porque irradia. Lo que cambia es de qué lado está la luz. Sobre papel, el resplandor es un halo de color proyectado hacia afuera más un anillo de 1px del mismo tono. El acento es un color saturado que brilla por sí mismo.',
+    hermana: 'K',
+    finalista: true
   }
 ];
 
