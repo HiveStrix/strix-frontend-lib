@@ -364,6 +364,9 @@
     padding: calc(var(--d-p1) / 2) var(--d-p2);
     border-bottom-color: var(--d-edge);
   }
+  /* La franja llena invierte el texto; la marca seguía en color de tono y se
+     perdía contra el fondo. Toma la misma tinta que la etiqueta. */
+  :global([data-d='B']) .kpi.on .kpi-lab .mk { color: var(--d-ink-on); }
   :global([data-d='B']) .sec-head {
     border-bottom: var(--d-bw) solid var(--d-edge); padding-bottom: var(--d-p1);
   }
@@ -393,6 +396,9 @@
     background: var(--d-brand); color: var(--d-brand-ink);
     padding: var(--d-p1) var(--d-p2);
   }
+  /* Cabecera teal llena: la marca iba en color de tono (verde, ámbar, rojo)
+     sobre teal y era ilegible. Toma la tinta de marca, como la etiqueta. */
+  :global([data-d='C']) .kpi-lab .mk { color: var(--d-brand-ink); }
   :global([data-d='C']) .kpi-body { margin-top: 0; padding: var(--d-p2) var(--d-p2) var(--d-p3); }
   :global([data-d='C']) .kpi.on { border-color: var(--d-brand); box-shadow: var(--d-shadow-lg); }
   :global([data-d='C']) .kpi.on .kpi-lab { background: var(--d-brand-deep); }
@@ -405,6 +411,9 @@
     background: var(--tone-fg); color: var(--d-ink-on);
     padding: var(--d-p1) var(--d-p3);
   }
+  /* El kicker se llena con el propio color de tono: la marca, que también va
+     en ese color, desaparecía. Toma la tinta invertida del kicker. */
+  :global([data-d='C']) .callout-kicker .mk { color: var(--d-ink-on); }
   :global([data-d='C']) .callout-txt { padding: 0 var(--d-p3) var(--d-p3); }
   /* La cabecera del bloque es teal lleno y .d-cap pinta en --d-brand: la nota
      de la derecha quedaba teal sobre teal, invisible. Va en tinta de marca. */
@@ -431,6 +440,9 @@
     box-shadow: var(--d-bw) var(--d-bw) 0 var(--d-ink);
   }
   :global([data-d='D']) .kpi.on .kpi-lab { background: var(--d-ink); color: var(--d-ink-on); }
+  /* En D todas las marcas son tinta negra: sobre la franja negra del KPI
+     activo quedaban invisibles. Se invierten con la etiqueta. */
+  :global([data-d='D']) .kpi.on .kpi-lab .mk { color: var(--d-ink-on); }
   :global([data-d='D']) .sec-title { text-transform: uppercase; font-weight: var(--d-w-bold); }
   :global([data-d='D']) .sec-head {
     border-bottom: var(--d-bw) solid var(--d-ink); padding-bottom: var(--d-p1);

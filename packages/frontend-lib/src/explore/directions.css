@@ -39,7 +39,7 @@
 /* ── A · ELEVACIÓN ──────────────────────────────────────────────────────── */
 [data-d='A'] {
   --d-ground: #f5f6f7; --d-surface: #ffffff; --d-sunk: #eaeced;
-  --d-ink: #14181a; --d-ink-2: #3c4145; --d-ink-3: #6c7175; --d-ink-on: #ffffff;
+  --d-ink: #14181a; --d-ink-2: #3c4145; --d-ink-3: #656A6E; --d-ink-on: #ffffff;
   --d-line: #dfe1e3; --d-edge: #cfd2d4; --d-bw: 1px;
   --d-r: 7px; --d-r-lg: 11px; --d-r-pill: 999px;
   --d-shadow: 0 1px 2px rgba(20,24,26,.06), 0 1px 1px rgba(20,24,26,.04);
@@ -56,13 +56,13 @@
   --d-att: #8a5a00; --d-att-band: #fbeeda; --d-att-edge: #e8d4a6;
   --d-crit: #b3261e; --d-crit-band: #fbe0dc; --d-crit-edge: #efc2bc;
   --d-info: #4a4e7a; --d-info-band: #e7e7f2; --d-info-edge: #c9cadd;
-  --d-neu: #6c7175; --d-neu-band: #eaeced; --d-neu-edge: #cfd2d4;
+  --d-neu: #656A6E; --d-neu-band: #eaeced; --d-neu-edge: #cfd2d4;
 }
 
 /* ── B · INSTRUMENTO ────────────────────────────────────────────────────── */
 [data-d='B'] {
   --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #f2f2f0;
-  --d-ink: #16181a; --d-ink-2: #40454a; --d-ink-3: #71777c; --d-ink-on: #ffffff;
+  --d-ink: #16181a; --d-ink-2: #40454a; --d-ink-3: #686E72; --d-ink-on: #ffffff;
   --d-line: #d3d6d7; --d-edge: #16181a; --d-bw: 1px;
   --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
   --d-shadow: none; --d-shadow-lg: none;
@@ -78,7 +78,7 @@
   --d-att: #7a4f00; --d-att-band: #fbf3e3; --d-att-edge: #7a4f00;
   --d-crit: #a51f17; --d-crit-band: #fcecea; --d-crit-edge: #a51f17;
   --d-info: #3f4370; --d-info-band: #eeeef5; --d-info-edge: #3f4370;
-  --d-neu: #71777c; --d-neu-band: #f2f2f0; --d-neu-edge: #71777c;
+  --d-neu: #686E72; --d-neu-band: #f2f2f0; --d-neu-edge: #71777c;
 }
 
 /* ── C · MARCA ──────────────────────────────────────────────────────────── */
@@ -87,7 +87,7 @@
   --d-brand-ink: #ffffff;
   --d-brand-deep: #094039;
   --d-ground: #f3f6f5; --d-surface: #ffffff; --d-sunk: #eaf0ee;
-  --d-ink: #16211f; --d-ink-2: #3d4a47; --d-ink-3: #6b7975; --d-ink-on: #ffffff;
+  --d-ink: #16211f; --d-ink-2: #3d4a47; --d-ink-3: #616E6B; --d-ink-on: #ffffff;
   --d-line: #dde5e2; --d-edge: #c6d3cf; --d-bw: 1px;
   --d-r: 4px; --d-r-lg: 10px; --d-r-pill: 999px;
   --d-shadow: 0 1px 2px rgba(9,40,36,.07);
@@ -105,7 +105,7 @@
   --d-att: #8a5300; --d-att-band: #fbedd7; --d-att-edge: #e7cf9f;
   --d-crit: #ac2118; --d-crit-band: #fbdfda; --d-crit-edge: #edbdb6;
   --d-info: #0e5a54; --d-info-band: #e2eeeb; --d-info-edge: #a8ccc6;
-  --d-neu: #6b7975; --d-neu-band: #eaf0ee; --d-neu-edge: #c6d3cf;
+  --d-neu: #616E6B; --d-neu-band: #eaf0ee; --d-neu-edge: #c6d3cf;
 }
 
 /* ── D · PESO ───────────────────────────────────────────────────────────── */
@@ -134,7 +134,7 @@
 /* ── E · AIRE ───────────────────────────────────────────────────────────── */
 [data-d='E'] {
   --d-ground: #fbfaf9; --d-surface: #ffffff; --d-sunk: #f4f2f0;
-  --d-ink: #221f1d; --d-ink-2: #504b46; --d-ink-3: #8a8580; --d-ink-on: #ffffff;
+  --d-ink: #221f1d; --d-ink-2: #504b46; --d-ink-3: #706B67; --d-ink-on: #ffffff;
   --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
   --d-r: 18px; --d-r-lg: 28px; --d-r-pill: 999px;
   --d-shadow: 0 2px 20px -8px rgba(34,31,29,.10);
@@ -151,13 +151,13 @@
   --d-att: #8a6224; --d-att-band: #f7efe2; --d-att-edge: transparent;
   --d-crit: #a63d34; --d-crit-band: #f8e8e5; --d-crit-edge: transparent;
   --d-info: #4c5075; --d-info-band: #ecedf3; --d-info-edge: transparent;
-  --d-neu: #8a8580; --d-neu-band: #f4f2f0; --d-neu-edge: transparent;
+  --d-neu: #706B67; --d-neu-band: #f4f2f0; --d-neu-edge: transparent;
 }
 
 /* ── F · TERMINAL ───────────────────────────────────────────────────────── */
 [data-d='F'] {
   --d-ground: #0f1213; --d-surface: #161a1b; --d-sunk: #0a0d0e;
-  --d-ink: #d7dedc; --d-ink-2: #a6afad; --d-ink-3: #6d7876; --d-ink-on: #0f1213;
+  --d-ink: #d7dedc; --d-ink-2: #a6afad; --d-ink-3: #7A8684; --d-ink-on: #0f1213;
   --d-line: #2a3132; --d-edge: #39423f; --d-bw: 1px;
   --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
   --d-shadow: none; --d-shadow-lg: none;
@@ -174,14 +174,14 @@
   --d-att: #e2bd6f; --d-att-band: #2b2314; --d-att-edge: #4a3a1d;
   --d-crit: #ef9d92; --d-crit-band: #2f1a17; --d-crit-edge: #4f2822;
   --d-info: #9aa6e8; --d-info-band: #1a1c2c; --d-info-edge: #303352;
-  --d-neu: #6d7876; --d-neu-band: #1c2122; --d-neu-edge: #39423f;
+  --d-neu: #7F8B89; --d-neu-band: #1c2122; --d-neu-edge: #39423f;
   --d-focus: #7fd1b9;
 }
 
 /* ── G · BANDA ──────────────────────────────────────────────────────────── */
 [data-d='G'] {
   --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #fafaf8;
-  --d-ink: #191817; --d-ink-2: #45433f; --d-ink-3: #7d7a74; --d-ink-on: #ffffff;
+  --d-ink: #191817; --d-ink-2: #45433f; --d-ink-3: #73716B; --d-ink-on: #ffffff;
   --d-line: #e6e4df; --d-edge: #d3d0c9; --d-bw: 1px;
   --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 999px;
   --d-shadow: none; --d-shadow-lg: 0 12px 40px -14px rgba(25,24,23,.28);
@@ -198,13 +198,13 @@
   --d-att: #8a5806; --d-att-band: #faf1e0; --d-att-edge: #8a5806;
   --d-crit: #ab2a20; --d-crit-band: #fbe9e6; --d-crit-edge: #ab2a20;
   --d-info: #464a72; --d-info-band: #eeeef4; --d-info-edge: #464a72;
-  --d-neu: #7d7a74; --d-neu-band: #f4f2ee; --d-neu-edge: #d3d0c9;
+  --d-neu: #6F6D67; --d-neu-band: #f4f2ee; --d-neu-edge: #d3d0c9;
 }
 
 /* ── H · FICHA ──────────────────────────────────────────────────────────── */
 [data-d='H'] {
   --d-ground: #e3dfd6; --d-surface: #ffffff; --d-sunk: #f4f1e9;
-  --d-ink: #221f19; --d-ink-2: #4b463c; --d-ink-3: #857e70; --d-ink-on: #ffffff;
+  --d-ink: #221f19; --d-ink-2: #4b463c; --d-ink-3: #666156; --d-ink-on: #ffffff;
   --d-line: #d8d2c4; --d-edge: #bdb5a2; --d-bw: 1px;
   --d-r: 2px; --d-r-lg: 3px; --d-r-pill: 999px;
   --d-shadow: 0 1px 0 var(--d-edge), 0 3px 0 #ffffff, 0 4px 0 var(--d-edge);
@@ -222,7 +222,7 @@
   --d-att: #8a5807; --d-att-band: #f8eed8; --d-att-edge: #ddc699;
   --d-crit: #a72d1e; --d-crit-band: #f8e2dc; --d-crit-edge: #e2b7ab;
   --d-info: #414a6b; --d-info-band: #e8eaf1; --d-info-edge: #bcc1d4;
-  --d-neu: #857e70; --d-neu-band: #efebe1; --d-neu-edge: #bdb5a2;
+  --d-neu: #6E685C; --d-neu-band: #efebe1; --d-neu-edge: #bdb5a2;
 }
 
 /* ==========================================================================
