@@ -11,10 +11,20 @@
   // librería demostrándose y qué parte es el demo hablando de ella.
   import Flota from './Flota.svelte';
   import Lectura from './Lectura.svelte';
+  import Ficha from './Ficha.svelte';
+  import Catalogo from './Catalogo.svelte';
+  import Documentos from './Documentos.svelte';
+  import Ajustes from './Ajustes.svelte';
+  import PrimerDia from './PrimerDia.svelte';
 
   const EJEMPLOS = [
     { id: 'flota', nombre: 'Flota', nota: 'Datos: KPIs, filtros, tabla, barras', c: Flota },
-    { id: 'lectura', nombre: 'Registrar lectura', nota: 'Formulario: validación y error', c: Lectura }
+    { id: 'lectura', nombre: 'Registrar lectura', nota: 'Formulario: validación y error', c: Lectura },
+    { id: 'ficha', nombre: 'Ficha de equipo', nota: 'Detalle: jerarquía, pestañas, historial y diálogo', c: Ficha },
+    { id: 'catalogo', nombre: 'Catálogo', nota: 'Buscar: filtros, orden y dos vistas de lo mismo', c: Catalogo },
+    { id: 'documentos', nombre: 'Documentos', nota: 'Ingesta: procedencia de cada dato y revisión por lote', c: Documentos },
+    { id: 'ajustes', nombre: 'Ajustes de familia', nota: 'Formulario largo: secciones, errores ubicados y un solo guardar', c: Ajustes },
+    { id: 'primerdia', nombre: 'Primer día', nota: 'Vacíos: sin nada y a medias, y las tres puertas de entrada', c: PrimerDia }
   ];
   // El ejemplo abierto vive en el hash, para que un enlace apunte a uno concreto
   // y para que recargar no te devuelva al primero.
