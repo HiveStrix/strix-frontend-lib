@@ -333,7 +333,8 @@
   border-radius: var(--d-r);
 }
 .d-textarea { padding: var(--d-p2); min-height: 84px; resize: vertical; }
-.d-input::placeholder { color: var(--d-ink-3); }
+.d-input::placeholder,
+.d-textarea::placeholder { color: var(--d-ink-3); }  /* el área de texto se había olvidado y caía al gris del navegador */
 .d-hint { font-size: var(--d-t-xs); color: var(--d-ink-3); }
 .d-error { font-size: var(--d-t-xs); color: var(--d-crit); font-weight: var(--d-w-med); }
 
@@ -1462,4 +1463,184 @@
   -webkit-backdrop-filter: none !important;
   border-color: var(--d-overlay-edge);
   box-shadow: var(--d-overlay-shadow);
+}
+
+/* ── W · CRISTAL TEMPLADO · piso de artesanía ────────────────────────────
+   Lo que las skills de diseño señalan y el vidrio necesita de verdad. */
+
+/* EL DOBLE BISEL. Un panel de vidrio apoyado plano sobre el fondo se ve como un
+   recorte; apoyado dentro de una bandeja se ve como una pieza. Dos anillos
+   concéntricos: uno exterior de sombra que lo separa del campo, uno interior de
+   luz que le da canto. Es la diferencia entre «div con blur» y material. */
+[data-d='W'] .d-panel::after {
+  content: ''; position: absolute; inset: 1px;
+  border-radius: calc(var(--d-r-lg) - 1px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .45);
+  pointer-events: none;
+}
+
+/* TRANSPARENCIA REDUCIDA. No es una preferencia estética: quien la activa suele
+   hacerlo porque el texto sobre fondos vivos le cuesta. Un desenfoque más fuerte
+   no ayuda; lo que ayuda es que el fondo desaparezca. La dirección deja de ser
+   de vidrio y sigue siendo usable, que es el orden correcto de prioridades. */
+@media (prefers-reduced-transparency: reduce) {
+  [data-d='W'] { --d-surface: #FFFFFF; --d-sunk: #F1F4F7; }
+  [data-d='W'] .d-panel,
+  [data-d='W'] .d-btn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  [data-d='W'] .d-panel { background: #FFFFFF; border-color: rgba(14, 23, 32, .14); }
+  [data-d='W'] .d-panel::after { box-shadow: none; }
+  [data-d='W'] .d-btn { background: #FFFFFF; }
+}
+
+/* CONTRASTE ALTO. Misma lógica: el campo de color se apaga y los filos se
+   endurecen. El halo crítico se queda, porque ahí el color ES el dato. */
+@media (prefers-contrast: more) {
+  [data-d='W'] {
+    --d-ground: #F4F6F9;
+    --d-surface: #FFFFFF;
+    --d-ink-3: #33404E;
+    --d-line: rgba(14, 23, 32, .28);
+  }
+  [data-d='W'] .d-panel {
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    background: #FFFFFF; border-color: rgba(14, 23, 32, .32);
+  }
+}
+
+/* PANTALLA ANGOSTA. El desenfoque de fondo es lo más caro que hay en una GPU
+   móvil, y a 380px un panel ocupa el ancho entero: no queda campo visible
+   alrededor que desenfocar, así que el efecto se paga y no se ve. Se apaga y se
+   conserva la superficie. Además el filo crítico engorda, porque en un teléfono
+   3px al borde de la pantalla se pierden contra el marco. */
+@media (max-width: 560px) {
+  [data-d='W'] .d-panel {
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    background: rgba(255, 255, 255, .92);
+  }
+  [data-d='W'] .d-panel::after { display: none; }
+  [data-d='W'] .d-row[data-tone='critical'],
+  [data-d='W'] .d-panel[data-tone='critical'] {
+    box-shadow: inset 5px 0 0 var(--d-crit);
+  }
+  [data-d='W'] .d-btn { min-height: var(--d-touch); }
+}
+
+/* MOCIÓN. Lo único que se mueve es lo que da respuesta a una acción: el control
+   que se presiona. Nada de ambiente. */
+[data-d='W'] .d-btn { transition: background 120ms var(--d-ease, cubic-bezier(.2,.8,.2,1)), box-shadow 120ms ease; }
+[data-d='W'] .d-btn:active { transform: translateY(1px); }
+@media (prefers-reduced-motion: reduce) {
+  [data-d='W'] .d-btn { transition: none; }
+  [data-d='W'] .d-btn:active { transform: none; }
+}
+
+/* ── W · CRISTAL TEMPLADO · los tres huecos que la auditoría encontró ────── */
+
+/* 1 · MODO FORZADO DE COLORES.
+   Los tres canales de estado de W —banda, filo y halo— son `background` y
+   `box-shadow`, y el modo forzado borra los tres. Una fila vencida quedaba
+   idéntica a una al día salvo por la palabra de la píldora. Para un ERP donde
+   «vencido» ES la información, eso no es un detalle.
+
+   `outline` sí sobrevive, así que ahí se muda la señal. No se usa
+   `forced-color-adjust: none`, que sería desactivar la preferencia de alguien
+   para que nuestro diseño gane: la dirección deja de ser de vidrio y sigue
+   diciendo lo que tiene que decir. */
+@media (forced-colors: active) {
+  [data-d='W'] .d-panel {
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border: 1px solid CanvasText;
+  }
+  [data-d='W'] .d-panel::after { display: none; }
+  [data-d='W'] .d-row[data-tone='critical'],
+  [data-d='W'] .d-panel[data-tone='critical'] {
+    outline: 3px solid CanvasText;
+    outline-offset: -3px;
+  }
+  /* Los otros estados conservan un filo más fino: distinto de «sin estado» y
+     distinto de «crítico», que son las tres categorías que hay que separar. */
+  [data-d='W'] .d-row[data-tone='attention'],
+  [data-d='W'] .d-row[data-tone='positive'],
+  [data-d='W'] .d-row[data-tone='neutral'] {
+    outline: 1px solid CanvasText;
+    outline-offset: -1px;
+  }
+  [data-d='W'] .d-pill { border: 1px solid CanvasText; }
+}
+
+/* 2 · MEDIDA.
+   No había un solo max-width en la dirección: a 1600px una línea de prosa
+   llegaba a 247 caracteres. El rango legible son 45 a 75. En un catálogo con
+   textos cortos no se nota; en un ERP con notas y mensajes de error largos, la
+   línea se vuelve ilegible sin que nada parezca roto. */
+[data-d='W'] { --d-measure: 68ch; }
+[data-d='W'] .d-hint,
+[data-d='W'] .d-error,
+[data-d='W'] .d-panel-body > p { max-width: var(--d-measure); }
+
+/* 3 · OSCURO.
+   El vidrio oscuro no es el claro invertido. El realce interior blanco que le
+   da canto al panel en claro es exactamente lo que en oscuro lo convierte en
+   plástico: sobre un fondo oscuro esa línea no lee como luz rasante, lee como
+   un borde pintado. En oscuro el canto lo da la ausencia — un filo apenas más
+   claro que el vidrio, y el campo de color detrás bajando de luminosidad en vez
+   de subir.
+
+   Un ERP de mantenimiento se usa en turno de noche y en bodega. */
+@media (prefers-color-scheme: dark) {
+  [data-d='W'] {
+    --d-ground:
+      radial-gradient(70% 56% at 12% 6%, #14304C 0%, transparent 62%),
+      radial-gradient(60% 60% at 90% 18%, #2A1F3F 0%, transparent 64%),
+      radial-gradient(78% 60% at 50% 99%, #123A38 0%, transparent 66%),
+      #0A0E13;
+    --d-surface: rgba(190, 220, 255, .07);
+    --d-sunk: rgba(190, 220, 255, .04);
+    --d-overlay: #161B22;
+    --d-overlay-ink: #E4EBF2;
+    --d-overlay-edge: rgba(190, 220, 255, .18);
+    --d-overlay-shadow: 0 20px 48px -14px rgba(0, 0, 0, .72), 0 4px 12px -4px rgba(0, 0, 0, .5);
+    --d-ink: #E6EDF4; --d-ink-2: #B3C0CD; --d-ink-3: #A2AFBB; --d-ink-on: #0A0E13;
+    --d-line: rgba(190, 220, 255, .14); --d-edge: rgba(190, 220, 255, .24);
+    --d-accent: #7FB0F5; --d-accent-ink: #08131F;
+    --d-accent-soft: rgba(127, 176, 245, .14); --d-accent-edge: rgba(127, 176, 245, .38);
+    /* Bandas opacas también acá, y por el mismo motivo: una translúcida se
+       apila cuando hay una píldora sobre una fila teñida. */
+    --d-pos: #7FD5A4; --d-pos-band: #172A21; --d-pos-edge: #2C4636;
+    --d-att: #EFC378; --d-att-band: #2C2416; --d-att-edge: #4A3A1E;
+    --d-crit: #F79C8F; --d-crit-band: #2F1A17; --d-crit-edge: #4E2823;
+    --d-info: #9DB2F0; --d-info-band: #1B2033; --d-info-edge: #313857;
+    --d-neu: #9FADBA; --d-neu-band: #1B2026; --d-neu-edge: #333B44;
+    --d-shadow: 0 8px 28px -10px rgba(0, 0, 0, .6);
+    --d-shadow-lg: 0 24px 56px -18px rgba(0, 0, 0, .75);
+    --d-focus: #7FB0F5;
+  }
+  /* El canto, en oscuro: un filo tenue, no un realce blanco. */
+  [data-d='W'] .d-panel::after {
+    box-shadow: inset 0 0 0 1px rgba(190, 220, 255, .09);
+  }
+  [data-d='W'] .d-panel-head { border-bottom-color: rgba(190, 220, 255, .12); }
+  [data-d='W'] .d-panel-foot { background: rgba(190, 220, 255, .04); border-top-color: rgba(190, 220, 255, .10); }
+  [data-d='W'] .d-row { border-bottom-color: rgba(190, 220, 255, .10); }
+  [data-d='W'] .d-btn {
+    background: rgba(190, 220, 255, .10);
+    border-color: rgba(190, 220, 255, .18);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  }
+  [data-d='W'] .d-btn:hover { background: rgba(190, 220, 255, .16); }
+  [data-d='W'] .d-btn--primary { background: var(--d-accent); color: var(--d-accent-ink); border-color: var(--d-accent); }
+  [data-d='W'] .d-btn--ghost { background: transparent; border-color: transparent; box-shadow: none; }
+  [data-d='W'] .d-input, [data-d='W'] .d-select, [data-d='W'] .d-textarea {
+    background: #10161D; border-color: rgba(190, 220, 255, .20);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, .35);
+  }
+  /* El halo crítico sube de intensidad: sobre oscuro, un resplandor al 55 % se
+     pierde contra el propio fondo. */
+  [data-d='W'] .d-row[data-tone='critical'],
+  [data-d='W'] .d-panel[data-tone='critical'] {
+    box-shadow: inset 3px 0 0 var(--d-crit), 0 6px 24px -8px rgba(247, 156, 143, .40);
+  }
 }

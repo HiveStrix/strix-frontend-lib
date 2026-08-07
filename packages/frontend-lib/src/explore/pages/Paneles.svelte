@@ -299,7 +299,8 @@
   :global([data-d='I']) .kpi-lab, :global([data-d='I']) .ficha-meta dt,
   :global([data-d='O']) .kpi-lab, :global([data-d='O']) .ficha-meta dt,
   :global([data-d='M']) .kpi-lab, :global([data-d='M']) .ficha-meta dt,
-  :global([data-d='T']) .kpi-lab, :global([data-d='T']) .ficha-meta dt {
+  :global([data-d='T']) .kpi-lab, :global([data-d='T']) .ficha-meta dt,
+  :global([data-d='W']) .kpi-lab, :global([data-d='W']) .ficha-meta dt {
     font-size: var(--d-t-sm);
     font-weight: var(--d-w-med);
     letter-spacing: 0;
@@ -1480,6 +1481,204 @@
   }
 
   /* ======================================================================
+     W · CRISTAL TEMPLADO. Cristal con las tres correcciones puestas.
+
+     Esta familia se ordena por MATERIAL, y en W el material tiene TRES
+     niveles, no uno. Esa es la diferencia entera con Cristal, que solo tenía
+     «vidrio» y «vidrio otra vez»:
+
+       LOSA     .ficha y .plan. Vidrio de verdad: desenfoque, sombra larga y el
+                doble bisel que el contrato le pone a todo .d-panel. Es una
+                pieza que se levantaría de la mesa.
+       LÁMINA   el mosaico de cifras. Mismo vidrio, pero es UNA superficie
+                continua de lectura y no una pieza apoyada sobre otra pieza:
+                lleva el realce especular que --d-shadow ya trae y NO un
+                segundo anillo interior. El doble bisel es la firma de la losa;
+                repetirlo acá lo gasta y deja de querer decir «pieza».
+       REGIÓN   las seis celdas y el panel anidado. Sin desenfoque propio, sin
+                sombra y sin bisel: son zonas de la superficie que las
+                contiene, y su único dibujo es la junta de luz.
+
+     Cristal ponía cada cifra a flotar por su cuenta. Seis objetos flotantes en
+     fila son la misma tabla de treinta objetos flotantes que la regla 2 de W
+     manda aplanar, solo que más corta. Acá el mosaico es una lámina y las
+     cifras viven adentro.
+
+     Los rótulos de KPI y de la ficha entran en la retirada de versalitas de
+     más arriba: W hereda de Cristal los mismos tokens de etiqueta (11px, caja
+     alta, .08em) y con ellos esta celda llegaba a diez marcas de agua. Queda
+     un solo epígrafe en pie, el «Estimado» del aviso, que es el único que
+     clasifica algo que el titular no dice.
+
+     HALLAZGO, el mismo que I, O y R ya tienen anotado unas líneas arriba: W
+     desenfoca en directions.css con literales (blur 20px saturate 1.5) y no
+     expone --d-blur ni --d-blur-sat, así que una página no puede igualar el
+     vidrio de su propia dirección sin repetir el número a mano. Acá el radio
+     sale de --d-p4, que es del mismo orden.
+     ====================================================================== */
+  :global([data-d='W']) .kpis {
+    gap: 0;
+    background: var(--d-surface);
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+    overflow: hidden;
+    backdrop-filter: blur(var(--d-p4)) saturate(1.5);
+    -webkit-backdrop-filter: blur(var(--d-p4)) saturate(1.5);
+  }
+  /* LA JUNTA, Y POR QUÉ NO ES DE LUZ. Cristal divide con filos blancos: un
+     inset de --d-line arriba de cada pieza. Sobre una lámina que ya es blanco
+     al 60 %, blanco sobre blanco no divide nada, y probado en pantalla la
+     junta clara sencillamente no estaba. W ya resolvió esto para sus filas y
+     sus cabeceras, que se dividen con una línea OSCURA fina; el mosaico sigue
+     esa gramática en vez de inventar otra. El brillo se queda donde sí tiene
+     detrás algo más oscuro: el borde exterior y el realce especular.
+
+     Va arriba y a la izquierda de CADA celda, y por eso la lámina queda bien
+     dividida con cuatro columnas, con dos o con una, sin una regla por punto
+     de quiebre: al plegarse, la misma junta pasa sola de dividir columnas a
+     dividir filas. Contra el canto de la lámina cae bajo el borde y no agrega
+     una segunda línea, así que el doble bisel sigue siendo de la losa.
+
+     HALLAZGO: W escribe sus divisiones internas con literales
+     (rgba(14,23,32,.09) en .d-row, .10 en .d-panel-head) y no las expone como
+     token. La página usa --d-edge, que es lo más cercano que el contrato
+     declara y pinta un punto más marcado. Falta un --d-divider. */
+  :global([data-d='W']) .kpi {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: inset var(--d-bw) 0 0 var(--d-edge),
+                inset 0 var(--d-bw) 0 var(--d-edge);
+  }
+  /* La cifra respira. A 35px sobre vidrio, pegada al rótulo, el bloque entero
+     se lee como una mancha oscura antes que como un número. */
+  :global([data-d='W']) .kpi-body { margin-top: var(--d-p2); }
+  :global([data-d='W']) .kpi:hover { background: var(--d-sunk); }
+  /* ELEGIDA: OPACA, Y TEÑIDA DE ACENTO. Es la regla de W puesta donde más se
+     nota. La celda con la que estás filtrando la flota es justo la que menos
+     puede tener un campo de color moviéndose por detrás, así que deja de ser
+     vidrio y pasa a ser superficie sólida.
+
+     El relleno no depende de la lámina: es blanco opaco con un velo de acento
+     encima, así que se ve igual con el vidrio puesto, con el vidrio apagado en
+     el teléfono y con transparencia reducida. Sin eso, el estado dependería de
+     que dos capas de blanco se distingan, que es exactamente lo que deja de
+     pasar en cuanto se apaga el desenfoque.
+
+     Y el relleno NO se tiñe del tono de la celda. Cada celda ya lleva su tono
+     en la marca y en la cifra; si además se rellenara de tono, no habría forma
+     de saber si la roja está rellena por estar elegida o por estar vencida.
+     Acento para el estado, tono para el dato, y no se cruzan.
+
+     HALLAZGO: --d-overlay está declarado para «lo que flota». Una celda
+     elegida no flota, pero es el único blanco opaco que W declara. Falta un
+     --d-surface-solid, que es el vidrio hecho sólido para lo que se queda
+     quieto; hoy la página tiene que pedirle prestado al token de los menús. */
+  :global([data-d='W']) .kpi.on {
+    background-color: var(--d-overlay);
+    background-image: linear-gradient(var(--d-accent-soft), var(--d-accent-soft));
+    color: var(--d-overlay-ink);
+    box-shadow: inset 0 0 0 max(var(--d-bw), 2px) var(--d-accent);
+  }
+  :global([data-d='W']) .kpi.on .kpi-lab { color: var(--d-ink); font-weight: var(--d-w-bold); }
+  /* EL HALO NO ENTRA EN EL MOSAICO, Y ES A PROPÓSITO. Dentro de una lámina que
+     recorta, un resplandor hacia afuera se corta contra el canto: se vería un
+     borrón detenido, no una alarma. El que flota es el mosaico entero, no la
+     celda. La alarma la lleva el mismo filo de 3px que el contrato le pone a
+     la fila crítica y a la ficha crítica, así que lo vencido tiene UN solo
+     dibujo en toda la celda y se reconoce sin distinguir el rojo. El 3px sale
+     de --d-bw para que siga el grosor de línea de la dirección en vez de ser
+     un número suelto. */
+  :global([data-d='W']) .kpi[data-tone='critical'] {
+    box-shadow: inset calc(var(--d-bw) * 3) 0 0 var(--d-crit),
+                inset var(--d-bw) 0 0 var(--d-edge),
+                inset 0 var(--d-bw) 0 var(--d-edge);
+  }
+  /* Elegida Y vencida. Las dos reglas de arriba pesan igual, así que sin esta
+     la última escrita se comería a la otra y la celda perdería un estado. El
+     filo se pinta antes que el anillo, o sea encima de él en el canto
+     izquierdo: se leen los dos a la vez. */
+  :global([data-d='W']) .kpi[data-tone='critical'].on {
+    box-shadow: inset calc(var(--d-bw) * 3) 0 0 var(--d-crit),
+                inset 0 0 0 max(var(--d-bw), 2px) var(--d-accent);
+  }
+  /* La lámina recorta: sin esto el anillo de foco se pierde bajo el overflow. */
+  :global([data-d='W']) .kpi:focus-visible { outline-offset: calc(-1 * var(--d-p1)); }
+  /* Cristal levanta sus titulares del campo con una sombra blanca de 1px. Acá
+     no: sobre la mancha más oscura que W dibuja en el fondo, la tinta de
+     titular saca 14:1, así que esa sombra no estaba resolviendo un problema de
+     lectura, estaba disimulando el fondo. Es la regla 1 aplicada a la
+     tipografía. */
+  :global([data-d='W']) .sec-head { padding-bottom: var(--d-p1); }
+  /* LA FICHA CRÍTICA RECUPERA SU MATERIAL. El contrato le da a
+     .d-panel[data-tone='critical'] un box-shadow entero, así que la ficha se
+     quedaba sin --d-shadow: sin elevación y sin el realce especular de arriba.
+     La pieza que lleva el equipo vencido era la única de la celda que no se
+     veía de vidrio. Vuelve el material y se conserva la alarma: filo, un
+     resplandor corto y la sombra de vidrio, en ese orden de pintado. */
+  :global([data-d='W']) .ficha[data-tone='critical'] {
+    box-shadow: inset calc(var(--d-bw) * 3) 0 0 var(--d-crit),
+                0 var(--d-p1) var(--d-p4) calc(-1 * var(--d-p2)) var(--d-crit),
+                var(--d-shadow);
+  }
+  :global([data-d='W']) .ficha-meta { gap: var(--d-p2); }
+  /* EL ANIDADO ES UNA REGIÓN, NO UNA SEGUNDA LOSA. Un backdrop-filter dentro
+     de otro desenfoca dos veces el mismo punto del campo y el conjunto se
+     enturbia; y una losa dentro de una losa pide un segundo doble bisel, que
+     es la firma repetida a un centímetro de sí misma. Se queda sin relleno y
+     sin sombra: lo delimitan una línea y un radio un escalón menor, que es lo
+     que hace que un anidado se vea concéntrico y no como dos cajas del mismo
+     tamaño de esquina.
+
+     Y la línea es oscura, por lo mismo que la junta del mosaico: el filo
+     blanco que .d-panel le presta sirve para separar una pieza del campo, no
+     para dividir por dentro de una pieza que ya es blanca. Sale una regla
+     sola para toda la celda, que es lo que hace que esto se lea como un
+     material y no como una colección de trucos: EL BLANCO ES EL CANTO DE
+     AFUERA, LA LÍNEA OSCURA ES LA DIVISIÓN DE ADENTRO.
+
+     Y recorta. Las bandas de tono de W son opacas y llegan de canto a canto,
+     así que la última fila del anidado sacaba dos esquinas cuadradas fuera del
+     radio: la banda se salía de la caja. Recortar es seguro justo porque acá
+     el crítico ya no irradia hacia afuera, solo lleva filo. */
+  :global([data-d='W']) .nest {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: transparent;
+    border-color: var(--d-edge);
+    border-radius: var(--d-r);
+    box-shadow: none;
+    overflow: hidden;
+  }
+  :global([data-d='W']) .nest::after { display: none; }
+  /* «Lecturas recibidas» no es una lista de urgencias: es la procedencia del
+     dato. BAT-014 aparece ahí porque su lectura llegó, no porque venza, así
+     que la fila conserva el filo, que dice de qué equipo se habla, y suelta el
+     resplandor. Con el halo también acá, en la celda habría cinco cosas
+     irradiando y ninguna urgiría, que es el defecto que W vino a corregir. */
+  :global([data-d='W']) .nest .plan-row[data-tone='critical'] {
+    box-shadow: inset calc(var(--d-bw) * 3) 0 0 var(--d-crit);
+  }
+  /* Dos resplandores concéntricos se leen como una mancha, no como dos cosas:
+     misma regla que K y T aplican más arriba. En esta celda TODA píldora
+     crítica vive dentro de algo que ya irradia, la ficha vencida y la fila
+     vencida, así que suelta el halo y se queda con su banda opaca, su marca y
+     su palabra, que es lo que informa. */
+  :global([data-d='W']) .d-pill[data-tone='critical'] { box-shadow: none; }
+  /* EL AVISO SE QUEDA PLANO Y OPACO, que es la frase de W dicha en un solo
+     elemento: al lado de una losa de vidrio con sombra larga, una banda opaca
+     sin sombra dice sola cuál de las dos cosas es material y cuál es texto. No
+     lleva halo porque no urge, es un supuesto. Y baja un escalón de radio por
+     la misma razón que el anidado: 22px es el canto de una pieza de vidrio, y
+     esto no es una pieza. Una sola escala de radio, dos alturas. */
+  :global([data-d='W']) .callout { border-radius: var(--d-r); }
+  /* Los dos botones del pie llevan white-space: nowrap y el pie no envuelve:
+     por debajo de unos 270px de columna se salen de la ficha. Envuelven, y
+     siguen alineados a la derecha. */
+  :global([data-d='W']) .d-panel-foot { flex-wrap: wrap; }
+
+  /* ======================================================================
      RESPONSIVE — hasta 380px. La celda manda, no la ventana: el contenedor
      es .root, así que una celda angosta se comporta igual esté sola o en
      una rejilla de ocho.
@@ -1556,6 +1755,93 @@
     :global([data-d='G']) .kpi-lab { text-align: left; }
     :global([data-d='G']) .sec-title { text-align: left; }
   }
+  /* ======================================================================
+     W · PANTALLA ANGOSTA, DECLARADA. Nadie había probado esta celda debajo de
+     500px, así que acá va escrito qué hace y por qué, en vez de confiar en que
+     el contrato la alcance.
+
+     QUÉ MANDA, LA VENTANA O LA CELDA. Las dos, y en sitios distintos:
+
+       LA VENTANA manda sobre el desenfoque, y solo sobre eso. directions.css
+       apaga el vidrio de .d-panel a 560px de ventana porque el desenfoque de
+       fondo lo paga la GPU del aparato, no el ancho de la columna. La lámina
+       de KPIs es de esta página y el contrato no la alcanza, así que se apaga
+       acá, con el MISMO umbral y también en @media: si la lámina siguiera
+       desenfocando dentro de un panel que ya no desenfoca, el vidrio quedaría
+       medio puesto, que se ve peor que no estar. Con el campo apagado la
+       lámina pasa a sólida, igual que hacen los paneles.
+
+       LA CELDA manda sobre todo lo demás, con @container sobre .root:
+
+         520c  el mosaico pasa de dos columnas a cuatro y la ficha se pone al
+               lado del aviso. Debajo de ese ancho EL AVISO ES LA COLUMNA QUE
+               CAE PRIMERO, y cae debajo de la ficha: el equipo vencido es el
+               objeto de la pantalla y el supuesto es un comentario sobre otro
+               equipo.
+         440c  los botones de pie toman 44px. Una celda de este ancho ya tiene
+               forma de teléfono aunque la ventana sea ancha, y el umbral de
+               560px del contrato no la ve. El pie ya envuelve a cualquier
+               ancho.
+         360c  el mosaico se pliega a una columna. La lámina no se rompe: las
+               celdas quedan apiladas dentro de la misma pieza de vidrio y la
+               junta de luz pasa sola de dividir columnas a dividir filas,
+               porque va arriba y a la izquierda de cada celda.
+
+     QUÉ SE VUELVE SCROLL HORIZONTAL: nada, y es una respuesta, no un olvido.
+     Esta familia no tiene tabla. Lo más ancho que hay son la cifra, las
+     píldoras con white-space: nowrap (que viven en filas con flex-wrap) y los
+     nombres de equipo (que parten con overflow-wrap: anywhere), así que a
+     320px nada empuja el ancho. Si alguna vez entra una tabla en esta página,
+     el scroll va contenido en su propio envoltorio y nunca en el body.
+     ====================================================================== */
+  @media (max-width: 560px) {
+    :global([data-d='W']) .kpis {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background: var(--d-overlay);
+    }
+    /* Sobre lámina sólida, --d-sunk es blanco sobre blanco y el apuntado deja
+       de verse. No se repone: a este ancho el puntero es un dedo y no hay
+       apuntado. Lo elegido y lo crítico no dependen del puntero. */
+    /* El contrato engorda el filo crítico a 5px en el teléfono, porque 3px
+       contra el marco de la pantalla se pierden. El mosaico lo sigue, y las
+       dos piezas que esta página redefine también, o quedarían finas justo
+       donde el resto engordó. */
+    :global([data-d='W']) .kpi[data-tone='critical'] {
+      box-shadow: inset calc(var(--d-bw) * 5) 0 0 var(--d-crit),
+                  inset var(--d-bw) 0 0 var(--d-edge),
+                  inset 0 var(--d-bw) 0 var(--d-edge);
+    }
+    :global([data-d='W']) .kpi[data-tone='critical'].on {
+      box-shadow: inset calc(var(--d-bw) * 5) 0 0 var(--d-crit),
+                  inset 0 0 0 max(var(--d-bw), 2px) var(--d-accent);
+    }
+    /* Y el resplandor se retira con el del contrato: a distancia de teléfono
+       un halo corto es humo, y el filo grueso hace el trabajo entero. */
+    :global([data-d='W']) .ficha[data-tone='critical'] {
+      box-shadow: inset calc(var(--d-bw) * 5) 0 0 var(--d-crit), var(--d-shadow);
+    }
+    :global([data-d='W']) .nest .plan-row[data-tone='critical'] {
+      box-shadow: inset calc(var(--d-bw) * 5) 0 0 var(--d-crit);
+    }
+  }
+  @container (max-width: 439px) {
+    /* Solo min-height. Tocar .d-btn entero acá le ganaría el fondo a
+       .d-btn--primary del contrato y dejaría tinta blanca sobre blanco. */
+    :global([data-d='W']) .d-panel-foot .d-btn { min-height: var(--d-touch); }
+  }
+  /* Vidrio apagado por preferencia. directions.css ya vuelve opacos --d-surface
+     y --d-sunk cuando alguien pide menos transparencia o más contraste, así que
+     la lámina y el apuntado se resuelven solos; lo único que el contrato no
+     alcanza es el desenfoque de la lámina, que es de esta página. El relleno de
+     la celda elegida no depende de ninguno de esos dos tokens, así que se ve
+     igual en los tres modos. */
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    :global([data-d='W']) .kpis {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .kpi { transition: none; }
     :global([data-d='A']) .kpi:hover { transform: none; }
@@ -1564,5 +1850,18 @@
     :global([data-d='S']) .kpi.on { transform: none; }
     :global([data-d='M']) .kpi::before,
     :global([data-d='Q']) .kpi::after { transition: none; }
+  }
+
+  /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════
+     El tamaño de un dedo es un hecho del aparato, no del ancho de la ventana.
+     directions.css sube los .d-btn de W a --d-touch dentro de
+     @media (max-width: 560px), así que una tableta de 768px —que se toca con
+     el pulgar igual que un teléfono— se quedaba con los controles de ratón.
+     Medido con puntero grueso emulado por CDP a 768px, esta página tenía
+     4 objetivos por debajo de 44px. Va por (pointer: coarse) porque ese es
+     el hecho que importa; el ancho ya tiene sus propias reglas y hacen otra
+     cosa. Con ratón no cambia un pixel. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .d-btn { min-height: var(--d-touch); }
   }
 </style>

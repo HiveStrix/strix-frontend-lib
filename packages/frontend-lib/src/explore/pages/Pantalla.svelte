@@ -1892,6 +1892,248 @@
     box-shadow: 0 -12px 28px -18px var(--d-accent);
   }
 
+  /* ── W · CRISTAL TEMPLADO — vidrio donde sirve, opaco donde estorba ────
+     Es Cristal corregido, y la corrección se ve entera acá porque esta
+     pantalla es donde Cristal se rompe: nueve losas del mismo material
+     apiladas (barra, veredicto, cuatro KPIs, dos paneles, pie). Nueve láminas
+     iguales no son jerarquía, son una sola hoja lechosa.
+
+     LA LEY DEL MATERIAL, en tres líneas y sin excepciones:
+
+     · Vidrio (backdrop-filter) en TRES superficies y ninguna más: la barra de
+       módulo, los dos paneles y el pie. Son las que se quedan quietas, las que
+       nadie toca y las únicas con campo detrás que valga la pena desenfocar.
+     · Opaco todo lo que se toca (KPIs, fichas, botones, campos) y todo lo que
+       carga texto denso (filas, encabezados de grupo, planes). Ahí el vidrio
+       estorba: el contraste pasaría a depender de cuántas capas hay debajo.
+     · Nunca vidrio sobre vidrio. Dentro de un panel el material se hace con
+       alfa sobre el vidrio que el panel ya trae, jamás con un segundo
+       backdrop-filter. Ese es el defecto que hunde a Cristal en pantalla
+       completa, y acá queda cerrado por regla, no por cuidado.
+
+     Nada FLOTA en esta pantalla: no hay menú propio, ni desplegable propio, ni
+     globo. El único desplegable es el select de «Agrupar por», que lo dibuja el
+     sistema operativo y ya es sólido, y las únicas ayudas emergentes son
+     atributos title. La red de seguridad de directions.css (--d-overlay por
+     posición) no llega a activarse acá, y eso es lo correcto: la regla 1 se
+     cumple porque no hay nada translúcido que pueda cruzarse con el texto de
+     abajo, no porque se la haya parcheado.
+
+     HALLAZGO 1: el radio de desenfoque sigue sin tokenizar. directions.css
+     escribe 20px dentro de [data-d='W'] .d-panel, así que la barra y el pie lo
+     repiten a mano para ser la misma lámina. Un --d-blur lo resolvería en un
+     solo lugar y además dejaría bajarlo por consulta de medios sin tocar cada
+     selector.
+     HALLAZGO 2: W no publica un token de superficie OPACA de control. El botón
+     lleva rgba(255,255,255,.82) escrito dentro de directions.css, así que el
+     KPI, que tiene que ser el mismo material, lo recompone desde --d-overlay
+     con color-mix en vez de repetir el hex. Un --d-control lo cerraría. */
+
+  /* el ancho del canto rojo vive en una sola variable: la pantalla angosta lo
+     engorda de una vez y no queda ni un filo desparejo */
+  :global([data-d='W']) .screen { --pg-canto: 3px; }
+  /* densidad. La pila entera se aprieta un escalón (16 a 12 entre bloques)
+     porque en Cristal el veredicto y los KPIs se comían los 620px y la tabla
+     empezaba justo debajo del corte: la pantalla contestaba «cuántos» y no
+     «cuál». Con esto la primera fila vencida asoma, que además es la única
+     manera honesta de decir que hay más abajo. */
+  :global([data-d='W']) .scroll { gap: var(--d-p2); }
+
+  /* la barra y el pie son la misma lámina, soldada al marco: no flotan, no
+     llevan margen y no llevan radio. En Cristal flotaban con margen y sombra,
+     que es exactamente lo que la regla 1 prohíbe para lo que flota. */
+  :global([data-d='W']) .topbar {
+    background: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-bottom-color: var(--d-overlay-edge);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+  :global([data-d='W']) .foot {
+    background: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-top-color: var(--d-overlay-edge);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+
+  /* EL CANTO ROJO. Es el recurso estructural de esta pantalla y codifica una
+     sola cosa: vencido. Aparece a la misma x en cada altura donde hay algo
+     vencido (veredicto, KPI de vencidos, encabezado de grupo, filas, plan),
+     porque veredicto, KPIs y paneles son hermanos de .scroll y comparten borde
+     izquierdo. A los treinta segundos se lee una columna roja interrumpida y no
+     hace falta leer una palabra.
+     El resplandor va un paso más adentro y lo pone directions.css: solo las
+     FILAS vencidas irradian, porque una fila es la máquina que hay que
+     atender. El veredicto la nombra, el canto la ubica, el halo la señala. */
+  /* tipografía fluida en la única frase larga de la pantalla: entre 320 y
+     544px baja sola de 26 a 19px, sin un punto de quiebre que la deje partida
+     justo antes. La escala vive en el bloque y no en la frase, así la marca de
+     severidad, que mide 1.15em, baja con ella: una señal de 30px al lado de
+     una frase de 19px sería un cartel, no una marca. Todo lo demás en esta
+     pantalla es dato tabular y no se escala. */
+  :global([data-d='W']) .verdict {
+    display: flex; align-items: center; gap: var(--d-p3);
+    font-size: clamp(var(--d-t-lg), 3.6vw + .4rem, var(--d-t-xl));
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='W']) .verdict[data-tone='critical'] {
+    box-shadow: var(--d-shadow), inset var(--pg-canto) 0 0 var(--d-crit);
+  }
+  :global([data-d='W']) .vk { font-size: 1em; }
+  :global([data-d='W']) .vt {
+    font-size: 1em;
+    font-weight: var(--d-w-med);
+    letter-spacing: -.02em;
+  }
+
+  /* los KPIs son CONTROLES, así que son opacos y no desenfocan: el mismo
+     material que .d-btn en W. Cuatro cajas de vidrio con una cifra encima del
+     campo de manchas es justo donde el número deja de leerse, y el desenfoque
+     en algo que se pulsa se paga en repintados a cada cambio de estado. */
+  :global([data-d='W']) .kpi {
+    padding: var(--d-p2) var(--d-p3);
+    background: color-mix(in srgb, var(--d-overlay) 82%, transparent);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border-color: var(--d-overlay-edge);
+    box-shadow: var(--d-shadow);
+  }
+  /* el reposo cambia de MATERIAL, no de altura: acá no se levanta nada porque
+     nada flota. La moción que queda es la que responde a un dedo. */
+  :global([data-d='W']) .kpi:hover { background: var(--d-overlay); }
+  :global([data-d='W']) .kpi:active { transform: translateY(1px); }
+  /* el pulsado se escribe con (0,3,0) a propósito: la regla de arriba pesa lo
+     mismo que .kpi[aria-pressed='true'] de la base y va después, así que sin
+     esto le comería el estado y el filtro activo quedaría idéntico al
+     inactivo. El subrayado de 3px es lo que evita que el estado sea solo
+     color; el aria-pressed lo dice, y la aparición de «Limpiar filtros» lo
+     confirma en palabras. */
+  :global([data-d='W']) .kpi[aria-pressed='true'] {
+    background: var(--tone-band);
+    border-color: var(--tone-edge);
+    box-shadow: var(--d-shadow), inset 0 -3px 0 var(--tone-fg);
+  }
+  :global([data-d='W']) .kpi[data-tone='critical'] {
+    box-shadow: var(--d-shadow), inset var(--pg-canto) 0 0 var(--d-crit);
+  }
+  :global([data-d='W']) .kpi[data-tone='critical'][aria-pressed='true'] {
+    box-shadow: var(--d-shadow), inset var(--pg-canto) 0 0 var(--d-crit), inset 0 -3px 0 var(--d-crit);
+  }
+
+  /* las fichas se quedan como en Cristal, que ya funcionaban: pastilla, canto
+     de luz y el velo más fino de la pantalla. Cambian dos cosas y las dos son
+     de uso: el reposo del ratón deja de ser el mismo --d-sunk que el descanso,
+     que en Cristal no daba respuesta ninguna, y el marcado vuelve al acento de
+     la base en lugar del blanco de Cristal, que apenas se distinguía. */
+  :global([data-d='W']) .fam {
+    border-radius: var(--d-r-pill);
+    border-color: var(--d-line);
+    background: var(--d-sunk);
+  }
+  :global([data-d='W']) .fam:hover { background: var(--d-surface); }
+  :global([data-d='W']) .fam[aria-pressed='true'] {
+    background: var(--d-accent-soft);
+    border-color: var(--d-accent-edge);
+    box-shadow: inset 0 1px 0 var(--d-line);
+  }
+  /* «Limpiar filtros» es la salida del estado filtrado y en W quedaba sin
+     fondo, sin borde y sin sombra sobre el campo de color: un enlace disfrazado
+     de botón. Se le devuelve el canto de control SIN tocar .d-btn, que en W es
+     justo la regla que le roba el relleno al primario. */
+  :global([data-d='W']) .filters .d-btn--ghost {
+    background: color-mix(in srgb, var(--d-overlay) 70%, transparent);
+    border-color: var(--d-overlay-edge);
+  }
+  :global([data-d='W']) .filters .d-btn--ghost:hover { background: var(--d-overlay); }
+
+  /* ── la tabla: vidrio afuera, opaco adentro ───────────────────────────
+     La altura separa los dos bloques. El listado es donde se decide, el
+     calendario es contexto, y eso es lo único que puede decir una sombra. */
+  :global([data-d='W']) .list { box-shadow: var(--d-shadow-lg); }
+  /* el encabezado de columna es un peldaño de alfa sobre el vidrio del panel,
+     nunca un segundo desenfoque. Su regla de abajo es una LÍNEA de tinta
+     (--d-edge) y no un filo de luz: en una tabla la estructura es el dato. */
+  :global([data-d='W']) .lhead { border-bottom-color: var(--d-edge); }
+  /* el encabezado de grupo comparte banda con sus filas, porque en W la fila
+     lleva la banda opaca del tono y un encabezado de otro color partiría el
+     estrato en dos. Lo que lo separa es la tinta del tono, el cuerpo y el peso,
+     más una sola regla en --tone-edge debajo. Sin borde arriba: el cambio de
+     banda entre estratos ya es el corte, y una raya más sería una raya doble
+     contra el borde inferior de la última fila del grupo anterior. */
+  :global([data-d='W']) .ghead {
+    background: var(--tone-band);
+    color: var(--tone-fg);
+    border-bottom-color: var(--tone-edge);
+    font-size: var(--d-t-sm);
+    font-weight: var(--d-w-semi);
+    text-transform: none;
+    letter-spacing: 0;
+  }
+  :global([data-d='W']) .gc { color: var(--d-ink-2); }
+  :global([data-d='W']) .ghead[data-tone='critical'] {
+    box-shadow: inset var(--pg-canto) 0 0 var(--d-crit);
+  }
+  /* la fila no lleva estado de reposo del ratón: no es un objeto que se pueda
+     pulsar, y en Cristal ese gris además le borraba la banda del tono. Todo lo
+     que hace la fila en W ya está en directions.css: banda opaca, sin anillo,
+     sin margen, y resplandor solo si está vencida.
+     Lo que sí falta es el canto del panel. .d-panel no recorta, y no puede
+     recortar porque eso mataría justo el halo de la fila vencida, que es un
+     resplandor hacia afuera. Así que la última fila redondea sus dos esquinas
+     o su banda opaca asoma cuadrada por el radio de 22px del vidrio. */
+  :global([data-d='W']) .rows > .row:last-child {
+    border-bottom-left-radius: calc(var(--d-r-lg) - var(--d-bw));
+    border-bottom-right-radius: calc(var(--d-r-lg) - var(--d-bw));
+  }
+  /* la pastilla de estado sobre una fila ya teñida: con la misma banda que la
+     fila deja de tener forma y queda un anillo suelto. Sube un peldaño de luz,
+     conserva su filo y su tinta del tono, y vuelve a leerse como una pieza. */
+  :global([data-d='W']) .c-state .d-pill,
+  :global([data-d='W']) .tlw { background: var(--d-surface); }
+
+  /* ── la línea de tiempo ───────────────────────────────────────────────
+     Cada plan es una banda opaca del tono dentro del panel de vidrio: mismo
+     material que una fila, y por la misma razón. */
+  :global([data-d='W']) .tlr {
+    background: var(--tone-band);
+    border: var(--d-bw) solid var(--tone-edge);
+    border-radius: var(--d-r);
+    padding: var(--d-p2) var(--d-p3);
+  }
+  :global([data-d='W']) .tlr[data-tone='critical'] {
+    box-shadow: inset var(--pg-canto) 0 0 var(--d-crit);
+  }
+  :global([data-d='W']) .track {
+    background: var(--d-sunk);
+    box-shadow: inset 0 0 0 1px var(--d-edge);
+  }
+  /* el umbral del 100 % tiene que leerse sobre el carril vacío Y sobre el
+     relleno, que a 118 % lo tapa entero: tinta llena con un filo de luz
+     alrededor, que es el mismo recurso con el que W separa el vidrio del
+     campo. Sin el filo, la marca desaparece dentro del rojo. */
+  :global([data-d='W']) .thr {
+    background: var(--d-ink);
+    box-shadow: 0 0 0 1px var(--d-line);
+  }
+
+  /* accesibilidad del material. Quien pide menos transparencia suele pedirla
+     porque el texto sobre fondos vivos le cuesta, así que el campo desaparece
+     y la dirección deja de ser de vidrio antes que dejar de ser usable.
+     directions.css ya lo hace con .d-panel y .d-btn; la barra, el pie y los
+     KPIs son de esta página y por lo tanto son deuda de esta página. */
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    :global([data-d='W']) .topbar,
+    :global([data-d='W']) .foot {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+    :global([data-d='W']) .kpi:not([aria-pressed='true']),
+    :global([data-d='W']) .filters .d-btn--ghost { background: var(--d-overlay); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='W']) .kpi { transition: none; }
+    :global([data-d='W']) .kpi:active { transform: none; }
+  }
+
   /* ======================================================================
      RESPONSIVE — hasta 380px. La fila deja de ser tabla y pasa a ser ficha
      de dos columnas: lo que identifica a la izquierda, el estado a la derecha.
@@ -1973,5 +2215,196 @@
     /* I — con la barra y el pie flotando, el aire de los lados se recorta */
     :global([data-d='I']) .topbar { margin: var(--d-p2) var(--d-p2) 0; }
     :global([data-d='I']) .foot { margin: 0 var(--d-p2) var(--d-p2); }
+  }
+
+  /* ======================================================================
+     W · CRISTAL TEMPLADO, EN ANGOSTO — declarado de principio a fin.
+
+     Es el hueco real de esta pantalla: nadie la miró abajo de 500px porque
+     Chrome sin cabeza en macOS no baja de un ancho mínimo, así que el tramo
+     donde un técnico la va a abrir de verdad pasó todas las rondas sin
+     mirarse. Acá va escrito qué se apila, qué columna se cae primero y qué se
+     vuelve desplazamiento.
+
+     LO QUE SE APILA
+       ≤760px  La fila deja de ser fila de tabla y pasa a ficha de tres
+               renglones: código y estado arriba, equipo y lectura en medio,
+               plan abajo a lo ancho. Lo hace la base para las veinte
+               direcciones; en W importa el doble porque la banda del tono deja
+               de ser una franja de 44px y pasa a ser el fondo de la ficha
+               entera, y el canto rojo pasa a correr por todo el lado izquierdo
+               de la ficha vencida. Sigue siendo lo primero que se ve.
+               Además se deja envolver la cabecera de panel: «Próximos
+               vencimientos» y «la marca es el 100 %» no entran juntos y .cnt va
+               en nowrap.
+       ≤560px  La barra de módulo se apila en dos renglones y la acción
+               primaria toma el ancho completo. Los KPIs pasan a dos por fila
+               (base). Las fichas de familia se envuelven en tres renglones de
+               44px.
+       ≤420px  Los KPIs conservan las dos columnas pero la cifra baja un
+               escalón y las etiquetas dejan de ir en una sola línea.
+
+     QUÉ COLUMNA SE CAE PRIMERO
+       Ninguna se cae: a ≤760px la rejilla de cinco columnas se reordena en
+       tres renglones y las cinco celdas siguen presentes. Es deliberado. En un
+       ERP de mantenimiento las cinco son la respuesta a «qué máquina atender»:
+       código, equipo, plan, lectura y estado. Esconder la lectura o el plan
+       en un teléfono es esconder justo el dato que se va a consultar parado
+       frente a la máquina. Lo que se cae es el encabezado de columna, que a
+       una sola ficha por renglón ya no rotula nada, y esa pérdida la cubren
+       las etiquetas implícitas de cada celda.
+
+     QUÉ SE VUELVE DESPLAZAMIENTO HORIZONTAL
+       Nada, y es una decisión, no una omisión. La tabla se reordena en vez de
+       desplazarse porque una tabla de cinco columnas en 320px es una tabla que
+       se lee con las dos manos. Lo que sí hay que impedir es el desplazamiento
+       ACCIDENTAL: .scroll declara overflow-y, o sea que su overflow-x calculado
+       es auto, así que cualquier cosa que sobresalga deja de verse y empieza a
+       moverse de lado. Los dos culpables reales están anotados abajo, uno por
+       uno, y los dos se resuelven dejando envolver el texto en vez de
+       recortarlo.
+     ====================================================================== */
+  @media (max-width: 760px) {
+    /* CULPABLE 1 de desplazamiento lateral: .cnt va en nowrap y con el título
+       al lado no entra en el ancho del panel. Empuja .d-panel y, por el
+       overflow-y de .scroll, la pantalla entera se mueve de lado. Envuelve. */
+    :global([data-d='W']) .d-panel-head { flex-wrap: wrap; row-gap: 2px; }
+    :global([data-d='W']) .d-panel-title { min-width: 0; }
+    :global([data-d='W']) .cnt { white-space: normal; }
+    /* la ficha respira: con tres renglones dentro, 8px de aire arriba y abajo
+       dejaban el texto pegado al canto de su propia banda */
+    :global([data-d='W']) .row { padding-block: var(--d-p2); row-gap: 3px; }
+    /* LA FILA DEJA DE RECORTAR Y EMPIEZA A ENVOLVER. En rejilla de cinco
+       columnas el recorte con puntos suspensivos es correcto: la columna de al
+       lado da el contexto y el ancho está garantizado. En ficha de dos, la
+       columna del equipo baja a 104px en un teléfono de 320 y «Batidora Imer
+       Syntesi 250» se convierte en «Batidora Ime…». Ese texto es la respuesta
+       a la única pregunta que se le hace a esta pantalla, así que envuelve.
+       La lectura (.mv) se queda recortando: son cuatro caracteres y va
+       alineada a la derecha, donde envolver la desalinearía de su porcentaje. */
+    :global([data-d='W']) .nm,
+    :global([data-d='W']) .pl,
+    :global([data-d='W']) .sub {
+      white-space: normal;
+      overflow: visible;
+      text-overflow: clip;
+    }
+  }
+  @media (max-width: 560px) {
+    /* el desenfoque se apaga. A este ancho la barra y el pie ocupan la pantalla
+       entera y no queda campo alrededor que desenfocar: el efecto se paga en
+       repintados y no se ve. directions.css ya lo apaga en .d-panel; la barra y
+       el pie son de esta página. La lámina se queda, lo que se va es el filtro. */
+    :global([data-d='W']) .topbar,
+    :global([data-d='W']) .foot {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      background: color-mix(in srgb, var(--d-overlay) 92%, transparent);
+    }
+    /* orden visual = orden del tabulador. La base mueve el buscador con
+       order:3 y deja el foco saltando del segundo renglón al primero. Acá la
+       barra pasa a rejilla de dos columnas y cada cosa cae donde el DOM la
+       puso: Flota y buscador en el primer renglón, la acción primaria a lo
+       ancho en el segundo, que es donde cae el pulgar. */
+    :global([data-d='W']) .topbar {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+    }
+    :global([data-d='W']) .search { order: 0; }
+    :global([data-d='W']) .act {
+      grid-column: 1 / -1;
+      width: 100%;
+      margin-left: 0;
+      min-height: var(--d-touch);
+    }
+    /* objetivos táctiles. La base deja la ficha de familia en 24px y el
+       selector y el campo en 36px, o sea por debajo de los 44 en los tres
+       controles que más se usan en esta pantalla. */
+    :global([data-d='W']) .fam {
+      min-height: var(--d-touch);
+      align-items: center;
+      scroll-snap-align: start;
+    }
+    :global([data-d='W']) .gsel,
+    :global([data-d='W']) .search .d-input { min-height: var(--d-touch); }
+    /* LO ÚNICO QUE SE VUELVE DESPLAZAMIENTO HORIZONTAL EN TODA LA PANTALLA, y
+       está contenido dentro de su propia caja: nunca mueve la página.
+       Con los objetivos a 44px, siete familias envueltas costaban unos 360px
+       de alto, o sea más de la mitad de la ventana, para una barra de filtro
+       que casi nunca se usa. En una tira que se arrastra cuestan 52 y la tabla
+       recupera lo demás. La ficha «Todas» va primera y siempre visible, así
+       que el estado de reposo se ve sin arrastrar nada, y el ajuste por
+       posición deja cada ficha entera al soltar.
+       El relleno vertical no es decorativo: overflow-x: auto obliga al eje
+       vertical a calcularse como auto, y sin esos 4px el anillo de foco de una
+       ficha quedaría recortado por su propio contenedor. */
+    :global([data-d='W']) .fams {
+      flex: 1 1 100%;
+      min-width: 0;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: inline proximity;
+      padding-block: 4px;
+      scrollbar-width: thin;
+    }
+    /* el canto rojo engorda entero. directions.css ya lleva la fila vencida de
+       3 a 5px porque contra el marco de un teléfono 3px se pierden; si el
+       veredicto, el KPI, el encabezado y el plan se quedan en 3, la columna
+       roja queda dentada justo donde más se la mira. */
+    :global([data-d='W']) .screen { --pg-canto: 5px; }
+  }
+  @media (max-width: 420px) {
+    /* CULPABLE 2 de desplazamiento lateral: a 320px cada KPI mide unos 111px y
+       le quedan 77 de contenido. «Por vencer» en una sola línea mide 86 y se
+       salía de su casilla, que no recorta.
+       El KPI apilado además costaba 130px de alto por casilla y entre el
+       veredicto y los cuatro KPIs no quedaba un solo píxel de tabla dentro de
+       los 620: la pantalla contestaba «cuántos» y nunca «cuál», que es lo
+       único que se le pregunta parado frente a la máquina. Acá la cifra y la
+       etiqueta comparten renglón y la nota baja al segundo. Ni un dato se
+       esconde, y se recuperan unos 160px, o sea el encabezado del grupo
+       vencido más sus dos filas. */
+    :global([data-d='W']) .kpi {
+      flex-direction: row;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0 var(--d-p1);
+      padding: var(--d-p2);
+    }
+    :global([data-d='W']) .kv { font-size: var(--d-t-lg); }
+    :global([data-d='W']) .kl {
+      flex: 1 1 auto;
+      min-width: 0;
+      white-space: normal;
+      font-size: var(--d-t-xs);
+    }
+    :global([data-d='W']) .kn {
+      flex: 1 1 100%;
+      white-space: normal;
+      text-overflow: clip;
+    }
+    /* el veredicto cede relleno, no cuerpo: la frase es lo que se lee primero
+       y bajarla de 19px sería cambiar la respuesta por el envase */
+    :global([data-d='W']) .verdict { padding: var(--d-p2); gap: var(--d-p2); }
+  }
+
+  /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════
+     El tamaño de un dedo es un hecho del aparato, no del ancho de la ventana.
+     directions.css sube los .d-btn de W a --d-touch dentro de
+     @media (max-width: 560px), así que una tableta de 768px —que se toca con
+     el pulgar igual que un teléfono— se quedaba con los controles de ratón.
+     Medido con puntero grueso emulado por CDP a 768px, esta página tenía
+     10 objetivos por debajo de 44px. Va por (pointer: coarse) porque ese es
+     el hecho que importa; el ancho ya tiene sus propias reglas y hacen otra
+     cosa. Con ratón no cambia un pixel. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .d-btn,
+    :global([data-d='W']) .d-input,
+    :global([data-d='W']) .gsel,
+    :global([data-d='W']) .d-select { min-height: var(--d-touch); }
+    /* Las fichas de familia son botones propios de esta pantalla y no
+       heredan de .d-btn. */
+    :global([data-d='W']) .fam { min-height: var(--d-touch); }
   }
 </style>

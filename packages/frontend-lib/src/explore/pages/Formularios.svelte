@@ -1909,6 +1909,237 @@
   :global([data-d='T']) .fm-note { padding-top: var(--d-p2); }
 
   /* ======================================================================
+     W · CRISTAL TEMPLADO. Vidrio donde sirve, opaco donde estorba, halo solo
+     donde urge. Es Cristal con las tres correcciones puestas, así que lo que
+     I resolvió bien se hereda tal cual y lo que I hace de más se retira.
+
+     REGLA 1, AUDITADA EN ESTA PÁGINA. La red de seguridad de directions.css
+     atrapa lo que flota por SUBCADENA de clase (menu, drop, pop, overlay,
+     sheet, dialog, tip) y por rol. Ninguna clase de esta página cae en esa
+     lista, y no es un descuido: acá lo único que flota de verdad es la lista
+     del select y el calendario del input date, que los dibuja el navegador.
+     Al select le declaro la opacidad igual, con --d-overlay, que es el token
+     que W creó para eso. En macOS el popup es nativo y la ignora; donde el
+     navegador lo pinta en página, la aplica. Y queda escrita la intención.
+
+     REGLA 4 ES LA QUE MÁS TRABAJO DA EN UN FORMULARIO, porque un formulario
+     es casi todo control. Los controles hechos a mano de esta página (la
+     casilla, el interruptor, el sufijo de unidad, el campo bloqueado) se
+     apoyan en la base sobre --d-surface y --d-sunk, que en W son blancos al
+     60 % y al 34 %. Encima del panel de vidrio eso son dos capas translúcidas
+     sobre una tercera: el mismo apilado que W nombra en sus propios tokens
+     cuando decide que las bandas de tono van opacas. Todo lo tocable pasa a
+     --d-neu-band.
+
+     HALLAZGO DE TOKEN: a W le falta una superficie hundida OPACA. --d-sunk es
+     translúcido a propósito y solo se vuelve sólido bajo
+     prefers-reduced-transparency, o sea justo cuando ya no hace falta. Le
+     vendría un --d-sunk-solid. Mientras no exista, --d-neu-band hace ese
+     papel, que es el que ya hacía en la base para el fondo del interruptor.
+
+     Y EL HALO, UNA SOLA VEZ EN TODA LA CELDA: el campo roto, con la misma
+     firma que directions.css le da a la fila crítica (filo de 3px a la
+     izquierda más un resplandor corto). Por eso el buscador NO se levanta al
+     foco, aunque I, T, S, K y A sí lo hagan; los dos bloques del cuerpo no se
+     tiñen de su data-tone; y una opción marcada no brilla, se rellena. Si
+     todo brilla, nada urge.
+     ====================================================================== */
+
+  /* El buscador es la otra superficie que se queda QUIETA, así que lleva el
+     mismo vidrio que el panel, una sola vez y apoyado directo en el campo de
+     manchas: es hermano del panel, no una capa encima (esa es la trampa que I
+     dejó escrita, y vale igual acá). El doble bisel se queda en el panel: a
+     esta altura el labio especular que ya trae --d-shadow alcanza, y W no
+     tiene un blanco más tenue que --d-line con el que graduar un segundo
+     anillo sin inventar un alfa. */
+  :global([data-d='W']) .fm-seek {
+    padding: var(--d-p3);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-color: var(--d-line);
+  }
+  :global([data-d='W']) .fm-seek-ctl { gap: var(--d-p2); }
+
+  /* Las etiquetas dejan las versalitas, por la razón que I dejó escrita y que
+     en W no cambia: el rótulo no se apoya en el campo blanco, se apoya en el
+     vidrio, y debajo del vidrio el fondo cambia de tono cada 200px. Once
+     píxeles en caja alta y tracked es lo primero que se pierde ahí. Gana por
+     tamaño y peso: 12,5px en --d-ink-2 dan 10:1 contra el panel. */
+  :global([data-d='W']) .fm-lab {
+    font-size: var(--d-t-xs); font-weight: var(--d-w-med);
+    letter-spacing: normal; text-transform: none; color: var(--d-ink-2);
+  }
+
+  /* Los dos bloques del cuerpo NO son bandejas. En I son sub-paneles de vidrio
+     hundido; en W el vidrio vive solo en el panel, así que dejan de fingir que
+     son contenedores y lo que agrupa vuelve a ser el encabezado más el aire.
+     Se ahorran dos capas translúcidas apiladas y el panel queda como una sola
+     pieza de material, que es lo que se reconoce de lejos. El filete bajo cada
+     encabezado es de tinta, no de luz: es el mismo que W le pone al canto de
+     .d-panel-head, y a 1px sobre vidrio claro la línea blanca no se ve. */
+  :global([data-d='W']) .fm-body { gap: var(--d-p4); }
+  :global([data-d='W']) .fm-grid { gap: var(--d-p3); }
+  :global([data-d='W']) .fm-set { padding-bottom: var(--d-p1); }
+  :global([data-d='W']) .fm-leg,
+  :global([data-d='W']) .fm-cap {
+    padding-bottom: var(--d-p1);
+    border-bottom: max(var(--d-bw), 1px) solid var(--d-edge);
+  }
+
+  /* CONTROLES OPACOS. El sufijo de unidad se queda con el canto suave de
+     --d-edge, que es el mismo peso que el borde del campo al que está soldado:
+     es texto fijo, no una zona que se toque, y un anillo oscuro de un lado de
+     la costura y uno claro del otro delata que son dos piezas. Y no le toco el
+     borde por una segunda razón: esta regla pesaría igual que
+     .fm-f--bad .fm-u de la base y va después, así que le borraría el filo rojo
+     al campo con error. */
+  :global([data-d='W']) .fm-u { background: var(--d-neu-band); }
+  /* La casilla y el interruptor sí llevan anillo de tinta, porque ahí el canto
+     es lo único que dice dónde termina la zona que se toca. En --d-edge, al
+     16 %, ese anillo da 1,4:1 sobre --d-neu-band; en --d-ink-3 da 6,2:1.
+     Una escala de radio y ni un cuadrado de otra familia: el pozo a --d-r, la
+     casilla a la mitad, la píldora solo en el riel del interruptor. */
+  :global([data-d='W']) .fm-mark,
+  :global([data-d='W']) .fm-sw {
+    background: var(--d-neu-band);
+    border-color: var(--d-ink-3);
+  }
+  :global([data-d='W']) .fm-mark { border-radius: calc(var(--d-r) / 2); }
+  :global([data-d='W']) .fm-mark--rd { border-radius: var(--d-r-pill); }
+  /* CUIDADO CON LA ESPECIFICIDAD, y acá se cobraba. Las tres reglas de arriba
+     pesan (0,2,0) igual que .fm-in:checked + .fm-mark de la base, y van
+     después: sin estas dos, la casilla marcada se quedaba gris con el glifo
+     blanco encima, o sea invisible, y sin un solo error en consola. */
+  :global([data-d='W']) .fm-in:checked + .fm-mark {
+    background: var(--d-accent); border-color: var(--d-accent); color: var(--d-accent-ink);
+  }
+  :global([data-d='W']) .fm-in:checked + .fm-sw {
+    background: var(--d-accent); border-color: var(--d-accent);
+  }
+
+  /* El foco del textarea. directions.css le da a W su propio foco a .d-input y
+     .d-select (borde de acento, sin contorno) y deja el textarea con el
+     contorno global de tinta: dos focos distintos en el mismo formulario. Se
+     iguala acá, con el mismo par de tokens y sin tocar el otro archivo. La
+     especificidad sube por elemento, (0,3,1), para no pelearle a nada. */
+  :global([data-d='W']) textarea.fm-inp:focus-visible {
+    outline: 0;
+    border-color: var(--d-accent);
+    box-shadow: 0 0 0 3px var(--d-accent-soft);
+  }
+
+  /* EL ÚNICO HALO. Misma firma que la fila crítica de directions.css: banda
+     opaca, filo de 3px a la izquierda y un resplandor corto que no se derrama.
+     El filo hace el trabajo cuando alguien no distingue el rojo, y debajo
+     siguen el glifo y la frase completa, así que el estado nunca queda solo en
+     color. --d-crit sobre --d-crit-band da 7,2:1. */
+  :global([data-d='W']) .fm-f--bad {
+    background: var(--tone-band);
+    border-radius: var(--d-r);
+    padding: var(--d-p2);
+    box-shadow: inset 3px 0 0 var(--d-crit), 0 4px 18px -8px var(--d-crit);
+  }
+
+  /* Bloqueado es opaco como todo lo demás: si lo dejo en --d-sunk, el campo
+     que NO se puede tocar pasa a ser el único por el que se ven las manchas,
+     que es la señal de affordance al revés. Y se sigue leyendo: --d-ink-2
+     sobre --d-neu-band da 9,5:1. La palabra «bloqueado» va en la etiqueta, así
+     que el estado tampoco depende del relleno. */
+  :global([data-d='W']) .fm-f--off .fm-inp[disabled] {
+    background: var(--d-neu-band);
+    box-shadow: none;
+  }
+
+  /* Lo único que flota en esta página lo dibuja el navegador. Donde el select
+     se pinta en página, se pinta con el token de W para lo que flota. */
+  :global([data-d='W']) .fm-inp option {
+    background: var(--d-overlay);
+    color: var(--d-overlay-ink);
+  }
+
+  /* El pie es translúcido y el panel tiene 22px de radio: sin esto la banda
+     del pie cuadra las dos esquinas de abajo por encima del vidrio. */
+  :global([data-d='W']) .fm-foot { border-radius: 0 0 var(--d-r-lg) var(--d-r-lg); }
+
+  /* Los dos modos que W ya contempla en directions.css para .d-panel valen
+     igual para el buscador, que es el otro vidrio de la celda. El fondo no hay
+     que reponerlo: en los dos modos --d-surface ya se vuelve sólido. */
+  @media (prefers-reduced-transparency: reduce) {
+    :global([data-d='W']) .fm-seek {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+  }
+  @media (prefers-contrast: more) {
+    :global([data-d='W']) .fm-seek {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+  }
+
+  /* ── W · PANTALLA ANGOSTA, DECLARADA ─────────────────────────────────────
+     Nadie probó esto abajo de 500px, así que va escrito y no supuesto. Son dos
+     fronteras porque son dos problemas distintos:
+
+       MATERIAL, por ventana (560px, la misma de directions.css). El desenfoque
+       de fondo es lo más caro que hay en una GPU de teléfono, y con el panel
+       ocupando el ancho entero no queda campo alrededor que desenfocar: el
+       efecto se paga y no se ve. Y el filo crítico engorda, porque 3px contra
+       el marco del teléfono se pierden.
+
+       DISPOSICIÓN, por contenedor (430px, la misma frontera con la que G y R
+       apilan sus raíles). Una celda de 380px dentro de una ventana de 1400
+       tiene el mismo problema de ancho que un teléfono, y acá las ocho celdas
+       se comparan en paralelo.
+
+     QUÉ SE APILA, EN ORDEN:
+       1 · La rejilla de campos cae a una columna. Es la primera que se cae
+           porque es la única que reparte ancho: con auto-fit y 168px de
+           mínimo, «Valor» y «Fecha» todavía entran de a dos en 350px, y a ese
+           ancho un campo de fecha nativo ya no muestra el año.
+       2 · El botón Buscar baja a su propio renglón a lo ancho. Antes quedaba
+           un muñón de 70px al lado de un campo de 200.
+       3 · Las tres métricas pasan a un renglón cada una, de 44px de alto y
+           todo el ancho: tres blancos de medio renglón son tres blancos que se
+           fallan.
+       4 · El pie se vuelve columna. No se reordena nada: Cancelar arriba y el
+           primario abajo, que es donde llega el pulgar, y así el orden de
+           tabulador sigue siendo el orden visual.
+
+     QUÉ NO SE APILA: el par valor + unidad. Son UN control, y partirlo lo
+     convierte en dos campos. El valor se encoge (min-width 0 en la base) y el
+     sufijo se queda en sus 34px.
+
+     QUÉ NO SE TRUNCA: ninguna etiqueta. Envuelven, con break-word por si algún
+     idioma trae una palabra más larga que la columna. Ni un ellipsis en la
+     celda.
+
+     QUÉ SE VUELVE SCROLL HORIZONTAL: nada. No hay tabla acá y ningún bloque
+     tiene ancho mínimo propio, así que la celda nunca empuja hacia los lados.
+     Lo único que recorta en vez de envolver es el texto del select nativo
+     («BAT-014 · Batidora Imer Syntesi 250»), que lo recorta el navegador
+     dentro del campo y no ensancha nada.
+     ──────────────────────────────────────────────────────────────────────── */
+  @media (max-width: 560px) {
+    :global([data-d='W']) .fm-seek {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+    :global([data-d='W']) .fm-f--bad { box-shadow: inset 5px 0 0 var(--d-crit); }
+  }
+  @container fm (max-width: 430px) {
+    :global([data-d='W']) .fm-grid { grid-template-columns: minmax(0, 1fr); }
+    :global([data-d='W']) .fm-lab { overflow-wrap: break-word; }
+    :global([data-d='W']) .fm-seek-btn { flex: 1 1 100%; min-height: var(--d-touch); }
+    :global([data-d='W']) .fm-radios { gap: var(--d-p1); }
+    :global([data-d='W']) .fm-radios .fm-opt { flex: 1 1 100%; }
+    /* Solo disposición: ni fondo, ni tinta, ni borde. Tocar .d-btn acá con
+       (0,3,0) le arrancaría el relleno al primario y lo dejaría con tinta
+       blanca sobre blanco. */
+    :global([data-d='W']) .fm-foot { flex-direction: column; align-items: stretch; }
+    :global([data-d='W']) .fm-acts { flex-direction: column; align-items: stretch; width: 100%; }
+    :global([data-d='W']) .fm-foot .d-btn { width: 100%; min-height: var(--d-touch); }
+  }
+
+  /* ======================================================================
      RESPONSIVE — hasta 380px. Cuando la celda se estrecha, el raíl de G y la
      columna de caracteres de F se apilan: un raíl de 148px dentro de 300px
      no deja nada para el contenido.
@@ -1986,5 +2217,25 @@
     }
     :global([data-d='O']) .fm-radios .fm-opt,
     :global([data-d='O']) .fm-acts .d-btn { flex: 1 1 100%; }
+  }
+
+  /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════
+     El tamaño de un dedo es un hecho del aparato, no del ancho de la ventana.
+     directions.css sube los .d-btn de W a --d-touch dentro de
+     @media (max-width: 560px), así que una tableta de 768px —que se toca con
+     el pulgar igual que un teléfono— se quedaba con los controles de ratón.
+     Medido con puntero grueso emulado por CDP a 768px, esta página tenía
+     15 objetivos por debajo de 44px. Va por (pointer: coarse) porque ese es
+     el hecho que importa; el ancho ya tiene sus propias reglas y hacen otra
+     cosa. Con ratón no cambia un pixel. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .d-btn,
+    :global([data-d='W']) .fm-inp,
+    :global([data-d='W']) .d-input,
+    :global([data-d='W']) .d-select,
+    :global([data-d='W']) .d-textarea { min-height: var(--d-touch); }
+    /* La tarjeta de opción es el objetivo real: el radio y la casilla viven
+       en .d-sr y quien toca, toca la tarjeta. */
+    :global([data-d='W']) .fm-opt { min-height: var(--d-touch); }
   }
 </style>

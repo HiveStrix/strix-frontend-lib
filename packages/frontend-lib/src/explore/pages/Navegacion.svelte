@@ -446,7 +446,7 @@
   .pg-arrow { font-size: var(--d-t-md); line-height: 1; }
 
   /* ======================================================================
-     LOS SIETE FINALISTAS · RECORTE DE VERSALITAS
+     LAS FINALISTAS · RECORTE DE VERSALITAS
 
      Esta celda llevaba NUEVE: el subtítulo de la barra, cinco etiquetas de
      raíl (Secciones, Ruta, Agrupar por, Familias, Página) y las tres
@@ -465,7 +465,7 @@
      usa como raíl y esa columna ES su silueta entera, P las alinea a la
      derecha, y dos de ellas son el aria-labelledby de su botonera. Ocultas
      con la técnica de .d-sr siguen nombrando el grupo para quien navega con
-     lector. Y se ocultan solo en los siete, que son los que se deciden.
+     lector. Y se ocultan solo en las finalistas, que son las que se deciden.
 
      Las tres cabeceras de la lateral se quedan a la vista y dejan de ser
      versalitas: son encabezados, no epígrafes. En caja normal se leen de un
@@ -477,7 +477,8 @@
   :global([data-d='I']) .cap-mute,
   :global([data-d='M']) .cap-mute,
   :global([data-d='O']) .cap-mute,
-  :global([data-d='T']) .cap-mute {
+  :global([data-d='T']) .cap-mute,
+  :global([data-d='W']) .cap-mute {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
     overflow: hidden; clip-path: inset(50%); white-space: nowrap;
   }
@@ -489,7 +490,8 @@
   :global([data-d='I']) .bar-sub,
   :global([data-d='M']) .bar-sub,
   :global([data-d='O']) .bar-sub,
-  :global([data-d='T']) .bar-sub {
+  :global([data-d='T']) .bar-sub,
+  :global([data-d='W']) .bar-sub {
     font-size: var(--d-t-xs); font-weight: var(--d-w);
     letter-spacing: 0; text-transform: none;
     color: var(--d-ink-3);
@@ -501,7 +503,8 @@
   :global([data-d='I']) .side-cap,
   :global([data-d='M']) .side-cap,
   :global([data-d='O']) .side-cap,
-  :global([data-d='T']) .side-cap {
+  :global([data-d='T']) .side-cap,
+  :global([data-d='W']) .side-cap {
     font-size: var(--d-t-xs); font-weight: var(--d-w-semi);
     letter-spacing: 0; text-transform: none;
     color: var(--d-ink-2);
@@ -516,7 +519,8 @@
   :global([data-d='I']) .bar-mod,
   :global([data-d='M']) .bar-mod,
   :global([data-d='O']) .bar-mod,
-  :global([data-d='T']) .bar-mod {
+  :global([data-d='T']) .bar-mod,
+  :global([data-d='W']) .bar-mod {
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
 
@@ -2032,7 +2036,270 @@
   :global([data-d='T']) .chip.on .chip-n { color: var(--d-accent); opacity: .78; }
   :global([data-d='T']) .pager-n { color: var(--d-ink-3); }
 
+  /* ======================================================================
+     W · CRISTAL TEMPLADO. Vidrio donde sirve, opaco donde estorba, halo
+     solo donde urge, traído a una barra de navegación.
+
+     EL VIDRIO SE QUEDA EN LA LÁMINA. La barra, las filas y la lateral no
+     pintan fondo propio: una sola superficie de vidrio, la de .shell, y
+     todo lo demás vive dentro. Es la trampa que I anota y que acá se
+     resuelve no cayendo en ella; si cada zona trajera su propio desenfoque
+     se estaría desenfocando un campo ya desenfocado y el módulo entero se
+     volvería lechoso. Los cortes internos siguen siendo luz, que es lo que
+     ya hace --d-line en W: blanco al 70 %, no una línea oscura.
+
+     NADA FLOTA EN ESTA FAMILIA. No hay menú de cuenta, ni desplegable de
+     familia, ni globo de ayuda: el botón de cuenta es un botón y las fichas
+     son botones. La red de seguridad de directions.css pinta con
+     --d-overlay cualquier clase que se llame menu, drop, pop, overlay,
+     sheet, dialog o tip, y ninguna clase de esta página contiene esas
+     cadenas: se revisaron las sesenta y tres, una por una, y ni el
+     .pg-group ni el .pager-n ni el .crumb-row la disparan. El día que la
+     barra crezca un menú de cuenta lo agarra la red y sale sólido sin que
+     nadie se acuerde de usar el token correcto.
+
+     EL RESPLANDOR NO MARCA UBICACIÓN, Y ESA ES LA DECISIÓN DE ESTA CELDA.
+     Hay ocho piezas que pueden estar activas: una pestaña, un ítem de
+     lateral, la miga final, tres segmentos, seis fichas y cuatro páginas.
+     Si lo activo brillara, brillarían ocho cosas a la vez y ninguna
+     urgiría, que es exactamente lo que la dirección prohíbe. Lo activo se
+     resuelve con las dos herramientas que W sí tiene, densidad y filo:
+
+       UBICACIÓN  pestaña, ítem de lateral, miga final
+                  el vidrio CUAJA. La pieza pasa de translúcida a sólida y
+                  gana un filo de 2px en su canto de avance: abajo en la
+                  tira de pestañas, a la izquierda en la columna y en la
+                  miga. Densidad, que es el gesto de I, llevada al tope.
+       SELECCIÓN  ficha, segmento, página
+                  el mismo vidrio TEÑIDO de acento, con anillo entero y sin
+                  filo. Sigue siendo translúcido: no cuajó.
+
+     Ninguna de las ocho se levanta. Lo único que se despega de la lámina en
+     W son los controles opacos que ya trae directions.css, y una pestaña
+     activa que además flotara sería una novena capa en una pantalla que
+     tiene tres.
+
+     EL HALO. La ruta termina en un equipo vencido, así que el estado es de
+     la fila entera y no solo de la última miga: la fila de migas lleva el
+     filo del tono, la misma pieza de 3px que la dirección le pone a una
+     fila crítica, y no lleva el resplandor que la acompaña ahí. Un filo
+     recorre un canto; un resplandor a lo largo de 900px de fila se derrama
+     sobre las vecinas y deja de señalar. El halo de esta celda vive en las
+     dos píldoras de tono crítico, que es donde directions.css lo puso y
+     donde se puede leer la palabra al lado de la luz: la barra dice
+     8 vencidos y la ruta dice Vencido. Dos luces, un solo mensaje.
+     ====================================================================== */
+  /* La lámina, entera y quieta, con la sombra larga de la escala. Sin ella
+     el vidrio no tiene de qué despegarse y el desenfoque no se lee. */
+  :global([data-d='W']) .shell { box-shadow: var(--d-shadow-lg); }
+  /* Bloqueo de forma: 12px en todo lo que se toca, 22 en la lámina. El
+     avatar venía en 999 y era la única corrida de esa escala fuera de
+     .d-pill, que es semántica y se repite igual en las veinte. */
+  :global([data-d='W']) .ava { border-radius: var(--d-r); }
+
+  /* UBICACIÓN. De translúcido a sólido, sin levantarse.
+     FALTA UN TOKEN: W tiene --d-surface (vidrio) y --d-overlay (lo que
+     flota, y por eso es sólido), y no tiene un vidrio cuajado para una
+     pieza que se queda pegada a la lámina. Se toma prestado --d-overlay,
+     que es el único blanco opaco de la dirección, y queda anotado: haría
+     falta un --d-surface-solid para no cargarle a --d-overlay un segundo
+     significado. */
+  :global([data-d='W']) .tab.on,
+  :global([data-d='W']) .side-item.on,
+  :global([data-d='W']) .crumb-now { background: var(--d-overlay); }
+  /* El filo va inset, no fuera: así sobrevive al recorte del carril de
+     pestañas cuando abajo de 470px se vuelve deslizable. */
+  :global([data-d='W']) .tab.on { box-shadow: inset 0 -2px 0 var(--d-accent); }
+  :global([data-d='W']) .side-item.on { box-shadow: inset 2px 0 0 var(--d-accent); }
+  /* La miga final es la única pieza de la celda con tono propio, así que su
+     filo es el del estado y no el del acento: el mismo gesto, el color que
+     le toca. #931C14 sobre blanco da 8,7:1. */
+  :global([data-d='W']) .crumb-now {
+    padding-inline: var(--d-p2);
+    color: var(--tone-fg);
+    box-shadow: inset 2px 0 0 var(--tone-fg);
+  }
+
+  /* SELECCIÓN. Vidrio teñido y anillo entero. Contra la pieza cuajada de
+     ubicación el salto es de material antes que de color: una es sólida y
+     tiene un canto grueso, la otra deja pasar el fondo y está rodeada. El
+     anillo va en acento pleno y no en --d-accent-edge, que al 32 % no
+     llegaba a ser una señal: el estado no puede depender del tinte solo. */
+  :global([data-d='W']) .chip.on,
+  :global([data-d='W']) .seg-b.on,
+  :global([data-d='W']) .pg.on {
+    background: var(--d-accent-soft);
+    color: var(--d-accent);
+    border-color: var(--d-accent);
+    font-weight: var(--d-w-semi);
+  }
+  :global([data-d='W']) .pager-n { color: var(--d-ink-2); }
+
+  /* El estado de la ruta, al canto de la fila. */
+  :global([data-d='W']) .row--crumbs { box-shadow: inset 3px 0 0 var(--tone-fg); }
+
+  /* La moción dura lo que dura la de un botón de W en directions.css, y con
+     la misma curva. Es el tiempo del cuajado: sin él, cambiar de pestaña es
+     un salto de blanco. El apagado NO se hereda del bloque de reducción de
+     moción que cierra este archivo, que pesa (0,2,0) contra los (0,3,0) de
+     acá, así que se repone abajo con el mismo peso. */
+  :global([data-d='W']) .tab,
+  :global([data-d='W']) .side-item,
+  :global([data-d='W']) .chip,
+  :global([data-d='W']) .seg-b,
+  :global([data-d='W']) .pg {
+    transition:
+      background 120ms var(--d-ease, cubic-bezier(.2, .8, .2, 1)),
+      box-shadow 120ms ease,
+      color 120ms ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='W']) .tab,
+    :global([data-d='W']) .side-item,
+    :global([data-d='W']) .chip,
+    :global([data-d='W']) .seg-b,
+    :global([data-d='W']) .pg { transition: none; }
+  }
+
+  /* ======================================================================
+     W ANGOSTO. El hueco que nadie probó, porque el navegador sin cabeza de
+     macOS no baja de 500px de ancho.
+
+     La cuenta a 380px de ventana: la rejilla deja una sola celda, la celda
+     descuenta 24px de margen a cada lado, 1px de marco y 20px de aire, y la
+     lámina descuenta 1px de canto y 17px de aire. Al contenido de la barra
+     le quedan 254px. Adentro tienen que entrar el nombre del módulo, la
+     píldora de vencidos, el buscador, Nuevo equipo y la cuenta. La píldora
+     ronda los 99px y el botón los 122: no entran ni esos dos con el nombre
+     al lado. Así que la retirada está escrita, por pasos y por prioridad.
+     ====================================================================== */
+
+  @container navmod (max-width: 469px) {
+    /* Primero se va la cuenta. El nombre ya se había ido a los 780px y lo
+       que quedaba era un disco con dos iniciales: quien está sentado ahí
+       sabe quién es. Se va del todo, no se esconde, así que tampoco queda
+       en el árbol de accesibilidad prometiendo algo que no está. */
+    :global([data-d='W']) .user { display: none; }
+
+    /* Después, la tira de pestañas deja de envolver y pasa a deslizarse.
+       Cinco pestañas repartidas en tres renglones dejan de ser una tira:
+       una tira es de una línea, esa es toda su silueta, y tres renglones de
+       pestañas son un menú mal dibujado. Deslizándose conserva la forma y
+       no esconde nada, porque la activa arranca a la vista y el navegador
+       trae a la vista la que recibe el foco. Los 5px de aire son para que
+       el anillo de foco no se coma el recorte, y se descuentan con el
+       margen para no mover la fila. */
+    :global([data-d='W']) .tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+      padding-block: 5px;
+      margin-block: -5px;
+    }
+    :global([data-d='W']) .tab { scroll-snap-align: start; }
+  }
+
+  /* Las fichas de familia NO se deslizan, y las páginas tampoco. Una tira de
+     pestañas es una dimensión con orden, primera, segunda, tercera, y por
+     eso se recorre. Seis familias son un conjunto sin orden, y esconder la
+     mitad de un conjunto detrás de un gesto es esconder la mitad de las
+     opciones. Envuelven, que es lo que un conjunto hace. */
+
+  /* EL UMBRAL ESTABA 340px DEMASIADO ABAJO, Y MEDIDO SE VE.
+
+     La línea única se rendía a los 379px de contenedor. Pero la cuenta de
+     arriba solo vale a 380px de ventana; el ancho al que la línea deja de
+     entrar de verdad es otro. Medido con el viewport fijado por CDP y la
+     rejilla de comparación forzada a una columna, el nombre del módulo
+     —178px— recibe esto:
+
+       contenedor 332px (rejilla)   116/178  65 %
+       contenedor 432px (línea)      58/178  33 %   ← peor que a 380px
+       contenedor 512px (línea)      72/178  40 %
+       contenedor 652px (línea)     158/178  89 %
+       contenedor 720px (línea)     178/178 100 %
+
+     Entre 380 y 719 la barra volvía a una sola línea que NO entra, y como
+     .bar-id es el único hijo con flex-shrink, absorbía el faltante entero:
+     a 480px de ventana la barra decía «Mante…» y el buscador quedaba como
+     una caja vacía de 36px sin sitio ni para el texto de ayuda. La píldora
+     de estado y «Nuevo equipo» conservaban su ancho completo, así que lo
+     primero que se sacrificaba era el nombre de la pantalla.
+
+     El umbral pasa a 719px, que es donde la línea única entra medida y no
+     calculada. Y la cuenta se va con ella: la escalera de retirada ya decía
+     que es lo primero que sobra, y en dos renglones no tiene celda propia
+     —sin esto, la rejilla se la inventaba en un tercer renglón. */
+  @container navmod (max-width: 719px) {
+    /* Acá se rinde la línea única, y se rinde de una manera escrita. La
+       barra pasa a dos renglones exactos, puestos con rejilla y no dejados
+       a que envuelvan solos: identidad y estado arriba, buscador y acción
+       abajo. Envolviendo por su cuenta se partía en tres y se comía 120px
+       de alto, que es la razón por la que la línea única existe. Puesta a
+       mano cuesta 90 y no se mueve más. El orden de tabulador no cambia:
+       la rejilla coloca, el marcado sigue mandando en el foco. */
+    :global([data-d='W']) .bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--d-p1) var(--d-p2);
+    }
+    :global([data-d='W']) .bar-id { grid-area: 1 / 1; }
+    :global([data-d='W']) .bar-flag { grid-area: 1 / 2; justify-self: end; }
+    :global([data-d='W']) .bar-find { grid-area: 2 / 1; }
+    :global([data-d='W']) .bar-do { grid-area: 2 / 2; }
+    :global([data-d='W']) .user { display: none; }
+  }
+
+  /* Abajo de 400px la lateral se apila encima del contenido, que es lo que
+     ya hace la base. Se queda apilada y vertical: una lista de navegación
+     es vertical, y la alternativa de un cajón que se abre por encima es
+     justo la capa flotante que esta familia no tiene. El costo está
+     aceptado y es real: ocho ítems de 44px por delante de las migas. */
+
+  /* A 560px de ventana la dirección apaga el desenfoque y sube la lámina a
+     blanco al 92 %: el vidrio deja de cuajar porque casi no queda vidrio, y
+     el filo se queda solo. Entonces engorda, por el mismo motivo por el que
+     engorda el filo crítico en directions.css, y con los mismos números. */
+  @media (max-width: 560px) {
+    :global([data-d='W']) .tab.on { box-shadow: inset 0 -3px 0 var(--d-accent); }
+    :global([data-d='W']) .side-item.on { box-shadow: inset 3px 0 0 var(--d-accent); }
+    :global([data-d='W']) .crumb-now { box-shadow: inset 3px 0 0 var(--tone-fg); }
+    :global([data-d='W']) .row--crumbs { box-shadow: inset 5px 0 0 var(--tone-fg); }
+  }
+
+  /* Objetivos táctiles. El tamaño de un dedo no depende del ancho de la
+     celda sino del aparato, así que esto va por tipo de puntero y no por
+     contenedor. directions.css ya sube los .d-btn de W a --d-touch; lo que
+     falta son las tres piezas que esta página escribe a mano y que se
+     quedaban en 36px. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .crumb-b,
+    :global([data-d='W']) .find,
+    :global([data-d='W']) .user { min-height: var(--d-touch); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .tab, .side-item, .chip, .seg-b, .pg { transition: none; }
+  }
+
+  /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════
+     El tamaño de un dedo es un hecho del aparato, no del ancho de la ventana.
+     directions.css sube los .d-btn de W a --d-touch dentro de
+     @media (max-width: 560px), así que una tableta de 768px —que se toca con
+     el pulgar igual que un teléfono— se quedaba con los controles de ratón.
+     Medido con puntero grueso emulado por CDP a 768px, esta página tenía
+     16 objetivos por debajo de 44px. Va por (pointer: coarse) porque ese es
+     el hecho que importa; el ancho ya tiene sus propias reglas y hacen otra
+     cosa. Con ratón no cambia un pixel. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .d-btn,
+    :global([data-d='W']) .d-input { min-height: var(--d-touch); }
+    /* Segmentos, fichas de familia y paginación son .d-btn--sm: 27px de alto
+       con ratón está bien, con pulgar no. Los números de página además caían
+       en 32px de ancho. */
+    :global([data-d='W']) .pg { min-width: var(--d-touch); }
   }
 </style>

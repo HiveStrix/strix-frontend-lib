@@ -2088,6 +2088,225 @@
     box-shadow: var(--d-shadow);
   }
 
+  /* ── W · CRISTAL TEMPLADO — vidrio en el panel, instrumento opaco encima ─
+     W es Cristal corregido, y las tres correcciones se traducen a esta familia
+     sin inventar nada nuevo: lo que flota va sólido, lo que mide va plano, y el
+     halo se lo gana lo vencido.
+
+     LA DECISIÓN QUE ORDENA TODA LA CELDA: dos materiales, uno por trabajo.
+     El vidrio es la superficie que se queda QUIETA, o sea el panel y la barra
+     de vista. Todo lo que MIDE o se TOCA (los cuatro carriles, la lámina del
+     minigráfico y las catorce teclas del calendario) se apoya sobre la misma
+     placa opaca.
+
+     Por qué la placa no es negociable: --d-sunk de W es blanco al 34 %, y sobre
+     un panel que ya es blanco al 60 % compone MÁS claro que el propio panel. La
+     pista de una barra quedaba más clara que su contenedor y con el campo de
+     color del fondo pasando a través en manchas: no había fondo contra el cual
+     leer un relleno, y sin fondo la barra no dice cuánto falta. I administró ese
+     problema bajando sus catorce vidrios al 22 %; acá se saca de raíz. La pista
+     opaca no es una preferencia, es lo que hace legible el dato.
+
+     HALLAZGO: el contrato no tiene token de desenfoque. directions.css escribe
+     blur(20px) a mano en el panel de W; acá se repite como --dv-blur para que la
+     barra de vista use exactamente el mismo vidrio y no uno parecido. El día que
+     exista --d-blur, estas dos líneas se borran solas.
+     HALLAZGO: tampoco hay token de halo por tono. Se arma con color-mix sobre
+     --d-crit, que en esta dirección es el único tono con derecho a irradiar. */
+  :global([data-d='W']) .dv {
+    --dv-blur: 20px; --dv-h: 12px; --dv-dot: 15px;
+    /* La placa y su filo salen de la escala neutra del contrato, no de un
+       blanco escrito a mano. Son los únicos dos valores que W agrega. */
+    --dv-plate: var(--d-neu-band);
+    --dv-hair: var(--d-neu-edge);
+  }
+
+  /* La barra de vista es panel: se queda quieta y no tapa nada, así que lleva
+     el mismo vidrio y el mismo doble bisel que .d-panel. Sus controles siguen
+     siendo opacos porque de eso se encarga directions.css, y esa es justo la
+     tesis de la dirección demostrada en 40px de alto: el fondo es vidrio, lo
+     que se toca es sólido. */
+  :global([data-d='W']) .dv-bar {
+    position: relative;
+    border-radius: var(--d-r-lg);
+    backdrop-filter: blur(var(--dv-blur)) saturate(1.5);
+    -webkit-backdrop-filter: blur(var(--dv-blur)) saturate(1.5);
+  }
+  :global([data-d='W']) .dv-bar::after {
+    content: ''; position: absolute; inset: 1px;
+    border-radius: calc(var(--d-r-lg) - 1px);
+    /* El filo interior es luz, no línea: por eso sale de --d-ink-on y no de
+       --d-line, que en alto contraste se da vuelta a tinta y convertiría el
+       bisel de la barra en un anillo oscuro mientras el del panel sigue claro. */
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--d-ink-on) 45%, transparent);
+    pointer-events: none;
+  }
+
+  /* Los cuatro carriles: una sola forma y un solo material. Pastilla en los
+     cuatro, placa opaca en los cuatro. Antes el surco del medidor era el único
+     rectángulo entre tres pastillas. */
+  :global([data-d='W']) .pb-track, :global([data-d='W']) .ck-trklane,
+  :global([data-d='W']) .tl-track, :global([data-d='W']) .ds-bar {
+    background: var(--dv-plate);
+    border-radius: var(--d-r-pill);
+  }
+  :global([data-d='W']) .pb-fill, :global([data-d='W']) .ck-fill,
+  :global([data-d='W']) .tl-elapsed { border-radius: var(--d-r-pill); }
+
+  /* EL UMBRAL, que es la lectura que más se paga si falla. A 118 % la marca del
+     100 % cae DENTRO del relleno rojo oscuro, y la línea de tinta al 50 % que
+     trae la base ahí da 2.1:1. A 72 % cae sobre la placa clara, donde una línea
+     blanca daría 1.2:1. Ninguna tinta sola sirve para los dos casos: núcleo
+     blanco con contrafilo de tinta sirve para ambos, y ni --d-ink-on ni --d-ink
+     se dan vuelta en alto contraste, así que la regla vale sin excepciones. */
+  :global([data-d='W']) .pb-thr, :global([data-d='W']) .ck-fin {
+    background: var(--d-ink-on); opacity: 1;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--d-ink) 55%, transparent);
+  }
+  /* El aviso de 85 % es aviso: se lee si lo buscás y no compite con el umbral. */
+  :global([data-d='W']) .pb-thr--soft {
+    background: var(--d-ink-on); opacity: .55; box-shadow: none;
+  }
+
+  /* EL ÚNICO HALO DE LA CELDA, y la frase que lo justifica: irradia el carril
+     cuyo relleno PASÓ el umbral, o sea lo vencido. Son dos en toda la celda, la
+     barra de 118 % y el reloj de calendario de 104 %, y ninguna otra pieza
+     brilla: ni las filas de la línea de tiempo, ni los días del calendario, ni
+     los tramos de la flota. Si todo brilla, nada urge. El resplandor va sobre
+     .pb-track y no sobre el relleno porque el surco recorta a sus hijos y no a
+     su propia sombra, así que las zonas siguen clipeadas contra la pastilla.
+     El estado nunca depende de este brillo: la píldora lleva la forma de la
+     marca, el texto dice «Vencido» y la cifra dice 118 %. */
+  :global([data-d='W']) .pb[data-tone='critical'] .pb-track,
+  :global([data-d='W']) .ck-lane[data-tone='critical'] .ck-trklane {
+    box-shadow: 0 4px 18px -6px color-mix(in srgb, var(--d-crit) 60%, transparent);
+  }
+
+  /* Las filas de la línea de tiempo se quedan PLANAS, incluidas las dos
+     vencidas: seis objetos flotantes son engorrosos de leer y la regla 2 de
+     esta dirección existe justamente para eso. Lo que sí tienen es el filo de
+     3px del contrato, que es el mismo device con el que W marca una .d-row
+     crítica y el que sigue funcionando cuando alguien no distingue el rojo. */
+  :global([data-d='W']) .tl-row[data-tone='critical'] { position: relative; }
+  /* El filo va en el canal de padding del panel y NO como padding de la fila:
+     un padding-left de 8px en dos de seis filas corre sus pistas 8px contra el
+     eje de días, y entonces el punto de «hoy» de esas dos deja de caer sobre la
+     marca de hoy. La franja informa; mover el dato no es una opción. */
+  :global([data-d='W']) .tl-row[data-tone='critical']::before {
+    content: ''; position: absolute; top: 0; bottom: 0;
+    left: calc(-1 * var(--d-p2)); width: 3px;
+    background: var(--d-crit);
+  }
+  /* Sin dato de vencimiento, el rayado tenía que dejar de ser --d-neu-band:
+     sobre la placa opaca, que ES --d-neu-band, desaparecía entero. */
+  :global([data-d='W']) .tl-hatch {
+    background: repeating-linear-gradient(45deg, var(--dv-hair) 0 var(--d-p1), transparent var(--d-p1) var(--d-p2));
+  }
+  /* --d-overlay es el único blanco sólido que W declara, y su regla es «lo que
+     tiene que separarse de lo de abajo se pinta sólido». Eso es exactamente lo
+     que hacen la chapa del vencimiento y el rótulo que se sale del eje: sobre
+     la placa opaca, un knockout translúcido deja pasar la pista y se lee como
+     una mancha. */
+  :global([data-d='W']) .tl-dot { background: var(--d-overlay); }
+  :global([data-d='W']) .tl-off { background: var(--dv-plate); }
+
+  /* El minigráfico es la quinta cosa que mide, así que va sobre la misma placa.
+     El relleno de área se retiñe contra la placa: --d-info-band sobre
+     --d-neu-band da 1.06:1 y el volumen de horas desaparecía. */
+  :global([data-d='W']) .sp-svg {
+    background: var(--dv-plate); border-radius: var(--d-r);
+  }
+  :global([data-d='W']) .sp-area { fill: color-mix(in srgb, var(--tone-fg) 13%, var(--dv-plate)); }
+  :global([data-d='W']) .sp-base { stroke: var(--dv-hair); }
+
+  /* LAS CATORCE TECLAS. Acá es donde W se separa de I de la forma más visible:
+     en I la tira son catorce vidrios sobre vidrio y hay que bajarlos al 22 %
+     para que el campo no se lave; en W un control es opaco y punto, así que la
+     tira es una botonera maciza apoyada sobre el panel. Se toca lo que no deja
+     pasar el fondo, y los tres días con trabajo son lo único con color.
+     La tecla NO lleva box-shadow propio: el anillo de hoy vive ahí y una regla
+     prefijada con [data-d] se lo comería sin avisar. */
+  :global([data-d='W']) .cal-day {
+    background: var(--dv-plate);
+    border-color: var(--dv-hair);
+  }
+  :global([data-d='W']) .cal-day[data-tone] {
+    background: var(--tone-band);
+    border-color: var(--tone-edge);
+  }
+  /* El :not() no es adorno: sin él esta regla y la base .cal-day--wknd[data-tone]
+     pesan lo mismo, gana la última, y el sábado 15 con el vencimiento de GEN-02
+     perdía su tono. */
+  :global([data-d='W']) .cal-day--wknd:not([data-tone]) {
+    background: color-mix(in srgb, var(--d-ink) 8%, var(--dv-plate));
+  }
+  /* Al pasar por encima, la tecla se blanquea: es el mismo gesto que
+     directions.css le da a .d-btn en esta dirección, no uno nuevo. */
+  :global([data-d='W']) .cal-day:not([data-tone]):hover {
+    filter: none; background: var(--d-overlay);
+  }
+
+  /* ── W · pantalla angosta ──────────────────────────────────────────────
+     Nadie probó esta página abajo de 500px. Lo que W declara, explícito:
+
+     1 · QUÉ SE APILA. Nada nuevo. Los dos cortes de la página ya apilan la
+         línea de tiempo y desarman la fila del detalle del día, y W los hereda
+         sin tocarlos: apilar dos veces la misma pieza es cómo se rompen estas
+         cosas.
+     2 · QUÉ COLUMNA SE CAE PRIMERO. El raíl de etiquetas (--dv-lab), que baja
+         a 88px a 430px y desaparece a 330px. Es la columna correcta porque su
+         contenido se repite completo en la línea de plazo de abajo. La segunda
+         en caerse es la hora de corte, que deja de estar anclada a la derecha:
+         un «Corte 6 ago · 09:12» solo y alineado a la derecha debajo de tres
+         controles alineados a la izquierda se lee como un resto, no como un
+         dato.
+     3 · QUÉ SE VUELVE SCROLL HORIZONTAL CONTENIDO. La tira de catorce días.
+         El corte de 430px la parte en dos filas de siete; abajo de 330px esas
+         siete columnas miden 28px y toda tecla queda por debajo del piso
+         táctil. Entonces la tira pasa a ser un riel de catorce teclas de
+         --d-touch de ancho que se desplaza DENTRO del panel, con
+         overscroll-behavior para que el gesto no arrastre la página. El
+         padding no es cosmético: el scrollport recorta, y sin esos píxeles el
+         anillo de foco de una tecla se cortaría contra el borde. */
+  @container (max-width: 330px) {
+    :global([data-d='W']) .dv-note { margin-left: 0; flex-basis: 100%; }
+    :global([data-d='W']) .cal-strip {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: var(--d-touch);
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-padding-inline: 4px;
+      padding: 4px 0 6px;
+    }
+  }
+
+  /* El desenfoque de fondo es lo más caro que hay en una GPU móvil, y a esa
+     medida el panel ocupa la pantalla entera: no queda campo alrededor que
+     desenfocar, así que el efecto se paga y no se ve. directions.css ya lo
+     apaga en .d-panel; la barra de vista es vidrio dibujado por esta página,
+     así que le toca a esta página apagarlo en el mismo umbral y no en otro.
+     Sin desenfoque, blanco al 60 % es una gasa: la barra pasa a --d-overlay,
+     que es el sólido que la dirección ya declara. */
+  @media (max-width: 560px) {
+    :global([data-d='W']) .dv-bar {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      background: var(--d-overlay);
+    }
+    :global([data-d='W']) .dv-bar::after { display: none; }
+  }
+
+  /* Quien pide menos transparencia suele pedirla porque el texto sobre fondos
+     vivos le cuesta. Misma lógica que el bloque de W en directions.css, para la
+     única superficie de vidrio que esta página agrega. */
+  @media (prefers-reduced-transparency: reduce) {
+    :global([data-d='W']) .dv-bar {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      background: var(--d-overlay);
+    }
+    :global([data-d='W']) .dv-bar::after { display: none; }
+  }
+
   /* ══════════════════════════════════════════════════════════════════════
      ESTRECHO — manda el ancho de la CELDA, no el de la ventana. Por eso
      container queries: dos celdas de 400px en un monitor de 1600 también
@@ -2139,5 +2358,21 @@
     :global([data-d='P']) .pb-head { grid-row: auto; }
     :global([data-d='P']) .pb-track, :global([data-d='P']) .pb-foot { grid-column: 1; grid-row: auto; }
     :global([data-d='P']) .ck-lane-lab { text-align: left; }
+  }
+
+  /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════
+     El tamaño de un dedo es un hecho del aparato, no del ancho de la ventana.
+     directions.css sube los .d-btn de W a --d-touch dentro de
+     @media (max-width: 560px), así que una tableta de 768px —que se toca con
+     el pulgar igual que un teléfono— se quedaba con los controles de ratón.
+     Medido con puntero grueso emulado por CDP a 768px, esta página tenía
+     2 objetivos por debajo de 44px. Va por (pointer: coarse) porque ese es
+     el hecho que importa; el ancho ya tiene sus propias reglas y hacen otra
+     cosa. Con ratón no cambia un pixel. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .d-btn,
+    :global([data-d='W']) .dv-sel,
+    :global([data-d='W']) .d-select { min-height: var(--d-touch); }
+    :global([data-d='W']) .cal-day { min-height: var(--d-touch); min-width: var(--d-touch); }
   }
 </style>

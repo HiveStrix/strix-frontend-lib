@@ -1418,6 +1418,127 @@
   }
   :global([data-d='T']) .empty { padding-block: var(--d-p3); }
 
+  /* ── W · CRISTAL TEMPLADO — el vidrio se queda en el panel ─────────────────
+     W es Cristal corregido, y una tabla es donde la corrección se ve.
+
+     Cristal disuelve el panel de la lista y convierte cada ítem en una lámina de
+     vidrio con su propio desenfoque. W hace exactamente lo contrario: el panel
+     es la única pieza que desenfoca, porque es la única que se queda quieta, y
+     todo lo que vive adentro es plano. Filas y renglones son bandas opacas sin
+     anillo, sin margen y sin resplandor.
+
+     Y el halo, que en Cristal halo era el tratamiento de estado por defecto,
+     queda en UNA cosa y es la más chica de la pantalla: la píldora de la fila
+     vencida. Esa decisión resuelve dos reglas a la vez. En una fila plana el
+     resplandor no se vería igual: las filas se tocan, la de abajo se pinta
+     después y le tapa el halo a la de arriba. En la píldora hay aire alrededor,
+     el halo se ve, y el que salta es el dato exacto que urge en vez de un
+     rectángulo de 620px. Es además el valor que W ya declara para .d-pill en
+     directions.css, sólo que apuntado al marcado que esta página sí produce.
+
+     La regla 1 no tiene dónde aplicarse acá: en esta página nada flota. Ni
+     menús, ni globos, ni diálogos. */
+
+  /* El panel desenfoca, así que el panel recorta: sin esto el pie cuadrado y la
+     última fila se salen de los 22px del canto y el vidrio deja de ser una
+     pieza. Los tres paneles quedan a la MISMA altura de sombra a propósito: son
+     tres especímenes de lo mismo y levantar uno diría algo que no es cierto. */
+  :global([data-d='W']) .tablepanel,
+  :global([data-d='W']) .clistpanel,
+  :global([data-d='W']) .emptypanel { overflow: hidden; }
+
+  /* LA ESCALERA DE DENSIDAD. Es la que Cristal tenía rota y W hereda: cabecera y
+     fila bajo el cursor pintaban las dos --d-sunk y eran indistinguibles. Tres
+     escalones honestos, los tres de vidrio: cabecera --d-surface, que es el
+     vidrio más espeso porque es lo que no se mueve; cursor encima --d-sunk;
+     fila en reposo transparente, que deja ver el campo. */
+  :global([data-d='W']) .tbl thead th {
+    background: var(--d-surface);
+    border-bottom: 1px solid var(--d-edge);
+    box-shadow: inset 0 1px 0 var(--d-line);   /* el filo especular, no una línea */
+  }
+  /* Las hairlines de la base son --d-line, que en W es blanco al 70 %. Blanco
+     sobre vidrio blanco no separa nada, y con seis filas eso es la diferencia
+     entre una tabla y una mancha. */
+  :global([data-d='W']) .tbl tbody td { border-bottom-color: var(--d-edge); }
+  /* La columna ordenada no cambia de espesor, que rompería la escalera: enciende
+     un canto de acento y se lleva la etiqueta al mismo color. El acento sobre el
+     vidrio de la cabecera da 6.9:1. */
+  :global([data-d='W']) .tbl thead th[aria-sort]:not([aria-sort='none']) {
+    box-shadow: inset 0 1px 0 var(--d-line), inset 0 -2px 0 var(--d-accent);
+  }
+  :global([data-d='W']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-accent); }
+
+  /* La banda de la fila vencida es OPACA, que es la razón por la que W declara
+     sus tonos en hex lleno y no en rgba. Y no se le va al pasar el cursor: en la
+     base ganaba el hover y la fila más urgente perdía su banda justo cuando
+     alguien la estaba apuntando. El estado es dato; el cursor es un accidente. */
+  :global([data-d='W']) .tbl tbody tr.alert:hover td,
+  :global([data-d='W']) .tbl tbody tr.alert.is-hover td { background: var(--tone-band); }
+
+  /* El estado entra por la izquierda y la selección por la derecha. La fila 1
+     está vencida Y marcada, que es el caso normal porque uno marca justamente lo
+     que va a atender: así muestra las dos cosas y ninguna tapa a la otra. Las
+     otras tres señales de selección siguen donde estaban, en la casilla, en el
+     peso del código y en el conteo del pie. */
+  :global([data-d='W']) .tbl tbody tr.on td.c-sel { box-shadow: none; }
+  :global([data-d='W']) .tbl tbody tr.on td.c-act { box-shadow: inset -3px 0 0 var(--d-accent); }
+  :global([data-d='W']) .tbl tbody tr.alert.on td { background: var(--tone-band); }
+  :global([data-d='W']) .tbl tbody tr.alert td.c-sel,
+  :global([data-d='W']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-crit); }
+
+  /* EL ÚNICO HALO DE LA PÁGINA, en tabla y en lista. Dos píldoras encendidas
+     entre diez es una pantalla que dice algo; diez encendidas no dicen nada. */
+  :global([data-d='W']) .tbl tbody tr.alert .d-pill,
+  :global([data-d='W']) ul.clist > li.citem.alert .d-pill { box-shadow: 0 0 12px -5px var(--d-crit); }
+
+  /* La casilla es un CONTROL, y en W los controles son opacos.
+     HALLAZGO: el único token sólido que W declara es --d-overlay, y está
+     reservado para lo que flota. Falta un token de superficie opaca que NO
+     flota; directions.css lo esquiva escribiendo #FFFFFF a mano en .d-input.
+     Acá se usa --d-overlay antes que un hex y queda anotado.
+     El anillo va en --d-ink-3 y no en --d-edge: --d-edge es rgba(14,23,32,.16),
+     que sobre vidrio claro da 1.5:1, y una casilla vacía a 1.5:1 no se ve. */
+  :global([data-d='W']) .pick {
+    background: var(--d-overlay);
+    border-color: var(--d-ink-3);
+  }
+  /* Y hay que reponer el relleno de marcado. Esta regla y `.pick:checked` pesan
+     lo mismo una vez que Svelte les cuelga la clase de ámbito, así que gana la
+     última, que es la de la dirección. Sin esto la marca blanca cae sobre blanco
+     y la casilla marcada se ve igual que la vacía. Misma trampa que ya hubo que
+     reponer en I, K, L y T. */
+  :global([data-d='W']) .pick:checked,
+  :global([data-d='W']) .pick:indeterminate {
+    background: var(--d-accent);
+    border-color: var(--d-accent);
+  }
+
+  /* LA CORRECCIÓN QUE MÁS SE VE. En Cristal el panel de la lista se apaga y cada
+     ítem pasa a ser una lámina de vidrio con su propio backdrop-filter: seis
+     desenfoques apilados para seis renglones de texto. En W el vidrio se queda
+     donde estaba, en el panel, y los seis renglones son renglones: banda opaca
+     donde hay estado, una hairline entre medio y nada más. Seis láminas son seis
+     objetos; seis renglones son una lista. */
+  :global([data-d='W']) ul.clist > li.citem { border-bottom: 1px solid var(--d-edge); }
+  :global([data-d='W']) ul.clist > li.citem:last-child { border-bottom: 0; }
+  :global([data-d='W']) ul.clist > li.citem.alert {
+    background: var(--tone-band);
+    box-shadow: inset 3px 0 0 var(--d-crit);
+  }
+  :global([data-d='W']) ul.clist > li.citem.on {
+    background: var(--d-accent-soft);
+    box-shadow: inset -3px 0 0 var(--d-accent);
+  }
+  :global([data-d='W']) ul.clist > li.citem.alert.on {
+    background: var(--tone-band);
+    box-shadow: inset 3px 0 0 var(--d-crit), inset -3px 0 0 var(--d-accent);
+  }
+  :global([data-d='W']) .empty { padding-block: var(--d-p3); }
+  /* NO se toca .d-btn en W. directions.css ya repara ahí el primario, y una
+     regla de página sobre .d-btn pesaría más que esa reparación y devolvería el
+     botón blanco con tinta blanca. El primario de W da 8.0:1 tal como está. */
+
   /* ==========================================================================
      RESPONSIVE — la celda manda, no la ventana. Familia, ubicación y lectura se
      pliegan bajo el nombre del equipo; la lista compacta es la salida real.
@@ -1543,5 +1664,141 @@
     font-family: var(--d-mono);
     font-size: .94em;
     letter-spacing: -.015em;
+  }
+
+  /* ==========================================================================
+     W · CRISTAL TEMPLADO · piso de artesanía y pantalla angosta.
+
+     Separado del bloque de arriba por la misma razón que en directions.css, que
+     también parte a W en dos: el material es una cosa y las condiciones en las
+     que se usa son otra. Ninguna de estas reglas cambia la dirección. La
+     sostienen cuando el aparato, la preferencia o el ancho la aprietan.
+     ========================================================================== */
+
+  /* CIFRAS EN MONOESPACIADA TABULAR. La lectura, el conteo y sobre todo el
+     retraso son la columna que se compara de un vistazo, y comparar dígitos pide
+     que los dígitos se alineen. «hace 12 d» es el dato que decide si el técnico
+     va hoy o el lunes. Va en W por la misma razón que ya va en Cristal. */
+  :global([data-d='W']) .figs {
+    font-family: var(--d-mono);
+    font-size: .94em;
+    letter-spacing: -.015em;
+  }
+
+  /* Nombres largos de verdad. «Compactadora Wacker DPU-6555» en una columna de
+     130px necesita permiso para partirse; sin él empuja la tabla entera y el
+     scroll horizontal se va varios cientos de píxeles más lejos. */
+  :global([data-d='W']) .nm,
+  :global([data-d='W']) .cinm { overflow-wrap: break-word; }
+
+  /* QUÉ HACE W A 380px, DECLARADO.
+
+     La tabla NO se vuelve tarjetas. El espécimen 2 de esta misma página ya es la
+     respuesta en tarjetas, y convertir la tabla en lo mismo dejaría dos
+     especímenes idénticos y borraría justo la comparación que la página existe
+     para hacer. La tabla sigue siendo una tabla y el ancho que le sobra se paga
+     con SCROLL HORIZONTAL CONTENIDO dentro de .tblwrap, que ya trae
+     overscroll-behavior-x: contain, así que el gesto no se escapa a la página.
+     El panel recorta, .spec y .stack llevan min-width: 0, y el documento nunca
+     desborda: lo que se mueve es la tabla, no la pantalla.
+
+     El orden en que se caen las columnas:
+       1º · celda ≤720px. Familia, ubicación y lectura. Son contexto, no
+            identidad, y bajan enteras a .sub debajo del nombre, donde ya estaban
+            escritas. Eso lo hace la base y W no lo cambia.
+       2º · celda ≤420px. El retraso se despega de la píldora y baja a su propio
+            renglón: la de estado es la única celda con dos datos y la que más
+            ancho pide de las que quedan.
+       3º · celda ≤420px. El aire lateral de las celdas baja de 12px a 8px. Con
+            44px de alto la fila sigue siendo cómoda de tocar y la tabla pierde
+            unos 48px de ancho, que es media pantalla de scroll menos.
+     No se cae ninguna más. El código no se cae nunca: es lo primero que busca
+     alguien con la máquina enfrente. Las acciones tampoco: esconder un control
+     no es plegar, es quitar. */
+  @container spec (max-width: 420px) {
+    :global([data-d='W']) .c-state { white-space: normal; }
+    :global([data-d='W']) .c-state .due { display: block; margin-left: 0; }
+    :global([data-d='W']) .tbl th,
+    :global([data-d='W']) .tbl td { padding-inline: var(--d-p1); }
+    /* La base pliega las acciones a dos renglones. W no. Apilarlas lleva la fila
+       de 44px a unos 96px, y con seis filas eso es el doble de scroll vertical a
+       cambio de 50px de ancho que igual no alcanzan para que la tabla entre. W
+       gasta scroll horizontal, que se recupera con el pulgar, antes que alto de
+       fila, que es lo que hace escaneable una lista. */
+    :global([data-d='W']) .acts { flex-wrap: nowrap; }
+  }
+
+  /* OBJETIVOS TÁCTILES. La casilla dibujada mide 15px y su área de clic la pone
+     .pick::before, que quedaba en 35 × 44. Con dedo se lleva a 45 × 44. Sólo con
+     puntero grueso: con un ratón, 45px de área invisible se comerían el clic de
+     la celda de al lado sin ganar nada a cambio. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .pick::before { left: -15px; right: -15px; }
+  }
+
+  /* PANTALLA ANGOSTA, la parte física. directions.css engorda el filo crítico de
+     3px a 5px por debajo de 560px, porque en un teléfono 3px al canto se pierden
+     contra el marco, pero lo hace sobre .d-row y esta página no usa .d-row: usa
+     <tr> y <li>. Sin esto la firma de W no llega a su propia tabla. Va por
+     viewport y no por contenedor a propósito: el grosor mínimo de un filo es un
+     hecho del aparato y de la mano, no del ancho de la celda. El plegado de
+     columnas de arriba es al revés, y por eso va por contenedor. */
+  @media (max-width: 560px) {
+    :global([data-d='W']) .tbl tbody tr.alert td.c-sel,
+    :global([data-d='W']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 5px 0 0 var(--d-crit); }
+    :global([data-d='W']) .tbl tbody tr.on td.c-act { box-shadow: inset -5px 0 0 var(--d-accent); }
+    :global([data-d='W']) ul.clist > li.citem.alert { box-shadow: inset 5px 0 0 var(--d-crit); }
+    :global([data-d='W']) ul.clist > li.citem.on { box-shadow: inset -5px 0 0 var(--d-accent); }
+    :global([data-d='W']) ul.clist > li.citem.alert.on {
+      box-shadow: inset 5px 0 0 var(--d-crit), inset -5px 0 0 var(--d-accent);
+    }
+  }
+
+  /* TRANSPARENCIA REDUCIDA Y CONTRASTE ALTO. Los dos ajustes de directions.css
+     apagan el vidrio llevando --d-surface a blanco sólido, y ahí la escalera de
+     densidad de la tabla se cae de golpe: la cabecera pintaba --d-surface, o sea
+     el mismo blanco que el panel, y desaparecía. La escalera estaba hecha de
+     transparencia; sin transparencia hay que rehacerla con lo que queda, que es
+     un gris y un tinte. La cabecera baja a --d-sunk y el cursor pasa al acento,
+     que sobre blanco es un azul apenas insinuado y no se confunde con el gris.
+     La banda de la fila vencida no se toca: ahí el color ES el dato. */
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    :global([data-d='W']) .tbl thead th { background: var(--d-sunk); box-shadow: none; }
+    :global([data-d='W']) .tbl thead th[aria-sort]:not([aria-sort='none']) { box-shadow: inset 0 -2px 0 var(--d-accent); }
+    :global([data-d='W']) .tbl tbody tr:hover td,
+    :global([data-d='W']) .tbl tbody tr.is-hover td { background: var(--d-accent-soft); }
+    :global([data-d='W']) .tbl tbody tr.alert:hover td,
+    :global([data-d='W']) .tbl tbody tr.alert.is-hover td { background: var(--tone-band); }
+  }
+
+  /* MOCIÓN. Lo único que se mueve en esta página es la aparición de las acciones
+     de fila, que es respuesta a una acción y no ambiente. Con moción reducida
+     aparecen igual, de golpe: se conserva la función y se tira el gesto. */
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='W']) .acts { transition: none; }
+  }
+
+  /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════
+     El tamaño de un dedo es un hecho del aparato, no del ancho de la ventana.
+     directions.css sube los .d-btn de W a --d-touch dentro de
+     @media (max-width: 560px), así que una tableta de 768px —que se toca con
+     el pulgar igual que un teléfono— se quedaba con los controles de ratón.
+     Medido con puntero grueso emulado por CDP a 768px, esta página tenía
+     30 objetivos por debajo de 44px. Va por (pointer: coarse) porque ese es
+     el hecho que importa; el ancho ya tiene sus propias reglas y hacen otra
+     cosa. Con ratón no cambia un pixel. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .d-btn { min-height: var(--d-touch); }
+    /* El botón de ordenar es una cabecera de columna de 15px de alto: se le
+       da caja completa sin mover la celda, con relleno vertical propio. */
+    :global([data-d='W']) .sortbtn {
+      min-height: var(--d-touch);
+      padding-block: calc((var(--d-touch) - 1.2em) / 2);
+      margin-block: calc((1.2em - var(--d-touch)) / 2);
+    }
+    /* La casilla NO va acá: .pick::before ya la lleva a 45 × 44 unas líneas
+       más arriba, y tocarle top/bottom rompería el centrado por transform. */
+    /* Paginación: los números caían en 32px de ancho. */
+    :global([data-d='W']) .pager .d-btn { min-width: var(--d-touch); }
   }
 </style>

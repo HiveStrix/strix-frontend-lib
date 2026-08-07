@@ -1756,6 +1756,367 @@
   :global([data-d='T']) .link { color: var(--d-accent); text-decoration-color: var(--d-accent-edge); }
   :global([data-d='T']) .spin { border-color: currentColor; border-top-color: transparent; }
 
+  /* ======================================================================
+     W · CRISTAL TEMPLADO. El vidrio se gasta UNA vez, en el panel.
+
+     Esta página es la que más caro le sale a Cristal. En I todo lo que agrupa
+     botones se convierte en otra losa de vidrio, y con cinco bloques por celda
+     terminan siendo cinco superficies translúcidas apiladas más las botoneras
+     de adentro. W dice lo contrario y acá se nota a simple vista: hay UNA losa
+     de vidrio por bloque y encima fichas opacas. En el ensayo con la vista
+     borrosa, I muestra cajas dentro de cajas y W muestra objetos sobre un
+     cristal.
+
+     Lo que NO se hace acá, y en I sí: la botonera no es una bandeja. Una
+     bandeja obliga a que los botones de adentro se vuelvan transparentes para
+     no pisarla, y un control transparente es justo lo que la regla 4 de la
+     dirección prohíbe, porque en W la opacidad ES la señal de que algo se
+     toca. Lo que agrupa la barra es el panel, el aire y un pelo de tinta
+     delante del destructivo. El único sitio donde los botones comparten canto
+     es el grupo de «Sobre la selección», y ahí el canto compartido dice algo
+     verdadero: las tres acciones caen sobre la misma selección, o sea que son
+     una decisión con tres salidas y no tres decisiones.
+
+     HALLAZGO, el mismo que ya está anotado para I: la dirección no expone su
+     desenfoque como token. Sin --d-blur, el blur(20px) saturate(1.5) de
+     .d-panel hay que repetirlo a mano en cualquier contenedor que una página
+     invente. Tampoco hay token para el anillo del doble bisel ni para el pelo
+     de tinta de la cabecera; los dos se derivan de --d-line y de --d-ink con
+     color-mix en vez de escribir un blanco o un gris a mano.
+     ====================================================================== */
+  :global([data-d='W']) .spec {
+    /* El umbral de esta página se mide contra el ancho REAL de la celda y no
+       contra el de la ventana. La rejilla del catálogo va de una a tres
+       columnas, así que a 1440px una celda puede ser tan angosta como la
+       pantalla de un teléfono, y a 380px la celda ES la pantalla. Preguntarle
+       al viewport da la respuesta equivocada en los dos extremos, y además es
+       lo que dejó este hueco sin encontrar: Chrome headless en macOS recorta
+       el ancho mínimo, así que la ventana nunca bajó de 500px. El contenedor
+       sí baja. */
+    container-type: inline-size;
+    container-name: acc-w;
+    gap: var(--d-p4);
+  }
+
+  /* EL PANEL, la única pieza de vidrio del bloque. */
+  :global([data-d='W']) .sec {
+    background: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border: max(var(--d-bw), 1px) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+  }
+  /* El desenfoque convierte al panel en contexto de apilado, y entonces el
+     orden entre bloques deja de ser automático: el menú desplegado, que cuelga
+     hacia abajo, quedaría por DEBAJO del bloque siguiente, que también
+     desenfoca. La escalera va al revés del DOM, igual que en Bruma y en Cinta.
+     Sin ella el menú se ve, porque es sólido, pero se ve tapado. */
+  :global([data-d='W']) .sec:nth-child(1) { z-index: 6; }
+  :global([data-d='W']) .sec:nth-child(2) { z-index: 5; }
+  :global([data-d='W']) .sec:nth-child(3) { z-index: 4; }
+  :global([data-d='W']) .sec:nth-child(4) { z-index: 3; }
+  :global([data-d='W']) .sec:nth-child(5) { z-index: 2; }
+  /* EL DOBLE BISEL, que en directions.css cuelga de .d-panel. Un panel de
+     vidrio apoyado plano sobre el fondo se ve como un recorte; con dos anillos
+     concéntricos, uno exterior de sombra que lo despega del campo y uno
+     interior de luz que le da canto, se ve como una pieza. */
+  :global([data-d='W']) .sec::after {
+    content: ''; position: absolute; inset: 1px;
+    border-radius: calc(var(--d-r-lg) - max(var(--d-bw), 1px));
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--d-line) 64%, transparent);
+    pointer-events: none;
+  }
+  /* La cabecera del bloque es la de un .d-panel de la librería, con el mismo
+     pelo de tinta al 10 % que W le da a .d-panel-head. Quien ya conoce el
+     panel reconoce el bloque sin aprender una forma nueva, que en una pantalla
+     de trabajo vale más que la forma nueva. */
+  :global([data-d='W']) .sec-cap {
+    margin: 0;
+    padding: var(--d-p2) var(--d-p3);
+    border-bottom: max(var(--d-bw), 1px) solid color-mix(in srgb, var(--d-ink) 10%, transparent);
+  }
+  :global([data-d='W']) .sec-body { padding: var(--d-p3); gap: var(--d-p3); }
+  :global([data-d='W']) .cell { min-width: 0; }
+  :global([data-d='W']) .hint,
+  :global([data-d='W']) .sub,
+  :global([data-d='W']) .ctx-name { overflow-wrap: break-word; }
+
+  /* LA EXCEPCIÓN, Y LA ÚNICA. El equipo vencido irradia y nada más en la celda
+     lo hace. El filo de 3px a la izquierda es la misma marca que directions.css
+     le pone a la fila y al panel críticos, así que el gesto se aprende una vez
+     y sirve en toda la dirección; además hace el trabajo cuando alguien no
+     distingue el rojo. La sombra base se conserva detrás para que el bloque no
+     pierda su canto de luz al ponerse crítico. */
+  :global([data-d='W']) .sec[data-tone='critical'] {
+    box-shadow:
+      inset 3px 0 0 var(--d-crit),
+      0 4px 18px -8px color-mix(in srgb, var(--d-crit) 55%, transparent),
+      var(--d-shadow);
+  }
+
+  /* LA BARRA TIENE DOS PISOS, EN CUALQUIER ANCHO.
+     Medida en la celda real del catálogo, la botonera de este equipo pide unos
+     760px y la celda da 640 en el mejor caso, así que envuelve siempre. Y con
+     `margin-left: auto`, envolver dejaba «Eliminar equipo» solo en el segundo
+     renglón, pegado al canto derecho y con medio renglón de hueco delante:
+     flotando sin dueño, y encima con el aspecto de ser lo más importante de la
+     barra por estar aparte.
+     La regla ocupa su propio renglón y ordena los dos pisos: arriba las tres
+     órdenes que operan el equipo, abajo lo que no lo opera, o sea el menú de
+     más acciones y el destructivo. Así el corte deja de ser un accidente del
+     ancho y pasa a decir algo. Es el mismo separador de siempre, girado de eje.
+     --d-line es blanco al 70 %, invisible sobre un panel casi blanco, así que
+     la regla toma --d-edge, que es el filo de tinta de la dirección. */
+  :global([data-d='W']) .bar { gap: var(--d-p2); }
+  :global([data-d='W']) .bar-sep {
+    flex: 1 0 100%;
+    width: auto; height: 0; min-height: 0;
+    margin: 0;
+    border-left: 0;
+    border-top: max(var(--d-bw), 1px) solid var(--d-edge);
+  }
+  :global([data-d='W']) .link { color: var(--d-accent); text-underline-offset: 3px; }
+  /* Sin retardo de doble toque en el único elemento de la página que se toca. */
+  :global([data-d='W']) .d-btn { touch-action: manipulation; }
+
+  /* El grupo comparte canto porque las tres acciones caen sobre la MISMA
+     selección. Sigue siendo opaco: lo que cambia es dónde están las esquinas,
+     no de qué está hecho el botón. */
+  @container acc-w (min-width: 26rem) {
+    :global([data-d='W']) .grp { gap: 0; }
+    :global([data-d='W']) .grp > .d-btn:not(:first-child) {
+      margin-left: calc(-1 * max(var(--d-bw), 1px));
+      border-start-start-radius: 0; border-end-start-radius: 0;
+    }
+    :global([data-d='W']) .grp > .d-btn:not(:last-child) {
+      border-start-end-radius: 0; border-end-end-radius: 0;
+    }
+  }
+
+  /* LAS VARIANTES, QUE ES DONDE ESTA DIRECCIÓN SE COBRA PÁGINAS.
+     `[data-d='W'] .d-btn` pesa (0,2,0) y las variantes pesan (0,1,0), así que
+     la dirección le gana a la variante en todo lo que la dirección toca.
+     directions.css repone el primario en reposo, pero NO repone ninguna
+     variante en :hover, y `[data-d='W'] .d-btn:hover { background: #FFFFFF }`
+     pesa (0,3,0). O sea que hoy, al pasarle el ratón, el primario de W se
+     vuelve blanco y conserva la tinta blanca: texto blanco sobre fondo blanco,
+     sin un error en consola. Al destructivo le pasa lo mismo y encima pierde
+     la banda. Se reponen las dos acá, y con ellas el fantasma y el
+     deshabilitado, que también quedaban blancos al pasar por encima. */
+  :global([data-d='W']) .d-btn--primary:hover {
+    background: var(--d-accent); filter: brightness(1.12);
+  }
+  /* El destructivo se separa del primario por VALOR, no por tono: el primario
+     es tinta clara sobre un bloque oscuro y el destructivo es tinta oscura
+     sobre una banda clara. En escala de grises son opuestos, así que se
+     distinguen sin que el rojo participe. El anillo va en --d-crit a plena
+     fuerza y no en --d-crit-edge, porque sobre vidrio el filo pálido se
+     desvanecía y el botón quedaba idéntico a un secundario con la tinta roja. */
+  :global([data-d='W']) .d-btn--danger {
+    background: var(--d-crit-band);
+    color: var(--d-crit);
+    border-color: var(--d-crit);
+  }
+  :global([data-d='W']) .d-btn--danger:hover {
+    background: color-mix(in srgb, var(--d-crit-band) 82%, var(--d-crit));
+  }
+  /* En W lo opaco es lo que se toca, así que el hover del fantasma es
+     MATERIALIZAR: pasa de no existir a ser una ficha sólida con su canto. El
+     relleno blanco ya se lo da la dirección; lo que falta es el filo. */
+  :global([data-d='W']) .d-btn--ghost:hover { border-color: var(--d-edge); }
+  /* Excepción con motivo: «Más acciones» no tiene rótulo del que agarrarse. En
+     una dirección donde el canto es lo que dice «esto es un control», el botón
+     de sólo icono necesita el suyo desde el principio, no al pasar el ratón. */
+  :global([data-d='W']) .d-btn--ghost.only { border-color: var(--d-edge); }
+  /* El deshabilitado. `.d-btn[disabled] { opacity: .45 }` sobre vidrio deja la
+     tinta en 2.9:1 contra el panel, y además `[data-d='W'] .d-btn:hover` le
+     pinta el fondo blanco al pasar por encima, que es lo contrario de lo que un
+     control apagado tiene que hacer. Acá se apaga con la banda neutra OPACA de
+     la dirección: 6.2:1 de --d-ink-3 contra --d-neu-band. Y lo que dice «no se
+     puede» no es el color sino que perdió el canto de luz y la sombra de
+     contacto, o sea que dejó de ser un objeto apoyado sobre el vidrio. */
+  :global([data-d='W']) .d-btn[disabled],
+  :global([data-d='W']) .d-btn[disabled]:hover {
+    opacity: 1;
+    background: var(--d-neu-band);
+    color: var(--d-ink-3);
+    border-color: var(--d-neu-edge);
+    box-shadow: none;
+    transform: none;
+  }
+  /* El anillo de foco de la dirección sale 2px hacia afuera. En el grupo y en
+     el dividido los cantos se tocan, así que sin esto el anillo del botón con
+     foco queda por debajo del vecino y se lee a medias. */
+  :global([data-d='W']) .d-btn:focus-visible { position: relative; z-index: 2; }
+
+  /* LO QUE FLOTA VA SÓLIDO, Y ACÁ HAY QUE ESCRIBIRLO.
+     directions.css trae la red de seguridad `[data-d='W'] [class*='menu']`,
+     pero pesa (0,2,0) y el `.menu` de esta página pesa lo mismo en cuanto
+     Svelte le agrega su clase de alcance. Empatan, y gana la que se imprime
+     después, que es la del componente: sin estas líneas el menú de W volvería a
+     ser --d-surface, o sea vidrio, y el texto del bloque de abajo se leería a
+     través del renglón «Registrar lectura y posponer 7 días». Es exactamente el
+     defecto que esta dirección existe para arreglar. */
+  :global([data-d='W']) .menu {
+    background: var(--d-overlay);
+    color: var(--d-overlay-ink);
+    border-color: var(--d-overlay-edge);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-overlay-shadow);
+  }
+  /* La misma red alcanza a .menu-item, que también lleva «menu» en el nombre de
+     la clase: cada renglón salía con fondo blanco propio y con la sombra larga
+     del desplegable entero. Tres renglones, tres sombras, dentro de un menú que
+     ya tiene la suya. */
+  :global([data-d='W']) .menu-item {
+    background: transparent;
+    border-color: transparent;
+    border-radius: var(--d-r);
+    box-shadow: none;
+  }
+  /* Y el hover heredado era --d-sunk, blanco al 34 %, invisible sobre un menú
+     que ahora es blanco sólido. El teclado tiñe el renglón igual que el ratón,
+     porque el foco se pasea por el menú con las flechas. */
+  :global([data-d='W']) .menu-item:hover,
+  :global([data-d='W']) .menu-item:focus-visible {
+    background: var(--d-accent-soft);
+  }
+
+  /* ── W · PANTALLA ANGOSTA, DECLARADA ───────────────────────────────────
+     Debajo de 26rem (416px de celda), el orden en que cae cada cosa:
+
+     1. La barra pasa a UNA orden por renglón, a lo ancho, con el rótulo
+        alineado a la izquierda. Una columna de comandos se barre con el pulgar;
+        cuatro fichas centradas de anchos distintos, no. El menú de más acciones
+        se queda en su cuadrado de 44 y no se estira, porque un botón sin rótulo
+        estirado a todo lo ancho no gana nada y pierde su forma de icono.
+     2. El destructivo deja de irse a la derecha: en una pila no hay derecha. Lo
+        sigue separando la regla, que ya era horizontal.
+     3. El grupo se despliega hacia abajo y las costuras cambian de eje. Sigue
+        siendo una sola pieza, con las esquinas arriba y abajo.
+     4. El dividido NO se parte. Partirlo lo convertiría en dos controles y se
+        perdería lo único que dice que la flecha pertenece al botón. La mitad
+        principal se estira y la flecha se queda en un cuadrado de 44.
+     5. El vidrio se apaga, por el motivo que ya escribió la dirección: a esta
+        altura el panel ocupa el ancho entero, no queda campo alrededor que
+        desenfocar, y el efecto se paga en GPU sin verse. El filo del crítico
+        engorda a 5px porque 3px al borde de la pantalla se pierden contra el
+        marco del teléfono.
+
+     Lo que NO depende del ancho: los dos pisos de la barra, que ya están
+     puestos arriba, y el objetivo táctil, que depende del puntero y no del
+     ancho de nada.
+
+     LO QUE NO PASA: nada se vuelve scroll horizontal. Una botonera que hay que
+     arrastrar esconde comandos, y ésta es la página de los comandos. El único
+     elemento que podría sobrar del ancho de la celda es el menú, y se limita al
+     100 %, porque la celda del catálogo recorta lo que se le salga. */
+  @container acc-w (max-width: 26rem) {
+    :global([data-d='W']) .sec {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      background: color-mix(in srgb, var(--d-overlay) 92%, transparent);
+    }
+    :global([data-d='W']) .sec::after { display: none; }
+    :global([data-d='W']) .sec[data-tone='critical'] {
+      box-shadow: inset 5px 0 0 var(--d-crit), var(--d-shadow);
+    }
+
+    :global([data-d='W']) .bar {
+      display: grid; grid-auto-flow: row; justify-items: stretch;
+      gap: var(--d-p1);
+    }
+    :global([data-d='W']) .bar > .d-btn {
+      width: 100%; justify-content: flex-start; min-height: var(--d-touch);
+    }
+    /* Los de sólo icono se quedan cuadrados de 44 en vez de estirarse: sin
+       rótulo, un botón a todo lo ancho no gana nada y pierde su forma. El
+       cuadrado los vuelve a hacer reconocibles, y de paso les da el ancho
+       táctil que a esta altura ya tienen de alto. */
+    :global([data-d='W']) .d-btn.only { min-width: var(--d-touch); }
+    :global([data-d='W']) .bar > .d-btn.only {
+      width: var(--d-touch);
+      justify-self: start; justify-content: center;
+    }
+    /* La regla ya es horizontal en cualquier ancho; en la rejilla se estira
+       sola. Lo único que cambia es que el destructivo deja de ir a la derecha,
+       porque en una pila no hay derecha. */
+    :global([data-d='W']) .bar-push { margin-left: 0; }
+
+    :global([data-d='W']) .grp { display: grid; grid-auto-flow: row; width: 100%; }
+    :global([data-d='W']) .grp > .d-btn {
+      width: 100%; justify-content: flex-start;
+      min-height: var(--d-touch); border-radius: 0;
+    }
+    :global([data-d='W']) .grp > .d-btn:not(:first-child) {
+      margin-top: calc(-1 * max(var(--d-bw), 1px));
+    }
+    :global([data-d='W']) .grp > .d-btn:first-child {
+      border-start-start-radius: var(--d-r); border-start-end-radius: var(--d-r);
+    }
+    :global([data-d='W']) .grp > .d-btn:last-child {
+      border-end-start-radius: var(--d-r); border-end-end-radius: var(--d-r);
+    }
+
+    :global([data-d='W']) .split-wrap { width: 100%; align-items: stretch; }
+    :global([data-d='W']) .split { width: 100%; }
+    :global([data-d='W']) .d-btn.split-main {
+      flex: 1 1 auto; min-width: 0;
+      justify-content: flex-start; min-height: var(--d-touch);
+    }
+    :global([data-d='W']) .d-btn.split-toggle {
+      flex: 0 0 var(--d-touch);
+      min-width: var(--d-touch); min-height: var(--d-touch);
+      padding-inline: 0;
+    }
+    :global([data-d='W']) .menu { max-width: 100%; }
+  }
+
+  /* OBJETIVO TÁCTIL. directions.css ya sube el botón de W a 44px, pero lo hace
+     por ancho de ventana (max-width: 560px), y el dedo no depende del ancho de
+     la ventana: una tableta táctil de 900px se quedaba sin él. Acá se pregunta
+     por el puntero, que es el eje correcto.
+     Consecuencia declarada: con puntero grueso W NO tiene botón pequeño. El de
+     la fila de la tabla de planes sigue siendo el más liviano de los dos, por
+     tipografía y por ancho, pero su caja llega a 44 igual que las demás,
+     porque 27px de alto en una fila que se toca con el pulgar no es una
+     variante de tamaño sino un fallo. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .d-btn { min-height: var(--d-touch); }
+    :global([data-d='W']) .d-btn.only,
+    :global([data-d='W']) .d-btn.split-toggle { min-width: var(--d-touch); }
+    /* El enlace de texto medía 170 × 20 y está solo en su renglón, así que la
+       excepción de «objetivo dentro de un bloque de texto» no lo cubre: es un
+       destino suelto de 20px de alto. Se le da caja de 44 sin tocar el cuerpo
+       de la letra —un enlace que crece de tamaño deja de parecer un enlace—:
+       el relleno agranda el área y el margen negativo devuelve el renglón a
+       donde estaba, así que la fila no se mueve un pixel. */
+    :global([data-d='W']) .link {
+      display: inline-flex; align-items: center;
+      min-height: var(--d-touch);
+      padding-block: calc((var(--d-touch) - 1.5em) / 2);
+      margin-block: calc((1.5em - var(--d-touch)) / 2);
+    }
+  }
+
+  /* TRANSPARENCIA REDUCIDA Y CONTRASTE ALTO. directions.css los resuelve a
+     nivel de token (--d-surface pasa a blanco sólido en los dos), así que lo
+     único que falta acá es apagar el desenfoque del bloque, que es propio de
+     esta página, y retirar el anillo interior de luz, que sobre blanco sólido
+     ya no tiene nada que biselar. */
+  @media (prefers-reduced-transparency: reduce) {
+    :global([data-d='W']) .sec {
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    }
+    :global([data-d='W']) .sec::after { display: none; }
+  }
+  @media (prefers-contrast: more) {
+    :global([data-d='W']) .sec {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+    :global([data-d='W']) .sec::after { display: none; }
+  }
+
   /* Al final del todo, para ganarle en orden a las variaciones por dirección. */
   @media (prefers-reduced-motion: reduce) {
     .spin{ animation: none; opacity: .6; }

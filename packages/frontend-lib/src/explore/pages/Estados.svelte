@@ -513,8 +513,11 @@
     background: var(--tone-fg); color: var(--d-ink-on);
     padding: var(--d-p1) var(--d-p3); margin-bottom: var(--d-p1);
   }
-  /* El gris medio sobre blanco no da contraste: el neutro va en tinta. */
-  :global([data-d='C']) .blk[data-tone='neutral'] .blk-kind { background: var(--d-ink-2); }
+  /* El neutro NO lleva .blk-kind: el único bloque de tono neutro de la página
+     es el aviso deshecho, y ese arranca directo en el titular. La regla que
+     había acá —«el gris medio sobre blanco no da contraste, el neutro va en
+     tinta»— no llegaba a pintar nada y era el único aviso del build. Si algún
+     día un bloque neutro estrena epígrafe, vuelve con la razón intacta. */
   :global([data-d='C']) .blk-title,
   :global([data-d='C']) .blk-body,
   :global([data-d='C']) .blk-acts,
@@ -1523,6 +1526,400 @@
   }
 
   /* ======================================================================
+     W · CRISTAL TEMPLADO. Cristal, con las tres correcciones puestas donde
+     esta página las pone a prueba de verdad: acá vive el diálogo.
+
+     La celda codifica dos hechos con dos recursos, y ninguno de los dos es
+     adorno.
+
+     EL MATERIAL DICE DÓNDE VIVE LA COSA. Lo que está EN la página es vidrio:
+     el aviso, el vacío, el sin conexión, el error, el escenario, lo que carga
+     y lo que procesa. Todo eso se queda quieto, que es la condición para que
+     el desenfoque valga la pena. Lo que aparece ENCIMA de la página se pinta
+     sólido con --d-overlay: el toast y el diálogo. Un diálogo translúcido
+     cruza su texto con el de la lista de abajo y no se lee ninguno de los
+     dos. El desenfoque no arregla eso, lo disimula.
+
+     EL HALO DICE SI URGE. Lo lleva una sola cosa de esta celda: el error. El
+     aviso informativo, el vacío, el sin conexión, los dos toasts, la barra de
+     proceso y el propio diálogo no irradian. Por eso cuando algo irradia se
+     ve. Un halo por objeto crítico y nunca anidado: la palabra «Error» no
+     vuelve a brillar dentro de un bloque que ya está brillando. El diálogo
+     tampoco necesita luz, porque el velo ya sacó del medio a todo lo que
+     podía competirle.
+
+     El velo sí desenfoca, y es el único desenfoque de la página que hace
+     trabajo de verdad: no lleva texto encima, y lo que empaña (la flota) es
+     justo lo que dejó de estar disponible.
+
+     La regla de bandas opacas queda demostrada dentro de la propia celda: la
+     misma píldora de tono aparece sobre cuatro sustratos, vidrio, fila
+     teñida, papel del toast y papel del diálogo, y vale lo mismo en los
+     cuatro. En Cristal la banda era translúcida y su contraste dependía de
+     cuántas capas hubiera debajo.
+
+     HALLAZGO para directions.css: la red de seguridad de W ataja lo que flota
+     por clase o por rol, y esta página se le escapa entera. El diálogo lleva
+     class="dlg" y role="alertdialog", y ninguno de los once selectores de esa
+     lista los alcanza: ni [class*='dialog'] matchea «dlg» ni [role='dialog']
+     matchea «alertdialog». O sea que el caso para el que se escribió la regla
+     1 es exactamente el caso que la regla no cubre. Falta [role='alertdialog']
+     en esa lista. Mientras tanto W va sólido acá a mano.
+     ====================================================================== */
+  :global([data-d='W']) .page {
+    --load-order: -1;
+    --skel-id: 4.6em;
+    --skel-pill: 7em;
+    /* El titular de un aviso le gana al cuerpo de lejos, y el cuerpo se lee
+       con el teléfono en la mano: 12,5px no alcanzaba. */
+    --blk-title-size: var(--d-t-md);
+    --blk-body-size: var(--d-t-sm);
+    /* Sin versalitas. W no declara la caja alta como idioma en ninguna parte
+       de su ficha: la heredó de Cristal. Seis encabezados en versalitas dan
+       seis veces el mismo ritmo tibio y ninguno gana la mirada, y una etiqueta
+       trackeada sobre cada sección es gramática que nadie eligió. En caja
+       normal el encabezado vuelve a ser un encabezado y la palabra de estado
+       vuelve a ser la píldora que ya es. */
+    --cap-case: none; --cap-track: 0;
+    --cap-size: var(--d-t-sm); --cap-weight: var(--d-w-semi); --cap-color: var(--d-ink);
+    --kind-case: none; --kind-track: 0;
+    --kind-size: var(--d-t-xs); --kind-weight: var(--d-w-semi);
+  }
+
+  /* EL VIDRIO, y solo acá. Las cuatro superficies que se quedan quietas. */
+  :global([data-d='W']) .blk {
+    --blk-bg: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border-color: var(--d-line);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+    padding: var(--d-p3);
+  }
+  :global([data-d='W']) .scene,
+  :global([data-d='W']) .load,
+  :global([data-d='W']) .proc {
+    position: relative;
+    background: var(--d-surface);
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    border: var(--d-bw) solid var(--d-line);
+    border-radius: var(--d-r-lg);
+    box-shadow: var(--d-shadow);
+  }
+  :global([data-d='W']) .load,
+  :global([data-d='W']) .proc { padding: var(--d-p2) var(--d-p3) var(--d-p3); }
+
+  /* EL DOBLE BISEL, el mismo que la dirección le da a .d-panel: un anillo de
+     sombra por fuera y uno de luz por dentro. Es lo que separa un div con
+     blur de una pieza de material apoyada en su bandeja. Va en el vidrio y
+     solo en el vidrio: sobre papel opaco un anillo de luz es un borde de más. */
+  :global([data-d='W']) .blk::after,
+  :global([data-d='W']) .scene::after,
+  :global([data-d='W']) .load::after,
+  :global([data-d='W']) .proc::after {
+    content: ''; position: absolute; inset: 1px;
+    border-radius: calc(var(--d-r-lg) - 1px);
+    box-shadow: inset 0 0 0 1px var(--d-line);
+    pointer-events: none;
+  }
+
+  /* La palabra de estado ES la píldora de la sección 1: banda de tono opaca,
+     canto de tono, marca y palabra. W no tiene un token de espaciado por
+     debajo de --d-p1 (8px), así que el relleno vertical sale de escalarlo. */
+  :global([data-d='W']) .blk-kind {
+    justify-self: start;
+    padding: calc(var(--d-p1) * .4) var(--d-p2) calc(var(--d-p1) * .4) var(--d-p1);
+    background: var(--tone-band);
+    border: var(--d-bw) solid var(--tone-edge);
+    border-radius: var(--d-r-pill);
+  }
+
+  /* LO ÚNICO QUE IRRADIA EN TODA LA CELDA. El filo de 3px hace el trabajo
+     cuando alguien no distingue el rojo, así que el estado no queda dicho solo
+     por color. El realce de arriba se repone a mano porque el halo reemplaza a
+     --d-shadow entero y ahí se iba el canto de luz que tiene el resto. */
+  :global([data-d='W']) .blk[data-tone='critical'] {
+    box-shadow: inset 3px 0 0 var(--d-crit),
+                inset 0 1px 0 var(--d-line),
+                0 4px 18px -8px color-mix(in srgb, var(--d-crit) 55%, transparent);
+  }
+
+  /* LO QUE FLOTA VA SÓLIDO. En el producto el toast es fixed y el diálogo
+     bloquea; en esta celda los dos viven en el flujo porque una celda no puede
+     alojar un fixed, pero se pintan con el material que les toca. La opacidad
+     es lo que dice si algo es página o si está encima de la página. */
+  :global([data-d='W']) .blk--toast,
+  :global([data-d='W']) .dlg {
+    --blk-bg: var(--d-overlay);
+    color: var(--d-overlay-ink);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border-color: var(--d-overlay-edge);
+    box-shadow: var(--d-overlay-shadow);
+  }
+  :global([data-d='W']) .blk--toast::after,
+  :global([data-d='W']) .dlg::after { content: none; }
+  :global([data-d='W']) .dlg { border-radius: var(--d-r-lg); padding: var(--d-p4); }
+
+  /* En la página el botón se aclara al pasar por encima, porque su fondo es
+     vidrio y el blanco lo levanta. Sobre el papel sólido del diálogo y del
+     toast eso no se ve, es blanco sobre blanco: ahí el botón se hunde en
+     tinta. Sin esta línea las cuatro acciones que viven sobre papel no tienen
+     respuesta de puntero. */
+  :global([data-d='W']) .dlg .d-btn:hover,
+  :global([data-d='W']) .blk--toast .d-btn:hover {
+    background: color-mix(in srgb, var(--d-ink) 7%, transparent);
+  }
+  :global([data-d='W']) .dlg .d-btn--danger:hover {
+    background: color-mix(in srgb, var(--d-crit-band) 78%, var(--d-crit));
+  }
+
+  /* El esqueleto y la barra no pueden salir de --d-line: en W la línea es
+     BLANCA (rgba blanco al 70 %), así que un bloque hecho con ella sobre
+     vidrio blanco no existe. Salen de la tinta, que es lo único que contrasta
+     contra el vidrio con cualquier cosa debajo. */
+  :global([data-d='W']) .skel-b {
+    background: color-mix(in srgb, var(--d-ink) 9%, transparent);
+    border-radius: var(--d-r);
+  }
+  :global([data-d='W']) .skel-row { min-height: var(--d-row-h); }
+  :global([data-d='W']) .proc-track {
+    background: color-mix(in srgb, var(--d-ink) 8%, transparent);
+    border-radius: var(--d-r);
+    box-shadow: inset 0 1px 2px color-mix(in srgb, var(--d-ink) 10%, transparent);
+  }
+  /* La barra NO brilla, ni la determinada ni la de espera. Un proceso que
+     avanza informa, no urge, y el halo está reservado. */
+  :global([data-d='W']) .proc-fill { border-radius: var(--d-r); box-shadow: none; }
+
+  /* Un código pegado a mano o un nombre de equipo sin espacios no rompen la
+     caja: parten donde tengan que partir. */
+  :global([data-d='W']) .blk-title,
+  :global([data-d='W']) .blk-body,
+  :global([data-d='W']) .scene-name { overflow-wrap: break-word; }
+  :global([data-d='W']) .reopen > * { min-width: 0; }
+
+  /* La casilla del diálogo medía 13px y su etiqueta 19px de alto: el objetivo
+     real de puntero era la etiqueta entera y se quedaba corta incluso con
+     mouse. Sube a 24px, que sale de escalar --d-p1 porque W no trae un token
+     de objetivo intermedio entre nada y --d-touch. */
+  :global([data-d='W']) .dlg-check { min-height: calc(var(--d-p1) * 3); }
+
+  /* HALLAZGO de contraste, y es el que más pesa de todos los que lleva esta
+     página, porque cae justo sobre la acción que borra 14 equipos. En
+     directions.css `[data-d='W'] .d-btn` pesa (0,2,0) y `.d-btn--danger` pesa
+     (0,1,0): el vidrio templado le gana el relleno Y el borde, y lo único que
+     sobrevive del destructivo es el color del texto. «Eliminar la familia»
+     queda idéntico a «Cancelar» salvo por la tinta, que es estado dicho solo
+     por color en el peor lugar posible. El arreglo de raíz va en
+     directions.css, donde falta un `[data-d='W'] .d-btn--danger` como el que
+     ya tienen U y V; mientras tanto esta página lo repone. Tinta #931C14 sobre
+     banda #F3DAD8 da 6,55:1. */
+  :global([data-d='W']) .d-btn--danger {
+    background: var(--d-crit-band);
+    color: var(--d-crit);
+    border-color: var(--d-crit-edge);
+  }
+  :global([data-d='W']) .d-btn--danger:hover {
+    background: color-mix(in srgb, var(--d-crit-band) 78%, var(--d-crit));
+  }
+  /* Un control ocupado se sigue leyendo: al 45 % sobre vidrio, «Reintentando…»
+     se desvanecía justo cuando es lo único que explica por qué no responde. */
+  :global([data-d='W']) .d-btn[disabled] { opacity: .62; }
+
+  /* El diálogo se queda con el filo crítico y sin halo. Va DESPUÉS del bloque
+     crítico a propósito: `.blk[data-tone='critical']` y
+     `.dlg[data-tone='critical']` pesan los dos (0,4,0), así que acá el orden
+     es lo único que decide, y sin esta línea el diálogo heredaría el
+     resplandor del error y quedarían dos cosas irradiando. */
+  :global([data-d='W']) .dlg[data-tone='critical'] {
+    box-shadow: inset 3px 0 0 var(--d-crit), var(--d-overlay-shadow);
+  }
+
+  /* EL VELO. El único desenfoque de la página que se gana el costo: no lleva
+     texto encima, y lo que empaña es la lista que acaba de dejar de estar
+     disponible. Desenfoca menos que el panel, 10px contra 20px, y es a
+     propósito: las filas se tienen que seguir reconociendo como filas, porque
+     el dato es que siguen ahí y vuelven cuando el diálogo se cierre. */
+  :global([data-d='W']) .veil {
+    background: color-mix(in srgb, var(--d-ink) 26%, transparent);
+    backdrop-filter: blur(10px) saturate(1.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    animation: veil-in 160ms var(--d-ease, cubic-bezier(.2, .8, .2, 1)) both;
+  }
+  /* La única moción que agrega esta dirección, y hace un trabajo concreto: la
+     escarcha cerrándose es lo que explica que la flota pasó a estar fuera de
+     alcance. El diálogo no entra animado, porque es lo que hay que leer. */
+  @keyframes veil-in { from { opacity: 0 } to { opacity: 1 } }
+  @media (prefers-reduced-motion: reduce) {
+    :global([data-d='W']) .veil { animation: none; }
+  }
+
+  /* TRANSPARENCIA REDUCIDA. Quien la activa suele hacerlo porque el texto
+     sobre fondos vivos le cuesta, así que W deja de ser de vidrio y sigue
+     siendo usable. --d-surface ya viene sólido desde directions.css; lo que
+     falta acá es apagar el desenfoque de las superficies propias de la página
+     y endurecer el canto, porque --d-line es blanco y sobre papel blanco no
+     dibuja nada. El velo deja de ser escarcha y pasa a ser una placa: si el
+     pedido es no ver a través, la lista se tapa en vez de mostrarse a medias. */
+  @media (prefers-reduced-transparency: reduce) {
+    :global([data-d='W']) .blk,
+    :global([data-d='W']) .scene,
+    :global([data-d='W']) .load,
+    :global([data-d='W']) .proc {
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+      border-color: var(--d-edge);
+    }
+    :global([data-d='W']) .blk::after,
+    :global([data-d='W']) .scene::after,
+    :global([data-d='W']) .load::after,
+    :global([data-d='W']) .proc::after { content: none; }
+    :global([data-d='W']) .veil {
+      background: var(--d-sunk);
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+    }
+  }
+
+  /* CONTRASTE ALTO. Misma lógica, del otro lado: directions.css ya apaga el
+     campo de color y endurece --d-line, así que los bordes se afilan solos.
+     Falta apagar el desenfoque, que a esa altura ya no tiene nada que
+     desenfocar. El halo crítico se queda: ahí el color ES el dato. */
+  @media (prefers-contrast: more) {
+    :global([data-d='W']) .blk,
+    :global([data-d='W']) .scene,
+    :global([data-d='W']) .load,
+    :global([data-d='W']) .proc {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+  }
+
+  /* ======================================================================
+     W · PANTALLA ANGOSTA, declarada.
+
+     Nadie miró esta celda abajo de 500px porque Chrome headless en macOS
+     recorta el ancho mínimo. La medida real: a 320px de viewport la celda
+     tiene 230px útiles, que es 320 menos los 24px de padding del harness a
+     cada lado, menos el borde del escenario, menos los 20px de padding
+     interno. Todo lo de abajo está pensado contra esos 230px.
+
+     1 · SE APILA todo lo que ya venía en una columna, más las acciones: los
+         botones pasan a ancho completo y su rótulo parte en dos líneas en vez
+         de desbordar la caja, porque «Asignar el equipo a mano» mide 174px y
+         el bloque deja 196px, que es margen de dos caracteres.
+
+     2 · SE CAE EL NOMBRE DEL EQUIPO, que es la tercera columna en orden de
+         importancia. Con 230px, el código (62px), la píldora de estado (78px)
+         y los dos huecos de 12px dejan 32px para «Batidora Imer Syntesi 250»,
+         que se apila en ocho renglones y convierte cada fila en un párrafo.
+         Arriba quedan el código y el estado, que son los dos datos que se
+         buscan; el nombre baja entero a la segunda línea. La fila crece por
+         encima de sus 44px en vez de recortar.
+
+     3 · NADA SE VUELVE SCROLL HORIZONTAL, y es una decisión y no un olvido.
+         Lo único tabular de esta página es una lista de tres campos, y una
+         lista de tres campos que se desplaza de lado esconde justamente la
+         píldora de estado, que es lo único que se mira. Reflujo antes que
+         desplazamiento, y ni recorte con puntos suspensivos: en un parte de
+         taller el nombre completo del equipo es lo que se compara contra la
+         chapa.
+
+     4 · SE APAGA EL DESENFOQUE en las superficies de página, por la misma
+         razón que la dirección lo apaga en .d-panel: a este ancho el panel
+         ocupa todo y no queda campo alrededor que desenfocar, así que el
+         efecto se paga en GPU y no se ve. Con él se va el doble bisel.
+
+     5 · NO SE APAGA EL DEL VELO, y es la única excepción. Su desenfoque no
+         depende de que sobre campo alrededor: lo que empaña es la lista que
+         tiene justo debajo, que está ahí a cualquier ancho. Es el desenfoque
+         que hace trabajo, así que es el que sobrevive.
+
+     6 · CRECEN LOS OBJETIVOS TÁCTILES. La dirección ya lleva los botones a
+         44px de alto; faltaban el ancho del descarte, que es una × de 32px, y
+         la casilla del diálogo, cuya etiqueta medía 18px de alto entera. Y el
+         filo crítico engorda a 5px, porque en un teléfono 3px contra el canto
+         se pierden contra el marco.
+     ====================================================================== */
+  @media (max-width: 560px) {
+    :global([data-d='W']) .blk,
+    :global([data-d='W']) .scene,
+    :global([data-d='W']) .load,
+    :global([data-d='W']) .proc {
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+      border-color: var(--d-edge);
+    }
+    :global([data-d='W']) .blk::after,
+    :global([data-d='W']) .scene::after,
+    :global([data-d='W']) .load::after,
+    :global([data-d='W']) .proc::after { content: none; }
+    /* Sin desenfoque debajo, la superficie sube a casi opaca: si no, el texto
+       queda leyéndose contra el campo de manchas a través de un 60 % de
+       blanco, que es donde el contraste se cae. El vidrio se condensa
+       pintándolo tres veces, 1−(1−a)³, que da 94 % sin inventar un color que
+       no esté en el bloque de tokens. */
+    :global([data-d='W']) .blk {
+      --blk-bg: linear-gradient(var(--d-surface), var(--d-surface)),
+                linear-gradient(var(--d-surface), var(--d-surface)),
+                linear-gradient(var(--d-surface), var(--d-surface));
+    }
+    :global([data-d='W']) .scene,
+    :global([data-d='W']) .load,
+    :global([data-d='W']) .proc {
+      background: linear-gradient(var(--d-surface), var(--d-surface)),
+                  linear-gradient(var(--d-surface), var(--d-surface)),
+                  linear-gradient(var(--d-surface), var(--d-surface));
+    }
+    /* Los overlays ya eran sólidos y no cambian a ningún ancho. Lo que los
+       sigue separando de la página cuando la página también es casi opaca no
+       es el relleno: es la elevación, --d-overlay-shadow contra --d-shadow, y
+       en el caso del diálogo el velo que tiene abajo. */
+    :global([data-d='W']) .blk--toast,
+    :global([data-d='W']) .dlg { --blk-bg: var(--d-overlay); }
+
+    :global([data-d='W']) .blk[data-tone='critical']:not(.dlg) {
+      box-shadow: inset 5px 0 0 var(--d-crit), inset 0 1px 0 var(--d-line);
+    }
+    :global([data-d='W']) .dlg[data-tone='critical'] {
+      box-shadow: inset 5px 0 0 var(--d-crit), var(--d-overlay-shadow);
+    }
+    :global([data-d='W']) .dlg { margin: var(--d-p1); padding: var(--d-p3); }
+
+    /* La fila se parte: código y estado arriba, nombre entero abajo. */
+    :global([data-d='W']) .scene-list .d-row {
+      flex-wrap: wrap; row-gap: 2px; padding-block: var(--d-p1);
+    }
+    :global([data-d='W']) .scene-list .d-row .d-pill { margin-left: auto; }
+    :global([data-d='W']) .scene-name { order: 1; flex: 1 0 100%; }
+    /* El esqueleto se parte igual. Es el hueco exacto de la fila que todavía
+       no llegó, así que si la fila se pliega en dos líneas y él no, la lista
+       da un salto al cargar y el bloque del nombre queda en 28px, que no es
+       la forma de ningún nombre. */
+    :global([data-d='W']) .skel-row { flex-wrap: wrap; row-gap: var(--d-p1); padding-block: var(--d-p1); }
+    :global([data-d='W']) .skel-b--pill { margin-left: auto; }
+    :global([data-d='W']) .skel-b--name { order: 1; flex: 1 0 100%; }
+
+    :global([data-d='W']) .blk-acts .d-btn--ghost { min-width: var(--d-touch); }
+    :global([data-d='W']) .dlg-check { min-height: var(--d-touch); }
+    :global([data-d='W']) .dlg-box { inline-size: 1.25em; block-size: 1.25em; }
+  }
+
+  @media (max-width: 420px) {
+    /* El rótulo parte antes que desbordar. La altura mínima de 44px que ya
+       pone la dirección absorbe la segunda línea sin que el botón crezca. */
+    :global([data-d='W']) .blk-acts .d-btn,
+    :global([data-d='W']) .dlg-acts .d-btn {
+      white-space: normal; text-align: center; line-height: 1.3;
+      padding-block: var(--d-p1);
+    }
+    /* El descarte no se estira con los demás. Un botón de ancho completo con
+       una × sola adentro se lee como una acción principal vacía, y es lo
+       contrario de lo que es: se queda cuadrado al final de la fila, del
+       tamaño de un pulgar y nada más. */
+    :global([data-d='W']) .blk-acts .d-btn--ghost {
+      flex: 0 0 auto; min-width: var(--d-touch); padding-inline: 0;
+    }
+  }
+
+  /* ======================================================================
      Movimiento y tamaños chicos.
      ====================================================================== */
   @media (prefers-reduced-motion: reduce) {
@@ -1557,5 +1954,27 @@
        líneas: a este ancho el solape se lee como error de maquetación. */
     :global([data-d='N']) .blk + .blk { margin-top: 0; }
     :global([data-d='N']) .sec-body { gap: var(--d-p1); }
+  }
+
+  /* ══ W · OBJETIVOS TÁCTILES, POR PUNTERO Y NO POR ANCHO ══════════════════
+     El tamaño de un dedo es un hecho del aparato, no del ancho de la ventana.
+     directions.css sube los .d-btn de W a --d-touch dentro de
+     @media (max-width: 560px), así que una tableta de 768px —que se toca con
+     el pulgar igual que un teléfono— se quedaba con los controles de ratón.
+     Medido con puntero grueso emulado por CDP a 768px, esta página tenía
+     11 objetivos por debajo de 44px. Va por (pointer: coarse) porque ese es
+     el hecho que importa; el ancho ya tiene sus propias reglas y hacen otra
+     cosa. Con ratón no cambia un pixel. */
+  @media (pointer: coarse) {
+    :global([data-d='W']) .blk-acts .d-btn,
+    :global([data-d='W']) .dlg-acts .d-btn { min-height: var(--d-touch); }
+    /* La × de descartar es la única que también fallaba de ancho: 34px. */
+    :global([data-d='W']) .blk-acts .d-btn--ghost { min-width: var(--d-touch); }
+    /* La casilla del diálogo mide 16px. El objetivo es la etiqueta entera,
+       que ya la envuelve: sólo le faltaba alto. */
+    :global([data-d='W']) .dlg-check {
+      min-height: var(--d-touch);
+      align-items: center;
+    }
   }
 </style>
