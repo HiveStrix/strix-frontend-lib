@@ -1903,14 +1903,14 @@
   --d-faro-att:  66%;   /* arde despacio */
   --d-faro-pos:  38%;   /* tibia */
   --d-faro-info: 38%;
-  --d-faro-neu:  16%;   /* el piso: sin dato no urge nada, pero sigue encendido */
+  --d-faro-neu:  34%;   /* el piso: sin dato no urge nada, pero sigue encendido */
   /* EL PISO. Ninguna pieza queda apagada del todo: todo lo que es una superficie
      en esta dirección irradia aunque sea un poco, en el morado de la marca. Lo
      que cambia entre una pieza y otra es CUÁNTO, y ahí es donde vuelve a entrar
      la urgencia. La escala completa queda: piso para todo, y por encima los
      cuatro escalones de estado. Sin el piso, «poco resplandor» y «ningún
      resplandor» se confundían y la escala perdía su primer peldaño. */
-  --d-faro-piso: 26%;
+  --d-faro-piso: 46%;
   /* El anillo es la otra mitad del efecto. Una luz que sólo cae por debajo se
      lee como sombra de color; lo que la vuelve emisión es que el canto de la
      pieza también esté encendido. */
@@ -1923,25 +1923,25 @@
    propiedad, y declararla dos veces hace que la segunda pise a la primera y la
    pieza pierda el peso de Prisma. */
 [data-d='AB'] .d-panel {
-  box-shadow: 0 8px 26px -10px color-mix(in srgb, var(--d-brand) var(--d-faro-piso), transparent),
+  box-shadow: 0 0 26px 2px color-mix(in srgb, var(--d-brand) var(--d-faro-piso), transparent),
               var(--d-shadow);
 }
 [data-d='AB'] .d-btn {
-  box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--d-brand) var(--d-faro-piso), transparent),
+  box-shadow: 0 0 14px 1px color-mix(in srgb, var(--d-brand) var(--d-faro-piso), transparent),
               0 2px 9px -4px rgba(60, 20, 140, .30), inset 0 1px 0 rgba(255, 255, 255, .92);
 }
 /* El primario es la pieza con más voltaje de la página: irradia en su propio
    color y no en el piso, porque un botón que llama a la acción y una tarjeta
    quieta no pueden alumbrar igual. */
 [data-d='AB'] .d-btn--primary {
-  box-shadow: 0 6px 20px -6px color-mix(in srgb, var(--d-accent) 65%, transparent),
+  box-shadow: 0 0 20px 2px color-mix(in srgb, var(--d-accent) 70%, transparent),
               inset 0 1px 0 rgba(255, 255, 255, .28);
 }
 [data-d='AB'] .d-btn--ghost { box-shadow: none; }
 /* Las píldoras de estado son lo más chico que lleva tono, así que su luz es la
    más corta: un resplandor de 10px que no se derrama sobre el texto vecino. */
 [data-d='AB'] .d-pill[data-tone] {
-  box-shadow: 0 2px 10px -3px color-mix(in srgb, var(--tone-fg) 46%, transparent);
+  box-shadow: 0 0 11px 0 color-mix(in srgb, var(--tone-fg) 55%, transparent);
 }
 /* Lo que flota NO irradia. Su trabajo es interrumpir, y un halo alrededor de un
    diálogo lo integra con la página en vez de despegarlo — que es lo contrario

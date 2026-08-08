@@ -1737,29 +1737,53 @@
      El resplandor va en el MISMO box-shadow que la sombra de contacto, no en
      una capa aparte: son la misma propiedad, y declararlos por separado hacía
      que el segundo pisara al primero y la tarjeta perdiera el peso de Prisma. */
+  /* LA GEOMETRÍA IMPORTA MÁS QUE LA OPACIDAD, y las dos primeras versiones de
+     esto la tenían mal. Estaban escritas como `0 10px 30px -8px`: una sombra
+     desplazada 10px hacia abajo y encogida 8px antes de difuminarse. Con eso,
+     por más alfa que se le suba —la crítica llegó a estar al 92 %— lo que
+     escapa del borde es una mancha debajo de la tarjeta. Eso es una sombra
+     teñida, y una sombra teñida no se lee como luz: se lee como que la pieza
+     está sucia.
+
+     Un resplandor no tiene dirección. Va con desplazamiento CERO, para que
+     irradie por los cuatro lados, y con spread POSITIVO, para que salga del
+     borde en vez de esconderse debajo. La sombra de contacto de Prisma se
+     conserva aparte, después: son dos cosas distintas y cada una hace la suya.
+
+     El anillo es la otra mitad. Una luz que sólo rodea la pieza se lee como
+     halo ambiental; lo que la vuelve emisión es que el canto también esté
+     encendido, porque entonces la fuente está en el objeto y no detrás. */
   :global([data-d='AB']) .kpi[data-tone='critical'] {
-    box-shadow: 0 10px 30px -8px color-mix(in srgb, var(--d-crit) var(--d-faro-crit), transparent),
+    box-shadow: 0 0 28px 3px color-mix(in srgb, var(--d-crit) var(--d-faro-crit), transparent),
+                0 0 0 1px color-mix(in srgb, var(--d-crit) var(--d-faro-ring), transparent),
                 var(--d-shadow);
+    border-color: color-mix(in srgb, var(--d-crit) var(--d-faro-ring), transparent);
   }
   :global([data-d='AB']) .kpi[data-tone='attention'] {
-    box-shadow: 0 10px 30px -10px color-mix(in srgb, var(--d-att) var(--d-faro-att), transparent),
+    box-shadow: 0 0 24px 2px color-mix(in srgb, var(--d-att) var(--d-faro-att), transparent),
+                0 0 0 1px color-mix(in srgb, var(--d-att) var(--d-faro-ring), transparent),
                 var(--d-shadow);
+    border-color: color-mix(in srgb, var(--d-att) var(--d-faro-ring), transparent);
   }
   :global([data-d='AB']) .kpi[data-tone='positive'] {
-    box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--d-pos) var(--d-faro-pos), transparent),
+    box-shadow: 0 0 20px 1px color-mix(in srgb, var(--d-pos) var(--d-faro-pos), transparent),
                 0 0 0 1px color-mix(in srgb, var(--d-pos) var(--d-faro-ring), transparent),
                 var(--d-shadow);
     border-color: color-mix(in srgb, var(--d-pos) var(--d-faro-ring), transparent);
   }
   :global([data-d='AB']) .kpi[data-tone='info'] {
-    box-shadow: 0 8px 24px -8px color-mix(in srgb, var(--d-info) var(--d-faro-info), transparent),
+    box-shadow: 0 0 20px 1px color-mix(in srgb, var(--d-info) var(--d-faro-info), transparent),
                 0 0 0 1px color-mix(in srgb, var(--d-info) var(--d-faro-ring), transparent),
                 var(--d-shadow);
     border-color: color-mix(in srgb, var(--d-info) var(--d-faro-ring), transparent);
   }
-  /* Sin dato no hay nada que anunciar. Apagado es un valor de la escala, no un
-     olvido: es lo que hace que las otras cuatro signifiquen algo. */
-  :global([data-d='AB']) .kpi[data-tone='neutral'] { box-shadow: var(--d-shadow); }
+  /* Sin dato no urge nada, pero tampoco queda muerta: se queda en el piso, en el
+     morado de la marca. Apagado del todo y «poco» se confundían, y ahí la escala
+     perdía su primer peldaño. */
+  :global([data-d='AB']) .kpi[data-tone='neutral'] {
+    box-shadow: 0 0 18px 1px color-mix(in srgb, var(--d-brand) var(--d-faro-neu), transparent),
+                var(--d-shadow);
+  }
 
   /* El riel deja de ser una barra pintada y pasa a ser un filamento: el relleno
      alumbra su propio carril. Es el mismo dibujo de AA con corriente. */
