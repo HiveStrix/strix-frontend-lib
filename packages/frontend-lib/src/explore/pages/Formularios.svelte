@@ -476,85 +476,14 @@
      versalitas»), no un adorno. Los nombres de sección son encabezados como
      en las otras dieciocho.
      ====================================================================== */
-  :global([data-d='B']) .fm-seek {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: stretch; gap: 0; padding: 0; border-color: var(--d-edge);
-  }
-  :global([data-d='B']) .fm-seek-lab {
-    display: flex; align-items: center; padding-inline: var(--d-p2);
-    background: var(--d-sunk); border-right: 1px solid var(--d-edge);
-  }
-  :global([data-d='B']) .fm-seek-ctl { gap: 0; flex-wrap: nowrap; }
-  :global([data-d='B']) .fm-q { border: 0; }
-  :global([data-d='B']) .fm-seek-btn { border: 0; border-left: 1px solid var(--d-edge); }
-  :global([data-d='B']) .fm-seek-hint {
-    grid-column: 1 / -1; padding: 3px var(--d-p2);
-    border-top: 1px solid var(--d-line);
-  }
   /* EL DIBUJO CONTINUO. Los tres bloques comparten canto en vez de separarse:
      gap 0 y un pelo de solape para que las dos líneas de contacto sean una. */
-  :global([data-d='B']) .fm-body { gap: 0; }
-  :global([data-d='B']) .fm-set,
-  :global([data-d='B']) .fm-opts,
-  :global([data-d='B']) .fm-states {
-    position: relative; border: 1px solid var(--d-edge);
-    padding: var(--d-p1) var(--d-p2) var(--d-p2);
-  }
-  :global([data-d='B']) .fm-opts,
-  :global([data-d='B']) .fm-states { margin-top: -1px; }
   /* Las marcas de esquina abrazan el DIBUJO entero: la de arriba en el primer
      bloque, la de abajo en el último. Antes las dos vivían en el fieldset y
      marcaban una caja que ya no existe. */
-  :global([data-d='B']) .fm-set::before,
-  :global([data-d='B']) .fm-states::after {
-    content: ''; position: absolute; width: 6px; height: 6px;
-    border: 1px solid var(--d-edge); pointer-events: none;
-  }
-  :global([data-d='B']) .fm-set::before { top: 3px; right: 3px; border-left: 0; border-bottom: 0; }
-  :global([data-d='B']) .fm-states::after { bottom: 3px; left: 3px; border-right: 0; border-top: 0; }
-  :global([data-d='B']) .fm-leg,
-  :global([data-d='B']) .fm-cap {
-    margin: 0 0 var(--d-p1); padding-inline: var(--d-p1);
-    font-size: var(--d-t-xs);
-  }
-  :global([data-d='B']) .fm-note { padding: var(--d-p2) var(--d-p2) 0; }
   /* Etiqueta de campo: versalita, que es la silueta de B, y en --d-ink-2 para
      que 10px en caja alta no queden en gris de segunda. */
-  :global([data-d='B']) .fm-lab { color: var(--d-ink-2); }
   /* Cifras en monoespaciada: se comparan por columna, no por palabra. */
-  :global([data-d='B']) .d-num { font-family: var(--d-mono); }
-  :global([data-d='B']) .fm-grid,
-  :global([data-d='B']) .fm-stack {
-    gap: 0; border-top: 1px solid var(--d-line); border-left: 1px solid var(--d-line);
-  }
-  :global([data-d='B']) .fm-grid > .fm-f,
-  :global([data-d='B']) .fm-stack > .fm-f,
-  :global([data-d='B']) .fm-stack > .fm-opt {
-    gap: 2px; padding: var(--d-p1) var(--d-p2);
-    border-right: 1px solid var(--d-line); border-bottom: 1px solid var(--d-line);
-  }
-  :global([data-d='B']) .fm-f .fm-inp {
-    border: 0; background: transparent; padding-inline: 0; min-height: 27px;
-  }
-  :global([data-d='B']) .fm-f .d-textarea { min-height: 54px; }
-  :global([data-d='B']) .fm-u {
-    border: 0; border-left: 1px solid var(--d-line);
-    background: transparent; border-radius: 0;
-  }
-  :global([data-d='B']) .fm-radios { gap: 0; }
-  :global([data-d='B']) .fm-radios .fm-opt {
-    min-height: 27px; padding-inline: var(--d-p2); margin-left: -1px;
-    border: 1px solid var(--d-line);
-  }
-  :global([data-d='B']) .fm-radios .fm-opt:first-child { margin-left: 0; }
-  :global([data-d='B']) .fm-radios .fm-in:checked ~ .fm-opt-txt { font-weight: var(--d-w-semi); }
-  :global([data-d='B']) .fm-mark { width: 12px; height: 12px; border-radius: 0; }
-  :global([data-d='B']) .fm-mark svg { width: 8px; height: 8px; }
-  :global([data-d='B']) .fm-mark--rd::after { width: 6px; height: 6px; border-radius: 0; }
-  :global([data-d='B']) .fm-sw { width: 30px; height: 15px; border-radius: 0; }
-  :global([data-d='B']) .fm-sw::after { width: 9px; height: 9px; top: 2px; left: 2px; border-radius: 0; }
-  :global([data-d='B']) .fm-in:checked + .fm-sw::after { transform: translateX(13px); }
-  :global([data-d='B']) .fm-f--bad { background: var(--d-crit-band); outline: 1px solid var(--d-crit); outline-offset: -1px; }
 
   /* ======================================================================
      C · MARCA — el bloque se anuncia por su cabecera.
@@ -620,46 +549,6 @@
      La casilla, el radio y el interruptor son cuadrados con su propia
      sombra dura y se MUEVEN hacia ella al presionarlos.
      ====================================================================== */
-  :global([data-d='D']) .fm-seek { border-color: var(--d-ink); box-shadow: var(--d-shadow); }
-  :global([data-d='D']) .fm-set {
-    border: var(--d-bw) solid var(--d-ink); box-shadow: var(--d-shadow);
-    background: var(--d-surface); padding: var(--d-p1) var(--d-p3) var(--d-p3);
-  }
-  :global([data-d='D']) .fm-leg {
-    background: var(--d-ink); color: var(--d-ink-on);
-    padding: 3px var(--d-p2); margin-left: calc(-1 * var(--d-p1));
-  }
-  :global([data-d='D']) .fm-opts,
-  :global([data-d='D']) .fm-states {
-    border: var(--d-bw) solid var(--d-ink); box-shadow: var(--d-shadow);
-    background: var(--d-surface); padding: var(--d-p2) var(--d-p3) var(--d-p3);
-  }
-  :global([data-d='D']) .fm-u {
-    background: var(--d-accent-soft); color: var(--d-ink);
-    font-weight: var(--d-w-bold); text-transform: uppercase;
-    border-color: var(--d-ink); border-left: 0;
-  }
-  :global([data-d='D']) .fm-mark {
-    width: 20px; height: 20px; border-radius: 0;
-    border-color: var(--d-ink); box-shadow: 2px 2px 0 var(--d-ink);
-  }
-  :global([data-d='D']) .fm-mark--rd { border-radius: 0; }
-  :global([data-d='D']) .fm-mark--rd::after { width: 9px; height: 9px; border-radius: 0; }
-  :global([data-d='D']) .fm-sw {
-    width: 44px; height: 24px; border-radius: 0;
-    border-color: var(--d-ink); box-shadow: 2px 2px 0 var(--d-ink);
-  }
-  :global([data-d='D']) .fm-sw::after {
-    width: 14px; height: 14px; top: 3px; left: 3px; border-radius: 0; background: var(--d-ink);
-  }
-  :global([data-d='D']) .fm-in:checked + .fm-sw::after { transform: translateX(21px); background: var(--d-ink-on); }
-  :global([data-d='D']) .fm-opt:active .fm-mark,
-  :global([data-d='D']) .fm-opt:active .fm-sw { transform: translate(2px, 2px); box-shadow: none; }
-  :global([data-d='D']) .fm-f--bad {
-    background: var(--d-crit-band); border: var(--d-bw) solid var(--d-ink);
-    box-shadow: var(--d-shadow); padding: var(--d-p2);
-  }
-  :global([data-d='D']) .fm-state { font-weight: var(--d-w-bold); color: var(--d-ink); }
 
   /* ======================================================================
      E · AIRE — ni un borde en toda la celda. El campo es un POZO relleno de
@@ -679,58 +568,6 @@
      etiquetas a la izquierda, y el error como franja de 3px en el canto.
      El campo es una línea de base: la unidad continúa esa misma línea.
      ====================================================================== */
-  :global([data-d='G']) .fm { gap: 0; }
-  :global([data-d='G']) .fm-seek {
-    grid-template-columns: var(--d-rail) minmax(0, 1fr);
-    gap: 0 var(--d-p3); align-items: center;
-    background: var(--d-sunk); border: 0; border-block: 1px solid var(--d-line);
-    border-radius: 0; box-shadow: none; padding: var(--d-p1) var(--d-p3);
-  }
-  :global([data-d='G']) .fm-seek-lab { text-align: right; }
-  :global([data-d='G']) .fm-seek-hint { grid-column: 2; }
-  :global([data-d='G']) .fm-body { padding-inline: 0; gap: 0; }
-  :global([data-d='G']) .fm-grid,
-  :global([data-d='G']) .fm-stack { grid-template-columns: 1fr; gap: 0; }
-  :global([data-d='G']) .fm-f {
-    position: relative;
-    grid-template-columns: var(--d-rail) minmax(0, 1fr);
-    gap: 0 var(--d-p3); align-items: baseline;
-    padding: var(--d-p2) var(--d-p3);
-    border-bottom: 1px solid var(--d-line);
-  }
-  :global([data-d='G']) .fm-lab { text-align: right; }
-  :global([data-d='G']) .fm-f[data-tone]::before {
-    content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--tone-fg);
-  }
-  :global([data-d='G']) .fm-f--bad .fm-inp,
-  :global([data-d='G']) .fm-f--bad .fm-u { border-color: var(--d-crit); }
-  :global([data-d='G']) .fm-u {
-    border: 0; border-bottom: 1px solid var(--d-edge); border-radius: 0;
-    background: transparent; padding: 0 0 0 6px; min-width: 0; justify-content: flex-start;
-  }
-  :global([data-d='G']) .fm-leg,
-  :global([data-d='G']) .fm-cap {
-    margin: 0; padding: var(--d-p1) var(--d-p3);
-    background: var(--d-sunk); border-block: 1px solid var(--d-line);
-  }
-  :global([data-d='G']) .fm-opt {
-    padding: var(--d-p1) var(--d-p3); border-bottom: 1px solid var(--d-line);
-  }
-  :global([data-d='G']) .fm-radios { gap: 0 var(--d-p3); padding-block: var(--d-p1); }
-  :global([data-d='G']) .fm-radios .fm-opt { padding: 0; border-bottom: 0; min-height: 0; }
-  :global([data-d='G']) .fm-radios .fm-opt-txt { border-bottom: 2px solid transparent; padding-bottom: 2px; }
-  :global([data-d='G']) .fm-radios .fm-in:checked ~ .fm-opt-txt {
-    border-bottom-color: var(--d-ink); font-weight: var(--d-w-semi);
-  }
-  :global([data-d='G']) .fm-mark { border-radius: 0; background: transparent; }
-  :global([data-d='G']) .fm-mark--rd { border-radius: 999px; }
-  :global([data-d='G']) .fm-sw { border-radius: 0; }
-  :global([data-d='G']) .fm-sw::after { border-radius: 0; }
-  :global([data-d='G']) .fm-note { padding: var(--d-p2) var(--d-p3); }
-  :global([data-d='G']) .fm-foot {
-    justify-content: flex-start;
-    padding-left: calc(var(--d-rail) + var(--d-p3) + var(--d-p3));
-  }
 
   /* ======================================================================
      H · FICHA — el buscador lleva su propia PESTAÑA con la etiqueta, igual
@@ -880,69 +717,9 @@
      un anillo de 1px de su propio tono más un resplandor difuso hacia afuera.
      El estado ES el color del resplandor, nunca un relleno.
      ====================================================================== */
-  :global([data-d='K']) .fm-seek {
-    border: 0;
-    background: var(--d-sunk);
-    box-shadow: var(--d-shadow);
-    padding: var(--d-p3);
-    transition: box-shadow 200ms ease;
-  }
-  :global([data-d='K']) .fm-seek:focus-within {
-    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 14px 60px -18px var(--d-accent);
-  }
-  :global([data-d='K']) .fm-body { gap: var(--d-p4); }
   /* Cada bloque irradia en el tono de lo que informa: el de estados en rojo,
      el de «al guardar» en azul. Se lee desde el otro lado del cuarto. */
-  :global([data-d='K']) .fm-opts,
-  :global([data-d='K']) .fm-states {
-    border: 0;
-    border-radius: var(--d-r-lg);
-    background: var(--d-sunk);
-    padding: var(--d-p3);
-    box-shadow: 0 0 0 1px var(--tone-edge), 0 14px 54px -20px var(--tone-fg);
-  }
-  :global([data-d='K']) .fm-leg,
-  :global([data-d='K']) .fm-cap { color: var(--d-accent); }
-  :global([data-d='K']) .fm-u {
-    background: transparent;
-    border: 0;
-    box-shadow: inset 0 0 0 1px var(--d-neu-edge);
-    border-radius: 0 var(--d-r) var(--d-r) 0;
-  }
-  :global([data-d='K']) .fm-mark {
-    background: transparent;
-    border: 0;
-    box-shadow: inset 0 0 0 1px var(--d-neu-edge);
-  }
-  :global([data-d='K']) .fm-in:checked + .fm-mark {
-    background: var(--d-accent);
-    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 0 22px -4px var(--d-accent);
-  }
-  :global([data-d='K']) .fm-sw {
-    background: transparent;
-    border: 0;
-    box-shadow: inset 0 0 0 1px var(--d-neu-edge);
-  }
-  :global([data-d='K']) .fm-in:checked + .fm-sw {
-    background: var(--d-accent);
-    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 0 26px -6px var(--d-accent);
-  }
-  :global([data-d='K']) .fm-in:checked ~ .fm-state { color: var(--d-accent); }
   /* El error no se rellena de rojo: el pozo se pone a irradiar rojo. */
-  :global([data-d='K']) .fm-f--bad .fm-inp,
-  :global([data-d='K']) .fm-f--bad .fm-u {
-    border-color: transparent;
-    background: transparent;
-    box-shadow: inset 0 0 0 1px var(--tone-edge), 0 0 26px -8px var(--tone-fg);
-  }
-  :global([data-d='K']) .fm-msg { color: var(--tone-fg); }
-  :global([data-d='K']) .fm-f--off .fm-inp[disabled] {
-    background: transparent;
-    box-shadow: inset 0 0 0 1px var(--d-neu-edge);
-    opacity: .6;
-  }
-  :global([data-d='K']) .fm-foot { border-top: 0; box-shadow: 0 -1px 0 var(--d-neu-edge); }
-  :global([data-d='K']) .fm-req { color: var(--d-crit); }
 
   /* ======================================================================
      L · GUIJARRO — el campo es una piedra HUNDIDA en la mesa. Cuatro radios
@@ -950,64 +727,7 @@
      compartieran los mismos cuatro, volverían a ser tarjetas. Por eso cada
      pieza de abajo lleva su propio juego, y los pozos rotan entre tres.
      ====================================================================== */
-  :global([data-d='L']) .fm-seek {
-    border: 0;
-    border-radius: 30px 40px 26px 34px;
-    padding: var(--d-p3);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='L']) .fm-opts {
-    border-radius: 42px 24px 36px 28px;
-    background: var(--d-sunk);
-    padding: var(--d-p3);
-    box-shadow: inset 4px 5px 12px -7px var(--d-ink-3);
-  }
-  :global([data-d='L']) .fm-states {
-    border-radius: 26px 38px 22px 44px;
-    background: var(--d-sunk);
-    padding: var(--d-p3);
-    box-shadow: inset 4px 5px 12px -7px var(--d-ink-3);
-  }
-  :global([data-d='L']) .fm-grid { gap: var(--d-p2) var(--d-p3); }
   /* Ningún pozo igual al de al lado. */
-  :global([data-d='L']) .fm-grid > .fm-f:nth-child(3n + 2) .fm-inp { border-radius: 24px 16px 22px 18px; }
-  :global([data-d='L']) .fm-grid > .fm-f:nth-child(3n) .fm-inp { border-radius: 16px 22px 26px 14px; }
-  :global([data-d='L']) .fm-stack > .fm-f:nth-child(2n) .fm-inp { border-radius: 22px 18px 24px 16px; }
-  :global([data-d='L']) .fm-u {
-    border: 0;
-    border-radius: 6px 22px 20px 6px;
-    background: var(--d-sunk);
-    box-shadow: inset 3px 4px 9px -6px var(--d-ink-3);
-  }
-  :global([data-d='L']) .fm-mark {
-    border: 0;
-    border-radius: 9px 6px 10px 7px;
-    background: var(--d-sunk);
-    box-shadow: 3px 4px 9px -5px var(--d-ink-3);
-  }
-  :global([data-d='L']) .fm-mark--rd { border-radius: 999px; }
-  :global([data-d='L']) .fm-sw {
-    border: 0;
-    border-radius: 999px;
-    background: var(--d-sunk);
-    box-shadow: inset 3px 4px 9px -5px var(--d-ink-3);
-  }
-  :global([data-d='L']) .fm-sw::after { background: var(--d-ink-3); box-shadow: 2px 3px 6px -3px var(--d-ink-3); }
-  :global([data-d='L']) .fm-in:checked + .fm-sw::after { background: var(--d-accent-ink); }
-  :global([data-d='L']) .fm-opt:active .fm-mark { box-shadow: inset 3px 4px 9px -5px var(--d-ink-3); }
-  :global([data-d='L']) .fm-f--bad {
-    background: var(--tone-band);
-    border-radius: 34px 22px 30px 20px;
-    padding: var(--d-p2) var(--d-p3);
-  }
-  :global([data-d='L']) .fm-f--bad .fm-inp,
-  :global([data-d='L']) .fm-f--bad .fm-u { border: 0; box-shadow: inset 3px 4px 9px -5px var(--d-crit); }
-  :global([data-d='L']) .fm-msg { padding-inline: var(--d-p1); }
-  :global([data-d='L']) .fm-f--off .fm-inp[disabled] { box-shadow: inset 3px 4px 9px -6px var(--d-ink-3); }
-  :global([data-d='L']) .fm-seek-btn { border-radius: 22px 16px 24px 18px; }
-  :global([data-d='L']) .fm-leg,
-  :global([data-d='L']) .fm-cap { font-size: var(--d-t-lg); color: var(--d-ink); letter-spacing: -.01em; }
-  :global([data-d='L']) .fm-hint { padding-inline: var(--d-p2); }
 
   /* ======================================================================
      M · BRUMA — no hay contenedores. El campo es un SUBRAYADO que se
@@ -1168,93 +888,11 @@
      milímetros, así que hay orden de apilado explícito —el de arriba pisa al
      de abajo— y la sombra de --d-shadow hace de sombra de contacto.
      ====================================================================== */
-  :global([data-d='N']) .fm-seek {
-    border-radius: var(--d-r-pill);
-    background: var(--d-surface-fill);
-    padding: var(--d-p2) var(--d-p4);
-  }
-  :global([data-d='N']) .fm-seek-ctl { gap: var(--d-p2); }
-  :global([data-d='N']) .fm-grid,
-  :global([data-d='N']) .fm-stack { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  :global([data-d='N']) .fm-f {
-    position: relative;
-    grid-template-columns: minmax(0, 11ch) minmax(0, 1fr);
-    align-items: center;
-    gap: 0 var(--d-p2);
-    min-height: var(--d-row-h);
-    padding: var(--d-p1) var(--d-p3);
-    border-radius: var(--d-r-pill);
-    background: var(--d-surface-fill);
-    box-shadow: var(--d-shadow);
-    margin-bottom: calc(-1 * var(--d-p1));
-  }
   /* Orden de apilado: la cinta de arriba se monta sobre la de abajo. */
-  :global([data-d='N']) .fm-grid > .fm-f:nth-child(1) { z-index: 5; }
-  :global([data-d='N']) .fm-grid > .fm-f:nth-child(2) { z-index: 4; }
-  :global([data-d='N']) .fm-grid > .fm-f:nth-child(3) { z-index: 3; }
-  :global([data-d='N']) .fm-grid > .fm-f:nth-child(4) { z-index: 2; }
-  :global([data-d='N']) .fm-grid > .fm-f:nth-child(5) { z-index: 1; }
   /* Carril dentro de carril se vuelve papilla: el pozo se apaga y el carril
      entero pasa a ser el control. */
-  :global([data-d='N']) .fm-f .fm-inp {
-    background: transparent;
-    border-color: transparent;
-    border-radius: 0;
-    box-shadow: none;
-    padding-inline: 0;
-  }
-  :global([data-d='N']) .fm-f .d-textarea { padding-block: var(--d-p1); }
-  :global([data-d='N']) .fm-u {
-    border: 0;
-    background: transparent;
-    border-radius: 0 var(--d-r-pill) var(--d-r-pill) 0;
-    min-width: 0;
-    padding-left: var(--d-p1);
-    justify-content: flex-start;
-  }
-  :global([data-d='N']) .fm-f--bad {
-    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 62%);
-  }
-  :global([data-d='N']) .fm-f--bad .fm-inp,
-  :global([data-d='N']) .fm-f--bad .fm-u { border-color: transparent; }
-  :global([data-d='N']) .fm-msg { padding-left: var(--d-p1); }
-  :global([data-d='N']) .fm-opts,
-  :global([data-d='N']) .fm-states {
-    border-radius: var(--d-r-lg);
-    background: var(--d-sunk-fill);
-    padding: var(--d-p2) var(--d-p3) var(--d-p3);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='N']) .fm-choices { gap: 0; }
   /* El colchón vertical iguala al solape: sin él, la cinta de arriba se come
      la primera línea de la de abajo cuando el texto crece a dos renglones. */
-  :global([data-d='N']) .fm-choices .fm-opt {
-    position: relative;
-    border-radius: var(--d-r-pill);
-    background: var(--d-surface-fill);
-    padding: var(--d-p1) var(--d-p3);
-    box-shadow: var(--d-shadow);
-    margin-bottom: calc(-1 * var(--d-p1));
-  }
-  :global([data-d='N']) .fm-choices .fm-opt:nth-child(1) { z-index: 2; }
-  :global([data-d='N']) .fm-choices .fm-opt:nth-child(2) { z-index: 1; }
-  :global([data-d='N']) .fm-radios { gap: var(--d-p1); }
-  :global([data-d='N']) .fm-radios .fm-opt {
-    min-height: 34px;
-    padding-inline: var(--d-p2);
-    border-radius: var(--d-r-pill);
-    background: var(--d-sunk-fill);
-    box-shadow: inset 0 2px 4px -2px var(--d-edge);
-  }
-  :global([data-d='N']) .fm-radios .fm-opt:has(.fm-in:checked) {
-    background: var(--d-accent-soft);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='N']) .fm-mark { border-radius: var(--d-r-pill); background: var(--d-surface-fill); }
-  :global([data-d='N']) .fm-sw { background: var(--d-sunk-fill); box-shadow: inset 0 2px 4px -1px var(--d-edge); }
-  :global([data-d='N']) .fm-sw::after { background: var(--d-ink-3); box-shadow: 0 1px 3px -1px var(--d-edge); }
-  :global([data-d='N']) .fm-in:checked + .fm-sw { background: var(--d-accent-fill); }
-  :global([data-d='N']) .fm-foot { border-radius: 0 0 var(--d-r-lg) var(--d-r-lg); }
 
   /* ======================================================================
      O · PRISMA — vidrio con la marca teñida ADENTRO. El campo vuelve a ser un
@@ -1425,80 +1063,12 @@
      consulta de contenedor —abajo, junto al resto del responsive— sobre la
      misma frontera de 430px con la que G conserva el suyo. Ahí sí hay ancho.
      ====================================================================== */
-  :global([data-d='P']) .fm { gap: 0; }
-  :global([data-d='P']) .fm-seek {
-    position: relative;
-    background: var(--d-sunk);
-    border: 0;
-    border-top: max(var(--d-bw), 1px) solid var(--d-line);
-    border-radius: 0;
-    box-shadow: none;
-    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(6px + var(--d-p3));
-  }
   /* La espina del buscador y la del panel se tocan (gap 0): se leen como UNA
      sola columna que baja por toda la celda. */
-  :global([data-d='P']) .fm-seek::before {
-    content: '';
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 6px;
-    background: var(--d-brand);
-  }
-  :global([data-d='P']) .fm-body { padding-inline: 0; gap: 0; }
-  :global([data-d='P']) .fm-grid,
-  :global([data-d='P']) .fm-stack { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  :global([data-d='P']) .fm-f,
-  :global([data-d='P']) .fm-choices .fm-opt {
-    position: relative;
-    margin-left: -6px;
-    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(6px + var(--d-p3));
-    border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
-  }
-  :global([data-d='P']) .fm-f::before,
-  :global([data-d='P']) .fm-choices .fm-opt::before {
-    content: '';
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: 6px;
-    background: var(--d-brand);
-  }
   /* El estado no pinta el fondo: muerde la espina con una muesca de su tono. */
-  :global([data-d='P']) .fm-f[data-tone]::before {
-    background: linear-gradient(180deg, var(--d-brand) 0%, var(--d-brand) 26%,
-                var(--tone-fg) 26%, var(--tone-fg) 74%, var(--d-brand) 74%);
-  }
-  :global([data-d='P']) .fm-leg,
-  :global([data-d='P']) .fm-cap {
-    margin: 0 0 0 -6px;
-    padding: var(--d-p1) var(--d-p3) var(--d-p1) calc(6px + var(--d-p3));
-    background: var(--d-sunk);
-    border-block: max(var(--d-bw), 1px) solid var(--d-line);
-    color: var(--d-brand);
-  }
-  :global([data-d='P']) .fm-note { padding: var(--d-p2) var(--d-p3); }
-  :global([data-d='P']) .fm-u {
-    border: 0;
-    border-bottom: max(var(--d-bw), 1px) solid var(--d-edge);
-    border-radius: 0;
-    background: transparent;
-    min-width: 0;
-    padding: 0 0 0 6px;
-    justify-content: flex-start;
-  }
-  :global([data-d='P']) .fm-radios { gap: var(--d-p1) var(--d-p3); }
-  :global([data-d='P']) .fm-radios .fm-opt { min-height: 0; padding: 0; margin: 0; border: 0; }
-  :global([data-d='P']) .fm-mark { border-radius: 0; }
-  :global([data-d='P']) .fm-mark--rd { border-radius: 999px; }
-  :global([data-d='P']) .fm-sw { border-radius: 0; }
-  :global([data-d='P']) .fm-sw::after { border-radius: 0; }
-  :global([data-d='P']) .fm-f--bad .fm-inp,
-  :global([data-d='P']) .fm-f--bad .fm-u { border-bottom-color: var(--d-crit); border-bottom-width: 2px; }
-  :global([data-d='P']) .fm-f--off .fm-inp[disabled] { background: transparent; }
   /* El pie NO se sangra hasta el raíl. Con 152px de raíl más los dos paddings
      quedan ~280px para tres botones y se apilan de a uno. Cuelgan del canto,
      como el resto de los estratos, y se leen en una línea. */
-  :global([data-d='P']) .fm-foot { justify-content: flex-start; padding-inline: var(--d-p3); }
-  :global([data-d='P']) .fm-acts { justify-content: flex-start; }
 
   /* ======================================================================
      Q · CHAROL — masa dura con superficie mojada. Cada bloque propio lleva
@@ -1510,104 +1080,9 @@
      alfa; ni un blanco inventado. Y pointer-events: none, porque el ::after
      se pinta después del contenido.
      ====================================================================== */
-  :global([data-d='Q']) .fm-seek,
-  :global([data-d='Q']) .fm-set,
-  :global([data-d='Q']) .fm-opts,
-  :global([data-d='Q']) .fm-states {
-    position: relative;
-    overflow: hidden;
-    background: var(--d-sunk-fill);
-    border: var(--d-bw) solid var(--d-edge);
-    border-radius: var(--d-r-lg);
-    padding: var(--d-p3);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='Q']) .fm-seek::after,
-  :global([data-d='Q']) .fm-set::after,
-  :global([data-d='Q']) .fm-opts::after,
-  :global([data-d='Q']) .fm-states::after {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 34%;
-    background: var(--d-surface);
-    -webkit-mask-image: linear-gradient(180deg, currentColor 0%, transparent 100%);
-    mask-image: linear-gradient(180deg, currentColor 0%, transparent 100%);
-    opacity: .7;
-    pointer-events: none;
-  }
-  :global([data-d='Q']) .fm-seek > *,
-  :global([data-d='Q']) .fm-set > *,
-  :global([data-d='Q']) .fm-opts > *,
-  :global([data-d='Q']) .fm-states > * { position: relative; z-index: 1; }
   /* La leyenda es una placa lacada de accent, no una barra de tinta plana:
      es lo que separa a Q de la masa seca de D. */
-  :global([data-d='Q']) .fm-leg {
-    display: inline-block;
-    background: var(--d-accent-fill);
-    color: var(--d-accent-ink);
-    border: var(--d-bw) solid var(--d-edge);
-    border-radius: var(--d-r);
-    margin: 0 0 var(--d-p3);
-    padding: 3px var(--d-p2);
-    box-shadow: 3px 3px 0 var(--d-ink), inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='Q']) .fm-cap {
-    display: inline-block;
-    background: var(--d-ink);
-    color: var(--d-ink-on);
-    border-radius: var(--d-r);
-    padding: 2px var(--d-p2);
-    margin-bottom: var(--d-p2);
-  }
-  :global([data-d='Q']) .fm-u {
-    background: var(--d-sunk-fill);
-    border-color: var(--d-edge);
-    color: var(--d-ink);
-    font-weight: var(--d-w-bold);
-    box-shadow: inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='Q']) .fm-mark {
-    border-color: var(--d-edge);
-    border-radius: min(var(--d-r), 6px);
-    background: var(--d-surface-fill);
-    box-shadow: 2px 2px 0 var(--d-ink), inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='Q']) .fm-in:checked + .fm-mark { background: var(--d-accent-fill); }
-  :global([data-d='Q']) .fm-sw {
-    border-color: var(--d-edge);
-    background: var(--d-sunk-fill);
-    box-shadow: 2px 2px 0 var(--d-ink), inset 0 2px 4px -1px var(--d-edge);
-  }
-  :global([data-d='Q']) .fm-sw::after { background: var(--d-ink); box-shadow: inset 0 1px 0 var(--d-surface); }
-  :global([data-d='Q']) .fm-in:checked + .fm-sw { background: var(--d-accent-fill); }
-  :global([data-d='Q']) .fm-in:checked + .fm-sw::after { background: var(--d-surface-fill); }
   /* Al presionar, la pieza entra en su sombra y el charol se apaga. */
-  :global([data-d='Q']) .fm-opt:active .fm-mark,
-  :global([data-d='Q']) .fm-opt:active .fm-sw {
-    transform: translate(2px, 2px);
-    box-shadow: inset 0 2px 5px -1px var(--d-edge);
-  }
-  :global([data-d='Q']) .fm-f--bad {
-    background: var(--tone-band);
-    border: var(--d-bw) solid var(--d-edge);
-    border-radius: var(--d-r);
-    box-shadow: var(--d-shadow);
-    padding: var(--d-p2);
-  }
-  :global([data-d='Q']) .fm-msg {
-    background: var(--d-surface);
-    border: var(--d-bw) solid var(--d-edge);
-    border-radius: var(--d-r);
-    padding: 4px var(--d-p2);
-  }
-  :global([data-d='Q']) .fm-f--off .fm-inp[disabled] {
-    background: var(--d-sunk-fill);
-    box-shadow: inset 0 2px 4px -1px var(--d-edge);
-  }
-  :global([data-d='Q']) .fm-acts { gap: var(--d-p2); }
-  :global([data-d='Q']) .fm-foot { gap: var(--d-p2); background: var(--d-sunk-fill); }
-  :global([data-d='Q']) .fm-state { font-weight: var(--d-w-bold); color: var(--d-ink); }
 
   /* ======================================================================
      R · VITRINA — la más densa de las diecinueve: fila de 26px y
@@ -1618,121 +1093,9 @@
      Mismo cuidado que en I y O: el desenfoque solo en la barra que se apoya
      en el fondo. Dentro del panel, transparencia.
      ====================================================================== */
-  :global([data-d='R']) .fm { padding: var(--d-p2); gap: var(--d-p2); }
-  :global([data-d='R']) .fm-seek {
-    display: flex;
-    align-items: stretch;
-    flex-wrap: wrap;
-    gap: 0;
-    padding: 0;
-    overflow: hidden;
-    backdrop-filter: blur(16px) saturate(1.3);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  }
-  :global([data-d='R']) .fm-seek-lab {
-    flex: none;
-    display: flex;
-    align-items: center;
-    padding-inline: var(--d-p2);
-    background: var(--d-sunk);
-    border-right: max(var(--d-bw), 1px) solid var(--d-line);
-  }
-  :global([data-d='R']) .fm-seek-ctl { flex: 1 1 140px; gap: 0; flex-wrap: nowrap; align-items: stretch; }
-  :global([data-d='R']) .fm-q { border: 0; border-radius: 0; background: transparent; }
-  :global([data-d='R']) .fm-seek-btn {
-    border: 0;
-    border-left: max(var(--d-bw), 1px) solid var(--d-line);
-    border-radius: 0;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-  :global([data-d='R']) .fm-seek-hint {
-    flex-basis: 100%;
-    padding: 2px var(--d-p2);
-    border-top: max(var(--d-bw), 1px) solid var(--d-line);
-  }
-  :global([data-d='R']) .fm-body { gap: var(--d-p2); }
-  :global([data-d='R']) .fm-set {
-    border: max(var(--d-bw), 1px) solid var(--d-line);
-    background: var(--d-sunk);
-  }
-  :global([data-d='R']) .fm-leg,
-  :global([data-d='R']) .fm-cap {
-    margin: 0;
-    padding: 2px var(--d-p2);
-    color: var(--d-accent);
-    background: var(--d-surface);
-    border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
-  }
-  :global([data-d='R']) .fm-grid,
-  :global([data-d='R']) .fm-stack { grid-template-columns: minmax(0, 1fr); gap: 0; }
   /* La fila de fichero: 26px, etiqueta en columna de vidrio propia. */
-  :global([data-d='R']) .fm-f {
-    /* 15ch, no 13: «Fuente bloqueado» en versalitas monoespaciadas no entra en
-       13 y se recortaba contra la divisoria. */
-    grid-template-columns: minmax(0, 15ch) minmax(0, 1fr);
-    gap: 0;
-    align-items: stretch;
-    min-height: var(--d-row-h);
-    border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
-  }
-  :global([data-d='R']) .fm-lab {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    overflow-wrap: anywhere;
-    line-height: 1.25;
-    padding: 2px var(--d-p2);
-    background: var(--d-sunk);
-    border-right: max(var(--d-bw), 1px) solid var(--d-line);
-  }
-  :global([data-d='R']) .fm-ctl { gap: 0; align-content: center; padding-block: 1px; }
-  :global([data-d='R']) .fm-f .fm-inp {
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    padding-inline: var(--d-p2);
-  }
-  :global([data-d='R']) .fm-hint,
-  :global([data-d='R']) .fm-msg { padding-inline: var(--d-p2); }
-  :global([data-d='R']) .fm-u {
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    min-width: 0;
-    padding-inline: var(--d-p1);
-    justify-content: flex-start;
-  }
-  :global([data-d='R']) .fm-opts,
-  :global([data-d='R']) .fm-states {
-    border: max(var(--d-bw), 1px) solid var(--d-line);
-    background: var(--d-sunk);
-  }
-  :global([data-d='R']) .fm-opt { min-height: var(--d-row-h); gap: var(--d-p2); padding-inline: var(--d-p2); }
-  :global([data-d='R']) .fm-stack > .fm-opt { border-bottom: max(var(--d-bw), 1px) solid var(--d-line); }
-  :global([data-d='R']) .fm-radios { gap: 0 var(--d-p3); padding: 0 var(--d-p2); }
-  :global([data-d='R']) .fm-mark {
-    width: 12px;
-    height: 12px;
-    border-radius: 0;
-    border-color: var(--d-edge);
-    background: var(--d-surface);
-  }
-  :global([data-d='R']) .fm-mark svg { width: 8px; height: 8px; }
-  :global([data-d='R']) .fm-mark--rd { border-radius: 999px; }
-  :global([data-d='R']) .fm-mark--rd::after { width: 6px; height: 6px; }
-  :global([data-d='R']) .fm-sw { width: 30px; height: 15px; border-color: var(--d-edge); background: var(--d-surface); }
-  :global([data-d='R']) .fm-sw::after { width: 9px; height: 9px; top: 2px; left: 2px; }
-  :global([data-d='R']) .fm-in:checked + .fm-sw::after { transform: translateX(13px); }
   /* El canto de estado va en la columna de etiqueta, que es la que tiene su
      propio relleno: en el .fm-f quedaría por debajo y no se vería. */
-  :global([data-d='R']) .fm-f--bad { background: var(--tone-band); }
-  :global([data-d='R']) .fm-f--bad .fm-lab { box-shadow: inset 2px 0 0 var(--tone-fg); }
-  :global([data-d='R']) .fm-f--bad .fm-inp,
-  :global([data-d='R']) .fm-f--bad .fm-u { border-color: transparent; color: var(--tone-fg); }
-  :global([data-d='R']) .fm-f--off .fm-inp[disabled] { background: transparent; }
-  :global([data-d='R']) .fm-note { padding: var(--d-p1) var(--d-p2) 0; }
-  :global([data-d='R']) .fm-foot { padding: var(--d-p1) var(--d-p2); }
 
   /* ======================================================================
      S · UMBRA — la tarjeta se queda BLANCA y lo que informa es la sombra
@@ -1745,58 +1108,9 @@
      El color nunca queda solo: el error mantiene su glifo y su frase, y el
      interruptor su palabra en .fm-state.
      ====================================================================== */
-  :global([data-d='S']) .fm-seek {
-    border: 0;
-    padding: var(--d-p3);
-    transition: box-shadow 160ms ease;
-  }
-  :global([data-d='S']) .fm-seek:focus-within { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='S']) .fm-body { gap: var(--d-p4); }
-  :global([data-d='S']) .fm-grid { gap: var(--d-p3); }
   /* LA FIRMA, en el marcado de esta página. */
-  :global([data-d='S']) .fm-opts,
-  :global([data-d='S']) .fm-states {
-    background: var(--d-surface);
-    border-radius: var(--d-r-lg);
-    padding: var(--d-p3);
-    box-shadow: 0 14px 36px -16px var(--tone-fg), var(--d-shadow);
-  }
-  :global([data-d='S']) .fm-leg,
-  :global([data-d='S']) .fm-cap { margin-bottom: var(--d-p2); }
-  :global([data-d='S']) .fm-u {
-    border: 0;
-    background: var(--d-sunk);
-    border-radius: 0 var(--d-r) var(--d-r) 0;
-  }
-  :global([data-d='S']) .fm-mark { border-color: var(--d-edge); background: var(--d-surface); }
-  :global([data-d='S']) .fm-in:checked + .fm-mark { box-shadow: 0 6px 14px -6px var(--d-accent); }
-  :global([data-d='S']) .fm-sw { background: var(--d-sunk); border-color: transparent; }
-  :global([data-d='S']) .fm-sw::after { background: var(--d-ink-3); box-shadow: var(--d-shadow); }
-  :global([data-d='S']) .fm-in:checked + .fm-sw { box-shadow: 0 6px 16px -7px var(--d-pos); }
   /* La fila hecha a mano: blanca, y la luz de abajo dice que está activa. */
-  :global([data-d='S']) .fm-choices .fm-opt {
-    background: var(--d-surface);
-    border-radius: var(--d-r);
-    padding-inline: var(--d-p2);
-    box-shadow: var(--d-shadow);
-    transition: box-shadow 160ms ease;
-  }
-  :global([data-d='S']) .fm-choices .fm-opt:has(.fm-in:checked) {
-    box-shadow: 0 10px 26px -12px var(--d-pos), var(--d-shadow);
-  }
   /* El campo con error NO se tiñe: sigue blanco y proyecta rojo. */
-  :global([data-d='S']) .fm-f--bad {
-    background: var(--d-surface);
-    border-radius: var(--d-r);
-    padding: var(--d-p2);
-    box-shadow: 0 12px 30px -14px var(--tone-fg), var(--d-shadow);
-  }
-  :global([data-d='S']) .fm-f--bad .fm-inp,
-  :global([data-d='S']) .fm-f--bad .fm-u { border-color: transparent; background: var(--d-sunk); }
-  :global([data-d='S']) .fm-f--off .fm-inp[disabled] { background: var(--d-sunk); box-shadow: none; }
-  :global([data-d='S']) .fm-msg { color: var(--d-crit); }
-  :global([data-d='S']) .fm-foot { border-top: 0; }
-  :global([data-d='S']) .fm-set { padding-bottom: var(--d-p1); }
 
   /* ======================================================================
      T · HALO CLARO — Halo, del otro lado de la luz.
@@ -2187,19 +1501,6 @@
      columna de caracteres de F se apilan: un raíl de 148px dentro de 300px
      no deja nada para el contenido.
      ====================================================================== */
-  @container fm (max-width: 430px) {
-    :global([data-d='G']) .fm-seek,
-    :global([data-d='G']) .fm-f { grid-template-columns: minmax(0, 1fr); gap: 4px; }
-    :global([data-d='G']) .fm-seek-hint { grid-column: 1; }
-    :global([data-d='G']) .fm-lab,
-    :global([data-d='G']) .fm-seek-lab { text-align: left; }
-    :global([data-d='G']) .fm-foot { padding-left: var(--d-p3); }
-    :global([data-d='B']) .fm-seek { grid-template-columns: minmax(0, 1fr); }
-    :global([data-d='B']) .fm-seek-lab { border-right: 0; border-bottom: 1px solid var(--d-edge); padding-block: 3px; }
-  }
-  @media (max-width: 720px) {
-    :global([data-d='G']) .fm-foot { padding-left: var(--d-p3); }
-  }
 
   /* ======================================================================
      RESPONSIVE DE LAS ONCE.
@@ -2210,46 +1511,15 @@
      debajo, P no pierde identidad: la espina de marca y las versalitas de
      marca no dependen del ancho, y las etiquetas se apilan.
      ====================================================================== */
-  @container fm (min-width: 431px) {
-    :global([data-d='P']) .fm-seek {
-      grid-template-columns: var(--d-rail) minmax(0, 1fr);
-      gap: 0 var(--d-p3);
-      align-items: center;
-    }
-    :global([data-d='P']) .fm-seek-hint { grid-column: 2; }
-    :global([data-d='P']) .fm-f {
-      grid-template-columns: var(--d-rail) minmax(0, 1fr);
-      gap: 0 var(--d-p3);
-      align-items: baseline;
-    }
-    :global([data-d='P']) .fm-lab,
-    :global([data-d='P']) .fm-seek-lab { text-align: right; }
-  }
 
   /* Y donde no hay ancho: la etiqueta montada en el cabo de la cinta (N) y
      la columna de fichero de la vitrina (R) se apilan antes que recortarse. */
   @container fm (max-width: 430px) {
-    :global([data-d='N']) .fm-f {
-      grid-template-columns: minmax(0, 1fr);
-      align-items: start;
-      gap: 2px;
-      border-radius: var(--d-r-lg);
-    }
-    :global([data-d='R']) .fm-f { grid-template-columns: minmax(0, 1fr); }
-    :global([data-d='R']) .fm-lab {
-      border-right: 0;
-      border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
-    }
     :global([data-d='O']) .fm-seek-lab {
       flex: 1 1 100%;
       border-right: 0;
       border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
       padding-block: 3px;
-    }
-    :global([data-d='R']) .fm-seek-lab {
-      flex: 1 1 100%;
-      border-right: 0;
-      border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
     }
     :global([data-d='O']) .fm-radios,
     :global([data-d='O']) .fm-acts { flex-wrap: wrap; }

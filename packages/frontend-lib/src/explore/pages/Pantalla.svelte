@@ -686,7 +686,6 @@
      izquierda de la frase que califica. Banda y Espina la mantienen alineada
      a la derecha del raíl, que es su propia gramática. */
   :global([data-d='A']) .verdict,
-  :global([data-d='B']) .verdict,
   :global([data-d='C']) .verdict,
   :global([data-d='I']) .verdict,
   :global([data-d='M']) .verdict,
@@ -729,88 +728,16 @@
   /* hasta la barra flota sobre su carril */
   :global([data-d='A']) .fill { box-shadow: var(--d-shadow); }
 
-  /* ── B · INSTRUMENTO — un plano: los bloques COMPARTEN borde ───────────
-     Densidad de cabina: TODA cifra va en monoespaciada. No es un gesto de
-     estilo, es lo que hace que 312 h, 1 840 h y 96 d se comparen columna
-     contra columna sin que el ojo tenga que recalibrar el ancho de cada
-     dígito. Es la regla que más se nota en la dirección más densa. */
-  :global([data-d='B']) .d-num { font-family: var(--d-mono); letter-spacing: -.02em; }
-  :global([data-d='B']) .kv { font-family: var(--d-mono); font-size: var(--d-t-xl); letter-spacing: -.04em; }
-  :global([data-d='B']) .scroll { padding: var(--d-p2); }
+  
   /* la pila entera se convierte en un solo marco continuo */
-  :global([data-d='B']) .scroll > * + * { margin-top: -1px; }
-  :global([data-d='B']) .topbar {
-    border-bottom-color: var(--d-edge);
-    padding: 0; gap: 0;
-  }
-  :global([data-d='B']) .topbar .mod { padding: var(--d-p1) var(--d-p3); }
-  :global([data-d='B']) .topbar .search {
-    padding: var(--d-p1) var(--d-p2);
-    border-left: 1px solid var(--d-line);
-    border-right: 1px solid var(--d-line);
-    align-self: stretch;
-  }
-  :global([data-d='B']) .topbar .act { margin: var(--d-p1) var(--d-p2); }
-  :global([data-d='B']) .verdict {
-    background: transparent; border-color: var(--d-edge); border-radius: 0;
-    position: relative; padding: var(--d-p2) var(--d-p3);
-  }
   /* marcas de esquina, como en .d-panel */
-  :global([data-d='B']) .verdict::before,
-  :global([data-d='B']) .verdict::after {
-    content: ''; position: absolute; width: 7px; height: 7px;
-    border: 1px solid var(--d-edge); pointer-events: none;
-  }
-  :global([data-d='B']) .verdict::before { top: 3px; left: 3px; border-right: 0; border-bottom: 0; }
-  :global([data-d='B']) .verdict::after { bottom: 3px; right: 3px; border-left: 0; border-top: 0; }
-  :global([data-d='B']) .vt { font-size: var(--d-t-md); font-weight: var(--d-w-semi); }
-  :global([data-d='B']) .kpis { gap: 0; }
-  :global([data-d='B']) .kpi + .kpi { margin-left: -1px; }
-  :global([data-d='B']) .filters {
-    border: 1px solid var(--d-line); padding: 0;
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  :global([data-d='B']) .flab { padding: var(--d-p1) var(--d-p2); border-right: 1px solid var(--d-line); align-self: stretch; display: flex; align-items: center; }
-  :global([data-d='B']) .fbody { padding: var(--d-p1) var(--d-p2); }
-  :global([data-d='B']) .fams { gap: 0; }
-  :global([data-d='B']) .fam + .fam { margin-left: -1px; }
-  :global([data-d='B']) .fam[aria-pressed='true'] { background: var(--d-accent); color: var(--d-accent-ink); position: relative; z-index: 1; }
-  :global([data-d='B']) .lhead { border-bottom-color: var(--d-edge); background: transparent; }
   /* el grupo es una división del plano: regla de canto arriba, marca a la
      izquierda y el conteo en la monoespaciada. Sin relleno: un plano técnico
      no se pinta de colores, se marca. */
-  :global([data-d='B']) .ghead {
-    background: transparent;
-    border-top: 1px solid var(--d-edge); border-bottom-color: var(--d-line);
-    color: var(--d-ink);
-  }
-  :global([data-d='B']) .gc { color: var(--d-ink-2); }
   /* la etiqueta del filtro vuelve a versalitas SOLO acá: en Instrumento las
      etiquetas fuera del marco son la silueta declarada de la dirección. */
-  :global([data-d='B']) .flab {
-    font-size: var(--d-label-size); font-weight: var(--d-label-weight);
-    letter-spacing: var(--d-label-track); text-transform: uppercase;
-    color: var(--d-ink-3);
-  }
-  :global([data-d='B']) .cnt { font-family: var(--d-mono); color: var(--d-ink-2); }
   /* fila de una sola línea: la densidad es el punto */
-  :global([data-d='B']) .c-eq, :global([data-d='B']) .c-plan, :global([data-d='B']) .c-metric {
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  :global([data-d='B']) .nm, :global([data-d='B']) .pl,
-  :global([data-d='B']) .mv, :global([data-d='B']) .sub { display: inline; overflow: visible; }
-  :global([data-d='B']) .sub::before { content: ' · '; color: var(--d-line); }
-  :global([data-d='B']) .lhead, :global([data-d='B']) .row {
-    grid-template-columns: 72px minmax(0, 2fr) minmax(0, 1.35fr) 116px 100px;
-  }
   /* la barra es una regla graduada, no una pastilla */
-  :global([data-d='B']) .track {
-    height: 10px; border-radius: 0; background: transparent;
-    border: 1px solid var(--d-line);
-    background-image: repeating-linear-gradient(90deg, var(--d-line) 0 1px, transparent 1px 25%);
-  }
-  :global([data-d='B']) .fill { border-radius: 0; }
-  :global([data-d='B']) .thr { top: -2px; bottom: -2px; background: var(--d-edge); }
 
   /* ── C · MARCA — la pantalla la sostienen barras llenas de color ─────── */
   :global([data-d='C']) .topbar {
@@ -858,60 +785,9 @@
   :global([data-d='C']) .d-panel-head .cnt { color: var(--d-brand-ink); }
   :global([data-d='C']) .vt { font-weight: var(--d-w-med); }
 
-  /* ── D · PESO — masa, caja alta y una sombra sólida donde caer ───────── */
-  :global([data-d='D']) .topbar {
-    background: var(--d-ink); color: var(--d-ink-on);
-    border-bottom: var(--d-bw) solid var(--d-ink);
-  }
-  :global([data-d='D']) .title { text-transform: uppercase; font-weight: var(--d-w-bold); }
-  :global([data-d='D']) .topbar .d-input { border-color: var(--d-surface); }
-  :global([data-d='D']) .topbar .act {
-    background: var(--d-surface); color: var(--d-ink); border-color: var(--d-surface); box-shadow: none;
-  }
-  :global([data-d='D']) .topbar .act:hover { filter: none; background: var(--d-sunk); }
-  :global([data-d='D']) .verdict {
-    border: var(--d-bw) solid var(--d-ink); box-shadow: var(--d-shadow);
-    margin-right: 4px;
-  }
-  :global([data-d='D']) .vt { text-transform: uppercase; font-weight: var(--d-w-bold); letter-spacing: -.005em; }
-  :global([data-d='D']) .kpis { padding-right: 4px; }
-  :global([data-d='D']) .kpi {
-    background: var(--tone-band); border-color: var(--d-ink); box-shadow: var(--d-shadow);
-  }
-  :global([data-d='D']) .kpi:active { transform: translate(4px, 4px); box-shadow: none; }
-  :global([data-d='D']) .kpi[aria-pressed='true'] { background: var(--d-ink); color: var(--d-ink-on); }
-  :global([data-d='D']) .kpi[aria-pressed='true'] .kv,
-  :global([data-d='D']) .kpi[aria-pressed='true'] .kn { color: var(--d-ink-on); }
-  :global([data-d='D']) .kv { color: var(--d-ink); font-size: var(--d-t-2xl); }
-  :global([data-d='D']) .kl { text-transform: uppercase; font-weight: var(--d-w-bold); font-size: var(--d-t-xs); }
-  :global([data-d='D']) .sect { margin-right: 4px; }
-  :global([data-d='D']) .lhead {
-    background: var(--d-ink); border-bottom-color: var(--d-ink);
-  }
-  :global([data-d='D']) .lhead .d-cap { color: var(--d-ink-on); }
-  :global([data-d='D']) .ghead {
-    background: var(--d-surface); color: var(--d-ink);
-    border-top: var(--d-bw) solid var(--d-ink); border-bottom-color: var(--d-ink);
-    font-weight: var(--d-w-bold);
-  }
-  :global([data-d='D']) .fam {
-    border-color: var(--d-ink); box-shadow: 3px 3px 0 var(--d-ink);
-    text-transform: uppercase; font-weight: var(--d-w-semi); margin-bottom: 3px;
-  }
-  :global([data-d='D']) .fam:active { transform: translate(3px, 3px); box-shadow: none; }
-  :global([data-d='D']) .fam[aria-pressed='true'] { background: var(--d-ink); color: var(--d-ink-on); }
-  :global([data-d='D']) .fam[aria-pressed='true'] .ct { color: var(--d-ink-on); }
+  
   /* la barra es un bloque con borde, y el relleno es el pastel del tono */
-  :global([data-d='D']) .track {
-    height: 16px; border: var(--d-bw) solid var(--d-ink); border-radius: 0; background: var(--d-surface);
-  }
-  :global([data-d='D']) .fill { background: var(--tone-band); border-radius: 0; }
-  :global([data-d='D']) .thr { top: -3px; bottom: -3px; width: 2px; background: var(--d-ink); }
   /* la pastilla en caja alta con borde de 2px pide su propia columna */
-  :global([data-d='D']) .lhead, :global([data-d='D']) .row {
-    grid-template-columns: 80px minmax(0, 1.9fr) minmax(0, 1.2fr) 78px 136px;
-  }
-  :global([data-d='D']) .foot { border-top-color: var(--d-ink); }
 
   /* ── E · AIRE — cero bordes en toda la celda; separa el espacio ──────── */
   /* la fila no lleva línea: la separa el aire, y el reposo es una pastilla */
@@ -923,75 +799,10 @@
   /* columnas separadas por regla, como una tabla de terminal */
   /* la barra de progreso es una barra de caracteres, con marca de umbral */
 
-  /* ── G · BANDA — ninguna caja: estratos a sangre y raíl a la izquierda ─ */
-  :global([data-d='G']) .scroll { padding: 0; gap: 0; }
+  
   /* la barra del módulo también respeta el raíl */
-  :global([data-d='G']) .topbar {
-    display: grid; grid-template-columns: var(--d-rail) minmax(0, 1fr) auto;
-    gap: 0 var(--d-p3); align-items: center;
-    background: transparent; border-bottom-color: var(--d-line);
-  }
-  :global([data-d='G']) .topbar .mod { align-items: flex-end; text-align: right; }
-  :global([data-d='G']) .verdict {
-    position: relative; background: transparent; border: 0;
-    border-bottom: 1px solid var(--d-line); border-radius: 0;
-    padding: var(--d-p3) var(--d-p3) var(--d-p3) calc(var(--d-p3) + 3px);
-  }
   /* el estado va como franja de 3px en el canto izquierdo, nunca como fondo */
-  :global([data-d='G']) .verdict::before {
-    content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--tone-fg);
-  }
-  :global([data-d='G']) .kpis {
-    gap: 0; border-bottom: 1px solid var(--d-line);
-  }
-  :global([data-d='G']) .kpi {
-    background: transparent; border: 0; border-radius: 0; box-shadow: none;
-    border-left: 3px solid var(--tone-fg); border-right: 1px solid var(--d-line);
-    padding: var(--d-p2) var(--d-p3);
-  }
-  :global([data-d='G']) .kpi:last-child { border-right: 0; }
-  :global([data-d='G']) .kpi[aria-pressed='true'] { background: var(--d-sunk); }
-  :global([data-d='G']) .filters {
-    background: var(--d-sunk); border-bottom: 1px solid var(--d-line);
-    padding: var(--d-p2) var(--d-p3);
-  }
-  :global([data-d='G']) .fam { border: 0; background: transparent; border-bottom: 2px solid transparent; border-radius: 0; padding-inline: 4px; }
-  :global([data-d='G']) .fam[aria-pressed='true'] { background: transparent; border-bottom-color: var(--d-ink); }
-  :global([data-d='G']) .lhead { background: transparent; border-bottom-color: var(--d-line); }
-  :global([data-d='G']) .lhead > .d-cap:first-child { text-align: right; }
-  :global([data-d='G']) .c-code { text-align: right; }
-  :global([data-d='G']) .ghead {
-    background: var(--d-sunk); border-block: 1px solid var(--d-line);
-    padding-left: calc(var(--d-p3) + 3px);
-  }
   /* franja de una sola línea: un estrato no se parte en dos */
-  :global([data-d='G']) .c-eq, :global([data-d='G']) .c-plan, :global([data-d='G']) .c-metric {
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  :global([data-d='G']) .nm, :global([data-d='G']) .pl,
-  :global([data-d='G']) .mv, :global([data-d='G']) .sub { display: inline; overflow: visible; }
-  :global([data-d='G']) .sub::before { content: ' · '; color: var(--d-edge); }
-  :global([data-d='G']) .lhead, :global([data-d='G']) .row {
-    grid-template-columns: 78px minmax(0, 2fr) minmax(0, 1.3fr) 118px 104px;
-  }
-  :global([data-d='G']) .row { padding-left: calc(var(--d-p3) + 3px); }
-  :global([data-d='G']) .tlb { padding: 0; gap: 0; }
-  :global([data-d='G']) .tlr {
-    position: relative; border-bottom: 1px solid var(--d-line);
-    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + 3px);
-  }
-  :global([data-d='G']) .tlr::before {
-    content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--tone-fg);
-  }
-  :global([data-d='G']) .track { height: 4px; border-radius: 0; background: var(--d-sunk); }
-  :global([data-d='G']) .thr { top: -4px; bottom: -4px; }
-  :global([data-d='G']) .foot {
-    display: grid; grid-template-columns: var(--d-rail) minmax(0, 1fr);
-    gap: 0 var(--d-p3); align-items: center;
-    background: transparent; border-top-color: var(--d-line);
-  }
-  :global([data-d='G']) .fcount { text-align: right; }
-  :global([data-d='G']) .vk { justify-content: flex-end; }
 
   /* ── H · FICHA — pestaña arriba, canto apilado abajo, regla doble ────── */
   /* la regla doble bajo el encabezado de columnas — el tic de la ficha */
@@ -1128,133 +939,14 @@
      una etiqueta blanca de 12px */
   /* el carril es un hueco húmedo y el relleno una placa con su propio brillo */
 
-  /* ── K · HALO — nada tiene borde: existe lo que irradia ────────────────
-     El estado es el COLOR DEL RESPLANDOR, no un relleno. Los KPIs son
-     cuatro luces de colores distintos flotando sobre negro; a ojos
-     entrecerrados no hay ni una caja en toda la celda.
-     HALLAZGO: K no publica ningún token de resplandor —radio, dispersión—,
-     solo los tonos. Los desenfoques van a mano; el color, siempre de token. */
-  :global([data-d='K']) .topbar {
-    background: transparent; border-bottom: 0;
-    box-shadow: 0 26px 50px -34px var(--d-accent);
-  }
-  :global([data-d='K']) .title { text-shadow: 0 0 20px color-mix(in srgb, var(--d-ink) 45%, transparent); }
-  :global([data-d='K']) .verdict {
-    border: 0; background: var(--tone-band);
-    box-shadow: 0 0 0 1px var(--tone-edge), 0 18px 64px -22px var(--tone-fg);
-  }
-  :global([data-d='K']) .vt { text-shadow: 0 0 24px color-mix(in srgb, var(--tone-fg) 40%, transparent); }
-  :global([data-d='K']) .kpi {
-    background: transparent; border: 0; border-radius: var(--d-r-lg);
-    padding: var(--d-p3);
-    box-shadow: 0 0 0 1px var(--tone-edge), 0 14px 46px -18px var(--tone-fg);
-  }
-  :global([data-d='K']) .kpi:hover { box-shadow: 0 0 0 1px var(--tone-fg), 0 16px 54px -16px var(--tone-fg); }
-  :global([data-d='K']) .kv { text-shadow: 0 0 22px var(--tone-fg); }
+  
   /* pulsado: el anillo se enciende entero, no solo cambia el tono */
-  :global([data-d='K']) .kpi[aria-pressed='true'] {
-    background: var(--tone-band);
-    box-shadow: 0 0 0 2px var(--tone-fg), 0 20px 66px -14px var(--tone-fg);
-  }
-  :global([data-d='K']) .sect { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='K']) .lhead {
-    background: transparent; border-bottom: 0;
-    box-shadow: 0 1px 0 var(--d-neu-edge);
-  }
   /* el título del grupo no lleva banda: se enciende en su tono */
-  :global([data-d='K']) .ghead {
-    background: transparent; border-bottom: 0;
-    color: var(--tone-fg); text-shadow: 0 0 18px var(--tone-fg);
-    padding-top: var(--d-p2);
-  }
-  :global([data-d='K']) .gc { color: var(--d-ink-3); text-shadow: none; }
-  :global([data-d='K']) .row:hover { background: var(--d-neu-band); }
-  :global([data-d='K']) .fam {
-    background: transparent; border: 0; border-radius: var(--d-r-pill);
-    box-shadow: 0 0 0 1px var(--d-neu-edge);
-  }
-  :global([data-d='K']) .fam:hover { box-shadow: 0 0 0 1px var(--d-ink-3), 0 6px 22px -12px var(--d-ink-2); }
-  :global([data-d='K']) .fam[aria-pressed='true'] {
-    background: var(--d-accent-soft); color: var(--d-ink);
-    box-shadow: 0 0 0 1px var(--d-accent), 0 8px 28px -12px var(--d-accent);
-  }
-  :global([data-d='K']) .track {
-    height: 6px; background: transparent; box-shadow: inset 0 0 0 1px var(--d-neu-edge);
-  }
-  :global([data-d='K']) .fill { background: var(--tone-fg); box-shadow: 0 0 20px -2px var(--tone-fg); }
-  :global([data-d='K']) .thr { background: var(--d-ink-3); }
   /* cada plan es otra luz suelta, con el anillo del tono y nada de relleno */
-  :global([data-d='K']) .tlr {
-    border-radius: var(--d-r); padding: var(--d-p2) var(--d-p3);
-    box-shadow: 0 0 0 1px var(--tone-edge), 0 12px 44px -22px var(--tone-fg);
-  }
-  :global([data-d='K']) .tlid { color: var(--d-accent); }
-  :global([data-d='K']) .foot {
-    background: transparent; border-top: 0;
-    box-shadow: 0 -22px 44px -34px var(--d-accent);
-  }
 
-  /* ── L · GUIJARRO — cuatro radios distintos, y distintos entre vecinos ─
-     HALLAZGO: L publica solo DOS juegos de radios (--d-r y --d-r-lg) y una
-     piedra necesita más de dos perfiles: con dos, las vecinas se vuelven a
-     leer como la misma tarjeta. Los otros dos salen de CRUZAR los que hay
-     con la barra de border-radius —radios horizontales de uno, verticales
-     del otro—, que sigue siendo token y no un valor inventado. */
-  :global([data-d='L']) .topbar {
-    margin: var(--d-p2) var(--d-p2) 0;
-    border: 0; border-radius: var(--d-r-lg) / var(--d-r);
-    background: var(--d-surface);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='L']) .verdict {
-    border: 0; border-radius: var(--d-r-lg);
-    background: var(--tone-band);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='L']) .kpi { border: 0; box-shadow: var(--d-shadow); padding: var(--d-p2) var(--d-p3) var(--d-p3); }
-  :global([data-d='L']) .kpi:nth-child(1) { border-radius: var(--d-r-lg); }
-  :global([data-d='L']) .kpi:nth-child(2) { border-radius: var(--d-r); }
-  :global([data-d='L']) .kpi:nth-child(3) { border-radius: var(--d-r-lg) / var(--d-r); }
-  :global([data-d='L']) .kpi:nth-child(4) { border-radius: var(--d-r) / var(--d-r-lg); }
-  :global([data-d='L']) .kpi:active { box-shadow: inset 3px 4px 9px -4px color-mix(in srgb, var(--d-ink) 32%, transparent); }
-  :global([data-d='L']) .kpi[aria-pressed='true'] { background: var(--tone-band); }
-  :global([data-d='L']) .sect { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='L']) .lhead { background: transparent; border-bottom: 0; }
+  
   /* cada fila es su propio canto: sin líneas, y ninguna igual a la de al lado */
-  :global([data-d='L']) .rows {
-    display: flex; flex-direction: column; gap: var(--d-p1);
-    padding: var(--d-p1) var(--d-p2) var(--d-p2);
-  }
-  :global([data-d='L']) .row { border-bottom: 0; background: var(--d-sunk); }
-  :global([data-d='L']) .row:nth-child(4n + 1) { border-radius: var(--d-r); }
-  :global([data-d='L']) .row:nth-child(4n + 2) { border-radius: var(--d-r) / var(--d-r-lg); }
-  :global([data-d='L']) .row:nth-child(4n + 3) { border-radius: var(--d-r-lg) / var(--d-r); }
-  :global([data-d='L']) .row:nth-child(4n) { border-radius: var(--d-r-lg); }
   /* el encabezado de grupo es una piedrita, no una franja de borde a borde */
-  :global([data-d='L']) .ghead {
-    width: fit-content; max-width: 100%;
-    border-bottom: 0; background: var(--tone-band); color: var(--d-ink);
-    border-radius: var(--d-r-lg) / var(--d-r);
-    padding: var(--d-p1) var(--d-p3);
-    margin-top: var(--d-p1);
-  }
-  :global([data-d='L']) .fam:nth-child(odd) { border-radius: var(--d-r); }
-  :global([data-d='L']) .fam:nth-child(even) { border-radius: var(--d-r) / var(--d-r-lg); }
-  :global([data-d='L']) .fam { border: 0; background: var(--d-sunk); box-shadow: var(--d-shadow); padding: 6px var(--d-p2); }
-  :global([data-d='L']) .fam[aria-pressed='true'] { background: var(--d-accent); color: var(--d-accent-ink); }
-  :global([data-d='L']) .fam[aria-pressed='true'] .ct { color: inherit; }
-  :global([data-d='L']) .track { height: 12px; border-radius: var(--d-r) / var(--d-r-lg); background: var(--d-sunk); }
-  :global([data-d='L']) .fill { border-radius: inherit; }
-  :global([data-d='L']) .thr { background: var(--d-ink-3); }
-  :global([data-d='L']) .tlr {
-    background: var(--d-surface); border-radius: var(--d-r-lg) / var(--d-r);
-    padding: var(--d-p2) var(--d-p3); box-shadow: var(--d-shadow);
-  }
-  :global([data-d='L']) .foot {
-    margin: 0 var(--d-p2) var(--d-p2);
-    border-top: 0; border-radius: var(--d-r) / var(--d-r-lg);
-    background: var(--d-surface); box-shadow: var(--d-shadow);
-  }
 
   /* ── M · BRUMA — no hay contenedores; el color se derrama por detrás ───
      HALLAZGO DE PINTADO, el que hacía invisible a esta dirección: el
@@ -1363,93 +1055,9 @@
     color: var(--d-accent-ink);
   }
 
-  /* ── N · CINTA — carriles de puntas redondas que se montan ─────────────
-     Hay orden de apilado explícito: el carril de arriba pasa por encima del
-     de abajo, y el de abajo devuelve una sombra de contacto hacia arriba.
-     Sin las dos cosas —solapamiento y contacto— esto son pastillas sueltas. */
-  :global([data-d='N']) .topbar {
-    position: relative; z-index: 6;
-    margin: var(--d-p2) var(--d-p3) calc(-1 * var(--d-p1));
-    padding: var(--d-p1) var(--d-p4);
-    border: var(--d-bw) solid var(--d-line);
-    border-radius: var(--d-r-pill);
-    background: var(--d-surface-fill);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='N']) .scroll { gap: 0; padding-top: var(--d-p3); }
-  :global([data-d='N']) .scroll > * { position: relative; }
-  :global([data-d='N']) .scroll > * + * { margin-top: calc(-1 * var(--d-p1)); }
-  :global([data-d='N']) .verdict {
-    z-index: 5;
-    border-radius: var(--d-r-pill); border-color: var(--tone-edge);
-    padding: var(--d-p2) var(--d-p4);
-    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 64%);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='N']) .kpis { z-index: 4; }
-  :global([data-d='N']) .filters { z-index: 3; }
-  :global([data-d='N']) .list { z-index: 2; }
-  :global([data-d='N']) .tl { z-index: 1; }
+  
   /* cuatro cintas que se montan de izquierda a derecha */
-  :global([data-d='N']) .kpi {
-    position: relative;
-    border-radius: var(--d-r-pill); border-color: var(--d-line);
-    padding: var(--d-p1) var(--d-p3);
-    background: var(--d-surface-fill);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='N']) .kpi + .kpi { margin-left: calc(-1 * var(--d-p2)); }
-  :global([data-d='N']) .kpi[aria-pressed='true'] {
-    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 70%);
-    z-index: 1;
-  }
-  :global([data-d='N']) .lhead { background: transparent; border-bottom: 0; padding-inline: var(--d-p4); }
-  :global([data-d='N']) .rows { padding: 0 var(--d-p2) var(--d-p2); }
   /* la cinta de abajo queda encima, así que la sombra de contacto va hacia arriba */
-  :global([data-d='N']) .row {
-    margin-bottom: calc(var(--d-p1) / -2);
-    box-shadow:
-      0 -3px 7px -5px color-mix(in srgb, var(--d-ink) 34%, transparent),
-      var(--d-shadow);
-  }
-  :global([data-d='N']) .ghead {
-    width: fit-content; max-width: 100%;
-    position: relative; z-index: 2;
-    border-bottom: 0; border-radius: var(--d-r-pill);
-    padding: var(--d-p1) var(--d-p3);
-    background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 72%);
-    box-shadow: var(--d-shadow);
-    margin-bottom: calc(var(--d-p1) / -2);
-  }
-  :global([data-d='N']) .fams { gap: 0; }
-  :global([data-d='N']) .fam {
-    border-radius: var(--d-r-pill); border-color: var(--d-line);
-    padding: 4px var(--d-p2);
-    background: var(--d-surface-fill);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='N']) .fam + .fam { margin-left: calc(var(--d-p1) / -3); }
-  :global([data-d='N']) .fam:hover, :global([data-d='N']) .fam:focus-visible { z-index: 1; }
-  :global([data-d='N']) .fam[aria-pressed='true'] {
-    background: var(--d-accent-fill); color: var(--d-accent-ink);
-    border-color: var(--d-accent-edge); z-index: 2;
-  }
-  :global([data-d='N']) .fam[aria-pressed='true'] .ct { color: inherit; }
-  :global([data-d='N']) .track { background: var(--d-sunk-fill); height: 10px; }
-  :global([data-d='N']) .fill {
-    background: linear-gradient(100deg, var(--tone-band) 0%, var(--tone-fg) 70%);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='N']) .thr { background: var(--d-ink-2); }
-  :global([data-d='N']) .foot {
-    position: relative; z-index: 7;
-    margin: calc(-1 * var(--d-p1)) var(--d-p3) var(--d-p2);
-    border: var(--d-bw) solid var(--d-line);
-    border-radius: var(--d-r-pill);
-    padding: var(--d-p1) var(--d-p4);
-    background: var(--d-sunk-fill);
-    box-shadow: var(--d-shadow);
-  }
 
   /* ── O · PRISMA — vidrio con la marca teñida ADENTRO ───────────────────
      La botonera es UNA pieza de vidrio segmentado, no tres botones sueltos:
@@ -1549,352 +1157,40 @@
      la tinta de marca para no quedar teal sobre teal */
   :global([data-d='O']) .d-panel-head .cnt { color: var(--d-brand-ink); }
 
-  /* ── P · ESPINA — una columna de marca de la que cuelga todo ───────────
-     EL RAÍL DE 152px VUELVE, pero solo donde hay ancho de verdad: el
-     veredicto, la barra de filtros, la tira de KPIs y las líneas del plan
-     ocupan el ancho entero de la pantalla. Las tarjetas angostas que lo
-     rompían no existen en esta página, y bajo 760px se recoge (abajo).
-     La tira de KPIs deja de ser cuatro columnas y pasa a ser cuatro
-     estratos colgados del raíl: es lo que separa a P de G a ojos
-     entrecerrados, porque G mantiene la rejilla de cuatro.
-     HALLAZGO: el ancho de la espina (6px en directions.css) no está
-     tokenizado. La página lo repite a mano; si no, la columna de la
-     pantalla y la de cada .d-panel quedarían desalineadas por un pelo. */
-  :global([data-d='P']) .topbar {
-    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px), var(--d-surface);
-    border-bottom-color: var(--d-line);
-    padding-left: calc(var(--d-p3) + 6px);
-  }
-  :global([data-d='P']) .scroll {
-    padding: 0; gap: 0;
-    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px);
-  }
-  :global([data-d='P']) .verdict {
-    position: relative;
-    grid-template-columns: var(--d-rail) minmax(0, 1fr);
-    gap: 0 var(--d-p3); align-items: baseline;
-    background: transparent; border: 0; border-bottom: 1px solid var(--d-line); border-radius: 0;
-    padding: var(--d-p3) var(--d-p3) var(--d-p3) calc(var(--d-p3) + 6px);
-  }
+  
   /* el estado no pinta el fondo: muerde la espina con una muesca de su tono */
-  :global([data-d='P']) .verdict::before,
-  :global([data-d='P']) .ghead::before,
-  :global([data-d='P']) .kpi::before {
-    content: ''; position: absolute; inset: 0 auto 0 0; width: 6px; pointer-events: none;
-    background: linear-gradient(180deg, var(--d-brand) 0 26%, var(--tone-fg) 26% 74%, var(--d-brand) 74%);
-  }
-  :global([data-d='P']) .vk { justify-content: flex-end; text-align: right; color: var(--d-brand); }
-  :global([data-d='P']) .kpis { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  :global([data-d='P']) .kpi {
-    position: relative;
-    display: grid; grid-template-columns: var(--d-rail) auto minmax(0, 1fr);
-    align-items: baseline; gap: 0 var(--d-p3);
-    background: transparent; border: 0; border-radius: 0; box-shadow: none;
-    border-bottom: 1px solid var(--d-line);
-    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + 6px);
-  }
-  :global([data-d='P']) .kl {
-    grid-column: 1; grid-row: 1; justify-content: flex-end; text-align: right;
-    color: var(--d-brand); font-weight: var(--d-w-semi);
-  }
-  :global([data-d='P']) .kv { grid-column: 2; grid-row: 1; font-size: var(--d-t-xl); }
-  :global([data-d='P']) .kn { grid-column: 3; grid-row: 1; text-align: right; }
-  :global([data-d='P']) .kpi[aria-pressed='true'] { background: var(--d-sunk); }
   /* la franja de filtros es opaca y taparía la espina de .scroll: se la
      vuelve a pintar encima, del mismo ancho */
-  :global([data-d='P']) .filters {
-    grid-template-columns: var(--d-rail) minmax(0, 1fr);
-    gap: 0 var(--d-p3); align-items: center;
-    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px), var(--d-sunk);
-    border-bottom: 1px solid var(--d-line);
-    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + 6px);
-  }
   /* el panel trae 6px de padding para dejarle sitio a su propia espina, y eso
      empujaba la muesca de cada fila a un segundo carril de 6 a 12px: dos
      columnas de marca donde tiene que haber una. Sin ese padding, la espina
      del panel y las muescas de filas y grupos caen en el mismo carril. */
-  :global([data-d='P']) .sect { padding-left: 0; }
-  :global([data-d='P']) .flab { text-align: right; color: var(--d-brand); }
-  :global([data-d='P']) .fam {
-    border: 0; border-bottom: 2px solid transparent; border-radius: 0;
-    background: transparent; padding-inline: 4px;
-  }
-  :global([data-d='P']) .fam[aria-pressed='true'] {
-    background: transparent; color: var(--d-brand); border-bottom-color: var(--d-brand);
-  }
   /* la rejilla del listado arranca donde termina la espina */
-  :global([data-d='P']) .lhead { background: transparent; padding-left: calc(var(--d-p3) + 6px); }
-  :global([data-d='P']) .ghead {
-    position: relative;
-    background: var(--d-sunk); color: var(--d-brand);
-    border-bottom-color: var(--d-line);
-    padding-left: calc(var(--d-p3) + 6px);
-  }
   /* mismo ajuste que en C: a .7 el conteo caía a 3.7:1 sobre --d-sunk. */
-  :global([data-d='P']) .gc { color: var(--d-brand); opacity: .85; }
-  :global([data-d='P']) .tlb { padding: 0; gap: 0; }
-  :global([data-d='P']) .tlr {
-    position: relative;
-    grid-template-columns: var(--d-rail) minmax(0, 1fr);
-    gap: 0 var(--d-p3); align-items: baseline;
-    border-bottom: 1px solid var(--d-line);
-    padding: var(--d-p2) var(--d-p3) var(--d-p2) calc(var(--d-p3) + 6px);
-  }
-  :global([data-d='P']) .tlr::before {
-    content: ''; position: absolute; inset: 0 auto 0 0; width: 6px;
-    background: linear-gradient(180deg, var(--d-brand) 0 26%, var(--tone-fg) 26% 74%, var(--d-brand) 74%);
-  }
-  :global([data-d='P']) .tlid { text-align: right; color: var(--d-brand); }
-  :global([data-d='P']) .track { height: 4px; border-radius: 0; background: var(--d-sunk); }
-  :global([data-d='P']) .fill { border-radius: 0; }
-  :global([data-d='P']) .thr { top: -4px; bottom: -4px; background: var(--d-ink-2); }
-  :global([data-d='P']) .foot {
-    background: linear-gradient(90deg, var(--d-brand) 0 6px, transparent 6px), var(--d-sunk);
-    border-top-color: var(--d-line);
-    padding-left: calc(var(--d-p3) + 6px);
-  }
 
-  /* ── Q · CHAROL — masa dura con la superficie mojada ───────────────────
-     Borde de 2px, sombra sólida desplazada y el barrido húmedo encima. El
-     barrido va en el fondo, como en J, para que no le tape el clic a nada.
-     HALLAZGO: mismo vacío que J — no hay --d-gloss. Se compone acá desde
-     --d-surface, que en Q es blanco puro. */
-  :global([data-d='Q']) .screen { --pg-gloss: color-mix(in srgb, var(--d-surface) 58%, transparent); }
+  
   /* La barra lleva tinta clara, así que NO lleva barrido: un blanco al 58 %
      sobre el tercio de arriba deja el texto en 3:1 justo donde vive. Lo
      mojado se lo da el propio degradado de --d-accent-fill —que ya no es un
      color plano— más el realce duro de 1px del canto. */
-  :global([data-d='Q']) .topbar {
-    background: var(--d-accent-fill);
-    color: var(--d-accent-ink);
-    border-bottom: var(--d-bw) solid var(--d-ink);
-    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--d-surface) 75%, transparent);
-  }
-  :global([data-d='Q']) .title { text-transform: uppercase; font-weight: var(--d-w-bold); }
   /* crimson sobre crimson no se ve: la acción se invierte a placa clara */
-  :global([data-d='Q']) .topbar .act {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%), var(--d-surface-fill);
-    color: var(--d-ink);
-  }
-  :global([data-d='Q']) .verdict {
-    border: var(--d-bw) solid var(--d-ink);
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 40%), var(--tone-band);
-    box-shadow: var(--d-shadow);
-    margin-right: 5px;
-  }
-  :global([data-d='Q']) .vt { font-weight: var(--d-w-semi); }
-  :global([data-d='Q']) .kpis { padding-right: 5px; }
-  :global([data-d='Q']) .kpi {
-    border: var(--d-bw) solid var(--d-ink); border-radius: var(--d-r-lg);
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 34%), var(--tone-band);
-    box-shadow: var(--d-shadow);
-    padding: var(--d-p2) var(--d-p3) var(--d-p3);
-  }
-  :global([data-d='Q']) .kv { color: var(--d-ink); }
-  :global([data-d='Q']) .kl { text-transform: uppercase; font-weight: var(--d-w-bold); font-size: var(--d-t-xs); }
-  :global([data-d='Q']) .kpi:active {
-    transform: translate(5px, 5px);
-    box-shadow: inset 0 2px 5px color-mix(in srgb, var(--d-ink) 35%, transparent);
-  }
   /* misma razón que en la barra: sobre crimson el barrido se cambia por el
      realce duro del canto, que no cruza ninguna palabra */
-  :global([data-d='Q']) .kpi[aria-pressed='true'] {
-    background: var(--d-accent-fill);
-    color: var(--d-accent-ink);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='Q']) .kpi[aria-pressed='true'] .kv,
-  :global([data-d='Q']) .kpi[aria-pressed='true'] .kn { color: var(--d-accent-ink); }
-  :global([data-d='Q']) .sect { margin-right: 5px; box-shadow: var(--d-shadow); }
-  :global([data-d='Q']) .lhead {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 50%), var(--d-sunk-fill);
-    border-bottom-color: var(--d-ink);
-  }
-  :global([data-d='Q']) .ghead {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 45%), var(--tone-band);
-    color: var(--d-ink); font-weight: var(--d-w-bold);
-    border-top: var(--d-bw) solid var(--d-ink); border-bottom-color: var(--d-ink);
-  }
-  :global([data-d='Q']) .fam {
-    border-color: var(--d-ink); border-radius: var(--d-r);
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 45%), var(--d-surface-fill);
-    box-shadow: 3px 3px 0 var(--d-ink);
-    text-transform: uppercase; font-weight: var(--d-w-semi); margin-bottom: 3px;
-  }
-  :global([data-d='Q']) .fam:active { transform: translate(3px, 3px); box-shadow: none; }
-  :global([data-d='Q']) .fam[aria-pressed='true'] {
-    background: var(--d-accent-fill);
-    color: var(--d-accent-ink);
-    box-shadow: 3px 3px 0 var(--d-ink), inset 0 1px 0 color-mix(in srgb, var(--d-surface) 70%, transparent);
-  }
-  :global([data-d='Q']) .fam[aria-pressed='true'] .ct { color: inherit; }
-  :global([data-d='Q']) .track {
-    height: 16px; border: var(--d-bw) solid var(--d-ink);
-    background: var(--d-sunk-fill); overflow: hidden;
-  }
-  :global([data-d='Q']) .fill {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 55%), var(--tone-fg);
-  }
-  :global([data-d='Q']) .thr { top: -3px; bottom: -3px; width: 2px; background: var(--d-ink); }
-  :global([data-d='Q']) .foot {
-    background: linear-gradient(180deg, var(--pg-gloss) 0%, transparent 45%), var(--d-sunk-fill);
-    border-top: var(--d-bw) solid var(--d-ink);
-  }
 
-  /* ── R · VITRINA — densidad de consola, material de vidrio ─────────────
-     La más densa de las diecinueve: fila de 26px, todo en una línea, y aun
-     así respira porque el fondo pasa a través. No repite los corchetes ni
-     los guiones de F: lo que la separa de Terminal es el material y el
-     cebrado de vidrio, no otro juego de signos.
-     ANIDADO: blur solo en barra, KPIs y pie. Dentro de .sect, alfa. */
-  :global([data-d='R']) .scroll { padding: var(--d-p2); gap: var(--d-p2); }
-  :global([data-d='R']) .topbar {
-    padding: var(--d-p1) var(--d-p2);
-    background: var(--d-surface);
-    backdrop-filter: blur(16px) saturate(1.3);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
-    border-bottom-color: var(--d-line);
-  }
-  :global([data-d='R']) .title {
-    font-size: var(--d-t-md); text-transform: uppercase;
-    letter-spacing: .12em; color: var(--d-accent);
-  }
-  :global([data-d='R']) .verdict {
-    border-radius: var(--d-r); border-color: var(--tone-edge);
-    padding: var(--d-p1) var(--d-p2);
-    backdrop-filter: blur(16px) saturate(1.3);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  }
-  :global([data-d='R']) .vt { font-size: var(--d-t-md); font-weight: var(--d-w-med); color: var(--tone-fg); }
-  :global([data-d='R']) .kpis { gap: var(--d-p1); }
+  
   /* el KPI se aplasta a dos líneas de consola */
-  :global([data-d='R']) .kpi {
-    flex-direction: row; align-items: baseline; flex-wrap: wrap;
-    gap: 0 var(--d-p1);
-    padding: var(--d-p1) var(--d-p2);
-    border-color: var(--d-line); border-radius: var(--d-r);
-    background: var(--d-surface);
-    backdrop-filter: blur(16px) saturate(1.3);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
-  }
-  :global([data-d='R']) .kv { font-size: var(--d-t-lg); }
-  :global([data-d='R']) .kn { flex: 1 1 100%; }
-  :global([data-d='R']) .kpi[aria-pressed='true'] { box-shadow: inset 0 0 0 1px var(--tone-fg); }
-  :global([data-d='R']) .sect { box-shadow: var(--d-shadow); }
-  :global([data-d='R']) .lhead { background: var(--d-sunk); border-bottom-color: var(--d-line); }
-  :global([data-d='R']) .lhead, :global([data-d='R']) .row {
-    grid-template-columns: 64px minmax(0, 2.2fr) minmax(0, 1.4fr) 92px 100px;
-    gap: var(--d-p2);
-  }
   /* una fila, una línea: 26px y ni un pixel más */
-  :global([data-d='R']) .nm, :global([data-d='R']) .pl,
-  :global([data-d='R']) .mv, :global([data-d='R']) .sub { display: inline; overflow: visible; }
-  :global([data-d='R']) .sub::before { content: ' · '; color: var(--d-ink-3); }
-  :global([data-d='R']) .c-eq, :global([data-d='R']) .c-plan, :global([data-d='R']) .c-metric {
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
   /* cebrado de vidrio: el renglón par deja pasar un poco menos de fondo */
-  :global([data-d='R']) .row:nth-child(even) { background: var(--d-sunk); }
-  :global([data-d='R']) .ghead {
-    min-height: var(--d-row-h); padding: 0 var(--d-p2);
-    background: var(--tone-band); color: var(--tone-fg); border-bottom: 0;
-  }
-  :global([data-d='R']) .gc { color: var(--d-ink-3); }
-  :global([data-d='R']) .fam {
-    padding: 0 var(--d-p1); font-size: var(--d-t-2xs);
-    border-color: var(--d-line); background: var(--d-surface);
-  }
-  :global([data-d='R']) .fam[aria-pressed='true'] { border-color: var(--d-accent); }
-  :global([data-d='R']) .tlb { padding: var(--d-p1) var(--d-p2) var(--d-p2); gap: var(--d-p1); }
   /* el carril es un medidor segmentado, no una pastilla */
-  :global([data-d='R']) .track {
-    height: 8px; border-radius: var(--d-r); background-color: var(--d-sunk);
-    background-image: repeating-linear-gradient(90deg, var(--d-line) 0 1px, transparent 1px 8.333%);
-    box-shadow: inset 0 0 0 1px var(--d-line);
-  }
-  :global([data-d='R']) .fill { box-shadow: 0 0 12px -2px var(--tone-fg); }
-  :global([data-d='R']) .thr { background: var(--d-ink-2); }
-  :global([data-d='R']) .foot {
-    padding: var(--d-p1) var(--d-p2);
-    background: var(--d-sunk);
-    backdrop-filter: blur(16px) saturate(1.3);
-    -webkit-backdrop-filter: blur(16px) saturate(1.3);
-    border-top-color: var(--d-line);
-  }
 
-  /* ── S · UMBRA — la tarjeta se queda blanca; informa la sombra ─────────
-     HALLAZGO, y es el que más pesa: la firma de S está escrita a mano
-     dentro de directions.css y SOLO para .d-panel y .d-row. No existe un
-     --d-shadow-tone, así que todo el marcado propio de una página —los
-     KPIs, el veredicto, los encabezados de grupo, las líneas del plan—
-     nacía sin firma y la dirección se caía justo donde se arma la pantalla.
-     Se recompone acá una vez, en --pg-lift, y se reparte a todo lo que
-     informa un estado. El contenido no se tiñe en ningún caso: el número va
-     en tinta, y lo que dice el estado son la marca, la palabra y la luz. */
-  :global([data-d='S']) .screen { --pg-lift: 0 10px 30px -12px var(--tone-fg); }
-  :global([data-d='S']) .topbar {
-    background: var(--d-surface); border-bottom: 0;
-    box-shadow: var(--d-shadow);
-    position: relative; z-index: 2;
-  }
-  :global([data-d='S']) .verdict {
-    background: var(--d-surface); border: 0;
-    box-shadow: var(--pg-lift), var(--d-shadow);
-  }
-  :global([data-d='S']) .vt { color: var(--d-ink); }
-  :global([data-d='S']) .kpi {
-    background: var(--d-surface); border: 0; border-radius: var(--d-r-lg);
-    padding: var(--d-p2) var(--d-p3) var(--d-p3);
-    box-shadow: var(--pg-lift), var(--d-shadow);
-  }
+  
   /* el número va en tinta: en esta dirección el color no toca el contenido */
-  :global([data-d='S']) .kv { color: var(--d-ink); }
-  :global([data-d='S']) .kpi:hover { transform: translateY(-1px); box-shadow: var(--pg-lift), var(--d-shadow-lg); }
   /* pulsado sin cambiar de color: anillo de tinta, que se ve en gris también */
-  :global([data-d='S']) .kpi[aria-pressed='true'] {
-    background: var(--d-surface);
-    box-shadow: inset 0 0 0 2px var(--d-ink), var(--pg-lift);
-  }
-  :global([data-d='S']) .sect { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='S']) .lhead { background: transparent; border-bottom: 0; }
   /* las filas ya traen la firma del primitivo: acá se les hace sitio */
-  :global([data-d='S']) .rows { padding: var(--d-p1) var(--d-p2) var(--d-p2); }
-  :global([data-d='S']) .ghead {
-    background: var(--d-surface); border-bottom: 0; border-radius: var(--d-r);
-    margin: var(--d-p2) 0 var(--d-p1);
-    box-shadow: var(--pg-lift);
-    position: relative; z-index: 1;
-  }
-  :global([data-d='S']) .fam {
-    border: 0; background: var(--d-sunk); border-radius: var(--d-r-pill);
-    padding: 5px var(--d-p2);
-  }
-  :global([data-d='S']) .fam[aria-pressed='true'] {
-    background: var(--d-surface); color: var(--d-ink);
-    box-shadow: 0 4px 12px -5px var(--d-ink), inset 0 0 0 1px var(--d-edge);
-  }
-  :global([data-d='S']) .track { background: var(--d-sunk); height: 10px; }
-  :global([data-d='S']) .fill { box-shadow: var(--pg-lift); }
-  :global([data-d='S']) .thr { background: var(--d-ink-3); }
   /* la línea del plan es marcado propio: sin esto, se quedaba sin firma */
-  :global([data-d='S']) .tlb { padding: var(--d-p2) var(--d-p3) var(--d-p3); gap: var(--d-p3); }
-  :global([data-d='S']) .tlr {
-    background: var(--d-surface); border-radius: var(--d-r);
-    padding: var(--d-p2) var(--d-p3);
-    box-shadow: var(--pg-lift), var(--d-shadow);
-  }
   /* hasta la pastilla se queda limpia: el fondo pasa a blanco y el tono se va
      abajo, a la luz. La palabra y la marca siguen llevando el estado, así que
      no queda información colgando solo del color */
-  :global([data-d='S']) .c-state .d-pill,
-  :global([data-d='S']) .tlw {
-    background: var(--d-surface);
-    box-shadow: 0 4px 12px -6px var(--tone-fg);
-  }
-  :global([data-d='S']) .foot {
-    background: var(--d-surface); border-top: 0;
-    box-shadow: 0 -8px 24px -14px color-mix(in srgb, var(--d-ink) 55%, transparent);
-  }
 
   /* ── T · HALO CLARO — nada se rellena: existe lo que irradia, sobre papel ─
      La regla de Halo entera, del lado claro de la luz. La prueba de que está
@@ -2279,23 +1575,11 @@
     .c-metric { grid-area: 2 / 2; }
     .c-plan { grid-area: 3 / 1 / 4 / 3; }
     /* a este ancho el raíl de 148px no deja nada para el contenido */
-    :global([data-d='G']) .topbar,
-    :global([data-d='G']) .foot { grid-template-columns: minmax(0, 1fr); }
-    :global([data-d='G']) .topbar .mod { align-items: flex-start; text-align: left; }
-    :global([data-d='G']) .fcount { text-align: left; }
-    :global([data-d='G']) .vk { justify-content: flex-start; }
-    :global([data-d='D']) .lhead, :global([data-d='D']) .row,
-    :global([data-d='B']) .lhead, :global([data-d='B']) .row,
-    :global([data-d='G']) .lhead, :global([data-d='G']) .row { grid-template-columns: minmax(0, 1fr) auto; }
     /* el marco de la barra de filtros se apila: la etiqueta pasa arriba */
-    :global([data-d='B']) .filters { grid-template-columns: minmax(0, 1fr); }
-    :global([data-d='B']) .flab { border-right: 0; border-bottom: 1px solid var(--d-line); }
   }
   @media (max-width: 560px) {
     .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     /* la rejilla de dos columnas necesita otro juego de divisiones */
-    :global([data-d='G']) .kpi:nth-child(2n) { border-right: 0; }
-    :global([data-d='G']) .kpi:nth-child(-n + 2) { border-bottom: 1px solid var(--d-line); }
     .search { flex: 1 1 100%; order: 3; }
     .act { margin-left: auto; }
     .tlt { flex: 1 1 100%; }
@@ -2310,25 +1594,7 @@
     /* P — el raíl de 152px se guarda de nuevo: bajo este ancho es
        exactamente la trampa por la que se había retirado. La espina se
        queda, porque no depende del ancho. */
-    :global([data-d='P']) .verdict,
-    :global([data-d='P']) .filters,
-    :global([data-d='P']) .tlr,
-    :global([data-d='P']) .kpi { grid-template-columns: minmax(0, 1fr); }
-    :global([data-d='P']) .kl,
-    :global([data-d='P']) .kv,
-    :global([data-d='P']) .kn {
-      grid-column: 1; grid-row: auto; text-align: left; justify-content: flex-start;
-    }
-    :global([data-d='P']) .vk,
-    :global([data-d='P']) .flab,
-    :global([data-d='P']) .tlid { text-align: left; justify-content: flex-start; }
     /* R — la fila de consola se rinde y pasa a ficha, como todas */
-    :global([data-d='R']) .lhead, :global([data-d='R']) .row {
-      grid-template-columns: minmax(0, 1fr) auto;
-    }
-    :global([data-d='R']) .c-eq, :global([data-d='R']) .c-plan, :global([data-d='R']) .c-metric {
-      white-space: normal;
-    }
   }
   @media (max-width: 560px) {
     /* O — la losa segmentada pasa a dos por dos: las divisiones de luz
@@ -2337,8 +1603,6 @@
     :global([data-d='O']) .kpi:nth-child(n + 3) { border-top: var(--d-bw) solid var(--d-line); }
     /* N — dos carriles por fila: el que abre cada fila no se monta con
        nada a su izquierda, y el solapamiento pasa a ser vertical */
-    :global([data-d='N']) .kpi:nth-child(odd) { margin-left: 0; }
-    :global([data-d='N']) .kpi:nth-child(n + 3) { margin-top: calc(-1 * var(--d-p1)); }
     /* I — con la barra y el pie flotando, el aire de los lados se recorta */
     :global([data-d='I']) .topbar { margin: var(--d-p2) var(--d-p2) 0; }
     :global([data-d='I']) .foot { margin: 0 var(--d-p2) var(--d-p2); }

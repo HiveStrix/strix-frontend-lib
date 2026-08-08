@@ -59,27 +59,7 @@
   --d-neu: #656A6E; --d-neu-band: #eaeced; --d-neu-edge: #cfd2d4;
 }
 
-/* ── B · INSTRUMENTO ────────────────────────────────────────────────────── */
-[data-d='B'] {
-  --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #f2f2f0;
-  --d-ink: #16181a; --d-ink-2: #40454a; --d-ink-3: #686E72; --d-ink-on: #ffffff;
-  --d-line: #d3d6d7; --d-edge: #16181a; --d-bw: 1px;
-  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
-  --d-shadow: none; --d-shadow-lg: none;
-  --d-p1: 6px; --d-p2: 8px; --d-p3: 11px; --d-p4: 14px; --d-gap: 12px;
-  --d-t-2xs: 10px; --d-t-xs: 11.5px; --d-t-sm: 12.5px; --d-t-md: 13.5px;
-  --d-t-lg: 16px; --d-t-xl: 21px; --d-t-2xl: 28px;
-  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 700;
-  --d-label-size: 10px; --d-label-case: uppercase; --d-label-track: .11em;
-  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
-  --d-row-h: 30px;
-  --d-accent: #16181a; --d-accent-ink: #ffffff; --d-accent-soft: #f2f2f0; --d-accent-edge: #16181a;
-  --d-pos: #245c33; --d-pos-band: #edf4ec; --d-pos-edge: #245c33;
-  --d-att: #7a4f00; --d-att-band: #fbf3e3; --d-att-edge: #7a4f00;
-  --d-crit: #a51f17; --d-crit-band: #fcecea; --d-crit-edge: #a51f17;
-  --d-info: #3f4370; --d-info-band: #eeeef5; --d-info-edge: #3f4370;
-  --d-neu: #686E72; --d-neu-band: #f2f2f0; --d-neu-edge: #71777c;
-}
+
 
 /* ── C · MARCA ──────────────────────────────────────────────────────────── */
 [data-d='C'] {
@@ -108,51 +88,9 @@
   --d-neu: #616E6B; --d-neu-band: #eaf0ee; --d-neu-edge: #c6d3cf;
 }
 
-/* ── D · PESO ───────────────────────────────────────────────────────────── */
-[data-d='D'] {
-  --d-ground: #e9e9e4; --d-surface: #ffffff; --d-sunk: #dcdcd5;
-  --d-ink: #000000; --d-ink-2: #1c1c1a; --d-ink-3: #55554f; --d-ink-on: #ffffff;
-  --d-line: #000000; --d-edge: #000000; --d-bw: 2px;
-  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 0px;
-  --d-shadow: 4px 4px 0 #000000;
-  --d-shadow-lg: 8px 8px 0 #000000;
-  --d-p1: 9px; --d-p2: 13px; --d-p3: 17px; --d-p4: 22px; --d-gap: 18px;
-  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 14px; --d-t-md: 15.5px;
-  --d-t-lg: 21px; --d-t-xl: 29px; --d-t-2xl: 42px;
-  --d-w: 500; --d-w-med: 600; --d-w-semi: 700; --d-w-bold: 800;
-  --d-label-size: 11.5px; --d-label-case: uppercase; --d-label-track: .05em;
-  --d-label-weight: 800; --d-label-color: var(--d-ink);
-  --d-row-h: 44px;
-  --d-accent: #000000; --d-accent-ink: #ffffff; --d-accent-soft: #dcdcd5; --d-accent-edge: #000000;
-  --d-pos: #000000; --d-pos-band: #9fdba9; --d-pos-edge: #000000;
-  --d-att: #000000; --d-att-band: #f6cf72; --d-att-edge: #000000;
-  --d-crit: #000000; --d-crit-band: #f5a099; --d-crit-edge: #000000;
-  --d-info: #000000; --d-info-band: #b6b8e8; --d-info-edge: #000000;
-  --d-neu: #000000; --d-neu-band: #dcdcd5; --d-neu-edge: #000000;
-}
 
-/* ── G · BANDA ──────────────────────────────────────────────────────────── */
-[data-d='G'] {
-  --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #fafaf8;
-  --d-ink: #191817; --d-ink-2: #45433f; --d-ink-3: #73716B; --d-ink-on: #ffffff;
-  --d-line: #e6e4df; --d-edge: #d3d0c9; --d-bw: 1px;
-  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 999px;
-  --d-shadow: none; --d-shadow-lg: 0 12px 40px -14px rgba(25,24,23,.28);
-  --d-p1: 8px; --d-p2: 12px; --d-p3: 16px; --d-p4: 20px; --d-gap: 0px;
-  --d-t-2xs: 10px; --d-t-xs: 12px; --d-t-sm: 13px; --d-t-md: 14.5px;
-  --d-t-lg: 17px; --d-t-xl: 23px; --d-t-2xl: 32px;
-  --d-w: 400; --d-w-med: 530; --d-w-semi: 600; --d-w-bold: 680;
-  --d-label-size: 10px; --d-label-case: uppercase; --d-label-track: .1em;
-  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
-  --d-row-h: 40px;
-  --d-rail: 148px;             /* the left gutter of labels — this direction's spine */
-  --d-accent: #191817; --d-accent-ink: #ffffff; --d-accent-soft: #f1efea; --d-accent-edge: #d3d0c9;
-  --d-pos: #2f6440; --d-pos-band: #eef4ee; --d-pos-edge: #2f6440;
-  --d-att: #8a5806; --d-att-band: #faf1e0; --d-att-edge: #8a5806;
-  --d-crit: #ab2a20; --d-crit-band: #fbe9e6; --d-crit-edge: #ab2a20;
-  --d-info: #464a72; --d-info-band: #eeeef4; --d-info-edge: #464a72;
-  --d-neu: #6F6D67; --d-neu-band: #f4f2ee; --d-neu-edge: #d3d0c9;
-}
+
+
 
 /* ==========================================================================
    PRIMITIVES — written once, against the tokens above.
@@ -199,16 +137,6 @@
 }
 
 /* B — the drawing frame: a hard outer edge and four corner ticks. */
-[data-d='B'] .d-panel { border-color: var(--d-edge); }
-[data-d='B'] .d-panel::before,
-[data-d='B'] .d-panel::after {
-  content: ''; position: absolute; width: 7px; height: 7px; pointer-events: none;
-  border: 1px solid var(--d-edge);
-}
-[data-d='B'] .d-panel::before { top: 3px; left: 3px; border-right: 0; border-bottom: 0; }
-[data-d='B'] .d-panel::after { bottom: 3px; right: 3px; border-left: 0; border-top: 0; }
-[data-d='B'] .d-panel-head { border-bottom-color: var(--d-edge); }
-[data-d='B'] .d-panel-title { text-transform: uppercase; letter-spacing: .09em; font-size: var(--d-t-2xs); }
 
 /* C — the head bar IS the container's identity. */
 [data-d='C'] .d-panel { border-color: var(--d-line); overflow: hidden; }
@@ -220,48 +148,16 @@
 [data-d='C'] .d-panel-foot { background: var(--d-sunk); }
 
 /* D — mass, and a solid shadow the block moves into. */
-[data-d='D'] .d-panel { border-color: var(--d-ink); }
-[data-d='D'] .d-panel-head { border-bottom-width: var(--d-bw); border-bottom-color: var(--d-ink); }
-[data-d='D'] .d-panel-title { text-transform: uppercase; font-weight: var(--d-w-bold); letter-spacing: -.01em; }
-[data-d='D'] .d-panel-foot { border-top-color: var(--d-ink); }
 
 /* E — no border anywhere; separation is space and a whisper of shadow. */
 
 /* F — the head is a rule of dashes, the way a TUI draws a box. */
 
 /* G — there is no panel. A "panel" is a full-bleed band with a label rail. */
-[data-d='G'] .d-panel {
-  border: 0; border-top: 1px solid var(--d-line); border-bottom: 1px solid var(--d-line);
-  border-radius: 0; box-shadow: none; margin-block: -1px 0;
-}
-[data-d='G'] .d-panel-head {
-  border-bottom: 0; background: var(--d-sunk);
-  padding: var(--d-p1) var(--d-p3);
-}
-[data-d='G'] .d-panel-title {
-  font-size: var(--d-label-size); font-weight: var(--d-label-weight);
-  letter-spacing: var(--d-label-track); text-transform: uppercase; color: var(--d-ink-3);
-}
-[data-d='G'] .d-panel-foot { background: transparent; border-top-color: var(--d-line); }
 /* The rail: a fixed gutter of right-aligned labels. Collapses under 720px,
    because a 148px rail on a phone leaves nothing for the content. */
 .d-rail { display: grid; grid-template-columns: 1fr; gap: 2px; }
-[data-d='G'] .d-rail {
-  grid-template-columns: var(--d-rail) minmax(0, 1fr);
-  gap: 0 var(--d-p3); align-items: baseline;
-  padding-block: var(--d-p1);
-}
-[data-d='G'] .d-rail > .d-cap { text-align: right; }
-@media (max-width: 720px) {
-  [data-d='G'] .d-rail { grid-template-columns: 1fr; }
-  [data-d='G'] .d-rail > .d-cap { text-align: left; }
-}
 /* State rides the left edge, never a background wash. */
-[data-d='G'] .d-panel[data-tone] { padding-left: 3px; }
-[data-d='G'] .d-panel[data-tone]::before {
-  content: ''; position: absolute; inset: 0 auto 0 0; width: 3px;
-  background: var(--tone-fg);
-}
 
 /* H — the tab is the head; the card carries a stacked edge below it. */
 /* The double rule under a card's first block — the ruled-card tell. */
@@ -274,11 +170,6 @@
   border-bottom: var(--d-bw) solid var(--d-line);
 }
 .d-row:last-child { border-bottom: 0; }
-[data-d='D'] .d-row { border-bottom-color: var(--d-ink); border-bottom-width: 1px; }
-[data-d='G'] .d-row { padding-inline: var(--d-p3); position: relative; }
-[data-d='G'] .d-row[data-tone]::before {
-  content: ''; position: absolute; inset: 0 auto 0 0; width: 3px; background: var(--tone-fg);
-}
 [data-d='A'] .d-row:hover, [data-d='C'] .d-row:hover{ background: var(--d-sunk); }
 
 /* ── Button ─────────────────────────────────────────────────────────────── */
@@ -307,17 +198,8 @@
 .d-btn--sm { min-height: 27px; padding: 0 var(--d-p2); font-size: var(--d-t-xs); }
 .d-btn[disabled] { opacity: .45; cursor: not-allowed; box-shadow: none; }
 
-[data-d='B'] .d-btn { min-height: 27px; }
-[data-d='D'] .d-btn { font-weight: var(--d-w-bold); text-transform: uppercase; letter-spacing: .02em; }
-[data-d='D'] .d-btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--d-ink); }
-[data-d='G'] .d-btn { border-color: transparent; border-bottom: 2px solid var(--d-edge); background: transparent; box-shadow: none; }
-[data-d='G'] .d-btn--primary { background: var(--d-accent); border-bottom-color: var(--d-accent); }
-
 /* A button GROUP. In B and F the buttons share edges instead of sitting apart. */
 .d-btn-group { display: inline-flex; gap: var(--d-p1); }
-[data-d='B'] .d-btn-group, [data-d='D'] .d-btn-group { gap: 0; }
-[data-d='B'] .d-btn-group > .d-btn + .d-btn,
-[data-d='D'] .d-btn-group > .d-btn + .d-btn { margin-left: calc(-1 * max(var(--d-bw), 1px)); }
 
 /* ── Field ──────────────────────────────────────────────────────────────── */
 .d-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
@@ -339,19 +221,10 @@
 .d-error { font-size: var(--d-t-xs); color: var(--d-crit); font-weight: var(--d-w-med); }
 
 [data-d='A'] .d-input, [data-d='A'] .d-select, [data-d='A'] .d-textarea { border-color: var(--d-edge); background: var(--d-surface); }
-[data-d='B'] .d-input, [data-d='B'] .d-select { min-height: 27px; border-color: var(--d-line); }
-[data-d='B'] .d-label { font-size: var(--d-label-size); text-transform: uppercase; letter-spacing: var(--d-label-track); color: var(--d-ink-3); font-weight: 600; }
 [data-d='C'] .d-input:focus-visible, [data-d='C'] .d-select:focus-visible { border-color: var(--d-brand); }
 /* E — the field is a filled well with no border at all. */
 /* F — the field is a prompt line: underline only, with a caret marker. */
 /* G — the field is a baseline, not a box. */
-[data-d='G'] .d-input, [data-d='G'] .d-select, [data-d='G'] .d-textarea {
-  border: 0; border-bottom: 1px solid var(--d-edge); border-radius: 0;
-  background: transparent; padding-inline: 0;
-}
-[data-d='G'] .d-input:focus-visible, [data-d='G'] .d-select:focus-visible {
-  outline: 0; border-bottom-color: var(--d-ink); border-bottom-width: 2px;
-}
 
 /* ── Pill: tone + mark + word. The one rule that survives every direction. ─ */
 .d-pill {
@@ -365,9 +238,6 @@
   border: 1px solid var(--tone-edge);
 }
 .d-pill svg { flex: none; width: 9px; height: 9px; }
-[data-d='D'] .d-pill { border-width: 2px; color: var(--d-ink); font-weight: var(--d-w-bold); text-transform: uppercase; }
-[data-d='G'] .d-pill { background: transparent; border: 0; padding-inline: 0; }
-[data-d='G'] .d-pill::after { content: ''; }
 
 /* Tone carriers. A page writes data-tone and everything downstream resolves. */
 [data-tone='positive']  { --tone-fg: var(--d-pos);  --tone-band: var(--d-pos-band);  --tone-edge: var(--d-pos-edge); }
@@ -400,6 +270,10 @@
     radial-gradient(84% 66% at 46% 98%, #C6E7DE 0%, transparent 66%),
     #EDF1F6;
   --d-surface: rgba(255, 255, 255, .56);
+  /* LO QUE FLOTA VA SOLIDO. Un menu o un dialogo translucido deja que el
+     texto de abajo se cruce con el de arriba y no se lee ninguno de los dos.
+     El velo de fondo si sigue siendo vidrio: ese no lleva texto encima. */
+  --d-overlay: #FFFFFF; --d-overlay-edge: rgba(18, 40, 56, .12);
   --d-sunk: rgba(255, 255, 255, .30);
   --d-ink: #0E1720; --d-ink-2: #2E3B48; --d-ink-3: #4C5866; --d-ink-on: #ffffff;
   --d-line: rgba(255, 255, 255, .68); --d-edge: rgba(14, 23, 32, .16); --d-bw: 1px;
@@ -451,121 +325,13 @@
    es esmalte, no un reflejo animado. */
 /* Al presionar, el brillo se apaga y la placa se hunde: el gesto físico. */
 
-/* ── K · HALO ────────────────────────────────────────────────────────────
-   Cero bordes en toda la dirección. Un elemento existe porque irradia. El
-   estado no es un relleno: es el color de su resplandor. */
-[data-d='K'] {
-  --d-ground: #05070A;
-  --d-surface: #0B1017;
-  --d-sunk: #080C11;
-  --d-ink: #E9F0F6; --d-ink-2: #B4C2CE; --d-ink-3: #8A9AA8; --d-ink-on: #05070A;
-  --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
-  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
-  --d-shadow: 0 0 0 1px rgba(150, 190, 230, .10), 0 10px 44px -14px rgba(80, 150, 255, .22);
-  --d-shadow-lg: 0 0 0 1px rgba(150, 190, 230, .16), 0 24px 80px -20px rgba(80, 150, 255, .34);
-  --d-p1: 9px; --d-p2: 13px; --d-p3: 18px; --d-p4: 24px; --d-gap: 20px;
-  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
-  --d-t-lg: 20px; --d-t-xl: 27px; --d-t-2xl: 37px;
-  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 680;
-  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .1em;
-  --d-label-weight: 560; --d-label-color: var(--d-ink-3);
-  --d-row-h: 48px;
-  --d-accent: #63E6C4; --d-accent-ink: #04140F;
-  --d-accent-soft: rgba(99, 230, 196, .12); --d-accent-edge: rgba(99, 230, 196, .34);
-  --d-pos: #5EE3A4; --d-pos-band: rgba(94, 227, 164, .10); --d-pos-edge: rgba(94, 227, 164, .32);
-  --d-att: #FFC65C; --d-att-band: rgba(255, 198, 92, .10); --d-att-edge: rgba(255, 198, 92, .32);
-  --d-crit: #FF8878; --d-crit-band: rgba(255, 136, 120, .10); --d-crit-edge: rgba(255, 136, 120, .32);
-  --d-info: #8FB6FF; --d-info-band: rgba(143, 182, 255, .10); --d-info-edge: rgba(143, 182, 255, .32);
-  --d-neu: #9AA9B7; --d-neu-band: rgba(154, 169, 183, .08); --d-neu-edge: rgba(154, 169, 183, .26);
-  --d-focus: #63E6C4;
-}
+
 /* Un panel con tono irradia en ese tono. Es la dirección donde el color de
    estado se ve desde el otro lado del cuarto sin leer una palabra. */
-[data-d='K'] .d-panel[data-tone] {
-  box-shadow: 0 0 0 1px var(--tone-edge), 0 12px 50px -16px var(--tone-fg);
-}
-[data-d='K'] .d-panel-head { border-bottom: 0; }
-[data-d='K'] .d-panel-foot { border-top: 0; background: transparent; }
-[data-d='K'] .d-row { border-bottom: 1px solid rgba(150, 190, 230, .07); }
-[data-d='K'] .d-btn {
-  background: rgba(150, 190, 230, .06);
-  border-color: transparent;
-  box-shadow: 0 0 0 1px rgba(150, 190, 230, .14);
-}
-[data-d='K'] .d-btn:hover { box-shadow: 0 0 0 1px rgba(150, 190, 230, .26), 0 6px 26px -10px rgba(120, 180, 255, .5); }
-[data-d='K'] .d-btn--primary {
-  background: var(--d-accent);
-  box-shadow: 0 0 0 1px rgba(99, 230, 196, .5), 0 8px 34px -10px rgba(99, 230, 196, .7);
-}
-[data-d='K'] .d-btn--ghost { background: transparent; box-shadow: none; }
-[data-d='K'] .d-input, [data-d='K'] .d-select, [data-d='K'] .d-textarea {
-  background: rgba(150, 190, 230, .05);
-  border-color: transparent;
-  box-shadow: inset 0 0 0 1px rgba(150, 190, 230, .14);
-}
-[data-d='K'] .d-input:focus-visible, [data-d='K'] .d-select:focus-visible {
-  outline: 0;
-  box-shadow: inset 0 0 0 1px var(--d-accent), 0 0 22px -6px var(--d-accent);
-}
-[data-d='K'] .d-pill { box-shadow: 0 0 16px -5px var(--tone-fg); }
 
-/* ── L · GUIJARRO ────────────────────────────────────────────────────────
-   Cuatro radios distintos por contenedor, nunca uno. Ninguna corrida recta en
-   toda la pantalla. La sombra es doble y direccional: cálida abajo a la
-   derecha, luz fría arriba a la izquierda — un objeto sobre una mesa. */
-[data-d='L'] {
-  --d-ground: #EFE9E1;
-  --d-surface: #FFFDFA;
-  --d-sunk: #F4EEE6;
-  --d-ink: #29231C; --d-ink-2: #544B41; --d-ink-3: #6B6155; --d-ink-on: #ffffff;
-  --d-line: transparent; --d-edge: transparent; --d-bw: 0px;
-  --d-r: 16px 22px 14px 20px;
-  --d-r-lg: 34px 26px 38px 28px;
-  --d-r-pill: 999px 999px 999px 999px;
-  --d-shadow: 7px 9px 20px -8px rgba(92, 72, 52, .26), -4px -4px 12px -6px rgba(255, 255, 255, .95);
-  --d-shadow-lg: 14px 20px 44px -14px rgba(92, 72, 52, .34), -6px -6px 18px -8px rgba(255, 255, 255, .95);
-  --d-p1: 12px; --d-p2: 16px; --d-p3: 22px; --d-p4: 30px; --d-gap: 22px;
-  --d-t-2xs: 11.5px; --d-t-xs: 13px; --d-t-sm: 14.5px; --d-t-md: 15.5px;
-  --d-t-lg: 21px; --d-t-xl: 28px; --d-t-2xl: 38px;
-  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 660;
-  --d-label-size: 12.5px; --d-label-case: none; --d-label-track: 0;
-  --d-label-weight: 520; --d-label-color: var(--d-ink-3);
-  --d-row-h: 52px;
-  --d-accent: #7A4A2E; --d-accent-ink: #FFFDFA;
-  --d-accent-soft: #EFE1D6; --d-accent-edge: transparent;
-  --d-pos: #35603F; --d-pos-band: #E3EEE2; --d-pos-edge: transparent;
-  --d-att: #7E5711; --d-att-band: #F5EBD8; --d-att-edge: transparent;
-  --d-crit: #97362A; --d-crit-band: #F6E2DC; --d-crit-edge: transparent;
-  --d-info: #414A70; --d-info-band: #E5E7EF; --d-info-edge: transparent;
-  --d-neu: #665C50; --d-neu-band: #EDE7DE; --d-neu-edge: transparent;
-}
+
 /* Cada guijarro es distinto del de al lado: si todos comparten los mismos
    cuatro radios dejan de ser piedras y vuelven a ser tarjetas. */
-[data-d='L'] .d-panel { border: 0; }
-[data-d='L'] .d-panel:nth-of-type(2n) { border-radius: 28px 36px 24px 40px; }
-[data-d='L'] .d-panel:nth-of-type(3n) { border-radius: 40px 24px 34px 26px; }
-[data-d='L'] .d-panel-head { border-bottom: 0; padding-bottom: var(--d-p1); }
-[data-d='L'] .d-panel-title { font-size: var(--d-t-lg); font-weight: var(--d-w-semi); letter-spacing: -.015em; }
-[data-d='L'] .d-panel-foot { border-top: 0; background: transparent; }
-[data-d='L'] .d-row { border-bottom: 1px solid #EAE2D8; }
-[data-d='L'] .d-btn {
-  border: 0;
-  border-radius: 18px 24px 16px 22px;
-  min-height: 46px;
-  box-shadow: 4px 5px 12px -5px rgba(92, 72, 52, .30), -2px -2px 7px -3px rgba(255, 255, 255, .95);
-}
-[data-d='L'] .d-btn:nth-of-type(2n) { border-radius: 24px 16px 22px 18px; }
-[data-d='L'] .d-btn:active { box-shadow: inset 3px 4px 9px -4px rgba(92, 72, 52, .38); }
-[data-d='L'] .d-btn--ghost { box-shadow: none; }
-[data-d='L'] .d-input, [data-d='L'] .d-select, [data-d='L'] .d-textarea {
-  background: var(--d-sunk);
-  border: 0;
-  border-radius: 18px 24px 16px 22px;
-  min-height: 50px;
-  box-shadow: inset 3px 4px 9px -5px rgba(92, 72, 52, .28);
-}
-[data-d='L'] .d-textarea { border-radius: 26px 20px 30px 22px; }
-[data-d='L'] .d-pill { border: 0; padding: 4px var(--d-p2); }
 
 /* ── M · BRUMA ───────────────────────────────────────────────────────────
    No hay contenedores. Lo que agrupa es una mancha de color desenfocada que se
@@ -656,91 +422,15 @@
 }
 [data-d='M'] .d-pill { border: 0; padding: 3px var(--d-p2); }
 
-/* ── N · CINTA ───────────────────────────────────────────────────────────
-   El contenedor no es una caja: es un carril. Puntas redondas, degradado a lo
-   largo, y los carriles se montan unos milímetros entre sí — hay orden de
-   apilado y sombra de contacto, como cintas puestas una sobre otra. */
-[data-d='N'] {
-  --d-ground: #F1EDE7;
-  --d-surface: #F8F4EE;
-  --d-surface-fill: linear-gradient(100deg, #FFFFFF 0%, #F6F2EC 58%, #EFE9E1 100%);
-  --d-sunk: #EDE7DF;
-  --d-sunk-fill: linear-gradient(100deg, #F2EDE6 0%, #E8E2D9 100%);
-  --d-ink: #221E19; --d-ink-2: #4A4239; --d-ink-3: #64594C; --d-ink-on: #ffffff;
-  --d-line: rgba(40, 32, 24, .10); --d-edge: rgba(40, 32, 24, .16); --d-bw: 1px;
-  --d-r: 999px; --d-r-lg: 30px; --d-r-pill: 999px;
-  --d-shadow: 0 6px 14px -6px rgba(70, 54, 38, .28), inset 0 1px 0 rgba(255, 255, 255, .9);
-  --d-shadow-lg: 0 16px 32px -12px rgba(70, 54, 38, .36), inset 0 1px 0 rgba(255, 255, 255, .9);
-  --d-p1: 9px; --d-p2: 14px; --d-p3: 20px; --d-p4: 26px; --d-gap: 14px;
-  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
-  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
-  --d-w: 400; --d-w-med: 530; --d-w-semi: 620; --d-w-bold: 700;
-  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
-  --d-label-weight: 620; --d-label-color: var(--d-ink-3);
-  --d-row-h: 44px;
-  --d-accent: #235A50;
-  --d-accent-fill: linear-gradient(100deg, #2E6F63 0%, #1B4A41 100%);
-  --d-accent-ink: #ffffff; --d-accent-soft: #DFEBE7; --d-accent-edge: #1B4A41;
-  --d-pos: #205C39; --d-pos-band: #E0EDE2; --d-pos-edge: #ADCDB5;
-  --d-att: #7A4E06; --d-att-band: #F7E9D2; --d-att-edge: #DCBD8B;
-  --d-crit: #96271B; --d-crit-band: #F7DFDA; --d-crit-edge: #DFB0A7;
-  --d-info: #33406E; --d-info-band: #E2E5F0; --d-info-edge: #B4BAD5;
-  --d-neu: #625648; --d-neu-band: #EBE5DC; --d-neu-edge: #C7BEB1;
-}
+
 /* El carril: puntas redondas de verdad, no un rectángulo con las esquinas
    suavizadas. 999px en el radio horizontal contra la mitad del alto. */
-[data-d='N'] .d-panel {
-  border-radius: var(--d-r-lg);
-  border-color: var(--d-line);
-}
-[data-d='N'] .d-panel + .d-panel {
-  margin-top: calc(-1 * var(--d-p1));
-  position: relative;
-}
-[data-d='N'] .d-panel-head {
-  border-bottom: 0;
-  border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
-  background: var(--d-sunk);
-}
-[data-d='N'] .d-panel-foot { border-top: 0; border-radius: 0 0 var(--d-r-lg) var(--d-r-lg); }
 /* Cada fila es su propia cinta, con contacto contra la de abajo. */
-[data-d='N'] .d-row {
-  border-bottom: 0;
-  border-radius: 999px;
-  background: var(--d-surface);
-  box-shadow: 0 3px 8px -4px rgba(70, 54, 38, .26), inset 0 1px 0 rgba(255, 255, 255, .85);
-  margin-bottom: 5px;
-  padding-inline: var(--d-p3);
-}
-[data-d='N'] .d-row[data-tone] {
-  background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 62%);
-}
-[data-d='N'] .d-btn {
-  border-radius: 999px;
-  background: var(--d-surface);
-  min-height: 40px;
-  padding-inline: var(--d-p3);
-}
-[data-d='N'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
-[data-d='N'] .d-input, [data-d='N'] .d-select {
-  border-radius: 999px;
-  background: var(--d-sunk);
-  min-height: 42px;
-  padding-inline: var(--d-p3);
-  box-shadow: inset 0 2px 4px rgba(70, 54, 38, .12);
-}
-[data-d='N'] .d-textarea { border-radius: 22px; background: var(--d-sunk); }
 
 /* Los degradados de J y N son RELLENO, no color. Van solo donde se pintan
    fondos; --d-accent y --d-surface siguen siendo colores en las catorce
    direcciones, que es lo que permite escribir `color: var(--d-accent)` sin
    preguntarse en cuál estás. */
-[data-d='N'] .d-panel, [data-d='N'] .d-row, [data-d='N'] .d-btn { background: var(--d-surface-fill); }
-[data-d='N'] .d-panel-head, [data-d='N'] .d-input, [data-d='N'] .d-select,
-[data-d='N'] .d-textarea { background: var(--d-sunk-fill); }
-[data-d='N'] .d-btn--primary { background: var(--d-accent-fill); }
-[data-d='N'] .d-btn--ghost { background: transparent; }
-[data-d='N'] .d-row[data-tone] { background: linear-gradient(100deg, var(--tone-band) 0%, #FBF8F3 62%); }
 
 /* ==========================================================================
    CINCO MEZCLAS.
@@ -817,248 +507,24 @@
 }
 [data-d='O'] .d-input:focus-visible { border-color: var(--d-brand); }
 
-/* ── P · ESPINA  (C · Marca + G · Banda) ─────────────────────────────────
-   Lo que resuelve: en Marca el color se gasta en cabeceras que se repiten
-   quince veces por pantalla y acaban siendo ruido. Acá el color aparece UNA
-   vez, como columna, y todo lo demás cuelga de ella. */
-[data-d='P'] {
-  --d-brand: #0E5A54;
-  --d-brand-ink: #ffffff;
-  --d-ground: #ffffff; --d-surface: #ffffff; --d-sunk: #F2F7F5;
-  --d-ink: #14201E; --d-ink-2: #3E4B48; --d-ink-3: #5E6C68; --d-ink-on: #ffffff;
-  --d-line: #E3EBE8; --d-edge: #C8D6D2; --d-bw: 1px;
-  --d-r: 0px; --d-r-lg: 0px; --d-r-pill: 999px;
-  --d-shadow: none; --d-shadow-lg: 0 14px 44px -16px rgba(10, 40, 36, .3);
-  --d-p1: 8px; --d-p2: 12px; --d-p3: 16px; --d-p4: 20px; --d-gap: 0px;
-  --d-t-2xs: 10px; --d-t-xs: 12px; --d-t-sm: 13px; --d-t-md: 14.5px;
-  --d-t-lg: 17px; --d-t-xl: 23px; --d-t-2xl: 32px;
-  --d-w: 400; --d-w-med: 530; --d-w-semi: 600; --d-w-bold: 680;
-  --d-label-size: 10px; --d-label-case: uppercase; --d-label-track: .1em;
-  /* El color de marca, no su tinta inversa: en P las versalitas viven sobre
-     papel blanco, no sobre la espina. --d-brand-ink es para lo que se pinta
-     ENCIMA del color, que acá es solo el botón primario. */
-  --d-label-weight: 620; --d-label-color: var(--d-brand);
-  --d-row-h: 40px;
-  --d-rail: 152px;
-  --d-accent: #0E5A54; --d-accent-ink: #ffffff;
-  --d-accent-soft: #E0EEEB; --d-accent-edge: #0E5A54;
-  --d-pos: #22603A; --d-pos-band: #E9F2EA; --d-pos-edge: #22603A;
-  --d-att: #7C4E04; --d-att-band: #F9F0DC; --d-att-edge: #7C4E04;
-  --d-crit: #9C2419; --d-crit-band: #F9E6E2; --d-crit-edge: #9C2419;
-  --d-info: #2A4570; --d-info-band: #E7EBF3; --d-info-edge: #2A4570;
-  --d-neu: #5E6C68; --d-neu-band: #EFF3F2; --d-neu-edge: #C8D6D2;
-}
+
 /* La espina: una columna llena de marca que baja por la izquierda y de la que
    cuelga todo. Es la única pieza de color de la pantalla. */
-[data-d='P'] .d-panel {
-  border: 0; border-radius: 0; box-shadow: none;
-  border-top: 1px solid var(--d-line);
-  padding-left: 6px;
-}
-[data-d='P'] .d-panel::before {
-  content: ''; position: absolute; inset: 0 auto 0 0; width: 6px;
-  background: var(--d-brand);
-}
-[data-d='P'] .d-panel-head {
-  background: var(--d-sunk); border-bottom: 0;
-  padding: var(--d-p1) var(--d-p3);
-}
-[data-d='P'] .d-panel-title {
-  font-size: var(--d-label-size); font-weight: var(--d-label-weight);
-  letter-spacing: var(--d-label-track); text-transform: uppercase;
-  color: var(--d-brand);
-}
-[data-d='P'] .d-panel-foot { background: transparent; border-top-color: var(--d-line); }
 /* El estado no pinta el fondo: muerde la espina con una muesca de su tono. */
-[data-d='P'] .d-panel[data-tone]::before,
-[data-d='P'] .d-row[data-tone]::before {
-  background: linear-gradient(180deg, var(--d-brand) 0%, var(--d-brand) 26%,
-              var(--tone-fg) 26%, var(--tone-fg) 74%, var(--d-brand) 74%);
-}
-[data-d='P'] .d-row { position: relative; padding-left: calc(var(--d-p3) + 6px); }
-[data-d='P'] .d-row::before {
-  content: ''; position: absolute; inset: 0 auto 0 0; width: 6px; background: var(--d-brand);
-}
 /* El raíl NO se aplica a ciegas. `.d-rail` se usa también dentro de tarjetas de
    200px, y una columna fija de 152px ahí deja un carácter por línea. G se
    salva porque las páginas ya tienen reglas propias para G; P todavía no las
    tiene, así que su identidad la cargan la espina y las versalitas de marca,
    que no dependen del ancho. El raíl vuelve cuando las páginas lo pidan. */
-[data-d='P'] .d-rail > .d-cap { color: var(--d-brand); }
-[data-d='P'] .d-btn {
-  border-color: transparent; border-bottom: 2px solid var(--d-brand);
-  background: transparent; box-shadow: none; border-radius: 0;
-}
-[data-d='P'] .d-btn--primary { background: var(--d-brand); border-bottom-color: var(--d-brand); }
-[data-d='P'] .d-input, [data-d='P'] .d-select, [data-d='P'] .d-textarea {
-  border: 0; border-bottom: 1px solid var(--d-edge); border-radius: 0;
-  background: transparent; padding-inline: 0;
-}
-[data-d='P'] .d-input:focus-visible, [data-d='P'] .d-select:focus-visible {
-  outline: 0; border-bottom-color: var(--d-brand); border-bottom-width: 2px;
-}
 
-/* ── Q · CHAROL  (D · Peso + J · Laca) ───────────────────────────────────
-   Lo que resuelve: Peso es honesto pero seco, y Laca es rica pero blanda. La
-   contradicción de las dos —masa dura, superficie mojada— es lo que la hace
-   memorable sin volverse decoración. */
-[data-d='Q'] {
-  --d-ground: #DCD8D1;
-  --d-surface: #FFFFFF;
-  --d-surface-fill: linear-gradient(180deg, #FFFFFF 0%, #F0ECE6 100%);
-  --d-sunk: #E7E2DA;
-  --d-sunk-fill: linear-gradient(180deg, #EDE8E1 0%, #DFD9D0 100%);
-  --d-ink: #000000; --d-ink-2: #1F1B17; --d-ink-3: #4E463C; --d-ink-on: #ffffff;
-  --d-line: #000000; --d-edge: #000000; --d-bw: 2px;
-  --d-r: 8px; --d-r-lg: 14px; --d-r-pill: 999px;
-  --d-shadow: 5px 5px 0 #000000, inset 0 1px 0 rgba(255, 255, 255, .95);
-  --d-shadow-lg: 9px 9px 0 #000000, inset 0 1px 0 rgba(255, 255, 255, .95);
-  --d-p1: 9px; --d-p2: 13px; --d-p3: 18px; --d-p4: 24px; --d-gap: 20px;
-  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 14px; --d-t-md: 15.5px;
-  --d-t-lg: 21px; --d-t-xl: 29px; --d-t-2xl: 40px;
-  --d-w: 480; --d-w-med: 580; --d-w-semi: 680; --d-w-bold: 780;
-  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .06em;
-  --d-label-weight: 780; --d-label-color: var(--d-ink);
-  --d-row-h: 46px;
-  --d-accent: #A50E1C;
-  --d-accent-fill: linear-gradient(180deg, #D4232F 0%, #8E0B17 100%);
-  --d-accent-ink: #ffffff; --d-accent-soft: #F6DDDF; --d-accent-edge: #000000;
-  --d-pos: #10502C; --d-pos-band: #A9DDB8; --d-pos-edge: #000000;
-  --d-att: #6B4300; --d-att-band: #F3CE7C; --d-att-edge: #000000;
-  --d-crit: #8A1410; --d-crit-band: #F0A7A2; --d-crit-edge: #000000;
-  --d-info: #232B63; --d-info-band: #B5B9E6; --d-info-edge: #000000;
-  --d-neu: #4E463C; --d-neu-band: #DFD9D0; --d-neu-edge: #000000;
-}
-[data-d='Q'] .d-panel { border-color: #000; background: var(--d-surface-fill); overflow: hidden; }
+
 /* El charol: barrido húmedo en el tercio de arriba, dentro del borde duro. */
-[data-d='Q'] .d-panel::after {
-  content: ''; position: absolute; inset: 0 0 auto 0; height: 34%;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, 0));
-  pointer-events: none;
-}
-[data-d='Q'] .d-panel-head { border-bottom-color: #000; background: var(--d-sunk-fill); }
-[data-d='Q'] .d-panel-title { text-transform: uppercase; font-weight: var(--d-w-bold); }
-[data-d='Q'] .d-panel-foot { border-top-color: #000; background: var(--d-sunk-fill); }
-[data-d='Q'] .d-row { border-bottom-color: #000; border-bottom-width: 1px; }
-[data-d='Q'] .d-btn {
-  background: var(--d-surface-fill);
-  border-color: #000;
-  font-weight: var(--d-w-bold); text-transform: uppercase; letter-spacing: .02em;
-  box-shadow: 3px 3px 0 #000, inset 0 1px 0 rgba(255, 255, 255, .95);
-}
-[data-d='Q'] .d-btn--primary { background: var(--d-accent-fill); }
-[data-d='Q'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
-[data-d='Q'] .d-btn:active { transform: translate(3px, 3px); box-shadow: 0 0 0 #000, inset 0 2px 5px rgba(0, 0, 0, .35); }
-[data-d='Q'] .d-input, [data-d='Q'] .d-select, [data-d='Q'] .d-textarea {
-  background: linear-gradient(180deg, #EFEBE4 0%, #FFFFFF 55%);
-  border-color: #000;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, .18);
-}
-[data-d='Q'] .d-pill { border-width: 2px; color: var(--d-ink); font-weight: var(--d-w-bold); text-transform: uppercase; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6); }
 
-/* ── R · VITRINA  (F · Terminal + I · Cristal) ───────────────────────────
-   Lo que resuelve: Terminal es la más densa de todas y por eso la más
-   agobiante. Cambiando el relleno sólido por vidrio sobre un campo con luz, la
-   misma densidad deja de sentirse apretada — el fondo respira a través. */
-[data-d='R'] {
-  --d-ground:
-    radial-gradient(56% 48% at 16% 6%, #12384C 0%, transparent 62%),
-    radial-gradient(48% 50% at 88% 26%, #2B2148 0%, transparent 64%),
-    radial-gradient(60% 50% at 50% 100%, #133C38 0%, transparent 66%),
-    #080B0F;
-  --d-surface: rgba(190, 225, 255, .07);
-  --d-sunk: rgba(190, 225, 255, .04);
-  --d-ink: #DCE7EE; --d-ink-2: #A9BAC6; --d-ink-3: #A6B3BC; --d-ink-on: #080B0F;
-  --d-line: rgba(190, 225, 255, .14); --d-edge: rgba(190, 225, 255, .22); --d-bw: 1px;
-  --d-r: 3px; --d-r-lg: 6px; --d-r-pill: 999px;
-  --d-shadow: 0 6px 26px -10px rgba(0, 0, 0, .7), inset 0 1px 0 rgba(190, 225, 255, .12);
-  --d-shadow-lg: 0 20px 56px -18px rgba(0, 0, 0, .8), inset 0 1px 0 rgba(190, 225, 255, .16);
-  --d-p1: 5px; --d-p2: 8px; --d-p3: 12px; --d-p4: 16px; --d-gap: 12px;
-  --d-t-2xs: 10px; --d-t-xs: 11px; --d-t-sm: 12px; --d-t-md: 13px;
-  --d-t-lg: 15.5px; --d-t-xl: 20px; --d-t-2xl: 27px;
-  --d-w: 400; --d-w-med: 500; --d-w-semi: 600; --d-w-bold: 700;
-  --d-label-size: 10.5px; --d-label-case: uppercase; --d-label-track: .09em;
-  --d-label-weight: 520; --d-label-color: var(--d-ink-3);
-  --d-row-h: 26px;
-  --d-font: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  --d-accent: #6FD8E0; --d-accent-ink: #04191C;
-  --d-accent-soft: rgba(111, 216, 224, .14); --d-accent-edge: rgba(111, 216, 224, .38);
-  --d-pos: #74DFA6; --d-pos-band: rgba(116, 223, 166, .14); --d-pos-edge: rgba(116, 223, 166, .34);
-  --d-att: #F0C671; --d-att-band: rgba(240, 198, 113, .14); --d-att-edge: rgba(240, 198, 113, .34);
-  --d-crit: #FF9084; --d-crit-band: rgba(255, 144, 132, .14); --d-crit-edge: rgba(255, 144, 132, .34);
-  --d-info: #9FB6F5; --d-info-band: rgba(159, 182, 245, .14); --d-info-edge: rgba(159, 182, 245, .34);
-  --d-neu: #AEBCC6; --d-neu-band: rgba(147, 164, 176, .12); --d-neu-edge: rgba(147, 164, 176, .28);
-  --d-focus: #6FD8E0;
-}
-[data-d='R'] .d-panel {
-  backdrop-filter: blur(16px) saturate(1.3);
-  -webkit-backdrop-filter: blur(16px) saturate(1.3);
-}
-[data-d='R'] .d-panel-head { background: rgba(190, 225, 255, .05); border-bottom-color: var(--d-line); }
-[data-d='R'] .d-panel-title { font-size: var(--d-t-xs); text-transform: uppercase; letter-spacing: .1em; color: var(--d-accent); }
-[data-d='R'] .d-panel-foot { background: rgba(190, 225, 255, .04); border-top-color: var(--d-line); }
-[data-d='R'] .d-row { border-bottom-color: rgba(190, 225, 255, .08); }
-[data-d='R'] .d-row:hover { background: rgba(190, 225, 255, .05); }
-[data-d='R'] .d-btn {
-  min-height: 24px; padding: 0 var(--d-p2); font-size: var(--d-t-xs);
-  background: rgba(190, 225, 255, .08);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border-color: var(--d-line);
-}
-[data-d='R'] .d-btn--primary { background: var(--d-accent); border-color: transparent; }
-[data-d='R'] .d-btn--ghost { background: transparent; backdrop-filter: none; box-shadow: none; }
-[data-d='R'] .d-input, [data-d='R'] .d-select, [data-d='R'] .d-textarea {
-  min-height: 24px; padding-inline: var(--d-p1);
-  background: rgba(190, 225, 255, .05); border-color: var(--d-line);
-}
 
-/* ── S · UMBRA  (A · Elevación + M · Bruma) ──────────────────────────────
-   Lo que resuelve: en casi todas las direcciones el estado ensucia el
-   contenido — una banda de color detrás del texto, un borde teñido. Acá la
-   tarjeta se queda blanca y limpia, y lo que informa es la LUZ de abajo. */
-[data-d='S'] {
-  --d-ground: #F6F6F7; --d-surface: #FFFFFF; --d-sunk: #F0F0F2;
-  --d-ink: #16181C; --d-ink-2: #3D4147; --d-ink-3: #62666D; --d-ink-on: #ffffff;
-  --d-line: transparent; --d-edge: #E2E3E6; --d-bw: 0px;
-  --d-r: 10px; --d-r-lg: 18px; --d-r-pill: 999px;
-  --d-shadow: 0 8px 24px -10px rgba(22, 24, 28, .22);
-  --d-shadow-lg: 0 24px 56px -18px rgba(22, 24, 28, .30);
-  --d-p1: 10px; --d-p2: 14px; --d-p3: 20px; --d-p4: 26px; --d-gap: 22px;
-  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
-  --d-t-lg: 20px; --d-t-xl: 27px; --d-t-2xl: 36px;
-  --d-w: 400; --d-w-med: 520; --d-w-semi: 610; --d-w-bold: 690;
-  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
-  --d-label-weight: 600; --d-label-color: var(--d-ink-3);
-  --d-row-h: 46px;
-  --d-accent: #16181C; --d-accent-ink: #ffffff;
-  --d-accent-soft: #EDEDF0; --d-accent-edge: transparent;
-  --d-pos: #26603C; --d-pos-band: #ECF3ED; --d-pos-edge: transparent;
-  --d-att: #7B5104; --d-att-band: #FAF1DF; --d-att-edge: transparent;
-  --d-crit: #9C271C; --d-crit-band: #FAE8E4; --d-crit-edge: transparent;
-  --d-info: #333A6B; --d-info-band: #ECEDF4; --d-info-edge: transparent;
-  --d-neu: #62666D; --d-neu-band: #F0F0F2; --d-neu-edge: transparent;
-}
-[data-d='S'] .d-panel { border: 0; }
-[data-d='S'] .d-panel-head { border-bottom: 1px solid #F0F0F2; }
-[data-d='S'] .d-panel-foot { border-top: 1px solid #F0F0F2; background: transparent; }
-[data-d='S'] .d-row { border-bottom: 1px solid #F1F1F3; }
+
+
 /* LA FIRMA. El contenido no se tiñe: la sombra sí. Un vencido proyecta rojo,
    un al día proyecta verde, y el texto se lee sobre blanco puro en los dos. */
-[data-d='S'] .d-panel[data-tone],
-[data-d='S'] .d-row[data-tone] {
-  box-shadow: 0 10px 30px -12px var(--tone-fg), 0 2px 8px -4px rgba(22, 24, 28, .18);
-}
-[data-d='S'] .d-row[data-tone] { border-radius: var(--d-r); margin-bottom: var(--d-p1); }
-[data-d='S'] .d-btn {
-  border: 1px solid var(--d-edge);
-  box-shadow: 0 2px 6px -3px rgba(22, 24, 28, .22);
-}
-[data-d='S'] .d-btn--ghost { border-color: transparent; box-shadow: none; }
-[data-d='S'] .d-input, [data-d='S'] .d-select, [data-d='S'] .d-textarea {
-  background: var(--d-sunk); border: 1px solid transparent; min-height: 44px;
-}
-[data-d='S'] .d-input:focus-visible { border-color: var(--d-ink); background: var(--d-surface); }
-[data-d='S'] .d-pill { border: 0; }
 
 /* ── T · HALO CLARO ──────────────────────────────────────────────────────
    Halo, del otro lado de la luz.
@@ -1165,6 +631,10 @@
     radial-gradient(80% 62% at 48% 98%, #C8E8DF 0%, transparent 66%),
     #EEF2F6;
   --d-surface: rgba(255, 255, 255, .58);
+  /* LO QUE FLOTA VA SOLIDO. Un menu o un dialogo translucido deja que el
+     texto de abajo se cruce con el de arriba y no se lee ninguno de los dos.
+     El velo de fondo si sigue siendo vidrio: ese no lleva texto encima. */
+  --d-overlay: #FFFFFF; --d-overlay-edge: rgba(18, 40, 56, .12);
   --d-sunk: rgba(255, 255, 255, .32);
   --d-ink: #0E1720; --d-ink-2: #2E3B48; --d-ink-3: #495563; --d-ink-on: #ffffff;
   --d-line: rgba(255, 255, 255, .70); --d-edge: rgba(14, 23, 32, .15); --d-bw: 1px;
@@ -1259,6 +729,10 @@
     radial-gradient(78% 60% at 50% 100%, #CCE7DE 0%, transparent 66%),
     #EDF1F5;
   --d-surface: rgba(255, 255, 255, .54);
+  /* LO QUE FLOTA VA SOLIDO. Un menu o un dialogo translucido deja que el
+     texto de abajo se cruce con el de arriba y no se lee ninguno de los dos.
+     El velo de fondo si sigue siendo vidrio: ese no lleva texto encima. */
+  --d-overlay: #FFFFFF; --d-overlay-edge: rgba(18, 30, 44, .12);
   --d-sunk: rgba(255, 255, 255, .30);
   --d-ink: #0D1620; --d-ink-2: #2C3946; --d-ink-3: #48545F; --d-ink-on: #ffffff;
   --d-line: rgba(255, 255, 255, .68); --d-edge: rgba(13, 22, 32, .16); --d-bw: 1px;
@@ -2069,3 +1543,408 @@
   [data-d='W'] *::before,
   [data-d='W'] *::after { border-color: currentColor !important; }
 }
+
+/* ==========================================================================
+   LA FAMILIA PRISMA: Y y Z.
+
+   Las dos salen de O y comparten paleta exacta. Lo único que las separa es de
+   dónde viene la profundidad: en Y la da el campo teñido que el vidrio
+   desenfoca, en Z la da la sombra sobre un fondo liso. Son hermanas, así que
+   los tokens de color están escritos igual en las dos a propósito — quien
+   compare los dos bloques tiene que ver que la única variable es el material.
+   ========================================================================== */
+
+/* ── Y · PRISMA PASTEL  (O + acento morado y estados pastel) ──────────────
+   Lo que resuelve: el teal de O es un color de marca que además carga peso
+   semántico — verde es «al día» en la escala de estados, así que la marca y el
+   estado se pisan. Un morado no compite con ninguna de las cuatro señales, y
+   eso libera la escala entera para pasarla a pastel sin que nada se confunda
+   con el cromo. El fondo es el de O, sin tocar: es la mitad de la comparación. */
+[data-d='Y'] {
+  /* LA RANURA. --x-accent lo escribe el selector del arnés; sin nada puesto cae
+     en el morado de siempre y la dirección se ve igual que antes. Todo lo demás
+     se DERIVA de acá en vez de ir escrito a mano, que es lo que hace que se
+     pueda cambiar de verdad: con los rgba() fijos que tenía, mover la marca
+     dejaba la cabecera, el relleno suave y el canto en el morado viejo y la
+     dirección quedaba partida en dos colores. */
+  --d-brand: var(--x-accent, #6541BE);
+  --d-brand-ink: color-mix(in srgb, var(--d-brand) 58%, #000000);
+  /* Idéntico a O, y NO sigue al acento a propósito: Y es la versión «con el
+     fondo como está». El campo que acompaña al color es AA. */
+  --d-ground:
+    radial-gradient(68% 54% at 8% 4%, #CBE6E0 0%, transparent 62%),
+    radial-gradient(58% 58% at 94% 16%, #D9E8F1 0%, transparent 64%),
+    radial-gradient(74% 60% at 52% 100%, #E4E9DC 0%, transparent 66%),
+    #F1F5F4;
+  --d-surface: rgba(255, 255, 255, .62);
+  --d-sunk: rgba(255, 255, 255, .34);
+  /* LO QUE FLOTA VA SOLIDO. Un menu o un dialogo translucido deja que el
+     texto de abajo se cruce con el de arriba y no se lee ninguno de los dos.
+     El velo de fondo si sigue siendo vidrio: ese no lleva texto encima. */
+  --d-overlay: #FFFFFF; --d-overlay-edge: rgba(23, 19, 39, .10);
+  --d-ink: #171327; --d-ink-2: #3B3454; --d-ink-3: #5B5473; --d-ink-on: #ffffff;
+  --d-line: rgba(255, 255, 255, .72); --d-edge: rgba(23, 19, 39, .14); --d-bw: 1px;
+  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
+  --d-shadow: 0 6px 22px -8px rgba(52, 32, 107, .24), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-shadow-lg: 0 22px 52px -16px rgba(52, 32, 107, .36), inset 0 1px 0 rgba(255, 255, 255, .92);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 530; --d-w-semi: 610; --d-w-bold: 690;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 620; --d-label-color: var(--d-brand);
+  --d-row-h: 44px;
+  /* La tinta del primario la calcula el arnés: de qué lado cae el blanco o el
+     negro depende de la luminancia del color elegido, y eso CSS no lo resuelve
+     solo. Sobre un acento claro, un texto blanco desaparece. */
+  --d-accent: var(--d-brand);
+  --d-accent-ink: var(--x-accent-ink, #ffffff);
+  --d-accent-soft: color-mix(in srgb, var(--d-brand) 14%, transparent);
+  --d-accent-edge: color-mix(in srgb, var(--d-brand) 34%, transparent);
+  /* PASTELES CON TINTA OSCURA. La banda baja de saturación, la tinta NO: en una
+     dirección de vidrio la banda ya se aclara sola contra el campo, así que si
+     además se aclarara el texto no quedaría contraste en ningún lado. Medido en
+     el peor caso —banda sobre vidrio sobre la mancha más oscura del campo—
+     ninguna tinta baja de 6:1. */
+  --d-pos: #14563A; --d-pos-band: rgba(126, 209, 168, .30); --d-pos-edge: rgba(96, 184, 141, .46);
+  --d-att: #7A4310; --d-att-band: rgba(246, 186, 124, .32); --d-att-edge: rgba(226, 160, 94, .48);
+  --d-crit: #97231F; --d-crit-band: rgba(244, 160, 168, .30); --d-crit-edge: rgba(226, 132, 141, .46);
+  --d-info: #26456E; --d-info-band: rgba(146, 190, 240, .30); --d-info-edge: rgba(116, 166, 224, .46);
+  --d-neu: #444056; --d-neu-band: rgba(255, 255, 255, .40); --d-neu-edge: rgba(23, 19, 39, .14);
+}
+[data-d='Y'] .d-panel {
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-color: var(--d-line);
+}
+/* La cabecera de O era un morado plano en dos paradas. Acá el degradado corre
+   en diagonal de lavanda a rosa, así que la marca entra por un lado y sale por
+   el otro en vez de ser una franja de un solo tono. Sigue siendo vidrio: son
+   dos capas translúcidas, no un relleno. */
+/* La diagonal sigue siendo de dos tonos, pero los dos salen de la marca: el
+   segundo es la marca escorada hacia un rosa cálido. Con el morado puesto da
+   casi exactamente el lavanda→rosa de antes, y con cualquier otro acento sigue
+   siendo un degradado de dos tonos en vez de un rosa suelto que ya no pega. */
+[data-d='Y'] .d-panel-head {
+  background: linear-gradient(115deg,
+    color-mix(in srgb, var(--d-brand) 22%, transparent) 0%,
+    color-mix(in srgb, color-mix(in srgb, var(--d-brand) 55%, #D96BB4) 16%, transparent) 100%);
+  color: var(--d-brand-ink);
+  border-bottom: 1px solid color-mix(in srgb, var(--d-brand) 18%, transparent);
+  border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
+}
+[data-d='Y'] .d-panel-title { color: var(--d-brand-ink); font-weight: var(--d-w-semi); }
+[data-d='Y'] .d-panel-foot { background: rgba(255, 255, 255, .26); border-top-color: rgba(255, 255, 255, .6); }
+[data-d='Y'] .d-row { border-bottom-color: rgba(23, 19, 39, .08); }
+[data-d='Y'] .d-btn {
+  background: rgba(255, 255, 255, .58);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border-color: rgba(255, 255, 255, .75);
+  box-shadow: 0 2px 9px -4px rgba(52, 32, 107, .28), inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+[data-d='Y'] .d-btn--primary { background: var(--d-accent); border-color: rgba(255, 255, 255, .30); }
+[data-d='Y'] .d-btn--ghost { background: transparent; box-shadow: none; backdrop-filter: none; }
+[data-d='Y'] .d-input, [data-d='Y'] .d-select, [data-d='Y'] .d-textarea {
+  background: rgba(255, 255, 255, .46);
+  border-color: rgba(255, 255, 255, .72);
+  box-shadow: inset 0 1px 3px rgba(52, 32, 107, .10);
+}
+[data-d='Y'] .d-input:focus-visible { border-color: var(--d-brand); }
+
+/* ── Z · PRISMA PASTEL LISO  (Y sin campo detrás) ─────────────────────────
+   Lo que resuelve: el vidrio de Y depende de que haya algo que desenfocar. En
+   producto real el fondo lo pone el cliente, y muchas veces es un liso. Z es la
+   misma marca con el material honesto para ese caso: sin campo detrás, el
+   backdrop-filter no desenfoca nada y la translucidez pasa a ser un efecto que
+   no informa — así que se cae entera y la elevación vuelve a la sombra, que es
+   de donde venía en A. La sombra va teñida de morado, no gris: una sombra
+   neutra debajo de una cabecera lavanda parece suciedad.
+
+   Consecuencia de perder el vidrio: las bandas de estado pasan a OPACAS. Una
+   banda translúcida sobre una superficie ya opaca se apila cuando hay una
+   píldora sobre una fila teñida, y el contraste termina dependiendo de cuántas
+   capas haya debajo. Los pasteles son los mismos, resueltos contra blanco. */
+[data-d='Z'] {
+  --d-brand: var(--x-accent, #6541BE);
+  --d-brand-ink: color-mix(in srgb, var(--d-brand) 58%, #000000);
+  /* Liso, y acá sí sigue al acento: en Z el fondo es lo único que lleva color de
+     marca en toda la página, así que si se queda en lavanda con un acento verde
+     la dirección entera queda desafinada. Es un 5 % — un tinte, no un color. */
+  --d-ground: color-mix(in srgb, var(--d-brand) 5%, #FFFFFF);
+  --d-surface: #ffffff;
+  --d-sunk: color-mix(in srgb, var(--d-brand) 8%, #FFFFFF);
+  --d-ink: #171327; --d-ink-2: #3B3454; --d-ink-3: #5B5473; --d-ink-on: #ffffff;
+  /* Sin vidrio, un borde blanco al 72 % sobre blanco no existe. La línea vuelve
+     a ser una línea, en el tono de la familia. */
+  --d-line: color-mix(in srgb, var(--d-brand) 12%, #FFFFFF);
+  --d-edge: color-mix(in srgb, var(--d-brand) 24%, #FFFFFF); --d-bw: 1px;
+  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
+  --d-shadow: 0 6px 22px -8px rgba(52, 32, 107, .22), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-shadow-lg: 0 22px 52px -16px rgba(52, 32, 107, .32), inset 0 1px 0 rgba(255, 255, 255, .92);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 530; --d-w-semi: 610; --d-w-bold: 690;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 620; --d-label-color: var(--d-brand);
+  --d-row-h: 44px;
+  /* Mezclas contra BLANCO, no contra transparent: Z perdio el vidrio, asi que
+     cada superficie tiene que resolverse en un color opaco o una pildora sobre
+     una fila teñida vuelve a apilar capas. */
+  --d-accent: var(--d-brand);
+  --d-accent-ink: var(--x-accent-ink, #ffffff);
+  --d-accent-soft: color-mix(in srgb, var(--d-brand) 12%, #FFFFFF);
+  --d-accent-edge: color-mix(in srgb, var(--d-brand) 28%, #FFFFFF);
+  --d-pos: #14563A; --d-pos-band: #DAF0E4; --d-pos-edge: #ABD9C1;
+  --d-att: #7A4310; --d-att-band: #FBE7D2; --d-att-edge: #EDC79B;
+  --d-crit: #97231F; --d-crit-band: #FBDDDF; --d-crit-edge: #EFB3B8;
+  --d-info: #26456E; --d-info-band: #DCE9F9; --d-info-edge: #AFC9EC;
+  --d-neu: #444056; --d-neu-band: #EEEBF5; --d-neu-edge: #D5CFE4;
+}
+/* La ley de Z en una regla: nada desenfoca. Se apaga en el selector ancho para
+   que ningún componente que herede el vidrio de otra dirección se cuele. */
+[data-d='Z'] .d-panel,
+[data-d='Z'] .d-btn,
+[data-d='Z'] .d-input,
+[data-d='Z'] .d-select,
+[data-d='Z'] .d-textarea {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-d='Z'] .d-panel {
+  background: var(--d-surface);
+  border-color: var(--d-line);
+  box-shadow: var(--d-shadow);
+}
+/* Misma diagonal lavanda→rosa que Y, resuelta en opaco. Los dos extremos son
+   los colores de Y aplanados contra blanco, así que las dos hermanas tienen la
+   misma cabecera y no dos cabeceras parecidas. */
+[data-d='Z'] .d-panel-head {
+  background: linear-gradient(115deg,
+    color-mix(in srgb, var(--d-brand) 18%, #FFFFFF) 0%,
+    color-mix(in srgb, color-mix(in srgb, var(--d-brand) 55%, #D96BB4) 14%, #FFFFFF) 100%);
+  color: var(--d-brand-ink);
+  border-bottom: 1px solid color-mix(in srgb, var(--d-brand) 22%, #FFFFFF);
+  border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
+}
+[data-d='Z'] .d-panel-title { color: var(--d-brand-ink); font-weight: var(--d-w-semi); }
+[data-d='Z'] .d-panel-foot { background: var(--d-sunk); border-top-color: var(--d-line); }
+[data-d='Z'] .d-row { border-bottom-color: var(--d-line); }
+[data-d='Z'] .d-btn {
+  background: var(--d-surface);
+  border-color: var(--d-edge);
+  box-shadow: 0 2px 9px -4px rgba(52, 32, 107, .24), inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+[data-d='Z'] .d-btn--primary {
+  background: var(--d-accent);
+  border-color: var(--d-accent);
+  color: var(--d-accent-ink);
+}
+[data-d='Z'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
+[data-d='Z'] .d-input, [data-d='Z'] .d-select, [data-d='Z'] .d-textarea {
+  background: var(--d-sunk);
+  border-color: var(--d-edge);
+  box-shadow: inset 0 1px 3px rgba(52, 32, 107, .08);
+}
+[data-d='Z'] .d-input:focus-visible { border-color: var(--d-brand); }
+
+/* ── AA · PRISMA VIVO  (Y con el morado subido y la cifra medida) ─────────
+   Lo que resuelve: Y bajó la saturación de todo a la vez —marca y estados— y el
+   resultado es correcto pero apagado: nada tira del ojo, así que una pantalla
+   con ocho equipos vencidos se lee igual de tranquila que una sin ninguno. AA
+   sube el morado un 65 % de saturación y las cuatro señales con él, y le devuelve
+   al KPI la información que le faltaba: cuánto es esa cifra del total.
+
+   El campo pasa a lavanda. En Y quedó el teal de O porque el pedido era «el
+   fondo como está», pero con un morado de esta fuerza el verde de la esquina
+   pelea de frente con la cabecera. Acá es una dirección nueva, así que el campo
+   acompaña. */
+[data-d='AA'],
+[data-d='AB'] {
+  /* LA RANURA, y acá manda sobre todo: en AA el color es la dirección, no un
+     detalle. El defecto es el morado subido —+65 % de saturación sobre el de Y—
+     y el resto del bloque lo deriva. */
+  --d-brand: var(--x-accent, #7226E8);
+  --d-brand-ink: color-mix(in srgb, var(--d-brand) 46%, #000000);
+  /* EL CAMPO SIGUE AL ACENTO. Es la diferencia con Y, que se queda con el teal
+     de O a propósito. Las tres manchas mantienen su geometría —posición, tamaño
+     y caída son la silueta de la dirección y no cambian— y sólo se retiñen: la
+     primera es la marca, la segunda la marca escorada al rosa, la tercera
+     escorada al azul. Así el campo gira entero con el acento en vez de quedar
+     un lavanda suelto detrás de un primario que ya es otra cosa. */
+  --d-ground:
+    radial-gradient(70% 56% at 6% 2%,
+      color-mix(in srgb, var(--d-brand) 22%, #FFFFFF) 0%, transparent 62%),
+    radial-gradient(60% 58% at 96% 14%,
+      color-mix(in srgb, color-mix(in srgb, var(--d-brand) 55%, #D96BB4) 24%, #FFFFFF) 0%, transparent 64%),
+    radial-gradient(76% 62% at 50% 100%,
+      color-mix(in srgb, color-mix(in srgb, var(--d-brand) 55%, #4A7BD9) 20%, #FFFFFF) 0%, transparent 66%),
+    color-mix(in srgb, var(--d-brand) 5%, #FFFFFF);
+  --d-surface: rgba(255, 255, 255, .64);
+  --d-sunk: rgba(255, 255, 255, .36);
+  /* LO QUE FLOTA VA SOLIDO. Un menu o un dialogo translucido deja que el
+     texto de abajo se cruce con el de arriba y no se lee ninguno de los dos.
+     El velo de fondo si sigue siendo vidrio: ese no lleva texto encima. */
+  --d-overlay: #FFFFFF; --d-overlay-edge: rgba(21, 15, 38, .10);
+  --d-ink: #150F26; --d-ink-2: #383052; --d-ink-3: #585072; --d-ink-on: #ffffff;
+  --d-line: rgba(255, 255, 255, .74); --d-edge: rgba(21, 15, 38, .14); --d-bw: 1px;
+  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
+  --d-shadow: 0 6px 22px -8px rgba(60, 20, 140, .26), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-shadow-lg: 0 22px 52px -16px rgba(60, 20, 140, .38), inset 0 1px 0 rgba(255, 255, 255, .92);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 530; --d-w-semi: 610; --d-w-bold: 690;
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 620; --d-label-color: var(--d-brand);
+  --d-row-h: 44px;
+  --d-accent: var(--d-brand);
+  --d-accent-ink: var(--x-accent-ink, #ffffff);
+  --d-accent-soft: color-mix(in srgb, var(--d-brand) 15%, transparent);
+  --d-accent-edge: color-mix(in srgb, var(--d-brand) 38%, transparent);
+  /* Los pasteles suben con la marca. Si el morado se fortalece y las señales se
+     quedan donde estaban, el cromo termina gritando más fuerte que el estado —
+     que es exactamente al revés de lo que tiene que pasar. Las tintas siguen
+     oscuras: lo que sube es la banda. */
+  --d-pos: #0F5233; --d-pos-band: rgba(74, 201, 145, .34); --d-pos-edge: rgba(46, 178, 120, .52);
+  --d-att: #6F3C06; --d-att-band: rgba(250, 168, 84, .36); --d-att-edge: rgba(232, 142, 50, .54);
+  --d-crit: #8E1A16; --d-crit-band: rgba(248, 124, 136, .34); --d-crit-edge: rgba(232, 88, 104, .52);
+  --d-info: #1E3C66; --d-info-band: rgba(112, 168, 240, .34); --d-info-edge: rgba(74, 138, 226, .52);
+  --d-neu: #403A54; --d-neu-band: rgba(255, 255, 255, .42); --d-neu-edge: rgba(21, 15, 38, .14);
+}
+[data-d='AA'] .d-panel,
+[data-d='AB'] .d-panel {
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border-color: var(--d-line);
+}
+[data-d='AA'] .d-panel-head,
+[data-d='AB'] .d-panel-head {
+  background: linear-gradient(115deg,
+    color-mix(in srgb, var(--d-brand) 26%, transparent) 0%,
+    color-mix(in srgb, color-mix(in srgb, var(--d-brand) 55%, #D96BB4) 20%, transparent) 100%);
+  color: var(--d-brand-ink);
+  border-bottom: 1px solid color-mix(in srgb, var(--d-brand) 22%, transparent);
+  border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
+}
+[data-d='AA'] .d-panel-title,
+[data-d='AB'] .d-panel-title { color: var(--d-brand-ink); font-weight: var(--d-w-semi); }
+[data-d='AA'] .d-panel-foot,
+[data-d='AB'] .d-panel-foot { background: rgba(255, 255, 255, .28); border-top-color: rgba(255, 255, 255, .6); }
+[data-d='AA'] .d-row,
+[data-d='AB'] .d-row { border-bottom-color: rgba(21, 15, 38, .08); }
+[data-d='AA'] .d-btn,
+[data-d='AB'] .d-btn {
+  background: rgba(255, 255, 255, .60);
+  backdrop-filter: blur(12px) saturate(1.4);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  border-color: rgba(255, 255, 255, .78);
+  box-shadow: 0 2px 9px -4px rgba(60, 20, 140, .30), inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+[data-d='AA'] .d-btn--primary,
+[data-d='AB'] .d-btn--primary { background: var(--d-accent); border-color: rgba(255, 255, 255, .30); }
+[data-d='AA'] .d-btn--ghost,
+[data-d='AB'] .d-btn--ghost { background: transparent; box-shadow: none; backdrop-filter: none; }
+[data-d='AA'] .d-input, [data-d='AA'] .d-select, [data-d='AA'] .d-textarea,
+[data-d='AB'] .d-input, [data-d='AB'] .d-select, [data-d='AB'] .d-textarea {
+  background: rgba(255, 255, 255, .48);
+  border-color: rgba(255, 255, 255, .74);
+  box-shadow: inset 0 1px 3px rgba(60, 20, 140, .10);
+}
+[data-d='AA'] .d-input:focus-visible,
+[data-d='AB'] .d-input:focus-visible { border-color: var(--d-brand); }
+
+/* NADA QUE FLOTE ES TRANSLÚCIDO — la corrección de W, que Y no tiene. Un diálogo
+   de vidrio deja que la tabla de abajo se cruce con su propio texto y no se lee
+   ninguno de los dos; se ve en `?p=estados&d=Y`, donde «¿Eliminar la familia
+   Batidoras?» cae encima de las filas.
+
+   POR QUÉ ES UN TOKEN Y NO UNA REGLA ACÁ. Lo que flota no se pinta desde este
+   archivo: `.dlg` saca su fondo de --blk-bg y `.menu` del suyo, y las dos viven
+   en el <style> de su página, o sea con la clase de scope de Svelte encima. Una
+   regla de este archivo les empata en especificidad y pierde por orden de
+   fuente — que es exactamente lo que le pasa a la red de seguridad de W, y por
+   eso W termina yendo «sólido a mano» en cada página. Así que la dirección
+   declara CUÁL es su superficie opaca y cada página la consume donde
+   corresponde. Un solo lugar para cambiarla, y funciona de verdad. */
+
+
+
+/* ── AB · PRISMA FARO  (AA, y el KPI es lo único que emite luz) ────────────
+   Lo que resuelve: en AA lo urgente se marca tiñendo la celda vencida. Funciona,
+   pero es una señal PLANA — teñida o no teñida, dos estados. La flota no es
+   binaria: hay algo vencido, algo por vencer y algo que sólo hay que mirar de
+   reojo, y eso es una escala, no un interruptor.
+
+   Acá la señal es la LUZ, que sí tiene grados. Cada celda irradia en su tono con
+   la intensidad de lo que urge: lo vencido quema, lo que está por vencer arde
+   despacio, lo que va al día apenas tibia, y lo que no tiene dato NO BRILLA. La
+   tira de seis KPIs se lee de una pasada por dónde está encendida, sin leer una
+   sola cifra.
+
+   POR QUÉ NO ES OTRA DIRECCIÓN DE HALO. En Halo claro, Cristal halo y Cristal
+   templado el resplandor es el idioma de la página entera. Acá el resto de la
+   dirección es Prisma sin tocar —vidrio, sombra, cabecera teñida— y emite UNA
+   sola familia de elementos. Es la diferencia entre una pantalla que brilla y
+   una pantalla con un tablero encendido. Si todo irradiara, sería Halo y sobra.
+
+   La escala vive en un token por tono para que se pueda subir o bajar entera sin
+   tocar seis reglas, y para que quede escrito que apagado es un valor legítimo
+   de la escala y no un olvido. */
+[data-d='AB'] {
+  /* La escala, calibrada CONTRA VIDRIO. El primer intento se escribió con los
+     valores que uno pondría sobre papel —62 / 40 / 22— y sobre una superficie
+     translúcida no se veía: el resplandor tiene que atravesar el mismo blanco
+     al 64 % que aclara todo lo demás. Sobre vidrio la luz arranca más arriba.
+     El salto entre escalones es lo que hace legible la escala, así que importa
+     más la distancia entre ellos que el valor de cada uno. */
+  --d-faro-crit: 92%;   /* quema */
+  --d-faro-att:  66%;   /* arde despacio */
+  --d-faro-pos:  38%;   /* tibia */
+  --d-faro-info: 38%;
+  --d-faro-neu:  16%;   /* el piso: sin dato no urge nada, pero sigue encendido */
+  /* EL PISO. Ninguna pieza queda apagada del todo: todo lo que es una superficie
+     en esta dirección irradia aunque sea un poco, en el morado de la marca. Lo
+     que cambia entre una pieza y otra es CUÁNTO, y ahí es donde vuelve a entrar
+     la urgencia. La escala completa queda: piso para todo, y por encima los
+     cuatro escalones de estado. Sin el piso, «poco resplandor» y «ningún
+     resplandor» se confundían y la escala perdía su primer peldaño. */
+  --d-faro-piso: 26%;
+  /* El anillo es la otra mitad del efecto. Una luz que sólo cae por debajo se
+     lee como sombra de color; lo que la vuelve emisión es que el canto de la
+     pieza también esté encendido. */
+  --d-faro-ring: 34%;
+}
+
+/* EL PISO DE LUZ, sobre las piezas del sistema. Todo lo que es una superficie
+   irradia en el morado de la marca; la urgencia sólo modula por encima de esto.
+   Va con --d-shadow adentro y no en una capa aparte: box-shadow es UNA
+   propiedad, y declararla dos veces hace que la segunda pise a la primera y la
+   pieza pierda el peso de Prisma. */
+[data-d='AB'] .d-panel {
+  box-shadow: 0 8px 26px -10px color-mix(in srgb, var(--d-brand) var(--d-faro-piso), transparent),
+              var(--d-shadow);
+}
+[data-d='AB'] .d-btn {
+  box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--d-brand) var(--d-faro-piso), transparent),
+              0 2px 9px -4px rgba(60, 20, 140, .30), inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+/* El primario es la pieza con más voltaje de la página: irradia en su propio
+   color y no en el piso, porque un botón que llama a la acción y una tarjeta
+   quieta no pueden alumbrar igual. */
+[data-d='AB'] .d-btn--primary {
+  box-shadow: 0 6px 20px -6px color-mix(in srgb, var(--d-accent) 65%, transparent),
+              inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+[data-d='AB'] .d-btn--ghost { box-shadow: none; }
+/* Las píldoras de estado son lo más chico que lleva tono, así que su luz es la
+   más corta: un resplandor de 10px que no se derrama sobre el texto vecino. */
+[data-d='AB'] .d-pill[data-tone] {
+  box-shadow: 0 2px 10px -3px color-mix(in srgb, var(--tone-fg) 46%, transparent);
+}
+/* Lo que flota NO irradia. Su trabajo es interrumpir, y un halo alrededor de un
+   diálogo lo integra con la página en vez de despegarlo — que es lo contrario
+   de lo que hace falta. Sombra dura y opaca, como cualquier overlay. */
+[data-d='AB'] .dlg,
+[data-d='AB'] .menu { box-shadow: var(--d-shadow-lg); }

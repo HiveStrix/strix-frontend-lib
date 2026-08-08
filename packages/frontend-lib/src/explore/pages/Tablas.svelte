@@ -639,51 +639,18 @@
   :global([data-d='A']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-ink); }
   :global([data-d='A']) .empty { padding-block: var(--d-p3); }
 
-  /* ── B · INSTRUMENTO — las celdas COMPARTEN borde, fila de 30px ────────── */
-  :global([data-d='B']) .tbl { border-collapse: collapse; }
-  :global([data-d='B']) .tbl th,
-  :global([data-d='B']) .tbl td { border: var(--d-bw) solid var(--d-line); padding: 0 var(--d-p2); }
-  :global([data-d='B']) .tbl tbody tr:last-child td { border-bottom: var(--d-bw) solid var(--d-line); }
-  :global([data-d='B']) .tbl thead th { border-color: var(--d-edge); }
-  :global([data-d='B']) .tbl thead th[aria-sort]:not([aria-sort='none']) { background: var(--d-edge); }
-  :global([data-d='B']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-ink-on); }
-  :global([data-d='B']) .tbl tbody tr.on td.c-sel { box-shadow: inset 2px 0 0 var(--d-edge); }
-  :global([data-d='B']) .pick { --pick: 12px; }
-  :global([data-d='B']) .sortmark::before { content: '▴'; }
-  :global([data-d='B']) .sortmark[data-dir='desc']::before { content: '▾'; }
+  
   /* La fila vencida no se marca sólo con un fondo de color: se DIBUJA con más
      peso de línea. En un plano técnico el grosor del trazo es el idioma, y una
      fila trazada en tinta contra hairlines grises se ve con los ojos entornados
      y sin distinguir un solo color. */
-  :global([data-d='B']) .tbl tbody tr.alert td { border-color: var(--d-edge); }
-  :global([data-d='B']) .tbl tbody tr.alert td.c-code { font-weight: var(--d-w-semi); }
   /* Una botonera es un marco continuo, no tres botones sueltos: la regla ya la
      cumplía .d-btn-group y el paginador se había quedado afuera. */
-  :global([data-d='B']) .pager { gap: 0; }
-  :global([data-d='B']) .pager > .d-btn + .d-btn { margin-left: calc(-1 * max(var(--d-bw), 1px)); }
-  :global([data-d='B']) .foot { padding-block: var(--d-p1); }
   /* El contenedor de tarjeta sobra. La lista tenía DOS marcos, el del panel con
      sus marcas de esquina y el suyo propio: en densidad de cabina eso es chrome
      que no informa. Queda un solo marco y la etiqueta pasa a estar fuera de él,
      que es la regla declarada de esta dirección. */
-  :global([data-d='B']) .d-panel.clistpanel { border: 0; box-shadow: none; }
-  :global([data-d='B']) .d-panel.clistpanel::before,
-  :global([data-d='B']) .d-panel.clistpanel::after { content: none; }
-  :global([data-d='B']) .clistpanel .d-panel-head { border-bottom: 0; padding: 0 0 var(--d-p1); }
-  :global([data-d='B']) .clist { border: var(--d-bw) solid var(--d-edge); }
-  :global([data-d='B']) ul.clist > li.citem {
-    grid-template-columns: 84px minmax(0, 1fr);
-    gap: 0 var(--d-p2);
-    align-items: center;
-    min-height: var(--d-row-h);
-    padding: 0 var(--d-p2);
-    border-bottom: var(--d-bw) solid var(--d-line);
-  }
-  :global([data-d='B']) ul.clist > li.citem:last-child { border-bottom: 0; }
   /* Un renglón por equipo, sin plegado: es una rejilla, no una pila de fichas. */
-  :global([data-d='B']) .cibody { flex-wrap: nowrap; overflow: hidden; }
-  :global([data-d='B']) .cinm { flex-basis: auto; }
-  :global([data-d='B']) .empty { padding-block: var(--d-p3); }
 
   /* ── C · MARCA — la cabecera de la tabla es la del bloque, en color ────── */
   :global([data-d='C']) .tablepanel,
@@ -708,60 +675,14 @@
   :global([data-d='C']) .tbl tbody tr.alert td.c-code { font-weight: var(--d-w-semi); }
   :global([data-d='C']) .empty { padding-block: var(--d-p3); }
 
-  /* ── D · PESO — cabecera tinta, tipografía 800, el bloque cae en su sombra */
-  :global([data-d='D']) .tbl thead th { background: var(--d-ink); border-bottom: var(--d-bw) solid var(--d-ink); }
-  :global([data-d='D']) .hcap { color: var(--d-ink-on); }
+  
   /* La columna ordenada se recorta en negativo sobre la barra tinta: masa, no color. */
-  :global([data-d='D']) .tbl thead th[aria-sort]:not([aria-sort='none']) { background: var(--d-surface); }
-  :global([data-d='D']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-ink); }
-  :global([data-d='D']) .tbl tbody td { border-bottom: 1px solid var(--d-ink); color: var(--d-ink); }
-  :global([data-d='D']) .tbl tbody tr.on td.c-sel { box-shadow: inset 6px 0 0 var(--d-ink); }
-  :global([data-d='D']) .tbl tbody td.c-code { text-transform: uppercase; font-weight: var(--d-w-bold); }
-  :global([data-d='D']) .pick { --pick: 17px; border-width: var(--d-bw); }
-  :global([data-d='D']) .sortmark::before { content: '▲'; }
-  :global([data-d='D']) .sortmark[data-dir='desc']::before { content: '▼'; }
-  :global([data-d='D']) .clistpanel { background: transparent; border: 0; box-shadow: none; }
-  :global([data-d='D']) .clistpanel .d-panel-head { border-bottom: var(--d-bw) solid var(--d-ink); padding-inline: 0; }
-  :global([data-d='D']) .clist { gap: var(--d-gap); padding: var(--d-p2) 6px var(--d-p2) 0; }
-  :global([data-d='D']) ul.clist > li.citem {
-    background: var(--d-surface);
-    border: var(--d-bw) solid var(--d-ink);
-    box-shadow: var(--d-shadow);
-    transition: transform 100ms ease, box-shadow 100ms ease;
-  }
-  :global([data-d='D']) ul.clist > li.citem:active { transform: translate(4px, 4px); box-shadow: none; }
-  :global([data-d='D']) .cicode,
-  :global([data-d='D']) .etitle { text-transform: uppercase; font-weight: var(--d-w-bold); letter-spacing: .02em; }
 
   /* ── E · AIRE — filas de 56px, cero líneas duras, selección en pastilla ── */
 
   /* ── F · TERMINAL — rejilla de caracteres de 24px, cursor y bloques ────── */
 
-  /* ── G · BANDA — sin caja: franjas a sangre con canto de color y raíl ──── */
-  :global([data-d='G']) .stack { gap: 0; }
-  :global([data-d='G']) .speclabel { margin: 0; padding: var(--d-p3) var(--d-p3) var(--d-p1); }
-  :global([data-d='G']) .note { padding: var(--d-p1) var(--d-p3) var(--d-p3); margin: 0; }
-  :global([data-d='G']) .tablepanel,
-  :global([data-d='G']) .clistpanel,
-  :global([data-d='G']) .emptypanel { border-left: 0; border-right: 0; }
-  :global([data-d='G']) .tbl { min-width: 600px; }
-  :global([data-d='G']) .tbl thead th { border-bottom: var(--d-bw) solid var(--d-line); }
-  :global([data-d='G']) .tbl thead th.c-sel { border-left: 3px solid transparent; }
-  :global([data-d='G']) .tbl tbody td.c-sel { border-left: 3px solid var(--tone-fg); }
-  :global([data-d='G']) .tbl tbody tr.alert td { background: transparent; }
-  :global([data-d='G']) .tbl tbody tr.on td.c-sel { box-shadow: none; }
-  :global([data-d='G']) .tbl tbody tr:last-child td { border-bottom: var(--d-bw) solid var(--d-line); }
-  :global([data-d='G']) ul.clist > li.citem {
-    grid-template-columns: var(--d-rail) minmax(0, 1fr);
-    gap: 0 var(--d-p3);
-    align-items: baseline;
-    padding: var(--d-p1) var(--d-p3) var(--d-p1) 0;
-    border-bottom: var(--d-bw) solid var(--d-line);
-    border-left: 3px solid var(--tone-fg);
-  }
-  :global([data-d='G']) ul.clist > li.citem.alert { background: transparent; }
-  :global([data-d='G']) .cicode { text-align: right; }
-  :global([data-d='G']) .empty { padding: var(--d-p3) var(--d-p3) var(--d-p4); }
+  
 
   /* ── H · FICHA — pestaña arriba, regla doble, renglones de fichero ─────── */
 
@@ -865,119 +786,19 @@
      DEBAJO del texto (z-index negativo dentro de un contexto propio), así que
      no le come contraste a nada ni le tapa el clic al botón de la fila. */
 
-  /* ── K · HALO — cero bordes; la fila que urge irradia ──────────────────────
-     El estado no es un relleno ni una línea: es el color del resplandor. Una
-     fila vencida se ve desde el otro lado del cuarto sin leer una palabra.
-     HALLAZGO: K no expone un token de resplandor (--d-glow-*), así que los
-     radios de difusión se escriben a mano igual que en directions.css; el
-     COLOR siempre sale de --tone-fg / --tone-edge / --d-accent. */
-  :global([data-d='K']) .tbl { border-spacing: 0 var(--d-p1); }
-  :global([data-d='K']) .tbl th,
-  :global([data-d='K']) .tbl td { border: 0; }
-  :global([data-d='K']) .tbl thead th { background: transparent; padding-bottom: var(--d-p2); }
-  :global([data-d='K']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap {
-    color: var(--d-accent);
-    text-shadow: 0 0 14px var(--d-accent-edge);   /* bloom, no bloque de color */
-  }
-  :global([data-d='K']) .tbl tbody td { background: var(--d-surface); }
-  :global([data-d='K']) .tbl tbody td.c-sel { border-radius: var(--d-r) 0 0 var(--d-r); }
-  :global([data-d='K']) .tbl tbody td.c-act { border-radius: 0 var(--d-r) var(--d-r) 0; }
-  :global([data-d='K']) .tbl tbody tr[data-tone] { box-shadow: 0 0 0 1px var(--tone-edge), 0 8px 30px -10px var(--tone-fg); }
-  :global([data-d='K']) .tbl tbody tr.alert { box-shadow: 0 0 0 1px var(--tone-edge), 0 12px 42px -6px var(--tone-fg); }
-  :global([data-d='K']) .tbl tbody tr.alert td { background: var(--d-surface); }
+  
   /* El cursor encima aclara la superficie; el resplandor sigue siendo del
      estado. Así hover y estado no se pisan. */
-  :global([data-d='K']) .tbl tbody tr:hover td,
-  :global([data-d='K']) .tbl tbody tr.is-hover td { background: var(--d-accent-soft); }
-  :global([data-d='K']) .tbl tbody tr.on { box-shadow: 0 0 0 1px var(--d-accent-edge), 0 14px 46px -12px var(--d-accent); }
-  :global([data-d='K']) .tbl tbody tr.on td { background: var(--d-accent-soft); }
-  :global([data-d='K']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
-  :global([data-d='K']) .tblwrap { padding: var(--d-p1) var(--d-p1) var(--d-p3); }
   /* Sin borde visible la casilla desaparece: --d-edge es transparent en K, así
      que el anillo lo pone el tono neutro, que sí está declarado. */
-  :global([data-d='K']) .pick {
-    background: var(--d-sunk);
-    border-color: var(--d-neu-edge);
-  }
   /* El resplandor solo no alcanza: sin relleno la marca es tinta oscura sobre
      --d-sunk, que en K también es casi negro. Se rellena de acento y la marca
      pasa a ser --d-accent-ink (#04140F) sobre menta: se lee, y el halo sigue
      siendo lo que dice «marcada» desde lejos. */
-  :global([data-d='K']) .pick:checked,
-  :global([data-d='K']) .pick:indeterminate {
-    background: var(--d-accent);
-    border-color: var(--d-accent-edge);
-    box-shadow: 0 0 16px -4px var(--d-accent);
-  }
-  :global([data-d='K']) .clistpanel { background: transparent; box-shadow: none; }
-  :global([data-d='K']) .clistpanel .d-panel-head { padding-inline: 0; }
-  :global([data-d='K']) .clist { gap: var(--d-p2); padding-bottom: var(--d-p2); }
-  :global([data-d='K']) ul.clist > li.citem {
-    background: var(--d-surface);
-    border-radius: var(--d-r-lg);
-    box-shadow: 0 0 0 1px var(--tone-edge), 0 8px 30px -18px var(--tone-fg);
-  }
-  :global([data-d='K']) ul.clist > li.citem.alert {
-    background: var(--d-surface);
-    box-shadow: 0 0 0 1px var(--tone-edge), 0 16px 50px -12px var(--tone-fg);
-  }
-  :global([data-d='K']) ul.clist > li.citem.on {
-    background: var(--d-surface);
-    box-shadow: 0 0 0 1px var(--d-accent-edge), 0 16px 50px -14px var(--d-accent);
-  }
-  :global([data-d='K']) .empty { padding-block: var(--d-p3); }
-  :global([data-d='K']) .etitle { text-shadow: 0 0 26px var(--d-accent-soft); }
 
-  /* ── L · GUIJARRO — cada fila es un canto rodado ───────────────────────────
-     Ninguna corrida recta: las filas son piedras separadas por aire y ninguna
-     repite las puntas de la de al lado.
-     HALLAZGO: L declara --d-r y --d-r-lg con los cuatro radios juntos, pero no
-     expone esquinas sueltas ni un juego alterno (--d-r-2). Para que una piedra
-     termine distinto de su vecina hay que escribir esquina por esquina; queda
-     anotado, y son las únicas medidas escritas a mano de esta dirección. */
-  :global([data-d='L']) .tbl { border-spacing: 0 var(--d-p1); }
-  :global([data-d='L']) .tbl th,
-  :global([data-d='L']) .tbl td { border: 0; }
-  :global([data-d='L']) .tbl thead th { background: transparent; padding-bottom: var(--d-p2); }
-  :global([data-d='L']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap {
-    background: var(--d-accent-soft);
-    color: var(--d-ink);
-    padding: 2px var(--d-p1);
-    border-radius: var(--d-r);        /* los cuatro radios del token, enteros */
-  }
-  :global([data-d='L']) .tbl tbody td { background: var(--d-surface); }
-  :global([data-d='L']) .tbl tbody tr { box-shadow: var(--d-shadow); }
-  :global([data-d='L']) .tbl tbody tr:hover,
-  :global([data-d='L']) .tbl tbody tr.is-hover { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='L']) .tbl tbody td.c-sel { border-radius: 22px 0 0 16px; }
-  :global([data-d='L']) .tbl tbody td.c-act { border-radius: 0 14px 24px 0; }
-  :global([data-d='L']) .tbl tbody tr:nth-child(2n) td.c-sel { border-radius: 14px 0 0 26px; }
-  :global([data-d='L']) .tbl tbody tr:nth-child(2n) td.c-act { border-radius: 0 26px 12px 0; }
-  :global([data-d='L']) .tblwrap { padding: var(--d-p1) var(--d-p1) var(--d-p3); }
-  :global([data-d='L']) .pick {
-    background: var(--d-sunk);
-    border-color: var(--d-ink-3);
-    border-radius: 7px 4px 6px 5px;
-  }
+  
   /* Misma reposición que en I: sin ella la marca blanca cae sobre --d-sunk
      crema y la casilla marcada no se distingue de la vacía. */
-  :global([data-d='L']) .pick:checked,
-  :global([data-d='L']) .pick:indeterminate {
-    background: var(--d-accent);
-    border-color: var(--d-accent);
-  }
-  :global([data-d='L']) .clistpanel { background: transparent; box-shadow: none; }
-  :global([data-d='L']) .clistpanel .d-panel-head { padding-inline: 0; }
-  :global([data-d='L']) .clist { gap: var(--d-p2); padding-bottom: var(--d-p2); }
-  :global([data-d='L']) ul.clist > li.citem {
-    background: var(--d-surface);
-    border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='L']) ul.clist > li.citem:nth-child(2n) { border-radius: var(--d-r); }
-  :global([data-d='L']) ul.clist > li.citem:nth-child(3n) { border-radius: 40px 24px 34px 26px; }
-  :global([data-d='L']) ul.clist > li.citem.on { box-shadow: var(--d-shadow-lg); }
-  :global([data-d='L']) .empty { padding-block: var(--d-p3); }
 
   /* ── M · BRUMA — no hay líneas, hay derrames ───────────────────────────────
      Cero contenedores y cero reglas horizontales: lo que separa una fila de la
@@ -1073,13 +894,7 @@
      encima de .d-btn--primary, y el primario queda papel sobre papel. */
   :global([data-d='M']) .d-btn--primary { background: var(--d-accent); color: var(--d-accent-ink); }
 
-  /* ── N · CINTA — cada fila es su propio carril, con contacto ───────────────
-     Puntas redondas de verdad, degradado a lo largo del carril, y orden de
-     apilado: el carril de arriba tapa al de abajo y le deja encima su sombra
-     de contacto. En la tabla los carriles se tocan; en la lista se montan. */
-  :global([data-d='N']) .tbl { border-spacing: 0; }
-  :global([data-d='N']) .tbl th,
-  :global([data-d='N']) .tbl td { border: 0; }
+  
   /* HALLAZGO: --d-surface-fill y --d-sunk-fill de N son degradados a 100deg
      pensados para un carril de una sola pieza. Dentro de una <table> cada celda
      reinicia el degradado y el carril sale aserrado, que es lo contrario de lo
@@ -1087,61 +902,11 @@
      —la celda de selección, que es donde arranca el carril— y el cuerpo queda
      en el color plano, así la cinta se lee de una sola pieza. Un token
      --d-surface-flat/--d-sunk-flat no hace falta: los colores planos ya están. */
-  :global([data-d='N']) .tbl thead th { background: var(--d-sunk); }
-  :global([data-d='N']) .tbl thead th.c-sel {
-    background: var(--d-sunk-fill);
-    border-radius: var(--d-r-pill) 0 0 var(--d-r-pill);
-  }
-  :global([data-d='N']) .tbl thead th.c-act { border-radius: 0 var(--d-r-pill) var(--d-r-pill) 0; }
-  :global([data-d='N']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-accent); }
-  :global([data-d='N']) .tbl tbody tr { position: relative; box-shadow: var(--d-shadow); }
-  :global([data-d='N']) .tbl tbody tr:nth-child(1) { z-index: 4; }
-  :global([data-d='N']) .tbl tbody tr:nth-child(2) { z-index: 3; }
-  :global([data-d='N']) .tbl tbody tr:nth-child(3) { z-index: 2; }
-  :global([data-d='N']) .tbl tbody tr:nth-child(4) { z-index: 1; }
-  :global([data-d='N']) .tbl tbody td { background: var(--d-surface); }
-  :global([data-d='N']) .tbl tbody td.c-sel {
-    background: var(--d-surface-fill);
-    border-radius: var(--d-r-pill) 0 0 var(--d-r-pill);
-    padding-left: var(--d-p3);
-  }
-  :global([data-d='N']) .tbl tbody td.c-act { border-radius: 0 var(--d-r-pill) var(--d-r-pill) 0; padding-right: var(--d-p3); }
   /* El tono entra por la punta del carril y se derrama hacia adentro. */
-  :global([data-d='N']) .tbl tbody tr.alert td.c-sel { background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 88%); }
-  :global([data-d='N']) .tbl tbody tr:hover td,
-  :global([data-d='N']) .tbl tbody tr.is-hover td { background: var(--d-sunk); }
   /* El carril seleccionado se monta encima de todos y levanta más sombra. */
-  :global([data-d='N']) .tbl tbody tr.on { z-index: 5; box-shadow: var(--d-shadow-lg); }
-  :global([data-d='N']) .tbl tbody tr.on td { background: var(--d-surface); }
-  :global([data-d='N']) .tbl tbody tr.on td.c-sel {
-    background: linear-gradient(100deg, var(--d-accent-soft) 0%, var(--d-surface) 88%);
-    box-shadow: inset 5px 0 0 var(--d-accent);
-  }
   /* Aire a los costados: sin él las puntas redondas del carril se cortan contra
      el canto del panel y la cinta vuelve a parecer una fila cuadrada. */
-  :global([data-d='N']) .tblwrap { padding: 0 var(--d-p2) var(--d-p2); }
-  :global([data-d='N']) .pick { border-radius: var(--d-r-pill); }
-  :global([data-d='N']) .d-panel.clistpanel { background: transparent; border-color: transparent; box-shadow: none; }
-  :global([data-d='N']) .clistpanel .d-panel-head { background: transparent; padding-inline: 0; }
-  :global([data-d='N']) .clist { gap: 0; padding-bottom: var(--d-p3); }
-  :global([data-d='N']) ul.clist > li.citem {
-    position: relative;
-    background: var(--d-surface-fill);
-    border-radius: var(--d-r-pill);
-    box-shadow: var(--d-shadow);
-    padding: var(--d-p2) var(--d-p4);
-  }
   /* Se montan unos milímetros: eso es lo que obliga a que haya orden. */
-  :global([data-d='N']) ul.clist > li.citem + li.citem { margin-top: calc(-1 * var(--d-p1)); }
-  :global([data-d='N']) ul.clist > li.citem:nth-child(1) { z-index: 6; }
-  :global([data-d='N']) ul.clist > li.citem:nth-child(2) { z-index: 5; }
-  :global([data-d='N']) ul.clist > li.citem:nth-child(3) { z-index: 4; }
-  :global([data-d='N']) ul.clist > li.citem:nth-child(4) { z-index: 3; }
-  :global([data-d='N']) ul.clist > li.citem:nth-child(5) { z-index: 2; }
-  :global([data-d='N']) ul.clist > li.citem:nth-child(6) { z-index: 1; }
-  :global([data-d='N']) ul.clist > li.citem.alert { background: linear-gradient(100deg, var(--tone-band) 0%, var(--d-surface) 62%); }
-  :global([data-d='N']) ul.clist > li.citem.on { z-index: 7; box-shadow: var(--d-shadow-lg); background: linear-gradient(100deg, var(--d-accent-soft) 0%, var(--d-surface) 70%); }
-  :global([data-d='N']) .empty { padding-block: var(--d-p3); }
 
   /* ── O · PRISMA — vidrio con la marca teñida adentro ───────────────────────
      La cabecera de la tabla es el mismo vidrio con la marca disuelta, no una
@@ -1205,206 +970,28 @@
   :global([data-d='O']) ul.clist > li.citem.on { box-shadow: inset 3px 0 0 var(--d-brand); }
   :global([data-d='O']) .empty { padding-block: var(--d-p3); }
 
-  /* ── P · ESPINA — la columna de marca, y cada fila la muerde ───────────────
-     La espina no la puede llevar el panel cuando adentro hay una <table>: la
-     muesca de cada fila caería fuera del table y no se alinearía nunca. Acá la
-     levantan la cabecera, la columna de selección y el pie, y sale una columna
-     de marca continua que cada fila muerde en su propio tramo.
-     HALLAZGO: P no expone el ancho de la espina como token (--d-spine); los 6px
-     repiten el valor de [data-d='P'] .d-panel::before en directions.css. */
-  :global([data-d='P']) .stack { gap: 0; }
-  :global([data-d='P']) .speclabel { margin: 0; padding: var(--d-p3) var(--d-p3) var(--d-p1); }
-  :global([data-d='P']) .note { margin: 0; padding: var(--d-p1) var(--d-p3) var(--d-p3); }
-  :global([data-d='P']) .d-panel.tablepanel,
-  :global([data-d='P']) .d-panel.clistpanel { padding-left: 0; }
-  :global([data-d='P']) .d-panel.tablepanel::before,
-  :global([data-d='P']) .d-panel.clistpanel::before { display: none; }
-  :global([data-d='P']) .tablepanel .d-panel-head,
-  :global([data-d='P']) .tablepanel .foot,
-  :global([data-d='P']) .clistpanel .d-panel-head {
-    background-image: linear-gradient(var(--d-brand), var(--d-brand));
-    background-size: 6px 100%;
-    background-repeat: no-repeat;
-    padding-left: calc(var(--d-p3) + 6px);
-  }
-  :global([data-d='P']) .tbl thead th.c-sel {
-    background-image: linear-gradient(var(--d-brand), var(--d-brand));
-    background-size: 6px 100%;
-    background-repeat: no-repeat;
-    padding-left: calc(var(--d-p2) + 6px);
-  }
+  
   /* La muesca: la espina sigue siendo marca arriba y abajo, y en el tramo del
      medio la muerde el tono de la fila. */
-  :global([data-d='P']) .tbl tbody td.c-sel {
-    background-image: linear-gradient(180deg, var(--d-brand) 0 26%, var(--tone-fg) 26% 74%, var(--d-brand) 74%);
-    background-size: 6px 100%;
-    background-repeat: no-repeat;
-    padding-left: calc(var(--d-p2) + 6px);
-  }
-  :global([data-d='P']) .tbl tbody tr.alert td { background-color: transparent; }
-  :global([data-d='P']) .tbl tbody tr:hover td,
-  :global([data-d='P']) .tbl tbody tr.is-hover td { background-color: var(--d-sunk); }
-  :global([data-d='P']) .tbl tbody tr.on td { background-color: var(--d-accent-soft); }
-  :global([data-d='P']) .tbl tbody tr.on td.c-sel { box-shadow: none; }
-  :global([data-d='P']) .tbl thead th { border-bottom: 1px solid var(--d-edge); }
-  :global([data-d='P']) .tbl tbody tr:last-child td { border-bottom: 1px solid var(--d-line); }
-  :global([data-d='P']) ul.clist > li.citem {
-    background-image: linear-gradient(180deg, var(--d-brand) 0 26%, var(--tone-fg) 26% 74%, var(--d-brand) 74%);
-    background-size: 6px 100%;
-    background-repeat: no-repeat;
-    border-bottom: 1px solid var(--d-line);
-    padding-left: calc(var(--d-p3) + 6px);
-  }
-  :global([data-d='P']) ul.clist > li.citem.alert { background-color: transparent; }
-  :global([data-d='P']) ul.clist > li.citem.on { background-color: var(--d-accent-soft); }
-  :global([data-d='P']) .cinm { font-weight: var(--d-w-semi); }
-  :global([data-d='P']) .empty { padding: var(--d-p3) var(--d-p3) var(--d-p4); }
 
-  /* ── Q · CHAROL — masa dura, superficie mojada ─────────────────────────────
-     Borde de 2px negro y sombra sólida desplazada de Peso, con el esmalte de
-     Laca encima: ninguna superficie plana y un realce húmedo arriba. */
-  :global([data-d='Q']) .tbl thead th {
-    background: var(--d-sunk-fill);
-    border-bottom: var(--d-bw) solid var(--d-ink);
-  }
+  
   /* La columna ordenada se marca con masa, no invirtiendo la tinta: el barrido
      húmedo del panel cae sobre la cabecera y aclararía cualquier fondo oscuro
      hasta dejar el texto claro por debajo de AA. Un canto negro de 4px aguanta
      el velo y es más de esta dirección que un bloque de color. */
-  :global([data-d='Q']) .tbl thead th[aria-sort]:not([aria-sort='none']) {
-    box-shadow: inset 0 -4px 0 var(--d-ink), inset 0 1px 0 var(--d-surface);
-  }
-  :global([data-d='Q']) .sortmark::before { content: '▲'; }
-  :global([data-d='Q']) .sortmark[data-dir='desc']::before { content: '▼'; }
-  :global([data-d='Q']) .tbl tbody td {
-    background: var(--d-surface-fill);
-    border-bottom: 1px solid var(--d-ink);
-    color: var(--d-ink);
-  }
-  :global([data-d='Q']) .tbl tbody tr.alert td { background: linear-gradient(180deg, var(--tone-band), var(--d-surface)); }
-  :global([data-d='Q']) .tbl tbody tr:hover td,
-  :global([data-d='Q']) .tbl tbody tr.is-hover td { background: var(--d-sunk-fill); }
   /* La fila seleccionada es una placa de laca clara con un canto macizo. La
      tentación era invertirla a rojo lleno, pero el barrido del panel le pasa
      por encima y una tinta clara ahí abajo no llega a AA: la selección la carga
      la masa del canto, que el velo no puede lavar. */
-  :global([data-d='Q']) .tbl tbody tr.on td { background: linear-gradient(180deg, var(--d-accent-soft), var(--d-surface)); }
-  :global([data-d='Q']) .tbl tbody tr.on td.c-sel { box-shadow: inset 5px 0 0 var(--d-ink); }
-  :global([data-d='Q']) .pick { border-width: var(--d-bw); box-shadow: inset 0 1px 0 var(--d-surface); }
   /* La lista: bloques macizos, cada uno con su sombra sólida y su brillo. */
-  :global([data-d='Q']) .d-panel.clistpanel { background: transparent; border: 0; box-shadow: none; }
-  :global([data-d='Q']) .d-panel.clistpanel::after { content: none; }
-  :global([data-d='Q']) .clistpanel .d-panel-head { border-bottom: var(--d-bw) solid var(--d-ink); padding-inline: 0; }
-  :global([data-d='Q']) .clist { gap: var(--d-gap); padding: var(--d-p2) 6px var(--d-p2) 0; }
-  :global([data-d='Q']) ul.clist > li.citem {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-    background: var(--d-surface-fill);
-    border: var(--d-bw) solid var(--d-ink);
-    border-radius: var(--d-r-lg);
-    box-shadow: var(--d-shadow);
-  }
-  :global([data-d='Q']) ul.clist > li.citem::after {
-    content: '';
-    position: absolute; inset: 0 0 auto 0; height: 34%;
-    background: linear-gradient(180deg, var(--d-surface), transparent);
-    opacity: .85;
-    pointer-events: none;
-    z-index: -1;
-  }
-  :global([data-d='Q']) ul.clist > li.citem.alert { background: linear-gradient(180deg, var(--tone-band), var(--d-surface)); }
-  :global([data-d='Q']) ul.clist > li.citem.on {
-    background: linear-gradient(180deg, var(--d-accent-soft), var(--d-surface));
-    box-shadow: var(--d-shadow-lg);
-  }
-  :global([data-d='Q']) .cicode,
-  :global([data-d='Q']) .etitle { text-transform: uppercase; font-weight: var(--d-w-bold); }
-  :global([data-d='Q']) .empty { padding-block: var(--d-p3); }
 
-  /* ── R · VITRINA — 26px monoespaciados sobre vidrio oscuro ─────────────────
-     La más densa de las diecinueve. Lo que la separa de Terminal no es el color
-     sino el material: el campo con luz respira a través, y las columnas quedan
-     separadas por parteluces de luz en vez de por aire. */
-  :global([data-d='R']) .tbl { min-width: 560px; }
-  :global([data-d='R']) .tbl th,
-  :global([data-d='R']) .tbl td { padding: 0 var(--d-p2); height: var(--d-row-h); }
-  :global([data-d='R']) .tbl th + th,
-  :global([data-d='R']) .tbl td + td { border-left: 1px solid var(--d-line); }
-  :global([data-d='R']) .tbl thead th { background: var(--d-sunk); border-bottom: 1px solid var(--d-edge); }
-  :global([data-d='R']) .hcap { color: var(--d-accent); }
-  :global([data-d='R']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap {
-    background: var(--d-accent); color: var(--d-accent-ink); padding-inline: var(--d-p1);
-  }
-  :global([data-d='R']) .sortmark::before { content: '^'; }
-  :global([data-d='R']) .sortmark[data-dir='desc']::before { content: 'v'; }
-  :global([data-d='R']) .tbl tbody td { border-bottom-color: var(--d-line); }
-  :global([data-d='R']) .tbl tbody tr.alert td { background: var(--tone-band); }
-  :global([data-d='R']) .tbl tbody tr.alert td.c-sel { box-shadow: inset 2px 0 0 var(--tone-fg); }
-  :global([data-d='R']) .tbl tbody tr:hover td,
-  :global([data-d='R']) .tbl tbody tr.is-hover td { background: var(--d-surface); }
-  :global([data-d='R']) .tbl tbody tr.on td { background: var(--d-accent-soft); }
-  :global([data-d='R']) .tbl tbody tr.on td.c-sel { box-shadow: inset 2px 0 0 var(--d-accent); }
-  :global([data-d='R']) .cursor::before { content: '\00a0\00a0'; }
-  :global([data-d='R']) .tbl tbody tr.on .cursor::before { content: '> '; color: var(--d-accent); }
-  :global([data-d='R']) .pick { --pick: 11px; }
-  :global([data-d='R']) .clist { background: var(--d-sunk); }
-  :global([data-d='R']) ul.clist > li.citem {
-    gap: 0 var(--d-p2);
-    align-items: center;
-    min-height: var(--d-row-h);
-    padding: 0 var(--d-p2);
-    border-bottom: 1px solid var(--d-line);
-  }
-  :global([data-d='R']) ul.clist > li.citem:last-child { border-bottom: 0; }
-  :global([data-d='R']) .cibody { flex-wrap: nowrap; overflow: hidden; }
-  :global([data-d='R']) .cinm { flex-basis: auto; }
-  :global([data-d='R']) ul.clist > li.citem.alert { background: var(--tone-band); box-shadow: inset 2px 0 0 var(--tone-fg); }
-  :global([data-d='R']) ul.clist > li.citem.on { background: var(--d-accent-soft); box-shadow: inset 2px 0 0 var(--d-accent); }
-  :global([data-d='R']) .etitle { font-size: var(--d-t-lg); text-transform: uppercase; letter-spacing: .08em; color: var(--d-accent); }
-  :global([data-d='R']) .empty { padding-block: var(--d-p2); }
+  
 
-  /* ── S · UMBRA — la fila se queda blanca y lo que informa es la sombra ─────
-     La firma de S vivía sólo en .d-panel y .d-row, así que en esta página —que
-     es todo marcado propio: <tr>, <li>, el panel vacío— no llegaba a ninguna
-     parte. Acá la reciben las filas de la tabla y los ítems de la lista: el
-     contenido nunca se tiñe, la luz de abajo sí. */
-  :global([data-d='S']) .tbl { border-spacing: 0 var(--d-p2); }
-  :global([data-d='S']) .tbl th,
-  :global([data-d='S']) .tbl td { border: 0; }
-  :global([data-d='S']) .tbl thead th { background: transparent; padding-bottom: var(--d-p1); }
-  :global([data-d='S']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-ink); }
-  :global([data-d='S']) .tbl tbody td { background: var(--d-surface); }
-  :global([data-d='S']) .tbl tbody td.c-sel { border-radius: var(--d-r) 0 0 var(--d-r); }
-  :global([data-d='S']) .tbl tbody td.c-act { border-radius: 0 var(--d-r) var(--d-r) 0; }
+  
   /* Vencido proyecta rojo, al día proyecta verde, y el texto se lee sobre
      blanco puro en los dos casos. */
-  :global([data-d='S']) .tbl tbody tr[data-tone] { box-shadow: 0 9px 26px -14px var(--tone-fg), var(--d-shadow); }
-  :global([data-d='S']) .tbl tbody tr.alert { box-shadow: 0 12px 32px -12px var(--tone-fg), var(--d-shadow); }
-  :global([data-d='S']) .tbl tbody tr.alert td { background: var(--d-surface); }
-  :global([data-d='S']) .tbl tbody tr:hover td,
-  :global([data-d='S']) .tbl tbody tr.is-hover td { background: var(--d-sunk); }
-  :global([data-d='S']) .tbl tbody tr.on td { background: var(--d-surface); }
-  :global([data-d='S']) .tbl tbody tr.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
-  :global([data-d='S']) .tblwrap { padding: var(--d-p1) var(--d-p2) var(--d-p3); }
   /* La pastilla pierde su banda: sobre una tarjeta que se quedó blanca, el
      color vive en la palabra y en la marca, no en un relleno. */
-  :global([data-d='S']) .d-pill { background: transparent; padding-inline: 0; }
-  :global([data-d='S']) .pick { border-color: var(--d-ink-3); }
-  :global([data-d='S']) .clistpanel { background: transparent; box-shadow: none; }
-  :global([data-d='S']) .clistpanel .d-panel-head { border-bottom: 0; padding-inline: 0; }
-  :global([data-d='S']) .clist { gap: var(--d-p2); padding-bottom: var(--d-p3); }
-  :global([data-d='S']) ul.clist > li.citem {
-    background: var(--d-surface);
-    border-radius: var(--d-r-lg);
-    box-shadow: 0 9px 26px -14px var(--tone-fg), var(--d-shadow);
-  }
-  :global([data-d='S']) ul.clist > li.citem.alert {
-    background: var(--d-surface);
-    box-shadow: 0 14px 36px -12px var(--tone-fg), var(--d-shadow);
-  }
-  :global([data-d='S']) ul.clist > li.citem.on { background: var(--d-surface); box-shadow: 0 14px 36px -12px var(--tone-fg), var(--d-shadow-lg); }
-  :global([data-d='S']) .empty { padding-block: var(--d-p3); }
 
   /* ── T · HALO CLARO — ni una línea; la fila que urge irradia ───────────────
      La regla de Halo entera, del lado del día: nada tiene borde y nada tiene
@@ -1793,15 +1380,11 @@
      pliegan bajo el nombre del equipo; la lista compacta es la salida real.
      ========================================================================== */
   @container spec (max-width: 720px) {
-    .tbl,
-    :global([data-d='G']) .tbl { min-width: 0; }
+    .tbl{ min-width: 0; }
     .c-fam, .c-loc, .c-read { display: none; }
     .sub { display: block; }
     .c-name { min-width: 130px; white-space: normal; }
     .nm { white-space: normal; }
-    :global([data-d='G']) ul.clist > li.citem { grid-template-columns: minmax(0, 1fr); padding-left: var(--d-p3); }
-    :global([data-d='G']) .cicode { text-align: left; }
-    :global([data-d='B']) ul.clist > li.citem{ grid-template-columns: minmax(0, 1fr); }
   }
   @container spec (max-width: 420px) {
     .foot { flex-direction: column; align-items: flex-start; }
@@ -1821,29 +1404,14 @@
   @container spec (min-width: 560px) {
     /* El raíl de etiquetas de P vuelve, y sólo acá: con 560px de celda, 152px
        de columna dejan más de 380px para el contenido. */
-    :global([data-d='P']) ul.clist > li.citem {
-      grid-template-columns: var(--d-rail) minmax(0, 1fr);
-      gap: 0 var(--d-p3);
-      align-items: baseline;
-      padding-block: var(--d-p1);
-    }
-    :global([data-d='P']) .cicode { text-align: right; }
     /* R es la más densa: su lista compacta también se vuelve rejilla de 26px. */
-    :global([data-d='R']) ul.clist > li.citem { grid-template-columns: 84px minmax(0, 1fr); }
   }
   @container spec (max-width: 720px) {
-    :global([data-d='R']) .tbl { min-width: 0; }
     /* Sin ancho, el carril de N y la piedra de L pierden el aire de los
        costados antes que la legibilidad del texto. */
-    :global([data-d='N']) ul.clist > li.citem { padding-inline: var(--d-p3); }
-    :global([data-d='L']) .tblwrap,
-    :global([data-d='K']) .tblwrap,
-    :global([data-d='S']) .tblwrap,
     :global([data-d='T']) .tblwrap { padding-inline: 0; }
     /* En celda angosta B pliega su lista a un renglón por campo, como el resto:
        una rejilla de dos columnas dentro de 300px deja un carácter por línea. */
-    :global([data-d='B']) .cibody { flex-wrap: wrap; overflow: visible; }
-    :global([data-d='B']) .cinm { flex-basis: 100%; }
   }
 
   /* ── Estado de fila en las direcciones que no lo repusieron ──────────────
@@ -1853,13 +1421,9 @@
      que la base. No es un retoque estético — sin esto, la lista compacta no
      comunica estado en siete de las diecinueve. */
   :global([data-d='A']) ul.clist > li.citem.alert,
-  :global([data-d='B']) ul.clist > li.citem.alert,
-  :global([data-d='C']) ul.clist > li.citem.alert,
-  :global([data-d='D']) ul.clist > li.citem.alert{ background: var(--tone-band); }
+  :global([data-d='C']) ul.clist > li.citem.alert{ background: var(--tone-band); }
   :global([data-d='A']) ul.clist > li.citem.on,
-  :global([data-d='B']) ul.clist > li.citem.on,
-  :global([data-d='C']) ul.clist > li.citem.on,
-  :global([data-d='D']) ul.clist > li.citem.on{ background: var(--d-accent-soft); }
+  :global([data-d='C']) ul.clist > li.citem.on{ background: var(--d-accent-soft); }
   /* A no usa el patrón `ul.clist >` en su base, así que necesita además su
      propio par al mismo peso. */
   :global([data-d='A']) ul.clist > li.citem.alert { background: var(--tone-band); }
@@ -1882,17 +1446,14 @@
      T con dos halos concéntricos. Las doce no finalistas quedan como estaban.
      ========================================================================== */
   :global([data-d='A']) .tbl tbody tr.alert.on td,
-  :global([data-d='B']) .tbl tbody tr.alert.on td,
   :global([data-d='C']) .tbl tbody tr.alert.on td,
   :global([data-d='I']) .tbl tbody tr.alert.on td,
   :global([data-d='O']) .tbl tbody tr.alert.on td { background: var(--tone-band); }
   :global([data-d='A']) .tbl tbody tr.alert.on td.c-sel,
-  :global([data-d='B']) .tbl tbody tr.alert.on td.c-sel,
   :global([data-d='C']) .tbl tbody tr.alert.on td.c-sel,
   :global([data-d='I']) .tbl tbody tr.alert.on td.c-sel,
   :global([data-d='O']) .tbl tbody tr.alert.on td.c-sel { box-shadow: inset 3px 0 0 var(--d-accent); }
   :global([data-d='A']) ul.clist > li.citem.alert.on,
-  :global([data-d='B']) ul.clist > li.citem.alert.on,
   :global([data-d='C']) ul.clist > li.citem.alert.on,
   :global([data-d='I']) ul.clist > li.citem.alert.on { background: var(--tone-band); }
 
@@ -1905,7 +1466,6 @@
      diecinueve, porque un identificador es mono en todas partes: eso ya lo
      resuelve .d-id.) */
   :global([data-d='A']) .figs,
-  :global([data-d='B']) .figs,
   :global([data-d='C']) .figs,
   :global([data-d='I']) .figs,
   :global([data-d='O']) .figs,

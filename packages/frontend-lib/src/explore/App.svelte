@@ -57,6 +57,56 @@
   };
 
   $: shown = solo ? DIRECTIONS.filter((d) => d.id === solo) : DIRECTIONS.filter((d) => live.has(d.id));
+
+  // EL ACENTO, ALTERABLE EN VIVO.
+  //
+  // Sólo lo escucha la familia Prisma pastel —Y, Z y AA—, que es la que declara
+  // su marca como ranura. Las otras diez lo tienen escrito y no se mueven a
+  // propósito: en Cota el acromatismo del cromo ES la dirección, en Marca el
+  // teal sostiene la estructura, y dejarlos cambiar sería comparar otra cosa en
+  // cada clic. En las tres pastel el color es justo lo que está en discusión.
+  //
+  // Cada una deriva de --x-accent lo suyo: Y sólo la marca y la cabecera (su
+  // campo es el de O y se queda), Z además el fondo liso y las líneas, AA
+  // además las tres manchas del campo.
+  const ACENTOS = [
+    { hex: '', name: 'Por defecto' },
+    { hex: '#7226E8', name: 'Morado' },
+    { hex: '#1B4E9E', name: 'Azul' },
+    { hex: '#0E5A54', name: 'Teal' },
+    { hex: '#B3261E', name: 'Rojo' },
+    { hex: '#16181A', name: 'Tinta' }
+  ];
+  // Sale de la URL por la misma razón que la página y las direcciones: para que
+  // «mirá las tres pastel en verde» sea un enlace y no una instrucción. Va SIN
+  // almohadilla —?a=7226E8— porque un # en una URL abre el fragmento y se come
+  // el resto. Se valida antes de usarlo: cualquier cosa que no sean seis
+  // dígitos hex cae al defecto en vez de escribir basura en una custom property.
+  const pedido = (params.get('a') ?? '').replace(/^#/, '').trim();
+  let acento = /^[0-9a-fA-F]{6}$/.test(pedido) ? `#${pedido}` : '';
+
+  // De qué lado cae la tinta del primario NO se puede resolver en CSS: hace
+  // falta la luminancia del color elegido. Sobre un acento claro, un texto
+  // blanco desaparece. Se calcula acá y se pasa como segunda variable.
+  function tintaSobre(hex) {
+    const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+    const [r, g, b] = c.map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+    const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    // El umbral es el punto en que el blanco y el negro empatan en contraste
+    // contra este fondo, no un 50 % de brillo a ojo.
+    return (1.05 / (L + 0.05)) >= ((L + 0.05) / 0.05) ? '#FFFFFF' : '#14181A';
+  }
+
+  $: if (typeof document !== 'undefined') {
+    const raiz = document.documentElement.style;
+    if (acento) {
+      raiz.setProperty('--x-accent', acento);
+      raiz.setProperty('--x-accent-ink', tintaSobre(acento));
+    } else {
+      raiz.removeProperty('--x-accent');
+      raiz.removeProperty('--x-accent-ink');
+    }
+  }
 </script>
 
 <div class="wrap">
@@ -87,6 +137,26 @@
     {/each}
     <span class="tip">clic para descartar · doble clic para verla sola</span>
     {#if solo}<button class="clear" on:click={() => (solo = null)}>Ver todas</button>{/if}
+  </div>
+
+  <div class="filter acento">
+    <span class="lbl">Acento</span>
+    {#each ACENTOS as a}
+      <button
+        class="tinta"
+        class:on={acento === a.hex}
+        aria-pressed={acento === a.hex}
+        on:click={() => (acento = a.hex)}
+        title={a.name}
+      >
+        <i style={a.hex ? `background:${a.hex}` : ''} class:def={!a.hex}></i>{a.name}
+      </button>
+    {/each}
+    <label class="libre">
+      Otro
+      <input type="color" bind:value={acento} aria-label="Color de acento a medida" />
+    </label>
+    <span class="tip">sólo lo escucha la familia <b>Prisma pastel</b> — Y, Z y AA</span>
   </div>
 
   <main>
@@ -143,6 +213,39 @@
   .chip.solo { background: #14181a; color: #fff; border-color: #14181a; }
   .chip.solo b { color: #b2b6b9; }
   .tip { font-size: 11px; color: #a3a8ac; margin-left: 4px; }
+
+  /* La fila del acento NO se pega. La de arriba ya ocupa el top:61px, y dos
+     barras pegadas al mismo offset se montan una encima de la otra; además el
+     alto de la primera cambia según cuántos chips envuelvan, así que no hay
+     número fijo que sirva. Es un control que se toca una vez, no uno que haga
+     falta tener siempre a mano. */
+  .acento { position: static; top: auto; z-index: auto; }
+  .tinta {
+    display: inline-flex; align-items: center; gap: 5px;
+    font: inherit; font-size: 12px;
+    padding: 4px 9px; border: 1px solid #dfe1e3; border-radius: 999px;
+    background: #fff; color: #24282b; cursor: pointer;
+  }
+  .tinta:hover { border-color: #b2b6b9; }
+  .tinta.on { background: #14181a; color: #fff; border-color: #14181a; }
+  .tinta i {
+    width: 11px; height: 11px; border-radius: 3px; flex: none;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .18);
+  }
+  /* «Por defecto» no tiene un color que mostrar: la muestra va en diagonal para
+     que se lea como ausencia y no como un gris elegido. */
+  .tinta i.def {
+    background: linear-gradient(135deg, #fff 44%, #c9ced1 44%, #c9ced1 56%, #fff 56%);
+  }
+  .libre {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; color: #24282b;
+    padding: 3px 9px 3px 10px; border: 1px solid #dfe1e3; border-radius: 999px;
+  }
+  .libre input {
+    inline-size: 22px; block-size: 20px; padding: 0;
+    border: 0; background: none; cursor: pointer;
+  }
   .clear { font: inherit; font-size: 12px; padding: 4px 9px; border: 0; border-radius: 999px; background: #eaeced; cursor: pointer; }
 
   main { padding: 26px 24px 80px; max-width: 1680px; margin: 0 auto; }
@@ -161,5 +264,11 @@
     .chip { background: #1b2022; border-color: #2c3134; color: #edeff0; }
     .chip.solo { background: #edeff0; color: #14181a; }
     .clear { background: #22282a; color: #edeff0; }
+    .tinta, .libre { background: #1b2022; border-color: #2c3134; color: #edeff0; }
+    .tinta.on { background: #edeff0; color: #14181a; border-color: #edeff0; }
+    .tinta i { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22); }
+    .tinta i.def {
+      background: linear-gradient(135deg, #1b2022 44%, #6d7478 44%, #6d7478 56%, #1b2022 56%);
+    }
   }
 </style>
