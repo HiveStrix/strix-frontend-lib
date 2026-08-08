@@ -2314,4 +2314,49 @@
        el tope es la mitad del dato y ya está en el cuerpo más chico del bloque */
     :global([data-d='X']) .xcota .d-cota-fig { font-size: var(--d-t-md); }
   }
+
+  /* ======================================================================
+     AB · PRISMA FARO — la misma ley de luz que en la página de paneles.
+
+     Esta celda tiene su propio marcado de KPI y su propia clase de scope, así
+     que las reglas de Paneles no la alcanzan: son dos componentes distintos que
+     se llaman igual. La consecuencia era que la dirección brillaba en la página
+     donde se la mira de a un componente y NO en la pantalla completa, que es
+     justo donde se juzga si el resplandor sirve o molesta.
+
+     Misma geometría que allá y por la misma razón: desplazamiento cero para que
+     irradie por los cuatro lados, spread positivo para que salga del borde, y el
+     anillo de 1px que pone la fuente en el objeto. Las intensidades salen de los
+     mismos --d-faro-*, así que la escala se sigue moviendo desde un solo lugar
+     para las dos páginas. */
+  :global([data-d='AB']) .kpi[data-tone='critical'] {
+    box-shadow: 0 0 26px 3px color-mix(in srgb, var(--d-crit) var(--d-faro-crit), transparent),
+                0 0 0 1px color-mix(in srgb, var(--d-crit) var(--d-faro-ring), transparent);
+    border-color: color-mix(in srgb, var(--d-crit) var(--d-faro-ring), transparent);
+  }
+  :global([data-d='AB']) .kpi[data-tone='attention'] {
+    box-shadow: 0 0 22px 2px color-mix(in srgb, var(--d-att) var(--d-faro-att), transparent),
+                0 0 0 1px color-mix(in srgb, var(--d-att) var(--d-faro-ring), transparent);
+    border-color: color-mix(in srgb, var(--d-att) var(--d-faro-ring), transparent);
+  }
+  :global([data-d='AB']) .kpi[data-tone='positive'] {
+    box-shadow: 0 0 18px 1px color-mix(in srgb, var(--d-pos) var(--d-faro-pos), transparent),
+                0 0 0 1px color-mix(in srgb, var(--d-pos) var(--d-faro-ring), transparent);
+    border-color: color-mix(in srgb, var(--d-pos) var(--d-faro-ring), transparent);
+  }
+  :global([data-d='AB']) .kpi[data-tone='info'] {
+    box-shadow: 0 0 18px 1px color-mix(in srgb, var(--d-info) var(--d-faro-info), transparent),
+                0 0 0 1px color-mix(in srgb, var(--d-info) var(--d-faro-ring), transparent);
+    border-color: color-mix(in srgb, var(--d-info) var(--d-faro-ring), transparent);
+  }
+  :global([data-d='AB']) .kpi[data-tone='neutral'] {
+    box-shadow: 0 0 16px 1px color-mix(in srgb, var(--d-brand) var(--d-faro-neu), transparent);
+  }
+  /* Filtrando por un estado, la celda elegida sube un escalón de luz en vez de
+     cambiar de dibujo: ya estaba encendida, y apagarla para marcarla habría
+     dicho lo contrario de lo que pasa. */
+  :global([data-d='AB']) .kpi[aria-pressed='true'] {
+    box-shadow: 0 0 30px 5px color-mix(in srgb, var(--tone-fg) 78%, transparent),
+                0 0 0 2px var(--tone-fg);
+  }
 </style>
