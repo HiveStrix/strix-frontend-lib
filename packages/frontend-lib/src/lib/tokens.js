@@ -79,12 +79,32 @@ export const TOKENS = {
   // raya. Ligarlo a `transparent` la apaga sin tocar ninguna regla.
   '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 55%, transparent)',
 
-  // The accent SLOT. Unbound: resolves to near-black, a real usable primary.
-  // A product overrides these four once, at its root.
-  '--sx-accent': 'var(--sx-n-900)',
-  '--sx-accent-ink': 'var(--sx-n-0)',
-  '--sx-accent-soft': 'var(--sx-n-100)',
-  '--sx-accent-edge': 'var(--sx-n-200)',
+  // EL HUECO DEL ACENTO. Un producto lo llena ligando estas cuatro propiedades
+  // en su raíz; es el único color que un producto elige.
+  //
+  // POR QUÉ EL DEFECTO YA NO ES CASI-NEGRO. Antes lo era, con el argumento de
+  // que un acento sin ligar debía dar un primario usable. El argumento se cae en
+  // Nácar por una razón mecánica: --sx-chrome-tint ya vale este mismo morado, así
+  // que el mobiliario entero sale con su traza. Un acento casi-negro contra un
+  // cromo violeta no es neutral: es una dirección desafinada de fábrica.
+  '--sx-accent': '#6541BE',
+  // Blanco sobre este morado da 6.88:1 — por encima de 4.5 con margen.
+  '--sx-accent-ink': '#FFFFFF',
+  // SIGUEN AL ACENTO, y esto es lo que la dirección vieja no hacía. Eran dos
+  // peldaños fijos de la rampa (n-100 y n-200), o sea grises: un estado
+  // interactivo pintado con ellos se lee como una superficie más sucia, no como
+  // una pieza que responde.
+  //
+  // EL PORCENTAJE ESTÁ MEDIDO, no elegido. Contra una fila blanca en reposo:
+  //   12 % → croma 15, distancia 16   (el valor de la exploración)
+  //   16 % → croma 20, distancia 21   ← éste
+  //   20 % → croma 25, distancia 27   (ya compite con una banda de estado)
+  // Sube de 12 a 16 porque acá el cromo YA está teñido con este mismo morado:
+  // los grises de la rampa llegan con croma 8, así que un tinte al 12 % aterriza
+  // casi encima y el hover se lee como un gris apenas más oscuro. El 16 % es el
+  // primer escalón que despega de forma inequívoca.
+  '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 16%, #FFFFFF)',
+  '--sx-accent-edge': 'color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF)',
 
   // Semantic tones. Fixed across every product: "vencido" must look identical
   // in maintenance, billing and inventory or the vocabulary stops being one.
@@ -102,9 +122,13 @@ export const TOKENS = {
   '--sx-info': '#4A4E7A',
   '--sx-info-band': '#E7E7F2',
   '--sx-info-edge': '#C9CADD',
-  '--sx-neutral': 'var(--sx-n-500)',
-  '--sx-neutral-band': 'var(--sx-n-100)',
-  '--sx-neutral-edge': 'var(--sx-n-200)',
+  // FIJADO A HEX, como los otros cuatro. Apuntaba a la rampa (n-500/n-100/n-200),
+  // así que su color cambiaba con el cromo de cada dirección: «ninguno» se veía
+  // distinto entre dos productos, que es exactamente lo que la ley prohíbe. Estos
+  // son los valores que resolvía con el cromo de Nácar, congelados.
+  '--sx-neutral': '#666373',
+  '--sx-neutral-band': '#EDEBF3',
+  '--sx-neutral-edge': '#D3D1DF',
 
   // Depth comes from light, not outlines. Sobre un fondo blanco la sombra es lo
   // único que levanta una pieza, así que lleva dos capas: una corta que da el

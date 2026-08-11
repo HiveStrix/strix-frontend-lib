@@ -60,6 +60,7 @@ const CHECKS = [
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
   ['--sx-accent-ink', '--sx-accent', 4.5, 'tinta sobre el acento'],
+  ['--sx-accent-edge', '--sx-surface', 3.0, 'filo del acento sobre superficie'],
   ...TONES.map((t) => [`--sx-${t}`, `--sx-${t}-band`, 4.5, `tono ${t} sobre su banda`])
 ];
 // Los filos de tono (--sx-positive-edge y compania) NO estan en el contrato, y
@@ -69,6 +70,7 @@ const CHECKS = [
 // Pill.svelte. El filo es refuerzo. Se informan aparte para que no pasen
 // inadvertidos, pero no rompen el build.
 const INFO = TONES.map((t) => [`--sx-${t}-edge`, '--sx-surface', `filo del tono ${t}`]);
+INFO.push(['--sx-accent-soft', '--sx-surface', 'hover sobre fila en reposo']);
 
 let malas = 0;
 const ground = resolve(TOKENS['--sx-ground']);
