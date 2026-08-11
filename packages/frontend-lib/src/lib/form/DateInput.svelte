@@ -191,7 +191,9 @@
     background: none; color: var(--sx-ink-3); cursor: pointer;
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
-  .cal:hover:not(:disabled) { background: var(--sx-sunk); color: var(--sx-ink); }
+  /* Mismo botón redondo (--sx-r-pill) que el resto de la familia de iconos
+     de campo: se ilumina bajo el cursor, no se hunde. */
+  .cal:hover:not(:disabled) { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .cal:disabled { cursor: not-allowed; opacity: .5; }
   .cal svg { width: 15px; height: 15px; }
 

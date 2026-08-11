@@ -164,7 +164,11 @@
     background: none; color: var(--sx-ink-3); cursor: pointer;
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
-  .icon:hover { background: var(--sx-sunk); color: var(--sx-ink); }
+  /* El icono es redondo (--sx-r-pill) y flota sobre el frame, igual que el
+     botón de cerrar de Toast/Dialog/SearchField: bajo el cursor se ilumina
+     con el acento. No es el caso del icono cuadrado embebido en el borde de
+     un control, que sí querría hundirse. */
+  .icon:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .icon svg { width: 14px; height: 14px; }
 
   @media (pointer: coarse) {

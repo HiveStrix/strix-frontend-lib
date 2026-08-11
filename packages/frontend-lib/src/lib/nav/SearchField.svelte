@@ -287,7 +287,8 @@
     cursor: pointer;
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
-  .x:hover { background: var(--sx-sunk); color: var(--sx-ink); }
+  /* El botón de limpiar se ilumina bajo el cursor; --sx-sunk lo hundía. */
+  .x:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .x svg { width: 14px; height: 14px; }
   .x:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
 

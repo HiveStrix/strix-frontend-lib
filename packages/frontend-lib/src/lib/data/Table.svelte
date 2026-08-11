@@ -1081,7 +1081,9 @@
     color: var(--sx-ink-2);
     cursor: pointer;
   }
-  .cmore:hover { color: var(--sx-ink); background: var(--sx-sunk); }
+  /* Mismo escalón que la fila y que .disc: --sx-sunk aquí salía gris sucio en
+     vez de iluminarse. Ver el comentario de la línea 917. */
+  .cmore:hover { color: var(--sx-ink); background: var(--sx-accent-soft); }
   .cmore:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
 
   .cdetail {

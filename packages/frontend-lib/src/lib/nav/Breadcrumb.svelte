@@ -148,7 +148,8 @@
     transition: color var(--sx-fast) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
   }
 
-  a.crumb:hover, button.crumb:hover { color: var(--sx-ink); background: var(--sx-sunk); }
+  /* Un cruce bajo el cursor se ilumina; --sx-sunk lo apagaba a gris. */
+  a.crumb:hover, button.crumb:hover { color: var(--sx-ink); background: var(--sx-accent-soft); }
 
   /* Where you are: the only crumb in full ink, and not a control. */
   .here {

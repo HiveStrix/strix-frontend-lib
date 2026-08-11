@@ -281,7 +281,8 @@
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
   .x svg { width: .8em; height: .8em; }
-  .x:hover { background: var(--sx-sunk); color: var(--sx-ink); }
+  /* El botón de cerrar se ilumina bajo el cursor; --sx-sunk lo hundía. */
+  .x:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
 
   .body {
     padding: 0 var(--sx-s-5) var(--sx-s-5);

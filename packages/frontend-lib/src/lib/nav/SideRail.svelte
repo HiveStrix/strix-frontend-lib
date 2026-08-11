@@ -197,7 +197,9 @@
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
 
-  .it:hover:not(.dis) { background: var(--sx-sunk); color: var(--sx-ink); }
+  /* El mismo tinte que .it.on usa para «seleccionado» (ver más abajo):
+     bajo el cursor el ítem se ilumina con el acento, no se hunde en gris. */
+  .it:hover:not(.dis) { background: var(--sx-accent-soft); color: var(--sx-ink); }
 
   /* Selected is a soft accent fill plus full ink plus aria-current. Three
      signals, none of which is only colour. */

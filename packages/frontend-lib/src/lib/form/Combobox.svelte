@@ -401,7 +401,9 @@
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease),
                 transform var(--sx-fast) var(--sx-ease);
   }
-  .icon:hover:not(:disabled) { background: var(--sx-sunk); color: var(--sx-ink); }
+  /* Mismo botón redondo (--sx-r-pill) que el de limpiar de Input/SearchField:
+     se ilumina bajo el cursor, no se hunde. */
+  .icon:hover:not(:disabled) { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .icon:disabled { cursor: not-allowed; opacity: .5; }
   .icon svg { width: 14px; height: 14px; }
   .chev.up { transform: rotate(180deg); }

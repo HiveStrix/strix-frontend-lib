@@ -296,7 +296,9 @@
     color: var(--sx-ink-3);
     transition: background var(--sx-fast) var(--sx-ease);
   }
-  .list li:hover { background: var(--sx-sunk); }
+  /* Una fila de la lista de archivos bajo el cursor se ilumina, igual que una
+     fila de Table; --sx-sunk la apagaba a gris. */
+  .list li:hover { background: var(--sx-accent-soft); }
   .fi { flex: none; width: 14px; height: 14px; }
   .nm {
     flex: 1 1 auto; min-width: 0; font-size: var(--sx-t-sm); color: var(--sx-ink);

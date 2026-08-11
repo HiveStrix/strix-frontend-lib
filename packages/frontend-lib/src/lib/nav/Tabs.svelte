@@ -199,7 +199,9 @@
     transition: color var(--sx-fast) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
   }
 
-  .tab:hover:not(:disabled) { color: var(--sx-ink); background: var(--sx-sunk); }
+  /* Igual que una fila de tabla: la pestaña bajo el cursor se ilumina con el
+     acento, no se hunde en un gris. */
+  .tab:hover:not(:disabled) { color: var(--sx-ink); background: var(--sx-accent-soft); }
 
   .tab.on { color: var(--sx-ink); }
 

@@ -359,7 +359,9 @@
     color: var(--sx-ink-2);
     cursor: pointer;
   }
-  .more:hover { color: var(--sx-ink); background: var(--sx-sunk); }
+  /* --sx-sunk aquí es el mismo bug que en Table.svelte: sobre blanco no
+     aclara, oscurece. El botón «más» se ilumina con el acento, no se hunde. */
+  .more:hover { color: var(--sx-ink); background: var(--sx-accent-soft); }
   .more:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
   .more svg { width: 12px; height: 12px; transition: transform var(--sx-fast) var(--sx-ease); }
   .more svg.down { transform: rotate(90deg); }
