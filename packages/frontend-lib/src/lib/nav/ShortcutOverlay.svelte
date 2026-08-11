@@ -204,7 +204,7 @@
      and does NOT inside a shadow root. A Core that needs this overlay must bind
      `--sx-scrim` on `:root` as well as on `:host`, or accept the fallback. */
   .sheet::backdrop {
-    background: var(--sx-scrim, rgba(20, 24, 26, .62));
+    background: var(--sx-scrim, rgba(26, 24, 34, .62));
   }
 
   .panel {
