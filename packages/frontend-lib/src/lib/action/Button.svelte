@@ -257,12 +257,14 @@
       transform: translateY(-1px);
       box-shadow: var(--sx-e-inset), var(--sx-e-2);
     }
+    /* --sx-sunk aquí es el mismo bug que en Table/Tabs/Menu: bajo el cursor
+       un botón secundario se ilumina, no se hunde en gris. */
     .outline:not(:disabled):not(.locked):hover {
-      background: var(--sx-sunk);
+      background: var(--sx-accent-soft);
       box-shadow: var(--sx-e-2);
     }
     .ghost:not(:disabled):not(.locked):hover {
-      background: var(--sx-sunk);
+      background: var(--sx-accent-soft);
       color: var(--sx-ink);
     }
   }

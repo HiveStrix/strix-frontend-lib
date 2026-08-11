@@ -201,8 +201,10 @@
   .nav { padding-inline: var(--sx-s-3); }
   .nav svg { width: 12px; height: 12px; flex: none; }
 
+  /* Igual que un botón outline/ghost: la página bajo el cursor se ilumina,
+     no se hunde en gris. */
   .nav:hover:not(:disabled), .num:hover:not(:disabled):not(.on) {
-    background: var(--sx-sunk);
+    background: var(--sx-accent-soft);
     color: var(--sx-ink);
   }
 

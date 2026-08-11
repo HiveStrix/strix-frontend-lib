@@ -236,7 +236,10 @@
   /* The one border in this family that is not a control outline, and it is only
      ever here while a cursor is carrying something. A drop target that does not
      declare itself is a drop target people drop next to. */
-  .drop.over { box-shadow: var(--sx-e-2), inset 0 0 0 2px var(--sx-accent); background: var(--sx-sunk); }
+  /* El anillo ya es del acento; un fondo --sx-sunk gris no combina con ese
+     anillo y además es el mismo bug de estado que el resto del barrido: la
+     zona activa se ilumina con el acento, no se hunde. */
+  .drop.over { box-shadow: var(--sx-e-2), inset 0 0 0 2px var(--sx-accent); background: var(--sx-accent-soft); }
   .drop:focus-within { box-shadow: var(--sx-e-2), inset 0 0 0 2px var(--sx-ink); }
   :global([data-sx-theme='dark']) .drop:focus-within,
   :global(.sx-dark) .drop:focus-within { box-shadow: var(--sx-e-2), inset 0 0 0 2px var(--sx-n-0); }
