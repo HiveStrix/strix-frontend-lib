@@ -60,17 +60,20 @@ const CHECKS = [
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
   ['--sx-accent-ink', '--sx-accent', 4.5, 'tinta sobre el acento'],
-  ['--sx-accent-edge', '--sx-surface', 3.0, 'filo del acento sobre superficie'],
   ...TONES.map((t) => [`--sx-${t}`, `--sx-${t}-band`, 4.5, `tono ${t} sobre su banda`])
 ];
-// Los filos de tono (--sx-positive-edge y compania) NO estan en el contrato, y
-// vale escribir por que: 1.4.11 pide 3:1 para el limite que hace falta para
-// IDENTIFICAR un componente. Una pildora no se identifica por su filo — se
-// identifica por su banda, su marca y su palabra, que es la regla que sostiene
-// Pill.svelte. El filo es refuerzo. Se informan aparte para que no pasen
+// Los filos de tono (--sx-positive-edge y compania) y el filo del acento
+// (--sx-accent-edge) NO estan en el contrato, y vale escribir por que: 1.4.11
+// pide 3:1 para el limite que hace falta para IDENTIFICAR un componente. Una
+// pildora no se identifica por su filo — se identifica por su banda, su marca
+// y su palabra, que es la regla que sostiene Pill.svelte. El filo es refuerzo.
+// Lo mismo con --sx-accent-edge: se usa sólo en ChoiceCards.svelte:219 (borde
+// de insignia dentro de tarjeta YA seleccionada) y SplitButton.svelte:135
+// (raya divisoria dentro de botón). Se informan aparte para que no pasen
 // inadvertidos, pero no rompen el build.
 const INFO = TONES.map((t) => [`--sx-${t}-edge`, '--sx-surface', `filo del tono ${t}`]);
 INFO.push(['--sx-accent-soft', '--sx-surface', 'hover sobre fila en reposo']);
+INFO.push(['--sx-accent-edge', '--sx-surface', 'filo del acento sobre superficie']);
 
 let malas = 0;
 const ground = resolve(TOKENS['--sx-ground']);
