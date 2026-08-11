@@ -99,6 +99,7 @@
   }
 
   .head {
+    background: var(--sx-thead);
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
@@ -161,7 +162,7 @@
   .foot {
     flex: none;
     padding: var(--sx-s-3) var(--panel-pad);
-    background: var(--sx-sunk);
+    background: var(--sx-thead);
     border-radius: 0 0 var(--panel-r) var(--panel-r);
     color: var(--sx-ink-2);
     font-size: var(--sx-t-sm);

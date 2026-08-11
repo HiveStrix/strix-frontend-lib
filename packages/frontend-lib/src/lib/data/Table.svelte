@@ -843,7 +843,7 @@
     position: sticky;
     top: 0;
     z-index: var(--sx-z-sticky);
-    background: var(--sx-surface);
+    background: var(--sx-thead);
     text-align: left;
     padding: var(--sx-s-3) var(--sx-s-4);
     white-space: nowrap;
@@ -866,7 +866,7 @@
     transition: background var(--sx-fast) var(--sx-ease);
   }
   th.right .sortbtn { flex-direction: row-reverse; }
-  .sortbtn:hover { background: var(--sx-sunk); }
+  .sortbtn:hover { background: var(--sx-accent-soft); }
   .sortbtn:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
 
   /* The sort mark is a SHAPE that moves, never a colour that changes: the
@@ -914,8 +914,14 @@
   /* `position: relative` on the row is what lets the primary cell's link stretch
      across it. The lead and action cells are raised out of its way. */
   tbody tr.row { position: relative; transition: background var(--sx-fast) var(--sx-ease); }
-  tbody tr.row:hover { background: var(--sx-sunk); }
-  tbody tr.row:focus-within { background: var(--sx-sunk); }
+  /* EL ESCALÓN DEL CURSOR. Iba a --sx-sunk, y ahí está la trampa de todo este
+     rebind: en una dirección de vidrio --sx-sunk es blanco translúcido y ACLARA
+     la fila; en una opaca es un gris y la misma regla la OSCURECE. Con Nácar
+     eso daba una fila gris donde tiene que haber una fila que se ilumina.
+     Sobre blanco no se puede aclarar, así que el escalón se hace con el acento,
+     que es un tinte apenas insinuado y no es gris. */
+  tbody tr.row:hover { background: var(--sx-accent-soft); }
+  tbody tr.row:focus-within { background: var(--sx-accent-soft); }
   tbody tr.on { background: var(--sx-accent-soft); }
   tbody tr.opened td { box-shadow: none; }
 
@@ -958,7 +964,7 @@
     cursor: pointer;
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
-  .disc:hover { background: var(--sx-sunk); color: var(--sx-ink); }
+  .disc:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .disc:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
   .disc svg, .cmore svg, .cdir svg { width: 12px; height: 12px; transition: transform var(--sx-fast) var(--sx-ease); }
   .disc svg.down, .cmore svg.down { transform: rotate(90deg); }

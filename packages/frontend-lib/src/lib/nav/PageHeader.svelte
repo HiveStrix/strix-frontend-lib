@@ -115,7 +115,21 @@
     clip-path: inset(50%); white-space: nowrap; border: 0;
   }
 
-  .hd { display: flex; flex-direction: column; gap: var(--sx-s-3); }
+  .hd {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sx-s-3);
+    /* LA FIRMA. La barra no se separa con una línea: se separa con la luz que
+       deja caer. La geometría está calibrada al límite de lo visible sobre
+       claro — bajarla más no la hace discreta, la hace invisible. La discreción
+       se gradúa por --sx-halo y sólo por ahí.
+       El z-index NO es opcional: sin él el fondo del hermano siguiente se pinta
+       después en el orden natural y se come la luz justo donde tiene que caer. */
+    border-bottom: 0;
+    box-shadow: 0 12px 28px -18px var(--sx-halo);
+    position: relative;
+    z-index: var(--sx-z-sticky);
+  }
 
   .sticky {
     position: sticky;
