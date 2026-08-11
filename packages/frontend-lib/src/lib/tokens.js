@@ -21,29 +21,63 @@
 
 /** The light theme: role tokens, tones, and the scales. */
 export const TOKENS = {
-  // Neutrals. Very slightly cool, never blue-grey.
-  '--sx-n-0': '#FFFFFF',
-  '--sx-n-50': '#F5F6F7',
-  '--sx-n-100': '#EAECED',
-  '--sx-n-150': '#DFE1E3',
-  '--sx-n-200': '#CFD2D4',
-  '--sx-n-300': '#B2B6B9',
-  '--sx-n-400': '#8B9094',
-  '--sx-n-500': '#6C7175',
-  '--sx-n-700': '#3C4145',
-  '--sx-n-800': '#24282B',
-  '--sx-n-900': '#14181A',
+  // LA PERILLA DEL CROMO. Es un COLOR y no un porcentaje, a propósito: ligarla a
+  // un neutro devuelve grises puros, así que un core que no quiera la traza
+  // violeta cambia UNA propiedad y no once. Su valor por defecto es el morado de
+  // Nácar.
+  '--sx-chrome-tint': '#6541BE',
 
-  // Surfaces and ink, named by ROLE so a dark theme is a re-binding.
-  '--sx-ground': 'var(--sx-n-50)',
+  // La rampa: neutros con una traza de la perilla. No es "gris teñido de marca"
+  // — la traza es del 4 al 8 %, que afina sin leerse como color. Un gris puro al
+  // lado de un acento morado se lee verdoso; eso es lo que corrige.
+  '--sx-n-0': '#FFFFFF',
+  '--sx-n-50': 'color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB)',
+  '--sx-n-100': 'color-mix(in srgb, var(--sx-chrome-tint) 5%, #F4F4F6)',
+  '--sx-n-150': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #EDEDF0)',
+  '--sx-n-200': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #DDDDE2)',
+  '--sx-n-300': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #BBBBC2)',
+  // n-400 es donde aterriza --sx-edge, el borde de un control. Su base está
+  // elegida para dar 3.47:1 contra blanco con la traza y 3.22:1 sin ella: los
+  // dos por encima del 3:1 de WCAG 1.4.11. NO puede salir de la escala de
+  // tercios del resto del cromo — para llegar a 3:1 mezclando marca haría falta
+  // un 64 %, que es un borde morado franco y no mobiliario.
+  '--sx-n-400': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #8E8E93)',
+  // n-500 es --sx-neutral, que se dibuja SOBRE n-100. Su base da 4.95:1 con la
+  // traza y 4.69:1 sin ella. En la dirección A daba 4.16 y estaba por debajo
+  // de AA sin que nadie lo hubiera medido.
+  '--sx-n-500': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #66666C)',
+  '--sx-n-700': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #414146)',
+  '--sx-n-800': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #27272B)',
+  '--sx-n-900': 'color-mix(in srgb, var(--sx-chrome-tint) 7%, #1B1B1E)',
+
+  // Los roles: qué es cada cosa, no de qué color es. Un producto que necesita
+  // mover UNA cosa pisa el rol; uno que necesita mover todo lo que dependa de un
+  // peldaño pisa la primitiva.
+  //
+  // El fondo es BLANCO, no un peldaño de la rampa. Es la silueta de Nácar: la
+  // tarjeta no se lee por diferencia de tono contra el campo sino por la sombra
+  // que deja. Es la desviación deliberada respecto de Prisma pastel.
+  '--sx-ground': 'var(--sx-n-0)',
   '--sx-surface': 'var(--sx-n-0)',
-  '--sx-sunk': 'var(--sx-n-100)',
+  '--sx-sunk': 'var(--sx-n-50)',
+  // --sx-line separa filas y cierra cabeceras: es AMBIENTE y puede ser tenue.
   '--sx-line': 'var(--sx-n-150)',
-  '--sx-edge': 'var(--sx-n-200)',
+  // --sx-edge es el límite de un CONTROL: dice dónde se puede escribir. Eso es
+  // información, no decoración, y por eso salta cuatro peldaños respecto de
+  // --sx-line en vez de acompañarlo. Los dos compartían token en la dirección A
+  // y por eso el borde de un input daba 1.52:1.
+  '--sx-edge': 'var(--sx-n-400)',
   '--sx-ink': 'var(--sx-n-900)',
   '--sx-ink-2': 'var(--sx-n-700)',
   '--sx-ink-3': 'var(--sx-n-500)',
   '--sx-ink-on': 'var(--sx-n-0)',
+  // EL ENCABEZADO. Token propio y no --sx-sunk, porque --sx-sunk también pinta
+  // los controles de formulario: cambiarle el color al encabezado movía también
+  // los inputs. Mueve cabecera de tabla y de panel a la vez.
+  '--sx-thead': 'var(--sx-n-0)',
+  // LA FIRMA de Nácar: la luz que deja caer la barra superior en vez de una
+  // raya. Ligarlo a `transparent` la apaga sin tocar ninguna regla.
+  '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 55%, transparent)',
 
   // The accent SLOT. Unbound: resolves to near-black, a real usable primary.
   // A product overrides these four once, at its root.
@@ -72,17 +106,20 @@ export const TOKENS = {
   '--sx-neutral-band': 'var(--sx-n-100)',
   '--sx-neutral-edge': 'var(--sx-n-200)',
 
-  // Depth comes from light, not outlines. Real offset, soft blur — a
-  // zero-offset halo is glow, which is decoration.
-  '--sx-e-1': '0 1px 2px rgba(20,24,26,.06), 0 1px 1px rgba(20,24,26,.04)',
-  '--sx-e-2': '0 6px 16px -4px rgba(20,24,26,.10), 0 2px 6px -2px rgba(20,24,26,.06)',
-  '--sx-e-3': '0 24px 48px -16px rgba(20,24,26,.26), 0 6px 14px -6px rgba(20,24,26,.12)',
-  '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.6)',
+  // Depth comes from light, not outlines. Sobre un fondo blanco la sombra es lo
+  // único que levanta una pieza, así que lleva dos capas: una corta que da el
+  // asiento y una larga que da el aire. El tinte NO es gris — una sombra gris
+  // bajo una familia lavanda parece suciedad — pero lleva un tercio del violeta
+  // de Prisma pastel, no el violeta entero.
+  '--sx-e-1': '0 1px 2px rgba(30,28,44,.05), 0 8px 24px -10px rgba(30,28,44,.18)',
+  '--sx-e-2': '0 2px 6px -2px rgba(30,28,44,.07), 0 16px 40px -14px rgba(30,28,44,.22)',
+  '--sx-e-3': '0 2px 6px -2px rgba(30,28,44,.07), 0 24px 56px -18px rgba(30,28,44,.28)',
+  '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.9)',
 
-  // Nothing square, and nothing nearly-square: 2px reads as a rendering error.
-  '--sx-r-1': '7px',
-  '--sx-r-2': '11px',
-  '--sx-r-3': '16px',
+  // La forma de Prisma: 12 y 22. Nada cuadrado, y nada casi-cuadrado.
+  '--sx-r-1': '8px',
+  '--sx-r-2': '12px',
+  '--sx-r-3': '22px',
   '--sx-r-pill': '999px',
 
   // Major third off 15 — the smallest size that survives a dirty screen at
@@ -125,7 +162,7 @@ export const TOKENS = {
   // `--sx-n-900` over an `--sx-n-900` ground is exactly nothing, at any
   // percentage, and three components had independently discovered that and
   // patched around it three different ways.
-  '--sx-scrim': 'rgba(20, 24, 26, .46)',
+  '--sx-scrim': 'rgba(26, 24, 34, .46)',
 
   '--sx-touch': '44px',
   '--sx-z-sticky': '40',
