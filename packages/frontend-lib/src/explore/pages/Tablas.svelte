@@ -449,7 +449,12 @@
   .tbl thead th {
     height: auto;
     padding-block: var(--d-p1);
-    background: var(--d-sunk);
+    /* El fondo del encabezado es SU PROPIO token, con reserva a --d-sunk. Antes
+       leía --d-sunk directo, que es el mismo token que pinta los controles de
+       formulario y el pie del panel: cambiarle el color al encabezado obligaba
+       a moverle el color a las tres cosas. Con la reserva puesta, las catorce
+       direcciones que no lo ligan siguen exactamente donde estaban. */
+    background: var(--d-thead, var(--d-sunk));
     border-bottom: max(var(--d-bw), 1px) solid var(--d-line);
   }
   .tbl tbody td { border-bottom: max(var(--d-bw), 1px) solid var(--d-line); color: var(--d-ink-2); }
@@ -1210,6 +1215,126 @@
   /* NO se toca .d-btn en W. directions.css ya repara ahí el primario, y una
      regla de página sobre .d-btn pesaría más que esa reparación y devolvería el
      botón blanco con tinta blanca. El primario de W da 8.0:1 tal como está. */
+
+  /* ══ AC · PRISMA SOBRIO · la tabla de Cristal, copiada ═════════════════════
+     Es la misma regla que I · Cristal y W · Cristal templado, tal cual. Las dos
+     son idénticas; W es I con dos correcciones encima y están las dos acá.
+
+     LA ESCALERA DE DENSIDAD, que es lo que se está copiando de verdad. Tres
+     escalones y no dos: cabecera --d-surface, que es la pieza que NO se mueve y
+     por eso la más sólida; fila bajo el cursor --d-sunk; fila en reposo
+     transparente. Cristal la tenía rota —cabecera y cursor pintaban las dos
+     --d-sunk y eran indistinguibles— y en una tabla de ocho columnas ese es el
+     peor sitio para perder el norte.
+
+     QUÉ CAMBIA AL TRAERLA A AC. En Cristal --d-surface es vidrio translúcido y
+     los tres escalones son tres espesores de vidrio. En AC --d-surface es
+     blanco opaco, así que la cabecera sale BLANCA sin pedirlo — que es
+     exactamente el encabezado blanco que se venía pidiendo. La escalera se
+     conserva porque no dependía del vidrio sino del orden: sólida arriba,
+     tenue en el cursor, nada en reposo.
+
+     LO ÚNICO QUE NO ES COPIA es que el fondo se lee de --d-thead con reserva a
+     --d-surface, para que cambiarlo siga siendo una línea en directions.css.
+     Con --d-thead en blanco los dos valores son el mismo color, así que no
+     altera el resultado. */
+  :global([data-d='AC']) .tbl thead th {
+    background: var(--d-thead, var(--d-surface));
+    border-bottom: 1px solid var(--d-edge);
+    box-shadow: inset 0 1px 0 var(--d-line);   /* el filo especular, no una línea */
+  }
+  /* De W: las hairlines de la base son --d-line, y sobre una superficie clara
+     apenas separan. Con seis filas eso es la diferencia entre una tabla y una
+     mancha. */
+  :global([data-d='AC']) .tbl tbody td { border-bottom-color: var(--d-edge); }
+  /* La columna ordenada NO cambia de espesor —eso rompería la escalera— sino que
+     enciende un canto de acento y se lleva la etiqueta al mismo color. */
+  :global([data-d='AC']) .tbl thead th[aria-sort]:not([aria-sort='none']) {
+    box-shadow: inset 0 1px 0 var(--d-line), inset 0 -2px 0 var(--d-accent);
+  }
+  :global([data-d='AC']) .tbl thead th[aria-sort]:not([aria-sort='none']) .hcap { color: var(--d-accent); }
+
+  /* == AD · NACAR · LA TABLA DE PRISMA PASTEL, POR VALOR =====================
+     Los intentos anteriores copiaban las REGLAS de otra direccion y las dejaban
+     leer los tokens de esta. Eso no copia una tabla: una regla que dice
+     `background: var(--d-sunk)` dibuja lo que ese token valga aca, y en una
+     direccion opaca vale un gris donde en Cristal vale blanco al 30 %. Misma
+     regla, tabla distinta, tres veces seguidas.
+
+     Aca se copian los VALORES. El bloque entero de Z · Prisma pastel liso,
+     token por token, acotado a .tbl. Adentro de la tabla la direccion ES Z; el
+     resto de Nacar no se entera. Como Z es opaca se reproduce exacta: no
+     depende de que haya un campo detras.
+
+     POR QUE NO LA DE CRISTAL, que era la otra opcion: no se puede. Su
+     superficie es rgba(255,255,255,.56) y su escalera de densidad esta hecha de
+     transparencia sobre un campo tenido. Sobre el fondo blanco de Nacar todos
+     esos valores resuelven a blanco puro y la escalera desaparece. No es un
+     problema de como se copie.
+
+     Estas lineas estan GENERADAS del bloque [data-d='Z'] de directions.css. Si
+     Z cambia, esto queda viejo y hay que regenerarlo. */
+  :global([data-d='AD']) .tbl {
+    --d-brand: var(--x-accent, #6541BE);
+    --d-brand-ink: color-mix(in srgb, var(--d-brand) 58%, #000000);
+    --d-ground: color-mix(in srgb, var(--d-brand) 5%, #FFFFFF);
+    --d-surface: #ffffff;
+    --d-sunk: color-mix(in srgb, var(--d-brand) 8%, #FFFFFF);
+    --d-ink: #171327;
+    --d-ink-2: #3B3454;
+    --d-ink-3: #5B5473;
+    --d-ink-on: #ffffff;
+    --d-line: color-mix(in srgb, var(--d-brand) 12%, #FFFFFF);
+    --d-edge: color-mix(in srgb, var(--d-brand) 24%, #FFFFFF);
+    --d-bw: 1px;
+    --d-r: 12px;
+    --d-r-lg: 22px;
+    --d-r-pill: 999px;
+    --d-shadow: 0 6px 22px -8px rgba(52, 32, 107, .22), inset 0 1px 0 rgba(255, 255, 255, .9);
+    --d-shadow-lg: 0 22px 52px -16px rgba(52, 32, 107, .32), inset 0 1px 0 rgba(255, 255, 255, .92);
+    --d-p1: 8px;
+    --d-p2: 12px;
+    --d-p3: 17px;
+    --d-p4: 22px;
+    --d-gap: 16px;
+    --d-t-2xs: 11px;
+    --d-t-xs: 12.5px;
+    --d-t-sm: 13.5px;
+    --d-t-md: 15px;
+    --d-t-lg: 19px;
+    --d-t-xl: 26px;
+    --d-t-2xl: 35px;
+    --d-w: 400;
+    --d-w-med: 530;
+    --d-w-semi: 610;
+    --d-w-bold: 690;
+    --d-label-size: 11px;
+    --d-label-case: uppercase;
+    --d-label-track: .08em;
+    --d-label-weight: 620;
+    --d-label-color: var(--d-brand);
+    --d-row-h: 44px;
+    --d-accent: var(--d-brand);
+    --d-accent-ink: var(--x-accent-ink, #ffffff);
+    --d-accent-soft: color-mix(in srgb, var(--d-brand) 12%, #FFFFFF);
+    --d-accent-edge: color-mix(in srgb, var(--d-brand) 28%, #FFFFFF);
+    --d-pos: #14563A;
+    --d-pos-band: #DAF0E4;
+    --d-pos-edge: #ABD9C1;
+    --d-att: #7A4310;
+    --d-att-band: #FBE7D2;
+    --d-att-edge: #EDC79B;
+    --d-crit: #97231F;
+    --d-crit-band: #FBDDDF;
+    --d-crit-edge: #EFB3B8;
+    --d-info: #26456E;
+    --d-info-band: #DCE9F9;
+    --d-info-edge: #AFC9EC;
+    --d-neu: #444056;
+    --d-neu-band: #EEEBF5;
+    --d-neu-edge: #D5CFE4;
+    --d-thead: color-mix(in srgb, var(--d-brand) 8%, #FFFFFF);
+  }
 
   /* ══ X · COTA · un libro de bodega, no una pantalla de software ════════════
 

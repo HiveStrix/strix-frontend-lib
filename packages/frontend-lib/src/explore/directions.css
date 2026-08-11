@@ -1948,3 +1948,311 @@
    de lo que hace falta. Sombra dura y opaca, como cualquier overlay. */
 [data-d='AB'] .dlg,
 [data-d='AB'] .menu { box-shadow: var(--d-shadow-lg); }
+
+/* ── AC · PRISMA SOBRIO  (Z con el cromo podado) ───────────────────────────
+   Lo que resuelve: Z tiene la forma correcta y el color en SEIS sitios a la vez
+   — el fondo, la cabecera en degradado, todas las etiquetas, la línea, el borde
+   y la sombra. Seis usos distintos del mismo morado significan que el morado no
+   dice nada: es decoración repartida. Y el que paga la cuenta es el acento, que
+   es la única pieza que de verdad tenía que llamar la atención y termina siendo
+   la séptima cosa morada de la pantalla.
+
+   LA PODA, en una frase: el color se retira de las PIEZAS y queda en dos sitios
+   — el CAMPO y el ESTADO. El campo es un 4 % y no es una pieza; existe para que
+   una tarjeta blanca se lea como tarjeta y no como un hueco. El estado es
+   vocabulario y no se toca. Todo lo demás —cabecera, etiquetas, líneas, bordes,
+   tinta— baja a neutro.
+
+   LO QUE NO SE TOCA ES LA FORMA. Mismo radio de 12 y 22, misma sombra real con
+   su reflejo interior, mismas superficies opacas, mismos pasteles de estado
+   resueltos contra blanco. En un squint test Z se lee como «barras de color
+   arriba de cada tarjeta» y AC como «tarjetas blancas y un botón morado»: son
+   dos siluetas distintas, no dos saturaciones de la misma.
+
+   POR QUÉ ESTO Y NO OTRA DIRECCIÓN NEUTRA. X · Cota ya reserva el color al
+   estado, pero llega ahí quitando el material: papel mate, sin sombra, sin
+   radio blando. AC conserva el material de Prisma entero y sólo le quita el
+   color al cromo. La diferencia se ve en el botón primario: en Cota es tinta,
+   acá es la marca del producto. */
+[data-d='AC'] {
+  --d-brand: var(--x-accent, #6541BE);
+  --d-brand-ink: color-mix(in srgb, var(--d-brand) 58%, #000000);
+  /* EL CAMPO SE VA A BLANCO. Z lo tiñe al 5 % y la primera versión de AC lo
+     dejaba al 4 %; acá se va entero. Consecuencia, y hay que escribirla porque
+     es la que se paga: sobre un campo teñido una tarjeta blanca se lee sola,
+     por diferencia de tono. Sobre blanco no hay diferencia de tono que leer, y
+     la tarjeta pasa a depender de DOS cosas y nada más — la línea y la sombra.
+     Las dos se ajustan abajo para sostener ese peso.
+
+     Lo que se gana a cambio: la marca deja de estar en el 100 % de los píxeles
+     de la pantalla. El único color que queda es el acento y el estado, que era
+     el punto entero de la dirección. */
+  --d-ground: #FFFFFF;
+  --d-surface: #ffffff;
+  --d-sunk: color-mix(in srgb, var(--d-brand) 5%, #F1F1F5);
+  /* EL ENCABEZADO, EN BLANCO Y EN UN SOLO SITIO. La estructura es la de Prisma
+     pastel sin tocar —la regla base de la tabla, un fondo y una línea abajo— y
+     lo único que cambia es que el fondo es blanco en vez de lavanda. Va en su
+     propio token y no en --d-sunk porque --d-sunk también pinta los controles
+     de formulario: son dos decisiones distintas y tienen que poder moverse por
+     separado. Cambiar el encabezado de toda la dirección —tabla y panel— es
+     cambiar esta línea. */
+  --d-thead: #FFFFFF;
+  /* La tinta pierde el sesgo violeta de Z (#171327 → #1A1A1F). Un texto teñido
+     es color en la pieza más repetida de la pantalla, que es exactamente lo que
+     esta dirección viene a sacar. */
+  --d-ink: #1A1A1F; --d-ink-2: #3E3E48; --d-ink-3: #62626E; --d-ink-on: #ffffff;
+  /* La OTRA de las dos cosas que ahora sostienen la tarjeta, así que la línea
+     se oscurece respecto de la primera versión (#E7E7EC → #E1E1E7): un
+     hairline calibrado contra un campo teñido desaparece contra uno blanco.
+     Conserva una traza de marca —un 7 %— porque un gris puro al lado de un
+     acento morado se lee verdoso; no es color, es afinación. */
+  --d-line: color-mix(in srgb, var(--d-brand) 7%, #E1E1E7);
+  --d-edge: color-mix(in srgb, var(--d-brand) 10%, #D2D2DA); --d-bw: 1px;
+  /* La forma de Prisma, intacta. */
+  --d-r: 12px; --d-r-lg: 22px; --d-r-pill: 999px;
+  /* La sombra pierde el tinte morado de Z (rgba(52,32,107,.22)): ese tinte
+     existía para no parecer suciedad bajo una cabecera lavanda, y acá no hay
+     cabecera lavanda. Pero NO baja de opacidad, sube: con el campo en blanco la
+     sombra es una de las dos únicas cosas que separan la tarjeta del fondo, así
+     que tiene que trabajar más que en Z, no menos. Queda casi neutra y algo más
+     presente. El reflejo interior superior se va: sobre blanco, un reflejo
+     blanco no existe. */
+  --d-shadow: 0 6px 22px -8px rgba(30, 28, 44, .20), 0 1px 2px rgba(30, 28, 44, .05);
+  --d-shadow-lg: 0 22px 52px -16px rgba(30, 28, 44, .28), 0 2px 6px -2px rgba(30, 28, 44, .07);
+  --d-p1: 8px; --d-p2: 12px; --d-p3: 17px; --d-p4: 22px; --d-gap: 16px;
+  --d-t-2xs: 11px; --d-t-xs: 12.5px; --d-t-sm: 13.5px; --d-t-md: 15px;
+  --d-t-lg: 19px; --d-t-xl: 26px; --d-t-2xl: 35px;
+  --d-w: 400; --d-w-med: 530; --d-w-semi: 610; --d-w-bold: 690;
+  /* EL CAMBIO QUE MÁS MORADO SACA DE LA PÁGINA. En Z toda etiqueta es
+     --d-brand: en una pantalla de formulario eso son veinte piezas moradas
+     contra un botón primario. Acá bajan a tinta terciaria y el botón se queda
+     solo con el color. */
+  --d-label-size: 11px; --d-label-case: uppercase; --d-label-track: .08em;
+  --d-label-weight: 620; --d-label-color: var(--d-ink-3);
+  --d-row-h: 44px;
+  /* EL ACENTO, sin competencia. Es lo único saturado que queda, y esa es la
+     ganancia entera de la dirección. Sigue siendo un hueco: --x-accent. */
+  --d-accent: var(--d-brand);
+  --d-accent-ink: var(--x-accent-ink, #ffffff);
+  --d-accent-soft: color-mix(in srgb, var(--d-brand) 10%, #FFFFFF);
+  --d-accent-edge: color-mix(in srgb, var(--d-brand) 24%, #FFFFFF);
+  /* Los pasteles de Z sin tocar: son vocabulario y ya están calibrados. */
+  --d-pos: #14563A; --d-pos-band: #DAF0E4; --d-pos-edge: #ABD9C1;
+  --d-att: #7A4310; --d-att-band: #FBE7D2; --d-att-edge: #EDC79B;
+  --d-crit: #97231F; --d-crit-band: #FBDDDF; --d-crit-edge: #EFB3B8;
+  --d-info: #26456E; --d-info-band: #DCE9F9; --d-info-edge: #AFC9EC;
+  /* El neutro SÍ cambia. En Z es morado desaturado (#444056 / #EEEBF5), así que
+     el tono que significa «ninguno» se dibuja con el color de la marca y un
+     estado neutro se lee como estado de marca. Acá es gris de verdad. */
+  --d-neu: #5A5A66; --d-neu-band: #EEEEF1; --d-neu-edge: #D6D6DE;
+}
+/* Misma ley que Z: nada desenfoca. Va en el selector ancho para que ningún
+   componente herede el vidrio de otra dirección. */
+[data-d='AC'] .d-panel,
+[data-d='AC'] .d-btn,
+[data-d='AC'] .d-input,
+[data-d='AC'] .d-select,
+[data-d='AC'] .d-textarea {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-d='AC'] .d-panel {
+  background: var(--d-surface);
+  border-color: var(--d-line);
+  box-shadow: var(--d-shadow);
+}
+/* LA CABECERA DEL PANEL, con la MISMA estructura que la de la tabla. Z la
+   resuelve con una diagonal lavanda→rosa; acá es un fondo plano más una línea
+   abajo, que es exactamente lo que hace la regla base de la tabla. Las dos leen
+   el mismo token, así que un encabezado de tabla y un encabezado de panel no
+   pueden quedar de dos colores distintos por descuido — que es justo lo que
+   pasaba cuando cada uno sacaba su fondo de un sitio diferente.
+
+   El título vuelve a tinta plena: en Z va en --d-brand-ink, que es marca. */
+[data-d='AC'] .d-panel-head {
+  background: var(--d-thead);
+  color: var(--d-ink);
+  border-bottom: 1px solid var(--d-line);
+  border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
+}
+[data-d='AC'] .d-panel-title { color: var(--d-ink); font-weight: var(--d-w-semi); }
+[data-d='AC'] .d-panel-foot { background: var(--d-thead); border-top-color: var(--d-line); }
+[data-d='AC'] .d-row { border-bottom-color: var(--d-line); }
+[data-d='AC'] .d-btn {
+  background: var(--d-surface);
+  border-color: var(--d-edge);
+  box-shadow: 0 2px 9px -4px rgba(38, 34, 54, .18), inset 0 1px 0 rgba(255, 255, 255, .92);
+}
+/* La única pieza saturada de la dirección. */
+[data-d='AC'] .d-btn--primary {
+  background: var(--d-accent);
+  border-color: var(--d-accent);
+  color: var(--d-accent-ink);
+}
+[data-d='AC'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
+[data-d='AC'] .d-input, [data-d='AC'] .d-select, [data-d='AC'] .d-textarea {
+  background: var(--d-sunk);
+  border-color: var(--d-edge);
+  box-shadow: inset 0 1px 3px rgba(38, 34, 54, .07);
+}
+/* El foco SÍ es marca, en las dos hermanas. Es el caso donde el color es
+   información —dónde está el teclado— y no cromo. */
+[data-d='AC'] .d-input:focus-visible { border-color: var(--d-brand); }
+
+/* ── AD · NÁCAR  (forma de Prisma + tabla de Cristal + barra de Halo claro) ─
+   Plantilla nueva, escrita entera, no una variante de otra.
+
+   LA LEY: nada se separa con una línea si puede separarse con luz o con
+   tipografía. El fondo es blanco liso, las superficies son blancas, y lo que
+   dice dónde termina una pieza y empieza otra es una sombra corta, un cambio de
+   registro tipográfico, o —donde no queda otra— una hairline gris con una traza
+   de marca. El color queda reservado a dos cosas: el acento y el estado.
+
+   DE DÓNDE VIENE CADA PARTE, para que se pueda auditar:
+   · La FORMA es de Prisma. Radio 12 y 22, superficies opacas, sombra real con
+     desplazamiento, pasteles de estado resueltos contra blanco.
+   · La TABLA es de Cristal (I / W), copiada en Tablas.svelte. Su escalera de
+     densidad de tres escalones es lo único que mantiene legible una tabla de
+     ocho columnas, y no dependía del vidrio: dependía del orden.
+   · La BARRA es de Halo claro (T), en Pantalla.svelte, a un tercio de fuerza.
+
+   POR QUÉ EL HALO VA EN UN TOKEN. T lo escribe con var(--d-accent) directo, a
+   opacidad plena, y para bajarlo hay que editar la regla. Acá la fuerza vive en
+   --d-halo y se sube o se baja de un sitio sin tocar ninguna regla. */
+[data-d='AD'] {
+  /* FORMA Y VOCABULARIO: los valores de Z, sin tocar. */
+  --d-r: 12px;
+  --d-r-lg: 22px;
+  --d-r-pill: 999px;
+  --d-bw: 1px;
+  --d-p1: 8px;
+  --d-p2: 12px;
+  --d-p3: 17px;
+  --d-p4: 22px;
+  --d-gap: 16px;
+  --d-t-2xs: 11px;
+  --d-t-xs: 12.5px;
+  --d-t-sm: 13.5px;
+  --d-t-md: 15px;
+  --d-t-lg: 19px;
+  --d-t-xl: 26px;
+  --d-t-2xl: 35px;
+  --d-w: 400;
+  --d-w-med: 530;
+  --d-w-semi: 610;
+  --d-w-bold: 690;
+  --d-label-size: 11px;
+  --d-label-case: uppercase;
+  --d-label-track: .08em;
+  --d-label-weight: 620;
+  --d-row-h: 44px;
+  --d-brand: var(--x-accent, #6541BE);
+  --d-brand-ink: color-mix(in srgb, var(--d-brand) 58%, #000000);
+  --d-ink-on: #ffffff;
+  /* El fondo NO sigue a Z. Z lo tiñe al 5 %; Nácar es blanco liso, que es
+     la instrucción que dio origen a la dirección y su silueta entera. Es la
+     única desviación deliberada de Z fuera del cromo, y se revierte con una
+     línea: color-mix(in srgb, var(--d-brand) 5%, #FFFFFF). */
+  --d-ground: #FFFFFF;
+  --d-surface: #ffffff;
+  /* CROMO: la misma mezcla de Z con el porcentaje de marca DIVIDIDO POR TRES.
+     No son grises nuevos inventados: son los colores de Z con un tercio de su
+     color. Por eso la dirección sigue leyéndose de la misma familia. */
+  --d-sunk: color-mix(in srgb, var(--d-brand) 3%, #FFFFFF);
+  --d-line: color-mix(in srgb, var(--d-brand) 4%, #FFFFFF);
+  --d-edge: color-mix(in srgb, var(--d-brand) 8%, #FFFFFF);
+  /* La tinta conserva la luminosidad exacta de Z y deja un tercio de su
+     desviación violeta. */
+  --d-ink: #1A181F;
+  --d-ink-2: #3F3D47;
+  --d-ink-3: #5F5C67;
+  /* La sombra de Prisma con el tinte a un tercio: sigue sin ser gris —una
+     sombra gris bajo una familia lavanda parece suciedad— pero ya no tiñe. */
+  --d-shadow: 0 6px 22px -8px rgba(60, 53, 78, .22), inset 0 1px 0 rgba(255, 255, 255, .9);
+  --d-shadow-lg: 0 22px 52px -16px rgba(60, 53, 78, .32), inset 0 1px 0 rgba(255, 255, 255, .92);
+  /* La etiqueta es el cambio que más color saca: en Z toda etiqueta es
+     --d-brand, y en un formulario eso son veinte piezas moradas compitiendo
+     con el botón primario. */
+  --d-label-color: var(--d-ink-3);
+  /* El encabezado: Z lo resuelve con un degradado lavanda→rosa; acá es un
+     tinte plano al 6 %. Un token, y mueve cabecera de panel y de tabla. */
+  --d-thead: color-mix(in srgb, var(--d-brand) 6%, #FFFFFF);
+  /* LA FIRMA de Nácar: la luz que deja caer la barra en vez de una raya.
+     Geometría de T, opacidad a la mitad. */
+  --d-halo: color-mix(in srgb, var(--d-brand) 55%, transparent);
+  /* VOCABULARIO: acento y los cinco tonos, idénticos a Z. No son cromo — son
+     lo que significa «vencido», y tiene que verse igual en toda la familia. */
+  --d-accent: var(--d-brand);
+  --d-accent-ink: var(--x-accent-ink, #ffffff);
+  --d-accent-soft: color-mix(in srgb, var(--d-brand) 12%, #FFFFFF);
+  --d-accent-edge: color-mix(in srgb, var(--d-brand) 28%, #FFFFFF);
+  --d-pos: #14563A;
+  --d-pos-band: #DAF0E4;
+  --d-pos-edge: #ABD9C1;
+  --d-att: #7A4310;
+  --d-att-band: #FBE7D2;
+  --d-att-edge: #EDC79B;
+  --d-crit: #97231F;
+  --d-crit-band: #FBDDDF;
+  --d-crit-edge: #EFB3B8;
+  --d-info: #26456E;
+  --d-info-band: #DCE9F9;
+  --d-info-edge: #AFC9EC;
+  --d-neu: #444056;
+  --d-neu-band: #EEEBF5;
+  --d-neu-edge: #D5CFE4;
+}
+
+/* Nada desenfoca: no hay vidrio en esta dirección. Va en el selector ancho para
+   que ningún componente herede el backdrop-filter de otra. */
+[data-d='AD'] .d-panel,
+[data-d='AD'] .d-btn,
+[data-d='AD'] .d-input,
+[data-d='AD'] .d-select,
+[data-d='AD'] .d-textarea {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-d='AD'] .d-panel {
+  background: var(--d-surface);
+  border-color: var(--d-line);
+  box-shadow: var(--d-shadow);
+}
+/* La cabecera del panel lee el MISMO token que la de la tabla, así que las dos
+   no pueden quedar de dos colores distintos por descuido. Lo que la separa del
+   cuerpo es el título en semibold contra un cuerpo en regular, más la hairline. */
+/* La cabecera vuelve a ser UNA BANDA, como en Z. Lo que cambia es que Z la
+   resuelve con una diagonal lavanda→rosa y acá es un tinte plano: el degradado
+   es el gesto más colorido de la dirección y era el primero que tenía que
+   bajar. Sigue siendo una banda —radio arriba, línea abajo— porque la cabecera
+   separada es forma de Prisma, y la forma se queda entera. */
+[data-d='AD'] .d-panel-head {
+  background: var(--d-thead);
+  color: var(--d-ink);
+  border-bottom: 1px solid var(--d-line);
+  border-radius: var(--d-r-lg) var(--d-r-lg) 0 0;
+}
+[data-d='AD'] .d-panel-title { color: var(--d-ink); font-weight: var(--d-w-semi); }
+[data-d='AD'] .d-panel-foot { background: var(--d-thead); border-top-color: var(--d-line); }
+[data-d='AD'] .d-row { border-bottom-color: var(--d-line); }
+[data-d='AD'] .d-btn {
+  background: var(--d-surface);
+  border-color: var(--d-edge);
+  box-shadow: 0 1px 2px rgba(28, 26, 42, .06), inset 0 1px 0 rgba(255, 255, 255, .9);
+}
+/* La única pieza saturada de la pantalla. */
+[data-d='AD'] .d-btn--primary {
+  background: var(--d-accent);
+  border-color: var(--d-accent);
+  color: var(--d-accent-ink);
+}
+[data-d='AD'] .d-btn--ghost { background: transparent; box-shadow: none; border-color: transparent; }
+[data-d='AD'] .d-input, [data-d='AD'] .d-select, [data-d='AD'] .d-textarea {
+  background: var(--d-sunk);
+  border-color: var(--d-edge);
+  box-shadow: inset 0 1px 3px rgba(28, 26, 42, .06);
+}
+/* El foco SÍ es marca: es el caso donde el color es información —dónde está el
+   teclado— y no cromo. */
+[data-d='AD'] .d-input:focus-visible { border-color: var(--d-brand); }

@@ -1221,6 +1221,33 @@
   /* la barra no se separa con una línea: se separa con la luz que deja caer.
      Sobre papel un resplandor tiene que ser mucho más corto que sobre negro:
      con la dispersión de Halo (-34px) acá no se veía absolutamente nada. */
+  /* ══ AD · NÁCAR · la barra se separa con luz, no con una raya ══════════════
+     El gesto es el de T · Halo claro y la cita es suya: «la barra no se separa
+     con una línea: se separa con la luz que deja caer». Lo que cambia es la
+     fuerza. T lo escribe con var(--d-accent) directo —opacidad plena— y sobre
+     una dirección blanca eso no se lee como una barra que flota: se lee como
+     una barra que gotea. Acá el color sale de --d-halo, que es el acento al
+     30 %, y la dispersión se acorta de -18px a -20px.
+
+     Que la fuerza viva en un token y no en esta regla es el punto: subir o
+     bajar la firma de la dirección entera es cambiar un porcentaje en
+     directions.css, sin abrir esta página. */
+  :global([data-d='AD']) .topbar {
+    background: transparent;
+    border-bottom: 0;
+    /* GEOMETRÍA DE T, SIN TOCAR. Los cuatro números son los suyos; lo único que
+       cambia es que el color sale de --d-halo, que es el acento a media fuerza,
+       en vez del acento entero. */
+    box-shadow: 0 12px 28px -18px var(--d-halo);
+    /* Y la barra se levanta, que es lo que hace A con su propia sombra. Sin
+       esto el fondo del hermano siguiente se pinta después en el orden natural
+       y se come la luz que la barra deja caer sobre él — que es justo el sitio
+       donde esta dirección espera verla. */
+    position: relative;
+    z-index: 2;
+  }
+  :global([data-d='AD']) .search .d-input { background: transparent; }
+
   :global([data-d='T']) .topbar {
     background: transparent; border-bottom: 0;
     box-shadow: 0 12px 28px -18px var(--d-accent);

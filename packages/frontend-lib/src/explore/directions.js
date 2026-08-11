@@ -141,6 +141,25 @@ export const DIRECTIONS = [
     mezcla: 'AA + luz graduada',
     hermana: 'AA',
     finalista: true
+  },
+  {
+    id: 'AC',
+    name: 'Prisma sobrio',
+    tagline: 'La forma de Prisma sobre blanco: el cromo entero se queda sin color.',
+    silhouette: 'Tarjetas blancas de esquina blanda sobre blanco, separadas sólo por una línea fina y una sombra. Ni un degradado, ni una etiqueta morada, ni un fondo teñido. Lo único saturado en toda la pantalla es el botón primario.',
+    form: 'Z tiene la forma correcta y el color en seis sitios a la vez: el fondo, la cabecera en degradado, TODAS las etiquetas, las líneas, los bordes y la sombra. Seis usos distintos del morado significan que el morado no dice nada — es decoración repartida. Acá el color se retira de TODO el cromo —fondo incluido— y queda en dos sitios: el acento y el estado. El fondo blanco es la decisión que más cuesta y la que más devuelve: una tarjeta blanca sobre un campo teñido se lee sola por diferencia de tono, y sobre blanco pasa a depender de dos cosas, la línea y la sombra, que por eso van más marcadas que en Z. A cambio, la marca deja de estar en el 100 % de los píxeles. La cabecera pierde el degradado lavanda→rosa y se aplana a un tono neutro; las etiquetas bajan de morado a tinta terciaria; la línea y el borde pasan a gris con una traza de marca para que no ensucien sobre el campo teñido; la tinta pierde el sesgo violeta. Lo que NO se toca es la forma: mismo radio de 12 y 22, misma sombra real, mismas superficies opacas, mismos pasteles de estado. La ganancia es el acento: en Z el botón primario compite con una cabecera teñida y seis etiquetas de su propio color, y acá es lo único saturado de la página. Un acento que no compite con nada es un acento que no hay que explicar.',
+    mezcla: 'Z con el cromo podado',
+    hermana: 'Z',
+    finalista: true
+  },
+  {
+    id: 'AD',
+    name: 'Nácar',
+    tagline: 'Todo blanco, y lo que separa una pieza de otra es luz, no línea.',
+    silhouette: 'Blanco sobre blanco de punta a punta. La barra superior no tiene raya: deja caer un resplandor corto. Las tarjetas flotan por sombra. Lo único saturado es el botón primario y las bandas de estado.',
+    form: 'Plantilla nueva, no una variante. Toma tres cosas de tres sitios y las reescribe juntas. De Prisma, la FORMA: radio de 12 y 22, superficies opacas, sombra real, pasteles de estado. De Cristal, la TABLA: la escalera de densidad de tres escalones —cabecera sólida porque es lo que no se mueve, fila bajo el cursor tenue, fila en reposo transparente—, que es lo único que mantiene legible una tabla de ocho columnas. De Halo claro, la BARRA: no se separa con una línea sino con la luz que deja caer, y acá va a un tercio de la fuerza de T, que sobre blanco es lo que hace la diferencia entre una barra que flota y una barra que gotea. El resto es la ley de la librería: el cromo no lleva color. Etiquetas en tinta, líneas en gris con una traza de marca para que no se lean verdosas al lado del acento, fondo blanco liso. El acento y el estado son el único color de la pantalla, y por eso los dos se ven sin explicarse.',
+    mezcla: 'forma de Prisma + tabla de Cristal + barra de Halo claro',
+    finalista: true
   }
 ];
 
