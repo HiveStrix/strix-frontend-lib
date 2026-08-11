@@ -136,9 +136,10 @@
     top: 0;
     z-index: var(--sx-z-sticky);
     background: var(--sx-ground);
-    /* Depth, not a rule line: what tells you content is passing underneath is
-       the shadow the header casts on it. */
-    box-shadow: var(--sx-e-1);
+    /* No declara box-shadow propio a propósito: .hd ya deja caer el halo, y
+       pegada es cuando más tiene que notarse que hay contenido pasando por
+       debajo. Redeclararlo acá con --sx-e-1 lo pisaba en silencio — la firma
+       de la dirección desaparecía justo cuando la barra se quedaba pegada. */
     padding-block: var(--sx-s-3);
     margin-inline: calc(var(--sx-s-4) * -1);
     padding-inline: var(--sx-s-4);
