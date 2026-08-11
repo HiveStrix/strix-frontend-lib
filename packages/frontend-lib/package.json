@@ -21,7 +21,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "tokens": "node scripts/tokens.mjs"
+    "tokens": "node scripts/tokens.mjs",
+    "contrast": "node scripts/contrast.mjs"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
