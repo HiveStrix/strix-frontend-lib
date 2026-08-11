@@ -185,10 +185,14 @@ adentro: un componente puede estar perfecto y aun así ser fácil de usar mal.
 **La librería** tiene 55 componentes y no tiene pruebas automatizadas. El README
 de `packages/frontend-lib` lleva su propia lista de lo que falta.
 
-**La dirección visual no está decidida.** `src/explore` muestra ocho direcciones
-—de tarjetas flotantes a franjas sin caja a rejilla monoespaciada— sobre el
-mismo contenido, para elegir una. Los 55 componentes de hoy hablan la primera.
-Cuando haya una elegida, se reconstruyen sobre los mismos huesos.
+**La dirección visual es Nácar.** Fondo blanco, piezas que se levantan por
+sombra en vez de por contorno, una barra que se separa por luz y no por raya.
+`src/explore` queda como el registro de las dieciséis direcciones que se
+compararon sobre el mismo contenido —de tarjetas flotantes a franjas sin caja
+a rejilla monoespaciada— y de por qué se eligió ésta y no otra; no se borra
+después de decidir. Los 55 componentes de hoy hablan Nácar. El detalle de la
+dirección —las tres capas de tokens, las tres perillas, qué copia de dónde—
+está en `packages/frontend-lib/README.md`.
 
 **Los ejemplos** son dos. Faltan al menos dos que servirían: una pantalla de
 detalle (la ficha de un equipo) y una de configuración con formularios largos,

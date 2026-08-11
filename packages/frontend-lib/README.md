@@ -38,6 +38,12 @@ cinco tonos —`positive`, `attention`, `critical`, `info`, `neutral`— que sig
 todos los productos. «Vencido» tiene que verse igual en mantenimiento, en facturación y en
 inventario o el vocabulario deja de ser uno.
 
+Los cinco tonos son hex fijo, sin excepción — ninguno deriva de la rampa neutra ni del acento. Es
+a propósito: si uno solo dependiera del cromo, ese tono cambiaría de color entre dos productos con
+acentos distintos, y «ninguno» dejaría de significar lo mismo en los dos. (`--sx-neutral` fue la
+excepción hasta esta reconstrucción: apuntaba a `--sx-n-500`, así que su color se movía con el
+cromo de cada dirección.)
+
 El acento **no es un tono**: es un hueco que cada producto llena. Ver *Ligar el acento*.
 
 Corolario que vale escribir aparte: **la profundidad viene de la luz, no de los contornos.**
@@ -61,6 +67,161 @@ son dos totales que nadie compara.
 Y al revés, que es la mitad que se olvida: **la prosa nunca lleva tabulares.** Una frase corrida
 en cifras tabulares se lee como un tartamudeo. Por eso la nota en prosa de un `DataList` es
 deliberadamente *no* tabular.
+
+---
+
+## La dirección: Nácar
+
+Las tres reglas de arriba son restricciones; Nácar es la silueta concreta que las lleva a un
+mobiliario. Se eligió comparando dieciséis direcciones sobre el mismo contenido —el registro queda
+en `explore.html`, ver *Estado* en el README raíz— y esto documenta en qué tokens vive, de dónde
+sale cada pieza, y qué perillas mueve un producto sin salir del sistema.
+
+### La ley
+
+> Nada se separa con una línea si puede separarse con luz o con tipografía. El color queda
+> reservado a dos cosas: el acento y el estado.
+
+Un borde de 1 px sigue existiendo para las tres cosas que la regla 1 ya nombra —el contorno de un
+control, el anillo de foco, `Divider`— y para nada más. Todo lo que en otra librería sería una
+línea, acá es una sombra o un cambio de peso tipográfico.
+
+### De dónde viene cada parte
+
+Nácar no es una variante: es una plantilla nueva armada con tres piezas de tres direcciones
+distintas.
+
+- **La forma es de Prisma**: radio 12 y 22, superficies opacas, sombra real con desplazamiento,
+  los pasteles de estado resueltos contra blanco.
+- **La tabla es de Prisma pastel (`Z`)**: copiada por valor, los 59 tokens de `[data-d='Z']`
+  acotados a `.tbl` en `explore/pages/Tablas.svelte`. Es la escalera de densidad de tres escalones
+  que hace legible una tabla de ocho columnas, y no se podía tomar de Cristal — su superficie es
+  `rgba(255,255,255,.56)` y esa escalera depende de un campo detrás que Nácar, sobre blanco, no
+  tiene.
+- **La barra es de Halo claro (`T`)**: no se separa con una línea sino con la luz que deja caer. La
+  geometría de T no se toca; lo que cambia es la opacidad.
+
+Fuera de la tabla, Nácar es Z con el cromo dividido por tres, más un fondo blanco.
+
+### Las tres capas
+
+```
+CAPA 1 · primitivas    la rampa de neutros, con su traza violeta
+                        --sx-n-0 … --sx-n-900
+                             ↓
+CAPA 2 · roles          qué es cada cosa, no de qué color es
+                        --sx-ground --sx-surface --sx-sunk --sx-line
+                        --sx-edge --sx-ink --sx-ink-2 --sx-ink-3 --sx-ink-on
+                             ↓
+CAPA 3 · perillas       lo que retunea la dirección sin tocar valores
+                        --sx-chrome-tint  --sx-halo  --sx-thead  --sx-accent
+```
+
+Los roles apuntan a las primitivas (`--sx-line: var(--sx-n-150)`); las perillas retunean sin que
+nadie tenga que ir a buscar un valor. Un producto elige el nivel más alto que le resuelve el
+problema:
+
+1. **Nácar tal cual** — no se escribe nada. Es el default.
+2. **Afinarlo** — se mueve una perilla:
+   ```css
+   --sx-accent: #B45309;
+   --sx-chrome-tint: #8E8E93;   /* grises neutros en vez de la traza violeta */
+   --sx-halo: transparent;      /* sin la firma de luz en la barra */
+   --sx-thead: var(--sx-sunk);  /* encabezados con relleno */
+   ```
+3. **Necesidad puntual** — se pisa un rol o una primitiva:
+   ```css
+   --sx-line: #E0E0E0;
+   --sx-n-150: #E0E0E0;
+   ```
+
+Los tres niveles son custom properties: funcionan igual en el Shell (luz DOM) y dentro de un Core
+(shadow root abierto).
+
+### Las tres perillas
+
+- **`--sx-chrome-tint`.** Es un color, no un porcentaje: el que se mezcla en cada peldaño de la
+  rampa neutra (`color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB)` en el más claro, hasta un
+  8 % en los intermedios). Por default vale el mismo morado que `--sx-accent`, `#6541BE`. Un core
+  que no quiera la traza violeta liga esta única propiedad a un gris y las once primitivas se
+  destiñen de una vez, no una por una.
+- **`--sx-thead`.** El fondo de encabezado, de tabla y de panel a la vez. Está separado de
+  `--sx-sunk` a propósito: `--sx-sunk` también pinta los controles de formulario, así que si
+  compartieran token, cambiarle el color al encabezado le cambiaba el color a los inputs de paso.
+- **`--sx-halo`.** La firma de la dirección: la luz que la barra superior deja caer en vez de una
+  raya (`box-shadow: 0 12px 28px -18px var(--sx-halo)` en `PageHeader`). Deriva del acento al 55 %
+  contra transparente; ligarlo a `transparent` la apaga sin tocar ninguna regla.
+
+### El acento ya no es casi negro
+
+Antes, sin ligar nada, `--sx-accent` resolvía a `--sx-n-900` — casi negro —, con el argumento de
+que un acento sin marca debía ser igual un primario usable. Ese argumento se cae en Nácar por una
+razón mecánica: `--sx-chrome-tint` ya vale el morado de la dirección, así que el mobiliario entero
+sale con esa traza, y un acento casi negro contra un cromo violeta es una dirección desafinada de
+fábrica. El default pasa a ser `#6541BE`, el mismo morado. Sigue siendo un hueco —un producto lo
+llena ligando cuatro propiedades, ver *Ligar el acento*— pero hoy, sin ligar nada, ese hueco no
+desentona con lo que lo rodea.
+
+### `--sx-accent-soft` y `--sx-accent-edge` derivan del acento
+
+Antes eran dos peldaños fijos de la rampa de grises (`--sx-n-100` y `--sx-n-200`). Ahora se
+mezclan con el acento, al 16 % y al 28 % contra blanco:
+
+```css
+--sx-accent-soft: color-mix(in srgb, var(--sx-accent) 16%, #FFFFFF);
+--sx-accent-edge: color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF);
+```
+
+El cambio existe porque el anterior fue el defecto más caro de toda esta reconstrucción:
+veintiún sitios de la librería se habían movido para que un estado interactivo se iluminara en vez
+de ensuciarse, apuntándolos a `--sx-accent-soft` — y como ese token era un gris fijo de la rampa,
+el arreglo no llegaba a hacer efecto. La regla que hay que llevarse: **un estado interactivo se
+pinta con `--sx-accent-soft`, nunca con `--sx-sunk`.** `--sx-sunk` es el fondo en reposo de un
+control; usarlo para un estado da una superficie más sucia, no una que responde.
+
+Por qué 16 % y no el 12 % que se usó en la exploración: en Nácar el cromo ya está teñido con el
+mismo morado del acento, así que sus grises llegan con croma 8 y un tinte al 12 % aterriza casi
+encima — el hover se leía como un gris apenas más oscuro que el de reposo. A 16 % el croma sube a
+20 y el tinte despega.
+
+### `--sx-line` y `--sx-edge` hacen dos trabajos distintos
+
+Éste es el error que este trabajo corrigió, y el que más fácil se vuelve a cometer: separar filas
+y delimitar un control no son el mismo trabajo, aunque compartieran token en la dirección anterior.
+
+- **`--sx-line`** separa — cierra una cabecera, divide una fila de la siguiente. Es *ambiente*:
+  puede ser tan tenue como haga falta, no hay requisito de contraste para una separación
+  decorativa.
+- **`--sx-edge`** delimita — es el borde de un `Field`, de un `Input`, de cualquier control. Dice
+  dónde se puede escribir. Eso es información, no decoración, y por eso tiene que dar **al menos
+  3:1** contra la superficie sobre la que se dibuja (WCAG 1.4.11).
+
+Compartir token fue el defecto: en A, donde `--sx-edge` colgaba del mismo peldaño que `--sx-line`,
+el borde de un input daba **1.52:1**. En Nácar `--sx-edge` salta a su propio peldaño de la rampa
+(`--sx-n-400`) en vez de acompañar a `--sx-line`, y hoy da **3.47:1**.
+
+La lección general, no sólo de este par: **una regla que dice `var(--sx-algo)` no dibuja un color,
+dibuja lo que ese token valga donde se lee.** Es el mismo error que costó cuatro intentos en la
+fase de exploración — ahí una regla copiada de Cristal (`background: var(--d-sunk)`) aclaraba una
+fila en una dirección donde `sunk` era blanco translúcido, y oscurecía la misma fila en una
+dirección donde `sunk` era un gris opaco. Verificar quiere decir resolver el valor final y comparar
+números, no mirar el nombre de la variable y confiar en que suene razonable.
+
+### La verificación
+
+`npm run contrast` es parte de la verificación, no un extra: resuelve cada token a color real y
+mide el contraste, en vez de confiar en que el nombre de la variable sea razonable. Corre el
+contrato duro (`--sx-edge` contra superficie y fondo, `--sx-ink`/`-2`/`-3`, la tinta sobre el
+acento, cada tono sobre su banda) y además informa —sin romper el build— el filo de cada tono y los
+dos derivados del acento, `--sx-accent-soft` y `--sx-accent-edge`. Esos dos quedan fuera del
+contrato duro a propósito: WCAG 1.4.11 pide 3:1 para el límite que hace falta para **identificar**
+un componente, y ni el filo de una insignia ya seleccionada ni un hover de fila identifican nada
+por sí solos — eso lo hacen la banda, la marca y la palabra (`Pill.svelte`), no el filo. El
+argumento completo vive en `scripts/contrast.mjs`.
+
+Sumale las siete páginas del catálogo a 1200 y 390 px: `npm run contrast` prueba que un color
+exista con el contraste que promete; no prueba que la pieza se vea bien. Las dos verificaciones son
+necesarias y ninguna reemplaza a la otra.
 
 ---
 
@@ -167,9 +328,12 @@ es todo lo que un producto liga — **una vez, en su raíz**:
 ligadura es correcta en los dos temas —un tinte en claro, una sombra en oscuro— sin escribir el
 bloque dos veces.
 
-**Sin ligar nada**, el acento resuelve a `--sx-n-900` (la tinta más profunda de la rampa neutra),
-que es un primario usable de verdad y no un hueco vacío esperando configuración. Un producto que
-no tiene marca todavía no tiene que hacer nada.
+**Sin ligar nada**, el acento resuelve a `#6541BE`, el morado de Nácar — no a `--sx-n-900` como
+en la dirección anterior. La razón es mecánica, no estética: `--sx-chrome-tint` ya vale ese mismo
+morado, así que el mobiliario entero sale con su traza, y un acento casi negro contra un cromo
+violeta es una dirección desafinada de fábrica. Sigue siendo un hueco vacío que un producto llena
+ligando las cuatro propiedades de arriba; lo que cambió es que hoy, sin ligar nada, ese hueco no
+desentona con lo que lo rodea. Un producto que no tiene marca todavía no tiene que hacer nada.
 
 El interruptor de la portada del catálogo hace exactamente esto y nada más: escribe cuatro
 propiedades en `<html>`. Todo lo demás —botones, filas seleccionadas, switches, barras de
@@ -295,6 +459,34 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
 - **Nada está probado automáticamente.** No hay tests. La verificación de este repo es mirar las
   siete páginas en los dos temas a 1200 y a 390 px, que es exactamente lo que hay que rehacer
   después de tocar algo.
+
+### Deuda de Nácar
+
+- **El modo oscuro de Nácar no existe.** `TOKENS_DARK` sigue siendo el oscuro de A —no se tocó, no
+  se declara compatible— y no se puede derivar de los valores claros: Nácar es una dirección de
+  luz (blanco, sombra suave, halo), y su versión oscura hay que diseñarla, no calcularla desde
+  ésta.
+- **El bloque `.tbl` de Nácar está generado, no vinculado.** `explore/pages/Tablas.svelte` copia
+  los 59 tokens de `[data-d='Z']` por valor y los acota a `[data-d='AD'] .tbl`. Si `Z` cambia, este
+  bloque queda desactualizado y nada lo avisa.
+- **Los filos de tono (`--sx-positive-edge` y compañía) dan ~1.5:1**, y junto con
+  `--sx-accent-edge` (1.56:1) y `--sx-accent-soft` (1.28:1) quedan fuera del contrato duro a
+  propósito. El argumento —WCAG 1.4.11 pide 3:1 para el límite que hace falta para *identificar*
+  un componente, y ni un hover ni el filo de una insignia ya seleccionada identifican nada por sí
+  solos, eso lo hacen la banda, la marca y la palabra— está escrito en `scripts/contrast.mjs` y se
+  informa en `npm run contrast` sin romper el build.
+- **El comentario de `--sx-accent-soft` en `tokens.js` cita una «distancia»** (16/21/27) calculada
+  con una métrica ad hoc —una media de diferencias por canal contra blanco— que ningún método
+  estándar reproduce. El croma sí es exacto (15/20/25, medido). Falta declarar el método de esa
+  distancia o borrar la cifra.
+- **`--sx-n-100` y `--sx-n-200` quedaron sin ningún consumidor**, desde que `--sx-neutral` se fijó
+  a hex y `--sx-accent-soft`/`-edge` pasaron a derivar del acento en vez de usarlos. Es higiene, no
+  un defecto: la rampa se mantiene completa a propósito, para que un producto que la necesite
+  entera la tenga.
+- **La verificación visual de las siete páginas, a 1200 y 390 px, todavía no la hizo una persona.**
+  Es la única parte del criterio de terminado que ningún script cubre — `npm run contrast` prueba
+  que un color exista con el contraste que promete, no que la tabla, el panel o el formulario se
+  vean bien.
 
 ### Sin resolver
 
