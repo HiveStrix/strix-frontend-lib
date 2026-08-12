@@ -456,7 +456,34 @@ const DISTINCT = [
   // la que se descartó --accent-pick al elegir la fórmula. Esta fila deja
   // eso medido para que nadie retinte --card-fill a -pick sin que nada
   // avise.
-  ['--sx-accent-soft', '--sx-accent-pick', 'Card variant="filled" contra "seleccionado": el relleno no puede leerse como fila elegida']
+  ['--sx-accent-soft', '--sx-accent-pick', 'Card variant="filled" contra "seleccionado": el relleno no puede leerse como fila elegida'],
+  // OCTAVA EXTENSIÓN DEL ARNÉS. El mismo patrón por tercera vez: --sx-e-inset
+  // no significa lo mismo donde se pega. En claro, Button.svelte lo pinta
+  // sobre --sx-accent/--sx-critical PLENOS (oscuros) y separa de sobra
+  // (5.55–5.91, ver el comentario en Card.svelte). En oscuro esos dos tokens
+  // se aclaran — son el lavado, con tinta casi negra encima — y el mismo 5%
+  // de blanco sobre un color YA casi blanco medía 1.026–1.036: por debajo
+  // del piso, y confirmado en pantalla (catálogo, Acciones, tema oscuro): la
+  // esquina superior es un relleno plano, sin traza de reflejo. Anotado y no
+  // tocado una vez (Toast: `624e58d`); acá se tocó: Button.svelte suma
+  // `--btn-inset`, un token PROPIO del componente (mismo patrón que
+  // `--card-crest-line`) que sólo se re-liga bajo `[data-sx-theme="dark"]` —
+  // --sx-e-inset compartido sigue intacto, porque en claro (acá) y en Toast
+  // oscuro sigue trabajando. Las dos filas de abajo miden la fórmula que
+  // `--btn-inset` usa en OSCURO (20% de blanco): 1.108 (acento) y 1.152
+  // (crítico), el mismo orden que la arista de `crest` (1.12–1.18) y el
+  // reflejo oscuro de Toast (1.16–1.17) — no un número al azar, el mismo
+  // rango que este repo ya aceptó dos veces para «una luz leída de cerca,
+  // no un foco». La fórmula corre igual contra el tema CLARO (1.43–1.57,
+  // arriba también) porque `DISTINCT` no distingue qué CSS custom property
+  // vive detrás de cada fila — no es lo que Button dibuja en claro (ahí
+  // sigue siendo --sx-e-inset al 90%, sin cambios), es una lectura de la
+  // MISMA fórmula contra el acento/crítico claros, y pasa con margen de
+  // sobra: no hay combinación en la que este par pueda fallar sin que
+  // --btn-inset en oscuro ya se haya roto primero, que es exactamente lo
+  // que una guarda de regresión tiene que hacer.
+  ['color-mix(in srgb, #FFFFFF 20%, var(--sx-accent))', '--sx-accent', 'Button: --btn-inset (oscuro) contra --sx-accent'],
+  ['color-mix(in srgb, #FFFFFF 20%, var(--sx-critical))', '--sx-critical', 'Button: --btn-inset (oscuro) contra --sx-critical']
 ];
 
 // EL UMBRAL. WCAG no cubre este eje —no hay un piso que copiar— así que sale

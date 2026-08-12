@@ -225,7 +225,7 @@
   .solid {
     background: var(--sx-accent);
     color: var(--sx-accent-ink);
-    box-shadow: var(--sx-e-inset), var(--sx-e-1);
+    box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-1);
   }
   .outline {
     background: var(--sx-surface);
@@ -243,7 +243,7 @@
   .danger {
     background: var(--sx-critical);
     color: var(--sx-ink-on);
-    box-shadow: var(--sx-e-inset), var(--sx-e-1);
+    box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-1);
   }
 
   /* ── Hover ──────────────────────────────────────────────────────────────
@@ -255,7 +255,7 @@
     .solid:not(:disabled):not(.locked):hover,
     .danger:not(:disabled):not(.locked):hover {
       transform: translateY(-1px);
-      box-shadow: var(--sx-e-inset), var(--sx-e-2);
+      box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-2);
     }
     /* --sx-sunk aquí es el mismo bug que en Table/Tabs/Menu: bajo el cursor
        un botón secundario se ilumina, no se hunde en gris. */
@@ -271,8 +271,30 @@
 
   .sx-btn:not(:disabled):not(.locked):active { transform: none; }
   .solid:not(:disabled):not(.locked):active,
-  .danger:not(:disabled):not(.locked):active { box-shadow: var(--sx-e-inset), var(--sx-e-1); }
+  .danger:not(:disabled):not(.locked):active { box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-1); }
   .outline:not(:disabled):not(.locked):active { box-shadow: var(--sx-e-1); }
+
+  /* EN OSCURO, --sx-accent Y --sx-critical SON PÁLIDOS (texto casi negro
+     encima) — no oscuros como en claro. --sx-e-inset ahí es 5 % de blanco
+     sobre un color YA casi blanco: medido, 1.026–1.036 contra el piso de
+     distinguibilidad de este repo (1.05), y visto en el catálogo (`Acciones`,
+     tema oscuro, zoom) el borde superior es un relleno plano sin traza de
+     reflejo — no un caso límite, un cero real. --sx-e-inset SIGUE SIN
+     TOCARSE: Button en claro (5.55–5.91) y Toast en oscuro (1.16–1.17) lo
+     usan y ahí sí trabaja — la misma lección de `Card crest` otra vez, un
+     valor compartido no significa lo mismo en cada superficie donde se pega.
+     `--btn-inset` es el token PROPIO de este componente, con el MISMO
+     mecanismo (blanco arriba, en la sombra) y más opacidad — la única
+     variable con margen para moverse cuando el fondo ya es pálido. .20
+     mide 1.11 (acento) y 1.15 (crítico), el mismo orden que el filo de
+     `crest` (1.12–1.18) y el reflejo oscuro de Toast (1.16–1.17) — ver el
+     par nuevo en `scripts/contrast.mjs`. */
+  :global([data-sx-theme='dark']) .sx-btn.solid,
+  :global(.sx-dark) .sx-btn.solid,
+  :global([data-sx-theme='dark']) .sx-btn.danger,
+  :global(.sx-dark) .sx-btn.danger {
+    --btn-inset: inset 0 1px 0 rgba(255, 255, 255, .2);
+  }
 
   /* ── Focus ──────────────────────────────────────────────────────────────
      Declared here and not inherited: base.css is a document stylesheet and a
