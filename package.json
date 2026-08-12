@@ -3,19 +3,61 @@
   "version": "0.1.0",
   "description": "El sistema de diseño de Strix: tokens y componentes Svelte para todos los frontends del ecosistema.",
   "type": "module",
+  "private": true,
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SantiagoHiveStrix/strix-frontend-example.git"
+  },
+  "files": [
+    "src/lib"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
-    ".": "./src/lib/index.js",
+    ".": {
+      "svelte": "./src/lib/index.js",
+      "default": "./src/lib/index.js"
+    },
     "./tokens.css": "./src/lib/tokens.css",
     "./base.css": "./src/lib/base.css",
-    "./tokens": "./src/lib/tokens.js",
-    "./marks": "./src/lib/marks.js",
-    "./shell": "./src/lib/shell/index.js",
-    "./action": "./src/lib/action/index.js",
-    "./form": "./src/lib/form/index.js",
-    "./nav": "./src/lib/nav/index.js",
-    "./data": "./src/lib/data/index.js",
-    "./feedback": "./src/lib/feedback/index.js",
-    "./metric": "./src/lib/metric/index.js"
+    "./tokens": {
+      "svelte": "./src/lib/tokens.js",
+      "default": "./src/lib/tokens.js"
+    },
+    "./marks": {
+      "svelte": "./src/lib/marks.js",
+      "default": "./src/lib/marks.js"
+    },
+    "./shell": {
+      "svelte": "./src/lib/shell/index.js",
+      "default": "./src/lib/shell/index.js"
+    },
+    "./action": {
+      "svelte": "./src/lib/action/index.js",
+      "default": "./src/lib/action/index.js"
+    },
+    "./form": {
+      "svelte": "./src/lib/form/index.js",
+      "default": "./src/lib/form/index.js"
+    },
+    "./nav": {
+      "svelte": "./src/lib/nav/index.js",
+      "default": "./src/lib/nav/index.js"
+    },
+    "./data": {
+      "svelte": "./src/lib/data/index.js",
+      "default": "./src/lib/data/index.js"
+    },
+    "./feedback": {
+      "svelte": "./src/lib/feedback/index.js",
+      "default": "./src/lib/feedback/index.js"
+    },
+    "./metric": {
+      "svelte": "./src/lib/metric/index.js",
+      "default": "./src/lib/metric/index.js"
+    }
   },
   "scripts": {
     "dev": "vite",
