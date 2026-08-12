@@ -162,30 +162,43 @@ fábrica. El default pasa a ser `#6541BE`, el mismo morado. Sigue siendo un huec
 llena ligando cuatro propiedades, ver *Ligar el acento*— pero hoy, sin ligar nada, ese hueco no
 desentona con lo que lo rodea.
 
-### `--sx-accent-soft` y `--sx-accent-edge` derivan del acento
+### `--sx-accent-soft`, `--sx-accent-pick` y `--sx-accent-edge` derivan del acento
 
-Antes eran dos peldaños fijos de la rampa de grises (`--sx-n-100` y `--sx-n-200`). Ahora se
-mezclan con el acento, al 10 % y al 28 % contra blanco:
+Antes `--sx-accent-soft` y `--sx-accent-edge` eran dos peldaños fijos de la rampa de grises
+(`--sx-n-100` y `--sx-n-200`). Hoy los tres se mezclan con el acento, contra blanco:
 
 ```css
 --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF);
+--sx-accent-pick: color-mix(in srgb, var(--sx-accent) 18%, #FFFFFF);
 --sx-accent-edge: color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF);
 ```
 
-El cambio existe porque el anterior fue el defecto más caro de toda esta reconstrucción:
-veintiún sitios de la librería se habían movido para que un estado interactivo se iluminara en vez
-de ensuciarse, apuntándolos a `--sx-accent-soft` — y como ese token era un gris fijo de la rampa,
-el arreglo no llegaba a hacer efecto. La regla que hay que llevarse: **un estado interactivo se
-pinta con `--sx-accent-soft`, nunca con `--sx-sunk`.** `--sx-sunk` es el fondo en reposo de un
-control; usarlo para un estado da una superficie más sucia, no una que responde.
+El cambio de `--sx-accent-soft`/`-edge` existe porque el anterior fue el defecto más caro de toda
+esta reconstrucción: veintiún sitios de la librería se habían movido para que un estado interactivo
+se iluminara en vez de ensuciarse, apuntándolos a `--sx-accent-soft` — y como ese token era un gris
+fijo de la rampa, el arreglo no llegaba a hacer efecto. La regla que hay que llevarse: **un estado
+interactivo se pinta con `--sx-accent-soft`, nunca con `--sx-sunk`.** `--sx-sunk` es el fondo en
+reposo de un control; usarlo para un estado da una superficie más sucia, no una que responde.
 
-Por qué 10 % y no 16 %: `--sx-accent-soft` hacía dos trabajos, el hover Y «seleccionado», y para
-que el hover despegara tenía que gritar — a 16 % eso se comía el contraste de lo que se dibuja
-ENCIMA del estado (`--sx-edge` daba 2.71:1, por debajo del piso de 3.0). Desde esta ronda,
-«seleccionado» se dice con un anillo de acento pleno (`Table`, `SideRail`) y `--sx-accent-soft`
-queda sólo con el hover, que es pasajero y no necesita gritar. A 10 % pasa el contrato en las dos
-configuraciones de `--sx-chrome-tint`: `--sx-edge` sobre `--sx-accent-soft` da 3.46:1 con el morado
-por defecto y 3.24:1 con la perilla en un neutro.
+**La distinción que separa `--sx-accent-soft` de `--sx-accent-pick` es PASAJERO contra
+PERSISTENTE, no «cualquier estado interactivo».** `--sx-accent-soft` es lo que dura mientras el
+puntero está encima o el foco está puesto — hover, focus. `--sx-accent-pick` es lo que queda
+cuando el usuario ya eligió algo — una fila seleccionada en `Table`, un ítem activo en `SideRail`.
+Es el error que más fácil se repite en este sistema, y ya se cometió dos veces: primero los dos
+estados compartieron `--sx-accent-soft` y una fila elegida se volvía indistinguible de la fila de
+al lado bajo el cursor; el arreglo de esa ronda separó «seleccionado» a un anillo de acento pleno
+en vez de a un segundo relleno, y un anillo alrededor de una fila de tabla no se lee como
+highlight — se lee como un marco. La salida son dos rellenos, uno por cada duración de estado.
+
+Por qué 10 % y 18 %, en los dos casos por la misma razón: cada uno tiene que despegarse del otro Y
+aguantar lo que se dibuja ENCIMA. `--sx-accent-soft` a 16 % — cuando todavía hacía los dos
+trabajos — le daba a `--sx-edge` 2.71:1, por debajo del piso de 3.0; a 10 %, sólo con el hover y el
+focus, `--sx-edge` sobre `--sx-accent-soft` da hoy **3.84:1** con el morado por defecto y **3.59:1**
+con la perilla en un neutro. `--sx-accent-pick` a 20 % hace caer `--sx-ink-3` a 4.45:1, por debajo
+de AA con la perilla en un neutro; a 18 % — el último escalón que aguanta las dos configuraciones —
+`--sx-edge` sobre `--sx-accent-pick` da **3.38:1** morado / **3.16:1** gris, y `--sx-ink-3` da
+**4.94:1** morado / **4.60:1** gris. `npm run contrast` mide las dos superficies para los tres
+tokens que se dibujan encima (`--sx-edge`, `--sx-ink-2`, `--sx-ink-3`).
 
 ### `--sx-line` y `--sx-edge` hacen dos trabajos distintos
 
@@ -201,13 +214,15 @@ y delimitar un control no son el mismo trabajo, aunque compartieran token en la 
 
 Compartir token fue el defecto: en A, donde `--sx-edge` colgaba del mismo peldaño que `--sx-line`,
 el borde de un input daba **1.52:1**. En Nácar `--sx-edge` salta a su propio peldaño de la rampa
-(`--sx-n-400`) en vez de acompañar a `--sx-line`, y hoy da **4.03:1** contra blanco con la perilla
-en el morado por defecto (**3.77:1** con la perilla en un neutro).
+(`--sx-n-400`) en vez de acompañar a `--sx-line`, y hoy da **4.47:1** contra blanco con la perilla
+en el morado por defecto (**4.18:1** con la perilla en un neutro).
 
-Un borde tiene dos lados, y el segundo casi se escapa: un control en hover, o un checkbox dentro de
-una fila seleccionada, tiene su borde rodeado de `--sx-accent-soft` por los dos lados, no de blanco.
-`--sx-n-400` está calibrado para aguantar también esa configuración —**3.46:1** morado / **3.24:1**
-gris— y `npm run contrast` mide las dos, no sólo la de superficie.
+Un borde tiene dos lados, y el segundo casi se escapa: un control en hover tiene su borde rodeado
+de `--sx-accent-soft` por los dos lados, no de blanco; un checkbox dentro de una fila *seleccionada*
+tiene el suyo rodeado de `--sx-accent-pick`, que es más fuerte todavía. `--sx-n-400` está calibrado
+para aguantar las dos — **3.84:1** morado / **3.59:1** gris contra `--sx-accent-soft`, **3.38:1**
+morado / **3.16:1** gris contra `--sx-accent-pick` — y `npm run contrast` mide las tres superficies,
+no sólo la de reposo.
 
 La lección general, no sólo de este par: **una regla que dice `var(--sx-algo)` no dibuja un color,
 dibuja lo que ese token valga donde se lee.** Es el mismo error que costó cuatro intentos en la
@@ -220,11 +235,13 @@ números, no mirar el nombre de la variable y confiar en que suene razonable.
 
 `npm run contrast` es parte de la verificación, no un extra: resuelve cada token a color real y
 mide el contraste, en vez de confiar en que el nombre de la variable sea razonable. Corre el
-contrato duro (`--sx-edge` contra superficie, fondo Y `--sx-accent-soft` —un borde tiene dos
-lados—, `--sx-ink`/`-2`/`-3` contra superficie y `--sx-ink-2`/`-3` contra `--sx-accent-soft` —el
-texto que se dibuja encima de un estado—, la tinta sobre el acento, cada tono sobre su banda) y
+contrato duro (`--sx-edge` contra superficie, fondo, `--sx-accent-soft` Y `--sx-accent-pick` —un
+borde tiene dos lados, y dos estados distintos rodeándolo—, `--sx-ink`/`-2`/`-3` contra superficie
+y `--sx-ink-2`/`-3` contra `--sx-accent-soft` Y `--sx-accent-pick` —el texto que se dibuja encima
+de un estado pasajero o de uno persistente—, la tinta sobre el acento, cada tono sobre su banda) y
 además informa —sin romper el build— el filo de cada tono, `--sx-thead` contra la tarjeta,
-`--sx-accent-edge` y el acento pleno que sostiene el anillo de selección. El filo de tono y
+`--sx-accent-edge` y el acento pleno que sostiene el anillo de selección en `Card` y
+`ChoiceCards`. El filo de tono y
 `--sx-accent-edge` quedan fuera del contrato duro a propósito: WCAG 1.4.11 pide 3:1 para el límite
 que hace falta para **identificar** un componente, y ni el filo de una insignia ya seleccionada ni
 un hover de fila identifican nada por sí solos — eso lo hacen la banda, la marca y la palabra
@@ -339,6 +356,12 @@ es todo lo que un producto liga — **una vez, en su raíz**:
 acento sin ligar de la librería: es la receta de Nácar, una dirección de luz sobre blanco, no una
 fórmula que se re-liga sola en oscuro. Un producto con tema oscuro tiene que declarar su propio
 bloque de estas cuatro variables bajo `[data-sx-theme="dark"]` — ver *Deuda de Nácar*.
+
+Hay un quinto derivado que casi nunca hace falta tocar: `--sx-accent-pick`, el relleno de
+selección persistente (18 % contra blanco). Se deriva de `--sx-accent` con la misma fórmula que
+`soft` y `edge`, así que **una fila seleccionada ya toma el color de marca sin que el producto
+declare nada** — ver el interruptor del catálogo más abajo. Sólo hace falta declararlo si el
+producto quiere un ratio distinto del 18 % por defecto, igual que con `soft` y `edge`.
 
 **Sin ligar nada**, el acento resuelve a `#6541BE`, el morado de Nácar — no a `--sx-n-900` como
 en la dirección anterior. La razón es mecánica, no estética: `--sx-chrome-tint` ya vale ese mismo
@@ -488,10 +511,10 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   1.4.11 pide 3:1 para el límite que hace falta para *identificar* un componente, y ni el filo de
   una insignia ya seleccionada identifica nada por sí solo, eso lo hacen la banda, la marca y la
   palabra— está escrito en `scripts/contrast.mjs` y se informa en `npm run contrast` sin romper el
-  build. `--sx-accent-soft` ya no es uno de estos: desde la última ronda de arreglos, `--sx-edge` y
-  `--sx-ink-2`/`-3` medidos SOBRE `--sx-accent-soft` —un borde y un texto tienen que aguantar el
-  fondo del estado en el que se dibujan, no sólo la superficie en reposo— sí están en el contrato
-  duro.
+  build. `--sx-accent-soft` y `--sx-accent-pick` ya no son uno de estos: `--sx-edge` y
+  `--sx-ink-2`/`-3` medidos SOBRE los dos —un borde y un texto tienen que aguantar el fondo del
+  estado en el que se dibujan, sea pasajero o persistente, no sólo la superficie en reposo— sí
+  están en el contrato duro.
 - **`--sx-n-100` y `--sx-n-200` quedaron sin ningún consumidor**, desde que `--sx-neutral` se fijó
   a hex y `--sx-accent-soft`/`-edge` pasaron a derivar del acento en vez de usarlos. Es higiene, no
   un defecto: la rampa se mantiene completa a propósito, para que un producto que la necesite
