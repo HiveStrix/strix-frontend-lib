@@ -25,6 +25,10 @@
   // can paste into a ticket.
   import { onMount, tick } from 'svelte';
   import Pill from '../lib/Pill.svelte';
+  // «Lo último que entró» sale del propio historial de git, no de una lista
+  // escrita a mano — ver scripts/novelties.mjs. Una lista a mano se
+  // desactualiza en dos semanas y miente, que es peor que no tenerla.
+  import { novelties } from 'virtual:sx-novelties';
 
   import Superficies from './pages/Superficies.svelte';
   import Acciones from './pages/Acciones.svelte';
@@ -181,6 +185,18 @@
     root.setProperty('--sx-accent-ink', b.ink);
     root.setProperty('--sx-accent-soft', `color-mix(in srgb, ${b.hex} 10%, #FFFFFF)`);
     root.setProperty('--sx-accent-edge', `color-mix(in srgb, ${b.hex} 28%, #FFFFFF)`);
+  }
+
+  // ── Novedades ────────────────────────────────────────────────────────────
+  // La marca de tiempo va con cada nombre para que la lista nunca reclame
+  // más de lo que es: si algo lleva semanas ahí, «hace 3 semanas» lo dice, en
+  // vez de dejar que «lo último» se lea como «lo de hoy» sin serlo.
+  function hace(ts) {
+    const s = Date.now() / 1000 - ts;
+    if (s < 3600) return `hace ${Math.max(1, Math.round(s / 60))} min`;
+    if (s < 86400) return `hace ${Math.round(s / 3600)} h`;
+    const d = Math.round(s / 86400);
+    return d === 1 ? 'hace 1 día' : `hace ${d} días`;
   }
 
   // Written as a string constant rather than inline in the markup: the snippet
@@ -380,6 +396,23 @@
           </p>
         </div>
       </section>
+
+      <!-- ── Lo último que entró ───────────────────────────────────────────
+           Se arma sola: `virtual:sx-novelties` lee qué archivo de componente
+           nació hace poco (ver scripts/novelties.mjs) y no de una lista que
+           alguien tiene que acordarse de actualizar. Por eso, si nada nació
+           hace poco, la sección entera desaparece en vez de mentir con una
+           lista vacía o repetida. -->
+      {#if novelties.length}
+        <section class="whatsnew" aria-labelledby="whatsnew-h">
+          <p class="sx-cap" id="whatsnew-h">Lo último que entró a la librería</p>
+          <ul class="newlist">
+            {#each novelties as n (n.href)}
+              <li><a href={n.href}><span class="nn">{n.name}</span><span class="nt">{hace(n.ts)}</span></a></li>
+            {/each}
+          </ul>
+        </section>
+      {/if}
 
       <!-- ── Las tres reglas ────────────────────────────────────────────── -->
       <section class="rules" aria-labelledby="reglas">
@@ -676,6 +709,26 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     color: var(--sx-ink-2);
     max-width: 74ch;
   }
+
+  /* ── Lo último que entró ─────────────────────────────────────────────── */
+  .whatsnew { display: flex; flex-direction: column; gap: var(--sx-s-3); }
+  .newlist { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sx-s-2); }
+  .newlist a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--sx-s-2);
+    padding: var(--sx-s-2) var(--sx-s-4);
+    background: var(--sx-surface);
+    border-radius: var(--sx-r-pill);
+    box-shadow: var(--sx-e-1);
+    color: var(--sx-ink);
+    text-decoration: none;
+    transition: box-shadow var(--sx-fast) var(--sx-ease), transform var(--sx-fast) var(--sx-ease);
+  }
+  .newlist a:hover { box-shadow: var(--sx-e-2); transform: translateY(-1px); }
+  .newlist a:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
+  .nn { font-size: var(--sx-t-sm); font-weight: var(--sx-w-semi); }
+  .nt { font-size: var(--sx-t-xs); color: var(--sx-ink-3); }
 
   /* ── Las reglas ───────────────────────────────────────────────────────── */
   h2 {

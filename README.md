@@ -660,6 +660,12 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   propia cabecera dice que es para las secciones de una app entre las que alguien navega todo el
   día, no para saltar dentro de un documento largo —, así que hace falta un componente nuevo
   (`PageIndex` o similar) el día que esto tenga que crecer a una octava página.
+- **«Lo último que entró» en la portada se deriva de git, no de una lista a mano** —
+  `scripts/novelties.mjs` busca qué archivo de componente nació hace poco, filtrando el commit que
+  los trajo a todos juntos (`--diff-filter=A --follow`, agrupado por cuántos archivos comparten
+  cada marca de tiempo). Lo que no ve: una prop nueva en un componente que ya existía —`tone` en
+  `Card`, las variantes de `Card` y `PageHeader`— porque eso no crea un archivo nuevo. Ningún
+  heurístico barato distingue con confianza «se agregó una prop» de «se corrigió una».
 - **Nada está probado automáticamente.** No hay tests. La verificación de este repo es mirar las
   siete páginas en los dos temas a 1200 y a 390 px, que es exactamente lo que hay que rehacer
   después de tocar algo.
