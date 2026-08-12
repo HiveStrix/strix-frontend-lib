@@ -395,6 +395,57 @@
             <p class="cl">12 días sin cerrar «Cambio de aceite 250 h». El canto de arriba es el único color nuevo en esta tarjeta — la palabra la dice el Pill.</p>
           </Panel>
         </div>
+
+        <h3 class="sx-cap sub">variant — reenviado a Card, medido acá</h3>
+        <p class="why">
+          <span class="sx-id">variant</span> (de <span class="sx-id">Card</span>) también reenvía,
+          sin listarse entre los props de este componente a propósito —
+          <span class="sx-id">$$restProps</span> lo lleva igual que <span class="sx-id">href</span>
+          o <span class="sx-id">interactive</span>. <span class="sx-id">crest</span> ya estaba medido:
+          el anillo vive en la Card exterior, independiente de <span class="sx-id">.head</span>.
+          <span class="sx-id">filled</span> no lo estaba — su cabecera del catálogo, hasta hoy, decía
+          que nadie había medido <span class="sx-id">--sx-thead</span> contra el relleno nuevo de
+          <span class="sx-id">--card-fill</span>. Es exactamente el par que el arnés ya mide con otro
+          nombre: <span class="sx-id">--card-fill</span> es <span class="sx-id">var(--sx-accent-soft)</span>
+          tal cual, y la fila <i>«cabecera contra el hover de su control»</i> de
+          <span class="sx-id">DISTINCT</span> ya compara <span class="sx-id">--sx-thead</span> contra
+          <span class="sx-id">--sx-accent-soft</span> en las cuatro combinaciones. El peor caso —claro,
+          cromo morado, el que este catálogo pinta por defecto— da 1.06:1: pasa el piso de 1.05, con
+          menos margen que el que <span class="sx-id">crest</span> tenía cuando medía 1.12 y no se veía
+          nada. Por eso la banda de acá abajo no se da por buena sólo con el número: la línea que seguía
+          se sacó mirando esta misma tarjeta en pantalla, en las cuatro combinaciones.
+        </p>
+
+        <div class="demo two-up">
+          <Panel title="Servicios" sub="raised — el default" icon="clipboard" level={3}>
+            <svelte:fragment slot="actions">
+              <Button size="sm" variant="ghost">Exportar CSV</Button>
+            </svelte:fragment>
+            <Stack gap={2}>
+              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
+              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
+            </Stack>
+          </Panel>
+
+          <Panel title="Servicios" sub="filled — el relleno con acento" icon="clipboard" level={3} variant="filled">
+            <svelte:fragment slot="actions">
+              <Button size="sm" variant="ghost">Exportar CSV</Button>
+            </svelte:fragment>
+            <Stack gap={2}>
+              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
+              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
+            </Stack>
+          </Panel>
+        </div>
+
+        <p class="note">
+          <b>Medido, no sólo calculado.</b> La banda superior se sigue leyendo como una pieza posada
+          sobre el relleno en las dos combinaciones de tema y las dos de cromo — el mismo veredicto que
+          el número. Queda como verificado en <span class="sx-id">Panel.svelte</span>: no hizo falta una
+          fila nueva en <span class="sx-id">DISTINCT</span> —la que ya medía «cabecera contra el hover
+          de su control» es, token por token, esta misma comparación— así que lo que cambió fue su
+          comentario, para que diga las dos cosas que mide.
+        </p>
       </section>
 
       <!-- ═══ WELL ═══════════════════════════════════════════════════════ -->

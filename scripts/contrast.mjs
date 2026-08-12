@@ -404,7 +404,20 @@ const DISTINCT = [
   // y el primer valor elegido quedó por debajo de este mismo piso — nadie se dio
   // cuenta porque el par no estaba acá. Ahora está.
   ['--sx-surface', '--sx-ground', 'la superficie contra el campo'],
-  ['--sx-thead', '--sx-accent-soft', 'cabecera contra el hover de su control'],
+  // SEGUNDO NOMBRE, MISMO PAR. Nació por `Table.svelte`'s `.sortbtn` (el
+  // hover de un botón de orden pintado sobre la cabecera de la tabla), pero
+  // es TOKEN POR TOKEN la misma comprobación que `Panel variant="filled"`
+  // necesitaba: `--card-fill` (Card.svelte) es `var(--sx-accent-soft)` sin
+  // modificar, así que la banda de `.head`/`.foot` de un Panel relleno
+  // separa contra exactamente este valor. No se agregó una fila nueva para
+  // Panel — el mismo argumento que ya sostiene el anillo de `crest` más
+  // abajo, «no hace falta una fila nueva para una variante que reusa el
+  // token tal cual» — así que esta fila ahora es la que deja verificado a
+  // los dos: el hover de Table Y el `filled` de Panel/Card. Peor caso: 1.06
+  // en claro/cromo morado (el default del catálogo) — visto en pantalla en
+  // `Superficies` → Panel → variant, no sólo calculado (ver el comentario en
+  // Panel.svelte).
+  ['--sx-thead', '--sx-accent-soft', 'cabecera contra el hover de su control — y contra Panel/Card variant="filled"'],
   ['--sx-thead', '--sx-surface', 'la banda contra la tarjeta'],
   ['--sx-accent-soft', '--sx-accent-pick', 'pasajero contra persistente'],
   ['--sx-accent-soft', '--sx-surface', 'el hover contra el reposo'],

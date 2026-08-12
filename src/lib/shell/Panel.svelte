@@ -34,10 +34,22 @@
   // carries it straight to the Card underneath, the same way it already
   // carries `href` or `interactive`. `<Panel variant="crest" …>` is measured
   // and correct — the ring lives on the outer Card, independent of `.head`.
-  // `<Panel variant="filled" …>` is NOT verified: `.head`/`.foot` paint
-  // `--sx-thead`, calibrated against `--sx-surface` (see the note in the
-  // README), and nobody has measured it against `--card-fill` yet. Treat it
-  // as untested, not as broken.
+  //
+  // `<Panel variant="filled" …>` IS NOW VERIFIED, both ways this repo has
+  // learned to insist on. `.head`/`.foot` paint `--sx-thead`, and `filled`
+  // separates `Card` from the field with `--card-fill` — which is
+  // `var(--sx-accent-soft)`, unchanged (`Card.svelte`) — instead of a
+  // shadow. `scripts/contrast.mjs`'s `DISTINCT` class already measured
+  // exactly this pair, under the name «cabecera contra el hover de su
+  // control» (`Table.svelte`'s `.sortbtn`); its comment now says both. Worst
+  // case (claro, cromo morado — the catalogue's own default) is 1.06:1,
+  // thinner margin over the 1.05 floor than `crest`'s ring had at 1.12 when
+  // a person looked at a real screen and saw nothing. Looked at anyway
+  // (`Superficies` → Panel → variant): the band still reads as a piece
+  // sitting on top of the tint in all four theme × chrome combinations —
+  // this pair survives on screen where the ring did not, most likely because
+  // it separates two large flat fields, not a hairline the eye has to hunt
+  // for. See the catalogue demo for the reasoning, in place, not just here.
   //
   // FLUSH is for content that owns the edge: a table, a list of rows, a chart.
   // The head keeps its padding, the body loses its horizontal one, and the
