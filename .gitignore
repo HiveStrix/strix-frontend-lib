@@ -2,3 +2,7 @@ node_modules/
 dist/
 .DS_Store
 *.log
+
+# material de trabajo efímero de los agentes — nunca versionado
+.superpowers/
+.work/
