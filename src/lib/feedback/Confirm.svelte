@@ -33,9 +33,36 @@
   //
   // The destructive button is never focused on open: focus lands on the panel so
   // the loss is read first, and the first tab stop is Cancelar.
+  //
+  // ASKING FOR A REASON. Some actions are not «is this okay» but «okay, why» —
+  // cancelling an open order, overriding a hold. Before this, a product built
+  // that by hand: its own Dialog, its own Textarea, its own wiring between the
+  // two. The shape was already proven; it belongs here.
+  //
+  //   <Confirm
+  //     action="Cancelar la orden" tone="attention" reversible
+  //     reasonLabel="Motivo" reasonRequired bind:reason
+  //     … on:confirm={(e) => cancel(e.detail.reason)} />
+  //
+  // `reasonLabel` is what turns the field on — empty string (the default) and
+  // Confirm looks exactly like it did before this existed. WHETHER a reason is
+  // mandatory is the caller's call, never this component's: `reasonRequired`
+  // says so, and when it is true the commit button stays disabled until there
+  // is text, the same way any other required field in this system blocks a
+  // submit. Validating the CONTENT of the reason — too short, a duplicate, a
+  // word the business forbids — is also the caller's job, and it speaks the
+  // same two-prop dialect as everything else here: `reasonError` says what is
+  // wrong, `reasonFix` says how to fix it, forwarded straight into the
+  // Textarea that already knows how to render that pair. Nothing new invented.
+  //
+  // The field sits AFTER the reassurance line and BEFORE the buttons, because
+  // asking for a reason only makes sense once the person has already read what
+  // they are about to do — it is the last thing between them and the action,
+  // not competition for the loss list's attention.
   import { createEventDispatcher } from 'svelte';
   import Dialog from './Dialog.svelte';
   import Button from '../action/Button.svelte';
+  import Textarea from '../form/Textarea.svelte';
   import { markOf } from '../marks.js';
 
   /** The verb phrase. Titles the dialog and labels the button — same words. */
@@ -56,6 +83,22 @@
   /** Announced while busy. «Eliminando el plan…» — the same verb, in progress. */
   export let busyNote = '';
 
+  /** '' ⇒ no reason field, the component behaves exactly as before. Any other
+   *  string turns it on and labels it — «Motivo», «Por qué se cancela». */
+  export let reasonLabel = '';
+  /** Bindable. What the person typed. */
+  export let reason = '';
+  /** The caller's call, not this component's: does the commit button wait for text? */
+  export let reasonRequired = false;
+  /** Mark the minority — see `reasonRequired`'s own note in Field/Textarea. */
+  export let reasonOptional = false;
+  export let reasonHint = '';
+  export let reasonPlaceholder = '';
+  /** The same two-prop pattern as everywhere else: what's wrong, how to fix it. */
+  export let reasonError = '';
+  export let reasonFix = '';
+  export let reasonRows = 3;
+
   const dispatch = createEventDispatcher();
 
   $: rows = (loses ?? []).map((l) => (typeof l === 'string' ? { text: l } : l));
@@ -68,6 +111,17 @@
   // — an open order being cancelled — so it takes the plain primary and lets the
   // losses list carry the tone, which is where the amber already is.
   $: commitVariant = tone === 'critical' ? 'danger' : 'solid';
+
+  // A required reason with nothing in it blocks the commit the same way a
+  // required Field blocks a form submit elsewhere in this system — not with an
+  // error shown before anyone has done anything wrong, just a button that
+  // will not fire yet.
+  $: reasonMissing = !!reasonLabel && reasonRequired && !(reason ?? '').trim();
+
+  function confirm() {
+    if (busy || reasonMissing) return;
+    dispatch('confirm', { reason });
+  }
 </script>
 
 <Dialog
@@ -77,7 +131,16 @@
   dismissible={!busy}
   on:close={() => dispatch('cancel')}
 >
-  <div class="say">
+  <!-- `tabindex="-1"` + `data-sx-autofocus`: Dialog auto-focuses the first
+       input/select/textarea it finds in the panel, which is the right default
+       everywhere else but wrong here — this component's whole argument is that
+       the loss gets read before anything else gets focus. Without this, adding
+       the reason Textarea below would have handed it the opening focus instead
+       of the panel, and the destructive button would have moved one Tab closer
+       for free. `data-sx-autofocus` wins the query Dialog runs on mount, so
+       focus lands here — same place it already landed before this field
+       existed — whether or not a reason is being asked for. -->
+  <div class="say" tabindex="-1" data-sx-autofocus>
     <slot />
 
     {#if rows.length}
@@ -109,6 +172,31 @@
     </p>
   </div>
 
+  <!-- A SIBLING of `.say`, not nested inside it — on purpose. `.say :global(p)`
+       above gives the slotted prose its bottom margin by matching every `p`
+       under `.say`, and Field/Textarea render their own `p.hint`/`p.msg` with
+       their OWN margin (top, not bottom). Nested, the leak would out-specify
+       Field's rule and silently eat the gap between the box and its message.
+       Sitting beside `.say` instead, in the same document position, costs
+       nothing — `data-sx-autofocus` still lives on `.say`, which is still
+       first in the DOM, so the focus behaviour above is unaffected. -->
+  {#if reasonLabel}
+    <div class="reason">
+      <Textarea
+        label={reasonLabel}
+        bind:value={reason}
+        rows={reasonRows}
+        hint={reasonHint}
+        placeholder={reasonPlaceholder}
+        error={reasonError}
+        fix={reasonFix}
+        required={reasonRequired}
+        optional={reasonOptional}
+        disabled={busy}
+      />
+    </div>
+  {/if}
+
   <svelte:fragment slot="foot">
     {#if busy && busyNote}
       <p class="busy-note" role="status">{busyNote}</p>
@@ -116,11 +204,21 @@
     <!-- The way OUT is first, and it is the first tab stop: the destructive
          button is never what focus lands on. `busy` and not `disabled` on the
          commit — a control the browser blurs mid-write drops a keyboard user on
-         <body>, which is the whole argument in Button's own header. -->
+         <body>, which is the whole argument in Button's own header. A required,
+         still-empty reason blocks it with `disabled` + `reason` together
+         instead — Button's own pattern for a control that has to explain why
+         it will not fire yet — so it stays focusable and announced rather than
+         vanishing from the tab order the way a bare `disabled` would. -->
     <Button variant="outline" disabled={busy} on:click={() => dispatch('cancel')}>
       {cancelLabel}
     </Button>
-    <Button variant={commitVariant} busy={busy} on:click={() => dispatch('confirm')}>
+    <Button
+      variant={commitVariant}
+      busy={busy}
+      disabled={reasonMissing}
+      reason={reasonMissing ? 'Escribí un motivo antes de continuar.' : ''}
+      on:click={confirm}
+    >
       {action}
     </Button>
   </svelte:fragment>
@@ -162,6 +260,12 @@
     color: var(--sx-ink-3);
   }
   .back.final { color: var(--sx-ink-2); font-weight: var(--sx-w-medium); }
+
+  /* The one place in this dialog with its own font size and colour: a Field
+     draws its own typography, and re-declaring `.say`'s smaller, dimmer prose
+     onto it would make the one thing the person still has to type look like
+     the least important line in the room. */
+  .reason { margin-top: var(--sx-s-4); font-size: var(--sx-t-md); color: var(--sx-ink); }
 
   .busy-note {
     margin: 0;

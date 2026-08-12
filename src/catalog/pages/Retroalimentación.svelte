@@ -42,6 +42,13 @@
   let asking = '';        // '' | 'plan' | 'order'
   let removing = false;
   let removeTimer;
+  // Cancelar una orden pide motivo. Antes de `reasonLabel`/`reasonRequired`
+  // esto se armaba a mano —un Dialog propio, un Textarea propio, la misma
+  // pareja `error`/`fix` reinventada— y funcionaba, que es exactamente por qué
+  // el hueco se cerró adentro de Confirm en vez de quedar como una receta que
+  // cada producto copia. `cancelReason` vive acá, no en Confirm: quién exige
+  // el motivo y qué hace con el texto es siempre del que llama.
+  let cancelReason = '';
 
   function reallyRemove() {
     removing = true;
@@ -494,6 +501,13 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
         primero, y la primera parada de <b>Tab</b> es Cancelar. Confirmá el primero para ver el estado
         ocupado — mientras escribe, ni Escape ni el scrim descartan.
       </p>
+      <p class="tip">
+        <b>«Cancelar la orden» pide un motivo, y es obligatorio.</b> Es <span class="sx-id">reasonLabel</span> +
+        <span class="sx-id">reasonRequired</span>, no un <span class="sx-id">Dialog</span> más un
+        <span class="sx-id">Textarea</span> armados a mano al lado — eso es justo lo que este par de props
+        reemplaza. «Cancelar la orden» se queda deshabilitado —con el motivo dicho, no callado— hasta que
+        haya texto, y el foco sigue cayendo en el panel al abrir, no en el campo.
+      </p>
     </div>
 
     <div class="code">
@@ -508,6 +522,10 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
       <div><dt class="sx-id">keeps</dt><dd>Lo que <em>no</em> se toca. Decilo cuando sea cierto: el silencio se lee como «se va todo».</dd></div>
       <div><dt class="sx-id">reversible</dt><dd><code>true</code> solo si de verdad se puede revertir desde la interfaz. Cambia la última línea antes del botón.</dd></div>
       <div><dt class="sx-id">busy</dt><dd>La escritura va en camino: los dos botones se congelan y el diálogo se cierra por dentro.</dd></div>
+      <div><dt class="sx-id">reasonLabel</dt><dd>Vacío (el default) ⇒ sin campo. Cualquier otro texto lo prende y lo etiqueta — ver la demo de «Cancelar la orden», abajo.</dd></div>
+      <div><dt class="sx-id">reasonRequired</dt><dd>Del que llama, nunca del componente. Si es <code>true</code>, «{action}» queda deshabilitado —con su motivo dicho en voz alta, no en silencio— hasta que haya texto.</dd></div>
+      <div><dt class="sx-id">reasonError</dt> · <dt class="sx-id">reasonFix</dt><dd>El mismo par de todo el sistema: qué está mal, cómo se arregla. Se reenvían directo al <span class="sx-id">Textarea</span> de adentro.</dd></div>
+      <div><dt class="sx-id">on:confirm</dt><dd>El detalle trae <code>{'{ reason }'}</code> —vacío si <span class="sx-id">reasonLabel</span> nunca se usó— así que no hace falta leer una segunda variable aparte del evento.</dd></div>
     </dl>
   </section>
 
@@ -1127,11 +1145,16 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
     ]}
     keeps={['El plan sigue corriendo y va a volver a vencer']}
     cancelLabel="Dejarla abierta"
-    on:confirm={() => {
+    reasonLabel="Motivo de la cancelación"
+    reasonRequired
+    reasonHint="Le llega a Jose Leobardo Gonzalez junto con el aviso."
+    bind:reason={cancelReason}
+    on:confirm={(e) => {
       asking = '';
-      push({ tone: 'attention', text: 'OT-0042 quedó cancelada.', action: 'Deshacer' });
+      cancelReason = '';
+      push({ tone: 'attention', text: `OT-0042 quedó cancelada: «${e.detail.reason}».`, action: 'Deshacer' });
     }}
-    on:cancel={() => (asking = '')}
+    on:cancel={() => { asking = ''; cancelReason = ''; }}
   />
 {/if}
 
