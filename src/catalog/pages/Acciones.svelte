@@ -10,7 +10,7 @@
   // Every demo is a real thing from a Costa Rican yard or workshop: BAT014 is a
   // concrete mixer, CL445926 is a HINO truck, PUNT-3M is a shoring post that is
   // never a tracked machine.
-  import { TOKENS_DARK } from '../../lib/tokens.js';
+  import { TOKENS, TOKENS_DARK } from '../../lib/tokens.js';
   import Pill from '../../lib/Pill.svelte';
   import Button from '../../lib/action/Button.svelte';
   import ButtonGroup from '../../lib/action/ButtonGroup.svelte';
@@ -57,6 +57,15 @@
   // the proof is the same values a real product would bind. Both skins, one
   // screen, no toggling back and forth to compare.
   const DARK = Object.entries(TOKENS_DARK).map(([k, v]) => `${k}:${v}`).join(';');
+  // EL «CLARO» NECESITABA SU PROPIA ISLA, Y NO LA TENÍA. Encontrado en el
+  // barrido visual: con el catálogo entero en tema oscuro, el panel «Claro»
+  // no llevaba ningún token propio — heredaba lo que hubiera alrededor, que
+  // ya era oscuro — así que las «dos pieles» se volvían la misma piel dos
+  // veces, justo cuando alguien mira esta sección para comprobar que oscuro
+  // funciona. Mismas 36 claves que DARK, tomadas de TOKENS en vez de
+  // TOKENS_DARK, para que las dos islas se construyan con el mismo mecanismo
+  // y ninguna dependa del interruptor de arriba de la página.
+  const LIGHT = Object.keys(TOKENS_DARK).map((k) => `${k}:${TOKENS[k]}`).join(';');
 
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -959,7 +968,7 @@
       rompe acá, ahora, y no en la tablet de alguien a las seis de la mañana.
     </p>
     <div class="skins">
-      <div class="skin">
+      <div class="skin" style={LIGHT}>
         <p class="sx-cap">Claro</p>
         <div class="stage">
           <div class="row">
