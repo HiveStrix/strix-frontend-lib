@@ -246,11 +246,13 @@ export const TOKENS_DARK = {
   '--sx-line': '#2C3134',
   // FIJADO A HEX, y no a un peldaño de la rampa, por la misma razón que
   // --sx-ink-3 más abajo: un borde tiene DOS LADOS y los tres fondos posibles
-  // debajo suyo (superficie, hover, selección) mandan el peor caso.
-  //     contra --sx-surface:      5.10  (piso 3.0)
-  //     contra --sx-ground:       5.91  (piso 3.0)
-  //     contra --sx-accent-soft:  3.98  (piso 3.0)
-  //     contra --sx-accent-pick:  3.05  (piso 3.0) — el que manda
+  // debajo suyo (superficie, hover, selección) mandan el peor caso. Medido
+  // contra la matriz completa (2 temas × 2 perillas del cromo), el peor caso
+  // es siempre --sx-accent-pick con la perilla en gris:
+  //     contra --sx-surface:      5.10 morado / 4.78 gris  (piso 3.0)
+  //     contra --sx-ground:       5.91 morado / 5.63 gris  (piso 3.0)
+  //     contra --sx-accent-soft:  4.24 morado / 3.97 gris  (piso 3.0)
+  //     contra --sx-accent-pick:  3.47 morado / 3.26 gris  (piso 3.0) — el que manda
   // El valor viejo, #3A3F43, daba 1.33 contra superficie: un borde casi
   // invisible sobre su propio fondo, que es la clase de defecto que este
   // arnés existe para atrapar y que nada atrapaba porque nada lo medía en
@@ -262,9 +264,16 @@ export const TOKENS_DARK = {
   // (4.62) pero fallaba sobre los dos estados que --sx-accent-pick y
   // --sx-accent-soft producen una vez que esos dos dejan de heredar del claro
   // (ver abajo): 4.29 sobre hover, 2.99 sobre selección — el defecto que trajo
-  // esta tarea. Con #BEBDC1: 7.59 / 5.92 / 4.54, este último al límite porque
-  // --sx-accent-pick es el fondo más claro de los tres y el que menos margen
-  // deja.
+  // la tarea anterior.
+  //
+  // Verificado de nuevo contra la matriz completa (2 temas × 2 perillas): el
+  // peor caso sigue siendo --sx-accent-pick, y sigue pasando con margen —
+  // 5.17 morado / 4.86 gris (piso 4.5) — porque --sx-accent-soft y
+  // --sx-accent-pick ya no aclaran mezclando blanco, mezclan el acento nuevo
+  // (ver ahí), que es menos luminoso: el fondo quedó más oscuro, no más
+  // claro, así que --sx-ink-3 no tuvo que subir de nuevo. Contra
+  // --sx-accent-soft: 6.31 morado / 5.90 gris. Contra --sx-surface: 7.59
+  // morado / 7.11 gris.
   //
   // Y ES UN HEX FIJO A PROPÓSITO, no un `var(--sx-n-400)`: n-400 es el peldaño
   // que --sx-edge (el claro) usa, y ya se movió dos veces en este trabajo por
@@ -287,55 +296,77 @@ export const TOKENS_DARK = {
   // de la dirección vieja — así que puede seguir a la superficie si el gris de
   // base se recalibra.
   '--sx-thead': 'color-mix(in srgb, #FFFFFF 6%, var(--sx-surface))',
-  // LA FIRMA, en oscuro. En claro el halo es el acento al 70% porque un
-  // resplandor morado sobre PAPEL se apaga rápido y necesita casi opacidad
-  // plena para notarse. En oscuro el acento es #EDEFF0 —casi blanco— y el
-  // fondo es oscuro: la relación de contraste ya está invertida y a favor del
-  // halo, así que la misma fuerza que en claro apenas se insinúa acá sería un
-  // foco de luz cayendo sobre la barra.
+  // LA FIRMA, en oscuro. Sigue resolviendo `var(--sx-accent)`, así que cuando
+  // el acento se movió de casi-blanco a lavanda (ver --sx-accent abajo) este
+  // token heredó el cambio sin tocarse — es justo el punto de que sea una
+  // perilla y no un hex propio.
   //
-  // 18% ES LA CIFRA QUE SE ELIGIÓ, no medida por el arnés —este token no está
-  // en el contrato duro ni en el informativo, porque no es una relación de
-  // texto ni de borde: es una sombra translúcida, y su intensidad es un juicio
-  // de diseño, no un número que un piso WCAG resuelva—. Se razonó así: el
-  // salto de --sx-accent-soft (8% de blanco) a --sx-accent-pick (16%) ya
-  // define cuánto “aclarado” se nota como estado interactivo en esta
-  // superficie; 18% cae apenas sobre ese techo, que para una sombra DECORATIVA
-  // (no un fondo sólido, con blur 28px y spread -18px difuminándola más
-  // todavía) debería leerse como una insinuación y no como una superficie
-  // encendida. Nadie lo confirmó todavía mirando la pantalla — ver el reporte.
+  // 18% sigue siendo la cifra elegida a mano, no medida por el arnés — este
+  // token no está en el contrato duro ni en el informativo porque no es una
+  // relación de texto ni de borde, es una sombra translúcida y su intensidad
+  // es un juicio de diseño. El argumento de fondo no cambia con el acento
+  // nuevo: #D1C6EC sigue siendo mucho más claro que la superficie oscura que
+  // tiene detrás (10.18:1 contra tinta oscura, ver --sx-accent), así que la
+  // relación de contraste sigue invertida y a favor del halo. Sigue sin
+  // confirmarse mirando la pantalla — ver el reporte.
   '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 18%, transparent)',
-  '--sx-accent': '#EDEFF0',
+  // EL ACENTO YA NO ES CASI-BLANCO. Antes valía #EDEFF0, heredado de una
+  // dirección donde el cromo era acromático y el acento hacía de tinta. Nácar
+  // dice lo contrario: «el acento y el estado son el único color de la
+  // pantalla», y con el acento casi-blanco el oscuro de Nácar no tenía color
+  // de marca en NINGÚN píxel — el botón primario era un rectángulo blanco, el
+  // foco era blanco, los enlaces eran blancos.
+  //
+  // En oscuro el acento tiene que seguir siendo CLARO (va sobre tinta oscura,
+  // y --sx-accent-ink de abajo lo asume) pero llevando la marca: es el morado
+  // de Nácar (#6541BE, el mismo hex que --sx-accent del claro) aclarado con
+  // blanco. Se midió a tres mezclas — tinta oscura (`var(--sx-n-900)`)
+  // encima, con la perilla del cromo en su default morado:
+  //     62% blanco → #C4B7E6 → 8.81:1
+  //     70% blanco → #D1C6EC → 10.18:1  ← elegido (9.70:1 con la perilla en gris)
+  //     78% blanco → #DDD5F1 → 11.63:1
+  // 70% deja marca reconocible — no se lava a blanco — y de sobra sobre el
+  // piso de 4.5 para la tinta que se dibuja encima, en las dos perillas.
+  '--sx-accent': '#D1C6EC',
   '--sx-accent-ink': 'var(--sx-n-900)',
-  // LA TRAMPA CENTRAL DE ESTE TEMA. En claro, --sx-accent-soft y
-  // --sx-accent-pick OSCURECEN el blanco mezclando el acento adentro: son
-  // fondos de estado que se separan de la superficie volviéndose más oscuros.
-  // En oscuro la superficie YA es oscura — oscurecerla más la funde con el
-  // fondo y el estado desaparece. El mismo nombre de token, el trabajo
-  // opuesto: acá ACLARAN la superficie mezclando blanco, no el acento.
+  // LA TRAMPA CENTRAL DE ESTE TEMA, Y POR QUÉ YA NO APLICA. Hasta acá,
+  // --sx-accent-soft y --sx-accent-pick ACLARABAN LA SUPERFICIE MEZCLANDO
+  // BLANCO, no el acento — el comentario original lo justificaba así: «el
+  // acento en oscuro YA es casi blanco, así que mezclarlo daría casi lo mismo
+  // que mezclar blanco puro». Esa premisa se cae con el punto de arriba: el
+  // acento ya no es casi blanco, es un lavanda con marca reconocible, así que
+  // mezclar uno u otro deja de ser lo mismo. Seguir mezclando blanco sería
+  // repetir, en oscuro, el mismo defecto que el CLARO de Nácar ya corrigió
+  // para estos dos tokens («`--sx-accent-soft`, `--sx-accent-pick` y
+  // `--sx-accent-edge` derivan del acento» en el README): un estado
+  // interactivo pintado con un gris fijo se lee como una superficie más
+  // sucia, no como una pieza que responde a LA marca.
   //
-  // Por qué blanco y no --sx-accent: el acento en oscuro YA es casi blanco
-  // (#EDEFF0), así que mezclarlo daría casi lo mismo que mezclar blanco puro,
-  // pero decirlo con blanco es lo que describe el movimiento real —«aclarado»,
-  // no «teñido de marca»— y no ata el estado a lo que un producto decida hacer
-  // con su acento en oscuro.
-  //
-  // 8% para hover, 16% para selección — la misma proporción 1:2 que separa
-  // --sx-accent-soft (10%) de --sx-accent-pick (18%) en claro, adaptada a que
-  // acá el rango disponible antes de que el borde o la tinta empiecen a fallar
-  // es más angosto. Sobre la superficie oscura de Nácar (#2C2937):
-  //     --sx-accent-soft → #3D3A47   --sx-edge encima: 3.98 · --sx-ink-3: 5.92
-  //     --sx-accent-pick → #4E4B57   --sx-edge encima: 3.05 · --sx-ink-3: 4.54
-  // Los dos al límite de abajo, no de arriba: subir el porcentaje aclara de
-  // más y --sx-ink-3 es el primero en caer por debajo de 4.5.
-  '--sx-accent-soft': 'color-mix(in srgb, #FFFFFF 8%, var(--sx-surface))',
-  // ANTES DE ESTA TAREA, ESTE TOKEN NO EXISTÍA EN OSCURO Y HEREDABA EL DE
-  // CLARO: un lavanda pensado para OSCURECER blanco, cayendo sobre una
-  // superficie que ya era oscura. La fila seleccionada se pintaba con ese
-  // lavanda y encima la tinta oscura —pensada para leerse sobre gris oscuro,
-  // no sobre lavanda claro— caía a 2.99 contra un piso de 4.5. Es el defecto
-  // que dio origen a esta tarea.
-  '--sx-accent-pick': 'color-mix(in srgb, #FFFFFF 16%, var(--sx-surface))',
+  // Se pasan a derivar de --sx-accent, igual que el claro — la única
+  // diferencia es contra qué se mezclan: el claro mezcla contra blanco (su
+  // superficie es blanca); el oscuro mezcla contra --sx-surface (la suya).
+  // Mismos porcentajes que ya tenía —8% hover, 16% selección—, porque lo que
+  // cambió no fue la proporción, fue CONTRA QUÉ se mezclaban:
+  //     --sx-accent-soft → #393645 morado / #3C3B42 gris
+  //     --sx-accent-pick → #464254 morado / #494751 gris
+  // Contra la matriz completa (2 temas × 2 perillas) el peor caso sigue
+  // siendo --sx-edge sobre --sx-accent-pick con la perilla en gris: 3.26:1
+  // (piso 3.0, antes 2.87). --sx-ink-3 en el mismo fondo: 4.86:1 (piso 4.5,
+  // antes 4.27). Con este cambio NINGUNO de --sx-edge, --sx-ink-2 e
+  // --sx-ink-3 tuvo que moverse: el lavanda (#D1C6EC) es menos luminoso que
+  // el blanco puro que mezclaban antes, así que el fondo resultante queda MÁS
+  // oscuro a igual porcentaje y deja más margen, no menos. Es la razón por la
+  // que esta tarea no tocó esos tres valores — la que resolvió el hueco fue
+  // esta derivación, no otra vuelta de oscurecer texto.
+  '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 8%, var(--sx-surface))',
+  // Mismo cambio que --sx-accent-soft arriba, y el mismo motivo. Antes de
+  // esta tarea este token ni siquiera existía en oscuro — heredaba el
+  // `--sx-accent-pick` del CLARO, un lavanda pensado para oscurecer blanco,
+  // cayendo sobre una superficie que ya era oscura; la fila seleccionada se
+  // pintaba con ese lavanda y la tinta oscura encima caía a 2.99 contra un
+  // piso de 4.5. Ese defecto es el que dio origen a esta tarea y ya está
+  // cerrado por la derivación de arriba: ver los números ahí.
+  '--sx-accent-pick': 'color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface))',
   '--sx-accent-edge': '#3A3F43',
   // The bands invert to low-chroma fills: a pale band with dark text does not
   // survive being dropped onto a dark ground.

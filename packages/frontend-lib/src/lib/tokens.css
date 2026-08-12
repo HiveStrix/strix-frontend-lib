@@ -110,10 +110,10 @@
   --sx-ink-on: var(--sx-n-900);
   --sx-thead: color-mix(in srgb, #FFFFFF 6%, var(--sx-surface));
   --sx-halo: color-mix(in srgb, var(--sx-accent) 18%, transparent);
-  --sx-accent: #EDEFF0;
+  --sx-accent: #D1C6EC;
   --sx-accent-ink: var(--sx-n-900);
-  --sx-accent-soft: color-mix(in srgb, #FFFFFF 8%, var(--sx-surface));
-  --sx-accent-pick: color-mix(in srgb, #FFFFFF 16%, var(--sx-surface));
+  --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 8%, var(--sx-surface));
+  --sx-accent-pick: color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface));
   --sx-accent-edge: #3A3F43;
   --sx-positive: #8FCB9B;
   --sx-positive-band: #1D2C21;

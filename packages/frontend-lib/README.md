@@ -510,32 +510,24 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
 
 ### Deuda de Nácar
 
-- **El modo oscuro de Nácar pasa el contrato, pero no está diseñado.** `npm run contrast` corre
-  ahora contra los dos temas y los dos dan verde: `--sx-thead`, `--sx-halo` y `--sx-accent-pick` —
-  los tres tokens que el oscuro no ligaba y heredaba del claro sin que nada lo midiera— tienen
-  valor propio; `--sx-edge` subió a `#9C9AA1` e `--sx-ink-3` a `#BEBDC1`, fijos a hex y no a un
-  peldaño de la rampa, para aguantar los tres fondos posibles bajo un borde o un texto (superficie,
-  hover, selección — el más exigente manda); `--sx-neutral` dejó de colgar de `var(--sx-n-400)` —el
-  mismo peldaño que usa `--sx-edge` del claro y que ya se movió dos veces por razones ajenas al
-  oscuro— y pasó a `var(--sx-ink-3)`. Pero **llevado al mínimo verificable no es lo mismo que
-  diseñado**: `TOKENS_DARK` sigue siendo, en su mayoría, el oscuro de la dirección anterior. Sus
-  grises de base (`--sx-sunk: #1B1F22`, `--sx-line: #2C3134`, `--sx-ink: #EDEFF0`,
-  `--sx-ink-2: #BCC1C4`, `--sx-accent-edge: #3A3F43`) son hex escritos a mano, sin la traza de
-  `--sx-chrome-tint` que el claro de Nácar sí lleva en toda su rampa — pasan el contrato porque el
-  contrato mide contraste, no temperatura de color, y nadie los tocó porque re-teñir el tema entero
-  es una decisión de diseño que esta tarea no pidió. `--sx-accent` en oscuro sigue siendo casi
-  blanco (`#EDEFF0`, heredado de la dirección A) en vez de una variación del morado de Nácar, que es
-  la pieza más grande de esa herencia y la que más notaría un ojo mirando la pantalla.
-  Adicionalmente, **`--sx-edge` e `--sx-ink-3` en oscuro sólo se verificaron contra el
-  `--sx-chrome-tint` por defecto** (`#6541BE`): con la perilla en gris (`#8E8E93`, el ejemplo que
-  documenta esta misma página) `--sx-surface` se corre lo suficiente como para que
-  `--sx-accent-pick` se aclare de más, y el trío que mide contra ese fondo cae por debajo del piso
-  (`--sx-edge` 2.87, `--sx-ink-3` 4.27, `--sx-ink-2` 4.39 — piso 3.0 / 4.5 / 4.5). El claro tiene
-  este mismo riesgo resuelto a mano, con los dos escenarios anotados en los comentarios de
-  `tokens.js` («X morado / Y gris»); el oscuro todavía no. Y **nadie miró el resultado en
-  pantalla**: pasar el contrato dice que un color existe con el contraste que promete, no que la
-  cabecera, el halo o la fila seleccionada se vean bien — esa verificación, como con el claro, es
-  humana y sigue pendiente.
+- **El modo oscuro de Nácar pasa el contrato Y lleva marca.** `npm run contrast` corre la matriz
+  completa: `CHECKS` × {claro, oscuro} × {`--sx-chrome-tint` morado por defecto, gris neutro
+  `#8E8E93`}, cuatro combinaciones, y las cuatro dan verde. La matriz reemplazó a un arnés que
+  sólo corría contra el morado — con el gris, `--sx-edge`, `--sx-ink-3` e `--sx-ink-2` caían bajo
+  el piso contra `--sx-accent-pick` (2.87 / 4.27 / 4.39, piso 3.0 / 4.5 / 4.5) y nada lo veía.
+  `--sx-accent` en oscuro dejó de ser casi-blanco (`#EDEFF0`, heredado de la dirección A) y pasó a
+  `#D1C6EC` — el morado de Nácar aclarado 70 % con blanco, verificado a 10.18:1 contra la tinta
+  oscura que se le dibuja encima (9.70:1 con la perilla en gris). `--sx-accent-soft` y
+  `--sx-accent-pick` dejaron de aclarar la superficie mezclando blanco fijo y pasaron a mezclar el
+  acento nuevo — el mismo criterio que ya usan `soft`/`pick`/`edge` en claro — y esa sola
+  derivación resolvió las tres fallas de la matriz sin tocar `--sx-edge`, `--sx-ink-2` ni
+  `--sx-ink-3`: el lavanda es menos luminoso que el blanco que mezclaban antes, así que el fondo
+  del estado queda más oscuro y deja más margen, no menos. Sigue pendiente: `TOKENS_DARK` todavía
+  tiene cinco hex sin la traza de `--sx-chrome-tint` (`--sx-sunk`, `--sx-line`, `--sx-ink`,
+  `--sx-ink-2`, `--sx-accent-edge`) — pasan el contrato porque el contrato mide contraste, no
+  temperatura de color — y **nadie miró el resultado en pantalla**: pasar el contrato dice que un
+  color existe con el contraste que promete, no que la cabecera, el halo o la fila seleccionada se
+  vean bien; esa verificación, como con el claro, es humana y sigue sin hacerse.
 - **El bloque `.tbl` de Nácar está generado, no vinculado.** `explore/pages/Tablas.svelte` copia
   los 59 tokens de `[data-d='Z']` por valor y los acota a `[data-d='AD'] .tbl`. Si `Z` cambia, este
   bloque queda desactualizado y nada lo avisa.
