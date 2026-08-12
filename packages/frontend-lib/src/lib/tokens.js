@@ -242,8 +242,13 @@ export const TOKENS = {
 export const TOKENS_DARK = {
   '--sx-ground': 'var(--sx-n-900)',
   '--sx-surface': 'var(--sx-n-800)',
-  '--sx-sunk': '#1B1F22',
-  '--sx-line': '#2C3134',
+  // RETINTADOS con la traza de --sx-chrome-tint, igual que toda la rampa del
+  // claro — antes eran hex sueltos de la dirección anterior, sin el 8% que el
+  // resto del sistema lleva, y por eso el oscuro se leía de otra familia que
+  // el claro. `--sx-edge` sobre `--sx-sunk` sigue en el contrato duro
+  // (piso 3.0) y aguanta de sobra: 5.68 morado / 5.35 gris.
+  '--sx-sunk': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #1B1F22)',
+  '--sx-line': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #2C3134)',
   // FIJADO A HEX, y no a un peldaño de la rampa, por la misma razón que
   // --sx-ink-3 más abajo: un borde tiene DOS LADOS y los tres fondos posibles
   // debajo suyo (superficie, hover, selección) mandan el peor caso. Medido
@@ -258,8 +263,19 @@ export const TOKENS_DARK = {
   // arnés existe para atrapar y que nada atrapaba porque nada lo medía en
   // este tema.
   '--sx-edge': '#9C9AA1',
-  '--sx-ink': '#EDEFF0',
-  '--sx-ink-2': '#BCC1C4',
+  // RETINTADO con la traza de --sx-chrome-tint al 4% — la misma idea que
+  // --sx-n-50 en el claro (el peldaño más claro de la rampa lleva la traza
+  // más liviana). Sigue dando 11.6:1 / 11.1:1 (morado/gris) contra
+  // --sx-surface, muy por encima del piso de 4.5: había margen de sobra para
+  // ganar coherencia sin arriesgar nada del contrato.
+  '--sx-ink': 'color-mix(in srgb, var(--sx-chrome-tint) 4%, #EDEFF0)',
+  // RETINTADO con la traza de --sx-chrome-tint al 6%. Es el que menos margen
+  // tenía de los cinco hex fríos —está en el contrato duro contra tres
+  // fondos, no sólo contra la superficie— así que se verificó el peor caso
+  // antes de tocarlo: contra --sx-accent-pick con la perilla en gris queda en
+  // 4.84 (piso 4.5, con 0.34 de margen). El resto sobra: 7.08/7.28 contra
+  // superficie, 5.88/6.04 contra --sx-accent-soft (gris/morado).
+  '--sx-ink-2': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #BCC1C4)',
   // SUBIÓ DE #8E9498 A #BEBDC1. El valor viejo pasaba sobre --sx-surface
   // (4.62) pero fallaba sobre los dos estados que --sx-accent-pick y
   // --sx-accent-soft producen una vez que esos dos dejan de heredar del claro
@@ -367,7 +383,13 @@ export const TOKENS_DARK = {
   // piso de 4.5. Ese defecto es el que dio origen a esta tarea y ya está
   // cerrado por la derivación de arriba: ver los números ahí.
   '--sx-accent-pick': 'color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface))',
-  '--sx-accent-edge': '#3A3F43',
+  // RETINTADO con la traza de --sx-chrome-tint al 8%, igual que el resto de
+  // los hex fríos de este bloque. No está en el contrato duro ni en el
+  // informativo —se usa sólo como filo de insignia ya seleccionada
+  // (ChoiceCards.svelte) y como raya divisoria (SplitButton.svelte), ninguno
+  // de los dos es lo que identifica el componente— así que no hay piso que
+  // verificar; el retinte es coherencia de familia, no una comprobación.
+  '--sx-accent-edge': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #3A3F43)',
   // The bands invert to low-chroma fills: a pale band with dark text does not
   // survive being dropped onto a dark ground.
   '--sx-positive': '#8FCB9B', '--sx-positive-band': '#1D2C21', '--sx-positive-edge': '#2E4436',

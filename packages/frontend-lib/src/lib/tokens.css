@@ -101,11 +101,11 @@
 :root[data-sx-theme="dark"], .sx-dark {
   --sx-ground: var(--sx-n-900);
   --sx-surface: var(--sx-n-800);
-  --sx-sunk: #1B1F22;
-  --sx-line: #2C3134;
+  --sx-sunk: color-mix(in srgb, var(--sx-chrome-tint) 8%, #1B1F22);
+  --sx-line: color-mix(in srgb, var(--sx-chrome-tint) 8%, #2C3134);
   --sx-edge: #9C9AA1;
-  --sx-ink: #EDEFF0;
-  --sx-ink-2: #BCC1C4;
+  --sx-ink: color-mix(in srgb, var(--sx-chrome-tint) 4%, #EDEFF0);
+  --sx-ink-2: color-mix(in srgb, var(--sx-chrome-tint) 6%, #BCC1C4);
   --sx-ink-3: #BEBDC1;
   --sx-ink-on: var(--sx-n-900);
   --sx-thead: color-mix(in srgb, #FFFFFF 6%, var(--sx-surface));
@@ -114,7 +114,7 @@
   --sx-accent-ink: var(--sx-n-900);
   --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 8%, var(--sx-surface));
   --sx-accent-pick: color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface));
-  --sx-accent-edge: #3A3F43;
+  --sx-accent-edge: color-mix(in srgb, var(--sx-chrome-tint) 8%, #3A3F43);
   --sx-positive: #8FCB9B;
   --sx-positive-band: #1D2C21;
   --sx-positive-edge: #2E4436;

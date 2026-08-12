@@ -522,12 +522,13 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   acento nuevo — el mismo criterio que ya usan `soft`/`pick`/`edge` en claro — y esa sola
   derivación resolvió las tres fallas de la matriz sin tocar `--sx-edge`, `--sx-ink-2` ni
   `--sx-ink-3`: el lavanda es menos luminoso que el blanco que mezclaban antes, así que el fondo
-  del estado queda más oscuro y deja más margen, no menos. Sigue pendiente: `TOKENS_DARK` todavía
-  tiene cinco hex sin la traza de `--sx-chrome-tint` (`--sx-sunk`, `--sx-line`, `--sx-ink`,
-  `--sx-ink-2`, `--sx-accent-edge`) — pasan el contrato porque el contrato mide contraste, no
-  temperatura de color — y **nadie miró el resultado en pantalla**: pasar el contrato dice que un
-  color existe con el contraste que promete, no que la cabecera, el halo o la fila seleccionada se
-  vean bien; esa verificación, como con el claro, es humana y sigue sin hacerse.
+  del estado queda más oscuro y deja más margen, no menos. Los cinco hex fríos que quedaban sin la
+  traza de `--sx-chrome-tint` (`--sx-sunk`, `--sx-line`, `--sx-ink`, `--sx-ink-2`,
+  `--sx-accent-edge`) se retintaron con el mismo porcentaje que usa el peldaño equivalente de la
+  rampa clara, verificados contra la matriz completa después de cada uno. Lo que sigue pendiente:
+  **nadie miró el resultado en pantalla** — pasar el contrato dice que un color existe con el
+  contraste que promete, no que la cabecera, el halo o la fila seleccionada se vean bien; esa
+  verificación, como con el claro, es humana y sigue sin hacerse.
 - **El bloque `.tbl` de Nácar está generado, no vinculado.** `explore/pages/Tablas.svelte` copia
   los 59 tokens de `[data-d='Z']` por valor y los acota a `[data-d='AD'] .tbl`. Si `Z` cambia, este
   bloque queda desactualizado y nada lo avisa.
