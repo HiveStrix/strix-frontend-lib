@@ -56,8 +56,21 @@
   // wearing a costume, so pair it with a real «crear» action instead of
   // `allowFree`. And never as a filter over a table that is already on screen —
   // that is a search field, and the table itself is the result list.
-  import { createEventDispatcher, tick } from 'svelte';
+  //
+  // DÓNDE VIVE LA LISTA. Donde existe `popover` (Chrome 114+, Safari 17+,
+  // Firefox 125+), `.pop` lleva `popover="manual"` y abre en la TOP LAYER, así
+  // que un ancestro con `overflow: hidden` no la recorta. Ahí deja de usarse
+  // el atributo `hidden` para ocultarla —mezclar `hidden` con `popover` puede
+  // dar comportamientos ambiguos entre navegadores— y en su lugar abrir y
+  // cerrar es enteramente cosa de `showPopover()`/`hidePopover()`, atados a
+  // `open`. La posición deja de ser `left: 0; right: 0` contra `.wrap`
+  // (`position: absolute`) y pasa a `position: fixed` con el ancho y el borde
+  // izquierdo de `.wrap` medidos por `place()` y escritos a mano, recalculados
+  // en cada `scroll` y `resize` mientras la lista está abierta. Donde
+  // `popover` no existe, `.pop` cae en exactamente lo de siempre.
+  import { createEventDispatcher, tick, onDestroy } from 'svelte';
   import Field from './Field.svelte';
+  import { supportsPopover, syncPopover } from '../shell/toplayer.js';
 
   /** The selected option's value. '' ⇒ nothing chosen. */
   export let value = '';
@@ -97,6 +110,7 @@
   let inputEl;
   let listEl;
   let wrapEl;
+  let popEl;
   let query = '';
   let open = false;
   let active = -1;
@@ -157,12 +171,45 @@
     if (restore && !allowFree) touched = false; // puts the chosen label back
   }
 
+  // El volteo arriba/abajo no cambió: sigue siendo una estimación de 320px, no
+  // el alto real de la lista, porque esta función corre ANTES de que el
+  // conteo de resultados (y por lo tanto el alto) esté resuelto. Lo nuevo es
+  // que, con `popover`, acá también se escriben las coordenadas — el ancho y
+  // el borde izquierdo de `.wrap`, en píxeles de viewport — porque `.pop` deja
+  // de estar posicionada contra `.wrap` para vivir en la top layer.
   function place() {
     if (!wrapEl || typeof window === 'undefined') return;
     const r = wrapEl.getBoundingClientRect();
     const want = 320;
     dropUp = r.bottom + want > window.innerHeight && r.top > window.innerHeight - r.bottom;
+    if (!supportsPopover || !popEl) return;
+    popEl.style.setProperty('--sx-pop-x', `${r.left}px`);
+    popEl.style.setProperty('--sx-pop-w', `${r.width}px`);
+    popEl.style.setProperty('--sx-pop-y', `${dropUp ? window.innerHeight - r.top : r.bottom}px`);
   }
+
+  // Entrar y salir de la top layer es cosa aparte de `place()`: `close()` no
+  // vuelve a medir nada, así que si `syncPopover` viviera adentro de
+  // `place()` nunca se llamaría `hidePopover()` al cerrar. Atado directo a
+  // `open`, la misma pregunta que Menu y Sheet resuelven cada uno a su modo.
+  $: syncPopover(popEl, open);
+
+  // `fixed` no sigue al campo solo: si la página —o un contenedor con scroll
+  // propio— se mueve mientras la lista está abierta, se despega. Un
+  // `<svelte:window>` sólo puede haber uno por componente y el de abajo ya lo
+  // usa `resize`, así que este va a mano, atado a `open` igual que los
+  // listeners de Menu — y por la misma razón: uno en captura que sigue vivo
+  // después de cerrar corre en cada scroll de toda la aplicación.
+  function onScroll() { if (open) place(); }
+
+  $: if (typeof document !== 'undefined' && supportsPopover) {
+    document.removeEventListener('scroll', onScroll, true);
+    if (open) document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+  }
+
+  onDestroy(() => {
+    if (typeof document !== 'undefined') document.removeEventListener('scroll', onScroll, true);
+  });
 
   const clamp = (i) => (shown.length === 0 ? -1 : (i + shown.length) % shown.length);
 
@@ -309,7 +356,14 @@
       </button>
     </div>
 
-    <div class="pop" class:up={dropUp} hidden={!open}>
+    <div
+      class="pop"
+      class:up={dropUp}
+      class:fx={supportsPopover}
+      hidden={supportsPopover ? false : !open}
+      popover={supportsPopover ? 'manual' : undefined}
+      bind:this={popEl}
+    >
       <p class="count" class:none={!loading && hits.length === 0}>{countLine}</p>
       <!-- Pointer down is swallowed so focus never leaves the input: without it
            the field blurs, the list closes, and the click lands on nothing. -->
@@ -418,11 +472,51 @@
     border-radius: var(--sx-r-2);
     box-shadow: var(--sx-e-3);
     overflow: hidden;
+    /* Cuatro declaraciones que acá no cambian nada y en `.fx` evitan que la
+       hoja de estilos de `popover` (`margin: auto; border: solid; padding:
+       .25em; color: CanvasText; height: fit-content`, activa apenas el
+       atributo está escrito) meta un anillo de aire adentro del borde
+       redondeado, un filo de ~3px, o una caja que no llena su alto por
+       contenido. `width` no está acá porque cada camino la resuelve distinto
+       — `left: 0; right: 0` estira en el de respaldo, `--sx-pop-w` la fija en
+       `.fx` — y ponerla en las dos a la vez sería escribir la misma cosa dos
+       veces para que la segunda gane. */
+    margin: 0;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    height: auto;
   }
   .pop.up { top: auto; bottom: calc(100% + var(--sx-s-2)); }
   .pop[hidden] { display: none; }
   :global([data-sx-theme='dark']) .pop,
   :global(.sx-dark) .pop { color-scheme: dark; }
+
+  /* Con `popover`, `.wrap` deja de ser el ancestro contra el que `left: 0;
+     right: 0` significan algo — `.pop` vive en la top layer. `.fx` cambia a
+     `fixed`, con `right: auto` (si no, el `inset: 0` de la hoja de estilos de
+     `popover` deja `right: 0` peleando contra el `left`/`width` de acá) y
+     `left`/`width` fijados por `place()` en `--sx-pop-x`/`--sx-pop-w`. El
+     margen de separación sigue siendo el mismo `var(--sx-s-2)` de siempre,
+     ahora del lado de `margin` en vez de sumado dentro del `calc()` de `top`
+     — igual que en Menu.
+     `--sx-pop-y` YA trae la dirección resuelta desde `place()` — es
+     `r.bottom` bajando, o `innerHeight - r.top` subiendo — así que acá se usa
+     tal cual, sin volver a restarla de `100vh`: hacerlo de nuevo deshace la
+     cuenta que JS ya hizo y deja la lista mal colocada cuando abre para
+     arriba. */
+  .pop.fx {
+    position: fixed;
+    left: var(--sx-pop-x, 0px);
+    right: auto;
+    width: var(--sx-pop-w, auto);
+    top: calc(var(--sx-pop-y, 0px) + var(--sx-s-2));
+    bottom: auto;
+  }
+  .pop.fx.up {
+    top: auto;
+    bottom: calc(var(--sx-pop-y, 0px) + var(--sx-s-2));
+  }
 
   .count {
     margin: 0; padding: var(--sx-s-2) var(--sx-s-3);
