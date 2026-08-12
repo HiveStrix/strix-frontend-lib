@@ -108,6 +108,9 @@
       // reactividad de abajo no llega a correr una limpieza final propia.
       document.removeEventListener('scroll', onReposition, true);
       window.removeEventListener('resize', onReposition);
+      // Idem para un cierre en pleno fade: sin esto, el `setTimeout`/listener
+      // pendiente de `scheduleExit()` sobreviviría al componente.
+      cancelPendingExit();
     };
   });
 
@@ -186,7 +189,69 @@
   // none` hasta `showPopover()`. `shown` ya decide la parte visual
   // (`visibility`/`opacity`, ver el `<style>`); esto decide la top layer, la
   // misma pregunta que `ShortcutOverlay` resuelve con `dlg.showModal()`/`close()`.
-  $: syncPopover(tipEl, shown);
+  //
+  // AL CERRAR, LA SALIDA ESPERA EL FIN DEL FADE. `.tip` transiciona `opacity`
+  // y `visibility` durante `--sx-fast` (120ms) — mientras esa transición
+  // corre el tooltip SIGUE siendo visible, con la opacidad animando. Salir de
+  // la top layer en ese instante (como hacía esto antes) deja al `position:
+  // fixed` sin top layer durante esos ~120ms, la ventana exacta en la que
+  // puede volver a anclarse contra un ancestro con `transform` o quedar
+  // recortado por uno con `overflow: hidden` — el bug que esta migración vino
+  // a arreglar, reabierto en el frame de cierre. `entrar` sigue siendo
+  // inmediato (no hay nada que esperar para APARECER); sólo `hidePopover()`
+  // se pospone a `transitionend` de `opacity`.
+  //
+  // `transitionend` no llega si la transición nunca corrió — moción reducida
+  // la desactiva, ver el `@media` de abajo — así que el respaldo por tiempo
+  // lee `getComputedStyle(...).transitionDuration`, que YA refleja esa media
+  // query, en vez de asumir el valor de `--sx-fast`: si la duración
+  // computada es 0, el respaldo cierra casi enseguida, igual que el cierre
+  // inmediato de antes. Si el tip vuelve a mostrarse antes de que el cierre
+  // pendiente llegue a correr, `cancelPendingExit()` lo descarta —
+  // `syncPopover` es idempotente, así que un cierre que nunca llegó a
+  // ejecutarse no deja nada que deshacer.
+  let cancelExit = null;
+
+  function cancelPendingExit() {
+    if (cancelExit) {
+      cancelExit();
+      cancelExit = null;
+    }
+  }
+
+  function scheduleExit() {
+    cancelPendingExit();
+    const el = tipEl;
+    if (!el) return;
+    const ms = Math.max(0, parseFloat(getComputedStyle(el).transitionDuration || '0') * 1000);
+    const onEnd = (e) => {
+      if (e.target === el && e.propertyName === 'opacity') finish();
+    };
+    // +40ms de margen: si `transitionend` no llega (pestaña sin foco,
+    // transición interrumpida), el respaldo igual saca al tip de la top
+    // layer en vez de dejarlo colgado ahí de forma indefinida.
+    const timer = setTimeout(finish, ms + 40);
+    function finish() {
+      el.removeEventListener('transitionend', onEnd);
+      clearTimeout(timer);
+      cancelExit = null;
+      syncPopover(el, false);
+    }
+    el.addEventListener('transitionend', onEnd);
+    cancelExit = () => {
+      el.removeEventListener('transitionend', onEnd);
+      clearTimeout(timer);
+    };
+  }
+
+  $: if (typeof document !== 'undefined' && supportsPopover) {
+    if (shown) {
+      cancelPendingExit();
+      syncPopover(tipEl, true);
+    } else {
+      scheduleExit();
+    }
+  }
 </script>
 
 <span class="wrap" bind:this={host}>
