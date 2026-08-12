@@ -127,51 +127,109 @@ INFO.push(['--sx-accent', '--sx-surface', 'el acento pleno, para el anillo de se
 // un color y pedirselo es ruido, no una comprobacion.
 const NO_COLOR = /^--sx-(e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch)/;
 
+// EL TERCER HUECO. Este archivo ya se extendió dos veces por la misma razón —
+// primero medía `--sx-edge` contra dos fondos que resolvían al mismo blanco
+// (una sola medición escrita dos veces), después corría contra un solo tema
+// (el oscuro se armó con tres tokens nuevos y nada los medía) — y las dos
+// veces el defecto vivía en lo que NO se medía, no en lo medido. Hay un
+// tercero: `--sx-chrome-tint` es una perilla, no un detalle cosmético — se
+// mezcla en toda la rampa neutra, y `--sx-edge`, `--sx-ink-2` e `--sx-ink-3`
+// cuelgan de esa rampa. El README documenta DOS valores como soportados —el
+// morado por defecto y un gris neutro para un core que no quiere la traza de
+// marca— y hasta ahora el arnés sólo corrió contra el morado. Con el gris,
+// en oscuro, `--sx-surface` se corre lo suficiente para que
+// `--sx-accent-pick` se aclare de más, y `--sx-edge` (2.87), `--sx-ink-3`
+// (4.27) e `--sx-ink-2` (4.39) caen bajo el piso sin que ningún tema por sí
+// solo lo mostrara: hacía falta la matriz completa, tema × perilla, para que
+// apareciera.
+const CHROME_KNOBS = [
+  ['#6541BE', 'cromo morado'],
+  ['#8E8E93', 'cromo gris']
+];
+
+// El oscuro no es una segunda hoja: es `TOKENS_DARK` pisando roles sobre
+// `TOKENS`, exactamente como se apila `:root[data-sx-theme="dark"]` sobre
+// `:root` en el navegador. Medir sólo `TOKENS_DARK` aislado mediría un objeto
+// que no existe en pantalla. La perilla del cromo vive en `TOKENS` (el
+// oscuro no la re-liga), así que alcanza con pisarla antes de apilar.
+const THEMES = [
+  ['claro', (tint) => ({ ...TOKENS, '--sx-chrome-tint': tint })],
+  ['oscuro', (tint) => ({ ...TOKENS, '--sx-chrome-tint': tint, ...TOKENS_DARK })]
+];
+
 /**
  * Corre el contrato duro (CHECKS + resolubilidad de todo token-color) contra
- * un juego de tokens ya apilado, e imprime la tabla rotulada con `label`.
- * Devuelve cuántas comprobaciones fallaron.
+ * un juego de tokens ya apilado. No imprime nada — devuelve la lista de
+ * comprobaciones que fallaron, para que el llamador decida cómo mostrarlas.
  */
-function runContract(tokens, label) {
-  let malas = 0;
+function evalContract(tokens) {
+  const fails = [];
   const ground = resolve(tokens['--sx-ground'], tokens);
-  console.log(`\n── ${label} ──────────────────────────────────────────────`);
-  console.log('token                    sobre               real    piso   \n' + '-'.repeat(64));
   for (const [fg, bg, min, checkLabel] of CHECKS) {
     const b = resolve(tokens[bg], tokens, ground);
     const r = ratio(resolve(tokens[fg], tokens, b), b);
-    const ok = r >= min;
-    if (!ok) malas++;
-    console.log(
-      `${fg.padEnd(24)} ${bg.padEnd(19)} ${r.toFixed(2).padStart(5)}  ${min.toFixed(1)}  ${ok ? 'ok' : 'FALLA — ' + checkLabel}`
-    );
+    if (r < min) fails.push({ fg, bg, r, min, checkLabel });
   }
   for (const [k, v] of Object.entries(tokens)) {
     if (NO_COLOR.test(k)) continue;
     try {
       resolve(v, tokens, ground);
     } catch (e) {
-      malas++;
-      console.log(`${k.padEnd(24)} NO RESUELVE — ${e.message}`);
+      fails.push({ fg: k, bg: null, r: null, min: null, checkLabel: 'NO RESUELVE — ' + e.message });
     }
   }
-  console.log('-'.repeat(64));
-  console.log(malas ? `${malas} comprobacion(es) fallando en ${label}` : `${label}: todo el contrato pasa`);
-  return malas;
+  return fails;
 }
 
+// CHECKS × {claro, oscuro} × {las perillas de arriba}: la matriz completa, no
+// dos listas. Cuatro combinaciones × diecisiete comprobaciones son demasiadas
+// filas para leer una por una, así que la salida es un resumen por
+// combinación —cuántas pasan, cuántas fallan— y el detalle completo sólo de
+// lo que falla. Si nadie puede leer la salida, nadie la va a correr.
 let malas = 0;
-malas += runContract(TOKENS, 'TEMA CLARO');
-// El oscuro no es una segunda hoja: es `TOKENS_DARK` pisando roles sobre
-// `TOKENS`, exactamente como se apila `:root[data-sx-theme="dark"]` sobre
-// `:root` en el navegador. Medir sólo `TOKENS_DARK` aislado mediría un objeto
-// que no existe en pantalla.
-malas += runContract({ ...TOKENS, ...TOKENS_DARK }, 'TEMA OSCURO');
+const resumen = [];
+const detalle = [];
+for (const [temaNombre, apilar] of THEMES) {
+  for (const [tint, tintLabel] of CHROME_KNOBS) {
+    const label = `${temaNombre} · ${tintLabel}`;
+    const fails = evalContract(apilar(tint));
+    malas += fails.length;
+    resumen.push({ label, total: CHECKS.length, fails });
+    if (fails.length) detalle.push({ label, fails });
+  }
+}
+
+console.log('\n── MATRIZ DE CONTRASTE — contrato duro × 2 temas × 2 perillas ──');
+console.log('combinación'.padEnd(26) + 'pasan  fallan');
+console.log('-'.repeat(40));
+for (const s of resumen) {
+  const ok = s.total - s.fails.length;
+  console.log(`${s.label.padEnd(26)} ${String(ok).padStart(5)}  ${String(s.fails.length).padStart(6)}`);
+}
+console.log('-'.repeat(40));
+
+if (detalle.length) {
+  console.log('\n── detalle de lo que falla ──────────────────────────────────');
+  for (const d of detalle) {
+    console.log(`\n${d.label}`);
+    console.log('token                    sobre               real    piso   \n' + '-'.repeat(64));
+    for (const f of d.fails) {
+      if (f.bg) {
+        console.log(
+          `${f.fg.padEnd(24)} ${f.bg.padEnd(19)} ${f.r.toFixed(2).padStart(5)}  ${f.min.toFixed(1)}  FALLA — ${f.checkLabel}`
+        );
+      } else {
+        console.log(`${f.fg.padEnd(24)} ${f.checkLabel}`);
+      }
+    }
+  }
+}
+console.log(malas ? `\n${malas} comprobacion(es) fallando en la matriz` : '\nla matriz entera pasa: 4 combinaciones, 0 fallas');
 
 // Las líneas de abajo son informativas (no suman a `malas`) y se miden una
-// sola vez, sobre el claro: no cambian de rol entre temas y duplicarlas sería
-// ruido, no comprobación.
-console.log('\ninformativo — no rompe el build (medido en TEMA CLARO)');
+// sola vez, sobre el claro con la perilla por defecto: no cambian de rol
+// entre temas ni perillas y duplicarlas sería ruido, no comprobación.
+console.log('\ninformativo — no rompe el build (medido en TEMA CLARO, cromo morado)');
 {
   const ground = resolve(TOKENS['--sx-ground'], TOKENS);
   for (const [fg, bg, label] of INFO) {
@@ -180,5 +238,4 @@ console.log('\ninformativo — no rompe el build (medido en TEMA CLARO)');
   }
 }
 console.log('-'.repeat(64));
-console.log(malas ? `${malas} comprobacion(es) fallando en total` : 'todo el contrato pasa en los dos temas');
 process.exit(malas ? 1 : 0);
