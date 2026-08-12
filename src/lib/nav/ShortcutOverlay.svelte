@@ -137,7 +137,13 @@
 
     {#if groups.length}
       <div class="cols">
-        {#each groups as g (g.title)}
+        <!-- `title` alone used to be the key. Two groups with no title both key to
+             `undefined`, Svelte finds the collision, and the whole overlay renders
+             blank instead of one badly-labelled group — a screen going white is a
+             worse failure than a missing heading. `SideRail` already carries the
+             fix for this exact shape (`it.key ?? \`s-${i}\``); the fallback here is
+             the same idea against the index, which is always unique. -->
+        {#each groups as g, i (g.title ?? `g-${i}`)}
           <section class="grp">
             <h3 class="sx-cap">{g.title}</h3>
             <dl>

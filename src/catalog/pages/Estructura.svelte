@@ -97,6 +97,18 @@
       { keys: ['Esc'], label: 'Cerrar o limpiar' }
     ]}
   ];
+
+  // EL CASO QUE ROMPÍA. Dos grupos sin `title`: antes de la clave con reserva
+  // (ver ShortcutOverlay.svelte) las dos entraban al bucle con la misma clave
+  // `undefined`, Svelte encontraba la colisión y la hoja entera se quedaba en
+  // blanco — no un grupo sin encabezado, la pantalla completa. Queda en el
+  // catálogo con su propio disparador para que el estado que rompía siga
+  // siendo visible, no sólo arreglado.
+  let keysSinTituloOpen = false;
+  const gruposSinTitulo = [
+    { items: [{ keys: ['G', 'F'], sep: 'luego', label: 'Ir a la flota' }] },
+    { items: [{ keys: ['/'], label: 'Buscar' }] }
+  ];
 </script>
 
 <div class="page">
@@ -475,6 +487,26 @@
           <em>devuelve el foco</em> a lo que lo tenía antes. Una trampa que no tuviste que escribir
           es una trampa que no puede estar mal.
         </p>
+
+        <h3 class="sx-cap sub">grupos sin título — el estado que rompía</h3>
+        <p class="why">
+          Dos grupos sin <span class="sx-id">title</span> tenían la misma clave —
+          <span class="sx-id">undefined</span>, las dos veces— en el bucle que los dibuja. Svelte
+          encuentra esa colisión y tira: no un grupo mal dibujado, la hoja entera en blanco. El
+          arreglo es la misma clave con reserva que ya usa <span class="sx-id">SideRail</span>
+          contra el índice, que nunca se repite. Queda demostrado, no sólo corregido.
+        </p>
+        <div class="demo">
+          <Button variant="outline" on:click={() => (keysSinTituloOpen = true)}>
+            Ver dos grupos sin título
+          </Button>
+        </div>
+        <ShortcutOverlay
+          bind:open={keysSinTituloOpen}
+          groups={gruposSinTitulo}
+          title="Dos grupos sin título"
+          subtitle="El caso que dejaba la pantalla en blanco antes de la clave con reserva."
+        />
       </section>
 
       <section class="closing">
@@ -566,6 +598,7 @@
   section { min-width: 0; scroll-margin-top: var(--sx-s-16); }
   h2 { margin: 0; font-size: var(--sx-t-xl); font-weight: var(--sx-w-bold); letter-spacing: -.025em; }
   .why { margin: var(--sx-s-3) 0 0; max-width: 68ch; font-size: var(--sx-t-md); line-height: 1.6; color: var(--sx-ink-2); }
+  .sub { margin: var(--sx-s-8) 0 0; }
   .note {
     margin: var(--sx-s-5) 0 0;
     max-width: 72ch;
