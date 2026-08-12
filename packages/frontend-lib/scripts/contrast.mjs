@@ -23,6 +23,20 @@
 // que un `var(--sx-accent)` dentro de un valor oscuro tiene que resolver contra
 // el acento OSCURO. Resolverlo siempre contra el claro habría sido la misma
 // trampa una vez más, sólo que adentro del propio arnés.
+//
+// EL SEXTO CASO, Y POR QUÉ ES UN EJE DISTINTO. Las dos secciones de arriba
+// cerraron dos huecos del mismo tipo de medición: un FRENTE contra un FONDO
+// (texto sobre superficie, borde sobre estado). Hay un eje que ese tipo de
+// medición no toca nunca: dos piezas que SIGNIFICAN cosas distintas —la
+// cabecera y el hover de su propio control, el estado pasajero y el
+// persistente, los dos registros de texto secundario— pueden resolver al
+// MISMO color sin que ninguna comprobación de legibilidad lo note, porque las
+// dos siguen siendo legibles contra lo que tienen detrás. Legible no es lo
+// mismo que distinguible: dos colores que pasan el piso de 4.5 contra su
+// fondo pueden estar a 1.00 el uno del otro. `evalDistinct()`, más abajo,
+// mide exactamente eso — dos tokens, resueltos, comparados ENTRE SÍ, nunca
+// contra un fondo— y es la razón por la que el archivo se llama «contraste» y
+// no «legibilidad»: hasta ahora medía sólo la mitad de lo que promete.
 import { TOKENS, TOKENS_DARK } from '../src/lib/tokens.js';
 
 const hex = (h) => {
@@ -181,42 +195,109 @@ function evalContract(tokens) {
   return fails;
 }
 
-// CHECKS × {claro, oscuro} × {las perillas de arriba}: la matriz completa, no
-// dos listas. Cuatro combinaciones × diecisiete comprobaciones son demasiadas
-// filas para leer una por una, así que la salida es un resumen por
-// combinación —cuántas pasan, cuántas fallan— y el detalle completo sólo de
-// lo que falla. Si nadie puede leer la salida, nadie la va a correr.
+// ── clase 2: DISTINGUIBILIDAD ───────────────────────────────────────────
+// Los ocho pares de abajo son los que un defecto real ya rompió: dos roles
+// que un componente pinta uno al lado del otro (o uno encima del otro, en
+// duración) y que tienen que leerse como DOS cosas. Ninguno se mide contra un
+// fondo — se miden entre sí.
+const DISTINCT = [
+  ['--sx-thead', '--sx-accent-soft', 'cabecera contra el hover de su control'],
+  ['--sx-thead', '--sx-surface', 'la banda contra la tarjeta'],
+  ['--sx-accent-soft', '--sx-accent-pick', 'pasajero contra persistente'],
+  ['--sx-accent-soft', '--sx-surface', 'el hover contra el reposo'],
+  ['--sx-accent-pick', '--sx-surface', 'la selección contra el reposo'],
+  ['--sx-ink-2', '--sx-ink-3', 'los dos registros de texto secundario'],
+  ['--sx-line', '--sx-edge', 'ambiente contra límite de control'],
+  ['--sx-sunk', '--sx-surface', 'el control contra su tarjeta']
+];
+
+// EL UMBRAL. WCAG no cubre este eje —no hay un piso que copiar— así que sale
+// de medir los ocho pares de arriba en las cuatro combinaciones y mirar dónde
+// cae lo que ya se sabe roto. Los cuatro colapsos genuinos (--sx-thead contra
+// --sx-accent-soft en oscuro, las dos perillas; --sx-ink-2 contra --sx-ink-3
+// en oscuro, las dos perillas) miden 1.0002, 1.0023, 1.0035 y 1.0437 — ninguno
+// pasa de 1.044. La separación más sutil que SÍ es real —--sx-thead contra
+// --sx-surface, claro, cromo gris— mide 1.060. 1.05 cae en ese hueco, con
+// margen para los dos lados. El 1.10 que sugería el pliego original habría
+// marcado como rotos varios pares que no lo son —la banda de cabecera y el
+// escalón hundido contra su tarjeta, en claro— y que tokens.js ya documenta
+// como una sutileza deliberada (el tinte al 6 %), no un descuido. Si un valor
+// nuevo empuja algo por debajo de 1.05, léase así: por debajo de este piso,
+// en una pantalla sucia o para un ojo con baja sensibilidad al contraste, dos
+// piezas que significan cosas distintas se leen como la misma pieza.
+const DISTINCT_MIN = 1.05;
+
+/**
+ * Corre la clase 2 (DISTINCT) contra un juego de tokens ya apilado. Misma
+ * forma de salida que `evalContract`, para que el llamador pueda tratar las
+ * dos clases de forma uniforme.
+ */
+function evalDistinct(tokens) {
+  const fails = [];
+  const ground = resolve(tokens['--sx-ground'], tokens);
+  for (const [a, b, checkLabel] of DISTINCT) {
+    const ca = resolve(tokens[a], tokens, ground);
+    const cb = resolve(tokens[b], tokens, ground);
+    const r = ratio(ca, cb);
+    if (r < DISTINCT_MIN) fails.push({ fg: a, bg: b, r, min: DISTINCT_MIN, checkLabel });
+  }
+  return fails;
+}
+
+// CHECKS × DISTINCT × {claro, oscuro} × {las perillas de arriba}: la matriz
+// completa, no listas sueltas. Cada combinación corre las DOS clases —
+// legibilidad (¿se lee?) y distinguibilidad (¿se distinguen?)— porque un
+// token puede pasar una y fallar la otra, y las dos tienen que estar en verde
+// a la vez para que la combinación cuente como buena. Demasiadas filas para
+// leer una por una, así que la salida es un resumen por combinación —cuántas
+// pasan, cuántas fallan, de cada clase— y el detalle completo sólo de lo que
+// falla. Si nadie puede leer la salida, nadie la va a correr.
 let malas = 0;
 const resumen = [];
 const detalle = [];
 for (const [temaNombre, apilar] of THEMES) {
   for (const [tint, tintLabel] of CHROME_KNOBS) {
     const label = `${temaNombre} · ${tintLabel}`;
-    const fails = evalContract(apilar(tint));
+    const tokens = apilar(tint);
+    const legibilidad = evalContract(tokens).map((f) => ({ ...f, clase: 'legibilidad' }));
+    const distinguibilidad = evalDistinct(tokens).map((f) => ({ ...f, clase: 'distinguibilidad' }));
+    const fails = [...legibilidad, ...distinguibilidad];
     malas += fails.length;
-    resumen.push({ label, total: CHECKS.length, fails });
+    resumen.push({
+      label,
+      totalLeg: CHECKS.length,
+      failLeg: legibilidad.length,
+      totalDist: DISTINCT.length,
+      failDist: distinguibilidad.length,
+      fails
+    });
     if (fails.length) detalle.push({ label, fails });
   }
 }
 
-console.log('\n── MATRIZ DE CONTRASTE — contrato duro × 2 temas × 2 perillas ──');
-console.log('combinación'.padEnd(26) + 'pasan  fallan');
-console.log('-'.repeat(40));
+console.log('\n── MATRIZ DE CONTRASTE — legibilidad + distinguibilidad × 2 temas × 2 perillas ──');
+console.log('combinación'.padEnd(26) + 'legibilidad     distinguibilidad');
+console.log(''.padEnd(26) + 'pasan  fallan   pasan  fallan');
+console.log('-'.repeat(62));
 for (const s of resumen) {
-  const ok = s.total - s.fails.length;
-  console.log(`${s.label.padEnd(26)} ${String(ok).padStart(5)}  ${String(s.fails.length).padStart(6)}`);
+  const okLeg = s.totalLeg - s.failLeg;
+  const okDist = s.totalDist - s.failDist;
+  console.log(
+    `${s.label.padEnd(26)} ${String(okLeg).padStart(5)}  ${String(s.failLeg).padStart(6)}   ${String(okDist).padStart(5)}  ${String(s.failDist).padStart(6)}`
+  );
 }
-console.log('-'.repeat(40));
+console.log('-'.repeat(62));
 
 if (detalle.length) {
   console.log('\n── detalle de lo que falla ──────────────────────────────────');
   for (const d of detalle) {
     console.log(`\n${d.label}`);
-    console.log('token                    sobre               real    piso   \n' + '-'.repeat(64));
+    console.log('token                    contra/sobre        real     piso   \n' + '-'.repeat(70));
     for (const f of d.fails) {
       if (f.bg) {
+        const verbo = f.clase === 'distinguibilidad' ? 'NO SE DISTINGUEN' : 'FALLA';
         console.log(
-          `${f.fg.padEnd(24)} ${f.bg.padEnd(19)} ${f.r.toFixed(2).padStart(5)}  ${f.min.toFixed(1)}  FALLA — ${f.checkLabel}`
+          `${f.fg.padEnd(24)} ${f.bg.padEnd(19)} ${f.r.toFixed(3).padStart(6)}  ${f.min.toFixed(2).padStart(5)}  ${verbo} — ${f.checkLabel}`
         );
       } else {
         console.log(`${f.fg.padEnd(24)} ${f.checkLabel}`);
@@ -224,7 +305,7 @@ if (detalle.length) {
     }
   }
 }
-console.log(malas ? `\n${malas} comprobacion(es) fallando en la matriz` : '\nla matriz entera pasa: 4 combinaciones, 0 fallas');
+console.log(malas ? `\n${malas} comprobacion(es) fallando en la matriz` : '\nla matriz entera pasa: 4 combinaciones, 0 fallas (legibilidad y distinguibilidad)');
 
 // Las líneas de abajo son informativas (no suman a `malas`) y se miden una
 // sola vez, sobre el claro con la perilla por defecto: no cambian de rol
