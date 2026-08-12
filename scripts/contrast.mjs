@@ -438,6 +438,18 @@ const DISTINCT = [
     'color-mix(in srgb, var(--sx-edge) 8%, var(--sx-sunk))',
     '--sx-ground',
     'Card variant="filled": el relleno contra el campo, sin sombra que lo separe'
+  ],
+  // SEXTA EXTENSIÓN DEL ARNÉS. La arista de `crest` (Card.svelte) usaba
+  // --sx-e-inset — blanco al 90% sobre --sx-surface blanco en claro — y
+  // nadie medía la arista CONTRA su propia superficie porque el par no
+  // existía. 1.000:1, exactamente cero distancia: no había defecto sutil,
+  // había ausencia. `--card-crest-line`, el token propio que reemplaza
+  // --sx-e-inset ahí (ver el comentario en Card.svelte para por qué no se
+  // tocó el compartido), es lo que se mide acá.
+  [
+    'color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface))',
+    '--sx-surface',
+    'Card variant="crest": la arista contra su propia superficie'
   ]
 ];
 

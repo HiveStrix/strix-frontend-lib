@@ -74,17 +74,41 @@
   //   crest — la línea, dibujada donde no estorba. Adaptada de un ERP real
   //   — de ahí salió el pedido de abrir esta salida — y RECOMPUESTA con
   //   tokens de Nácar, no copiada: las tres capas ya existían, sueltas.
-  //     · `--sx-e-inset`               el reflejo especular de arriba
+  //     · `--card-crest-line`         el filo de arriba (token PROPIO — ver
+  //                                    por qué más abajo)
   //     · `0 0 0 1px var(--sx-edge)`   el anillo, EN LA SOMBRA — no en
   //                                    `border`: no ocupa layout, no pelea
   //                                    con el radio. `ChoiceCards.svelte` usa
   //                                    `border` para su propio anillo y paga
   //                                    ese costo; acá no hace falta pagarlo.
   //     · `--sx-e-1/2/3`               la sombra de siempre, según `elevation`
-  //   `--sx-e-inset` ya vale distinto por tema (.9 en claro, .05 en oscuro):
-  //   un reflejo blanco al 60% se ve bien sobre blanco y grita sobre negro,
-  //   y ésa es la razón de que el número no sea fijo. No se inventó un rgba
-  //   nuevo acá — se usó el que ya estaba resuelto y medido.
+  //   LA PRIMERA VERSIÓN USABA `--sx-e-inset` — el reflejo blanco que ya
+  //   tenían Button y Toast — y ERA UN DEFECTO, la novena repetición del
+  //   mismo error de este repo: un valor copiado de otro sistema no
+  //   significa lo mismo donde se pega. En Sarion las tarjetas viven sobre
+  //   un fondo oscuro y un reflejo blanco AHÍ lee. Acá `--sx-surface` en
+  //   claro es `#FFFFFF` — blanco al 90% sobre blanco mide 1.000:1, ni un
+  //   defecto sutil: no hay línea, literalmente. Nadie lo vio en pantalla
+  //   hasta que una persona miró la variante; `pnpm contrast` no lo atrapaba
+  //   porque el par no estaba medido — ver `DISTINCT` en
+  //   `scripts/contrast.mjs`, ahora sí lo está.
+  //   UN REFLEJO BLANCO NECESITA ALGO OSCURO DEBAJO. Por eso NO se tocó
+  //   `--sx-e-inset` — lo usan `Button.svelte` y `Toast.svelte` sobre
+  //   superficies donde el reflejo SÍ trabaja (el acento pleno, una sombra
+  //   `e-3` fuerte) y retocarlo ahí para arreglar acá habría repetido el
+  //   mismo error una vez más, sólo que en la dirección contraria. `crest`
+  //   tiene su propio token, `--card-crest-line`, definido como
+  //   `color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface))` — un 6% de
+  //   la TINTA sobre la SUPERFICIE, no un rgba fijo. Es opaco (no depende de
+  //   qué haya detrás) y no necesita un bloque `[data-sx-theme="dark"]`
+  //   aparte: `--sx-ink` y `--sx-surface` ya se reamarran solos por tema, así
+  //   que UNA fórmula sirve para las dos. En claro, `--sx-ink` es casi
+  //   negro: el filo sale apenas más oscuro que la superficie — un canto
+  //   iluminado desde arriba, leído sobre papel, no un reflejo. En oscuro,
+  //   `--sx-ink` es casi blanco: la MISMA fórmula da, sola, el reflejo claro
+  //   que antes había que escribir a mano. Medido: 1.12–1.18 en las cuatro
+  //   combinaciones de tema y perilla, todas por encima del piso de 1.05 —
+  //   ver el par nuevo en `DISTINCT`.
   //
   //   filled — el tono. Sin sombra, o con la mínima: el relleno hace el
   //   trabajo que antes hacía la luz, así que una grilla de muchas tarjetas
@@ -213,6 +237,15 @@
        faint and raise the percentage later if it turns out to under-read — it
        is one number, not a rewrite. */
     --card-glow: color-mix(in srgb, var(--card-tone, transparent) 22%, transparent);
+    /* THE CREST EDGE — `crest` only, costs nothing otherwise. A token OF ITS
+       OWN, not a re-bind of `--sx-e-inset` (Button/Toast keep that one
+       untouched, see the note at the top of this file for why). Built
+       entirely from `--sx-ink` and `--sx-surface`, which already re-bind
+       under `[data-sx-theme="dark"]`, so one formula covers both themes:
+       dark ink on a light surface reads as a hairline shadow, light ink on
+       a dark surface reads as the reflection the mechanism was named for.
+       Measured: 1.12–1.18 across theme × chrome-tint. See `pnpm contrast`. */
+    --card-crest-line: color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface));
     /* THE FILL FOR `filled` ONLY — costs nothing when the variant is not
        `filled` since nothing reads it otherwise. `--sx-sunk` alone measured
        1.042 against `--sx-ground` in dark (below this repo's 1.05 floor);
@@ -276,41 +309,41 @@
      be flat and still show its line; that is the whole point of choosing a
      line over light) where `raised` shows nothing at `.e0` — altitude is not
      what identifies a crest card, the ring is. */
-  .crest.e0 { box-shadow: var(--sx-e-inset), 0 0 0 1px var(--sx-edge); }
+  .crest.e0 { box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge); }
   .crest.e1 {
-    box-shadow: var(--sx-e-inset), 0 0 0 1px var(--sx-edge), var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
+    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
   }
   .crest.e2 {
-    box-shadow: var(--sx-e-inset), 0 0 0 1px var(--sx-edge), var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
+    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
   }
   .crest.e3 {
-    box-shadow: var(--sx-e-inset), 0 0 0 1px var(--sx-edge), var(--sx-e-3), 0 12px 28px -18px var(--card-glow);
+    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-3), 0 12px 28px -18px var(--card-glow);
   }
   .crest.selected {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, var(--sx-e-inset), 0 0 0 1px var(--sx-edge),
+      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
       var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
   }
   .crest.selected.e2 {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, var(--sx-e-inset), 0 0 0 1px var(--sx-edge),
+      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
       var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
   }
   .crest.selected.e3 {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, var(--sx-e-inset), 0 0 0 1px var(--sx-edge),
+      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
       var(--sx-e-3), 0 12px 28px -18px var(--card-glow);
   }
   .crest.live:hover {
-    box-shadow: var(--sx-e-inset), 0 0 0 1px var(--sx-edge), var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
+    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
   }
   .crest.live.selected:hover {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, var(--sx-e-inset), 0 0 0 1px var(--sx-edge),
+      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
       var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
   }
   .crest.live:active {
-    box-shadow: var(--sx-e-inset), 0 0 0 1px var(--sx-edge), var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
+    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
   }
 
   /* ═══ VARIANT: filled — el tono ═══════════════════════════════════════════
