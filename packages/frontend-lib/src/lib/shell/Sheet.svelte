@@ -240,15 +240,24 @@
     inset: 0;
     z-index: var(--sx-z-overlay);
     display: flex;
-    /* Los seis de abajo cancelan la hoja de estilos que trae `popover» —
-       `[popover] { margin: auto; border: solid; padding: .25em; overflow: auto;
-       color: CanvasText; background-color: Canvas; }`, activa apenas el
-       atributo está escrito, esté abierto o no. Cada una es un bug visible si
-       se deja: `margin: auto` pelea con `inset: 0` y termina centrando una
-       caja chica en vez de cubrir la pantalla; `border: solid` dibuja un filo
-       de ~3px que nadie pidió; `padding` encoge el área que el velo (`inset: 0`
-       contra ESTA caja) alcanza a cubrir; y `Canvas` pinta una placa opaca
-       detrás de `--sx-scrim`, que es translúcido a propósito. Nada de esto es
+    /* La hoja de estilos que trae `popover` —activa apenas el atributo está
+       escrito, esté abierto o no— impone diez declaraciones sobre CUALQUIER
+       `[popover]`: `position: fixed; inset: 0; width: fit-content; height:
+       fit-content; margin: auto; border: solid; padding: .25em; overflow:
+       auto; color: CanvasText; background-color: Canvas`. `position: fixed`
+       e `inset: 0` son exactamente los valores que esta regla ya pone dos
+       líneas arriba —no hay nada que cancelar ahí, coinciden—. Los OCHO
+       restantes sí necesitan reset, y van todos abajo: sin ellos, `margin:
+       auto` pelea con `inset: 0` y termina centrando una caja chica en vez de
+       cubrir la pantalla; `border: solid` dibuja un filo de ~3px que nadie
+       pidió; `padding` encoge el área que el velo (`inset: 0` contra ESTA
+       caja) alcanza a cubrir; `Canvas` pinta una placa opaca detrás de
+       `--sx-scrim`, que es translúcido a propósito; y `width`/`height:
+       fit-content` —las dos que faltaban acá y por eso el cajón dejaba de
+       cubrir la pantalla— sobredeterminan el posicionamiento junto con
+       `inset: 0`: con un ancho y un alto que no son `auto`, el navegador
+       descarta `right` y `bottom`, y la caja pasa a ser shrink-to-fit anclada
+       arriba a la izquierda en vez de cubrir el viewport. Nada de esto es
        estilo nuevo: es lo que un `<div>` común ya tenía, repetido para que
        `popover` no lo pueda pisar. */
     margin: 0;
@@ -257,6 +266,8 @@
     overflow: visible;
     color: inherit;
     background: none;
+    width: auto;
+    height: auto;
   }
 
   .scrim {
