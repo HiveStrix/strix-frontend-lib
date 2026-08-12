@@ -292,12 +292,22 @@
      the data lands. The sweep says «still coming» and nothing else; under
      reduced motion it simply stops and the bone stays. */
   .bone-line { min-height: 1.1em; }
+  /* EL BRILLO QUE BARRE, MEDIDO. Encontrado en el barrido visual: en tema
+     oscuro el «Cargando…» de MTTR era casi invisible (≈1.13:1 muestreado por
+     píxel en pantalla, el mismo orden que otros defectos de este repo que
+     pasaban un número y no se veían). --sx-line contra --sx-sunk —el brillo
+     contra el hueso que barre— mide 1.11–1.25:1 según tema, la misma
+     debilidad que Radio.svelte encontró y arregló en su propio anillo
+     deshabilitado (ver ese archivo para los números completos). --sx-edge,
+     el token que este sistema ya mide a 3:1 para el límite de un control,
+     reemplaza al brillo acá; Bar/StackedBar/Sparkline/Threshold comparten
+     esta misma fórmula copiada y llevan el mismo cambio. */
   .bone {
     display: block;
     width: 3.5ch;
     height: .8em;
     border-radius: var(--sx-r-1);
-    background: linear-gradient(90deg, var(--sx-sunk), var(--sx-line), var(--sx-sunk));
+    background: linear-gradient(90deg, var(--sx-sunk), var(--sx-edge), var(--sx-sunk));
     background-size: 220% 100%;
     animation: sx-bone 1.4s var(--sx-ease) infinite;
   }

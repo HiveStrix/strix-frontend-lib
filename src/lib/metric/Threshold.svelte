@@ -379,12 +379,15 @@
   }
   .bad .mk { flex: none; width: 9px; height: 9px; margin-top: .28em; }
 
+  /* El brillo que barre era casi invisible en oscuro (~1.11-1.25:1, --sx-line
+     contra --sx-sunk) — mismo defecto y mismo arreglo que Stat.svelte, ver ese
+     archivo para los números completos. */
   .bone {
     display: block;
     width: 100%;
     height: 100%;
     border-radius: var(--sx-r-1);
-    background: linear-gradient(90deg, var(--sx-sunk), var(--sx-line), var(--sx-sunk));
+    background: linear-gradient(90deg, var(--sx-sunk), var(--sx-edge), var(--sx-sunk));
     background-size: 220% 100%;
     animation: sx-bone 1.4s var(--sx-ease) infinite;
   }
