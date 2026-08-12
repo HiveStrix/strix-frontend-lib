@@ -202,13 +202,20 @@
      abajo) usa un relleno propio, más fuerte, porque persiste. */
   .it:hover:not(.dis) { background: var(--sx-accent-soft); color: var(--sx-ink); }
 
-  /* Selected is --sx-accent-pick (18 %, persistente) plus a full-accent edge
-     plus full ink plus aria-current. Compartía relleno con el hover y los dos
-     estados eran indistinguibles; ahora cada uno tiene el suyo, y el canto
-     queda como refuerzo, no como única señal. */
+  /* Elegido es --sx-accent-pick (18 %, persistente) más tinta plena, más
+     semibold, más aria-current. Tres señales sin contar el color, que es la
+     regla de la casa.
+     LLEVÓ UN CANTO DE ACENTO Y SE QUITÓ. Era `inset 2px 0 0` sobre un elemento
+     con esquina redondeada, y una sombra interior sigue la curva: el canto no
+     se dibujaba como una barra sino como un PARÉNTESIS. Este repo ya lo había
+     arreglado una vez en otra dirección (fcf3236) y se reintrodujo acá sin
+     mirarlo en pantalla.
+     Además era vestigial: existía de cuando hover y elegido compartían relleno
+     y hacía falta una segunda señal. La escalera de dos niveles —soft para lo
+     pasajero, pick para lo persistente— resolvió eso bien, y el arnés mide que
+     los dos se distingan. El canto no agregaba nada y rompía la forma. */
   .it.on {
     background: var(--sx-accent-pick);
-    box-shadow: inset 2px 0 0 var(--sx-accent);
     color: var(--sx-ink);
     font-weight: var(--sx-w-semi);
   }
