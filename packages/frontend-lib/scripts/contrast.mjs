@@ -85,6 +85,14 @@ export const ratio = (a, b) => {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 };
 
+/**
+ * Casi toda entrada de CHECKS/DISTINCT nombra un token de sistema, pero un
+ * valor específico de un solo componente (el "resta" de StackedBar) no
+ * necesita un token nuevo para una sola línea de CSS. Si `key` no es una
+ * clave del diccionario, se trata como el valor crudo que ya es.
+ */
+const lookup = (key, tokens) => (key in tokens ? tokens[key] : key);
+
 // ── el contrato ──────────────────────────────────────────────────────────
 // 3.0  limite de un componente de interfaz  (WCAG 1.4.11)
 // 4.5  texto normal                          (WCAG 1.4.3)
@@ -111,12 +119,26 @@ const CHECKS = [
   ['--sx-ink-3', '--sx-accent-pick', 4.5, 'texto terciario sobre una fila elegida'],
   ['--sx-ink-2', '--sx-accent-pick', 4.5, 'texto secundario sobre una fila elegida'],
   // StackedBar.svelte, .rest: el segmento que dice cuánto falta es un dato, no
-  // ambiente, y se pinta con --sx-edge sobre el fondo REAL de .track
-  // (--sx-sunk) — no contra --sx-surface, que no es lo que hay detrás de la
-  // barra. Antes de este arnés .rest usaba --sx-line (ambiente, sin piso) y
-  // resolvía a 1.15:1; es el cuarto caso de un token usado para un trabajo que
-  // no es el suyo.
-  ['--sx-edge',  '--sx-sunk', 3.0, 'segmento "resta" de StackedBar sobre el fondo del track'],
+  // ambiente, y se pinta sobre el fondo REAL de .track (--sx-sunk) — no contra
+  // --sx-surface, que no es lo que hay detrás de la barra. Antes de este arnés
+  // .rest usaba --sx-line (ambiente, sin piso) y resolvía a 1.15:1; es el
+  // cuarto caso de un token usado para un trabajo que no es el suyo.
+  //
+  // YA NO ES `--sx-edge` A SECAS. Lo fue, y por eso pasaba esta fila y
+  // fallaba la de DISTINGUIBILIDAD más abajo: .s-d (el último paso real de la
+  // rampa) usa el mismo --sx-edge, así que las dos muestras de la leyenda
+  // resolvían al mismo color — 1.000:1 en las cuatro combinaciones, el
+  // defecto que dio origen a la clase 2. El valor de abajo no es un token de
+  // sistema (es específico de esta única línea de CSS), así que no vive en
+  // TOKENS — `evalContract`/`evalDistinct` resuelven cualquier `fg`/`bg` que
+  // no sea una clave del diccionario como el valor crudo que es. Ver el
+  // comentario junto a `.rest` en StackedBar.svelte para los dos números.
+  [
+    'color-mix(in srgb, var(--sx-edge) 90%, var(--sx-sunk))',
+    '--sx-sunk',
+    3.0,
+    'segmento "resta" de StackedBar sobre el fondo del track'
+  ],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
@@ -180,8 +202,8 @@ function evalContract(tokens) {
   const fails = [];
   const ground = resolve(tokens['--sx-ground'], tokens);
   for (const [fg, bg, min, checkLabel] of CHECKS) {
-    const b = resolve(tokens[bg], tokens, ground);
-    const r = ratio(resolve(tokens[fg], tokens, b), b);
+    const b = resolve(lookup(bg, tokens), tokens, ground);
+    const r = ratio(resolve(lookup(fg, tokens), tokens, b), b);
     if (r < min) fails.push({ fg, bg, r, min, checkLabel });
   }
   for (const [k, v] of Object.entries(tokens)) {
@@ -208,14 +230,28 @@ const DISTINCT = [
   ['--sx-accent-pick', '--sx-surface', 'la selección contra el reposo'],
   ['--sx-ink-2', '--sx-ink-3', 'los dos registros de texto secundario'],
   ['--sx-line', '--sx-edge', 'ambiente contra límite de control'],
-  ['--sx-sunk', '--sx-surface', 'el control contra su tarjeta']
+  ['--sx-sunk', '--sx-surface', 'el control contra su tarjeta'],
+  // GUARDA DE REGRESIÓN, no uno de los ocho pares originales del pliego: es
+  // el defecto (c) en persona. `.s-d` (el último paso real de la rampa de
+  // StackedBar) y `.rest` (lo que falta) resolvían los dos a `--sx-edge` —
+  // 1.000:1, la leyenda con dos muestras idénticas y dos nombres distintos.
+  // El arreglo vive en `.rest` (StackedBar.svelte) y en el CHECK de
+  // legibilidad de arriba; esta fila es lo que evita que alguien retinte uno
+  // de los dos por separado y los vuelva a juntar sin que nada avise.
+  [
+    'color-mix(in srgb, var(--sx-edge) 90%, var(--sx-sunk))',
+    '--sx-edge',
+    '"resta" de StackedBar contra su propio último paso (.s-d)'
+  ]
 ];
 
 // EL UMBRAL. WCAG no cubre este eje —no hay un piso que copiar— así que sale
-// de medir los ocho pares de arriba en las cuatro combinaciones y mirar dónde
-// cae lo que ya se sabe roto. Los cuatro colapsos genuinos (--sx-thead contra
-// --sx-accent-soft en oscuro, las dos perillas; --sx-ink-2 contra --sx-ink-3
-// en oscuro, las dos perillas) miden 1.0002, 1.0023, 1.0035 y 1.0437 — ninguno
+// de medir los ocho pares del pliego en las cuatro combinaciones (la novena
+// entrada de arriba es la guarda de regresión de StackedBar, no parte de esa
+// medición) y mirar dónde cae lo que ya se sabe roto. Los cuatro colapsos
+// genuinos (--sx-thead contra --sx-accent-soft en oscuro, las dos perillas;
+// --sx-ink-2 contra --sx-ink-3 en oscuro, las dos perillas) miden 1.0002,
+// 1.0023, 1.0035 y 1.0437 — ninguno
 // pasa de 1.044. La separación más sutil que SÍ es real —--sx-thead contra
 // --sx-surface, claro, cromo gris— mide 1.060. 1.05 cae en ese hueco, con
 // margen para los dos lados. El 1.10 que sugería el pliego original habría
@@ -236,8 +272,8 @@ function evalDistinct(tokens) {
   const fails = [];
   const ground = resolve(tokens['--sx-ground'], tokens);
   for (const [a, b, checkLabel] of DISTINCT) {
-    const ca = resolve(tokens[a], tokens, ground);
-    const cb = resolve(tokens[b], tokens, ground);
+    const ca = resolve(lookup(a, tokens), tokens, ground);
+    const cb = resolve(lookup(b, tokens), tokens, ground);
     const r = ratio(ca, cb);
     if (r < DISTINCT_MIN) fails.push({ fg: a, bg: b, r, min: DISTINCT_MIN, checkLabel });
   }

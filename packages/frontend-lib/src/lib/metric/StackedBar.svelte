@@ -231,7 +231,15 @@
     box-shadow: -1px 0 0 var(--sx-surface) inset;
     min-width: 2px;
   }
-  .seg:last-child { box-shadow: none; }
+  /* .rest, cuando existe, es siempre el último `.seg` del track — pero a
+     diferencia de un `.s-d` genuinamente final, SIEMPRE tiene un vecino a su
+     izquierda (usable exige sum > 0, así que `parts` nunca está vacío cuando
+     `.rest` se dibuja). Perder el corte ahí fue parte del defecto: dos
+     bloques sin línea entre ellos se leen como uno solo, y esto pasaba
+     mientras `.rest` Y `.s-d` compartían además el mismo color — sin corte y
+     sin diferencia, no había NADA que los separara. Con `.rest` ya en su
+     propio tono (ver más abajo) el corte es el remate, no el único arreglo. */
+  .seg:last-child:not(.rest) { box-shadow: none; }
 
   /* The achromatic series ramp, built from role tokens so it inverts with the
      theme instead of vanishing into the ground. */
@@ -250,11 +258,26 @@
   /* --sx-line es ambiente: separa filas, cierra cabeceras, y no lleva piso de
      contraste porque una hairline decorativa no lo necesita. Este segmento no
      es una hairline: pinta cuánto falta, que es un dato, y WCAG 1.4.11 le pide
-     3:1 contra el fondo real del track (--sx-sunk). --sx-edge es el token del
-     límite que SÍ tiene que verse — el mismo que ya pinta el último escalón de
-     la rampa acromática arriba (.s-d) — y resuelve a 4.04:1 en claro y 5.97:1
-     en oscuro contra --sx-sunk, contra el 1.15:1 / 1.26:1 que dejaba --sx-line. */
-  .rest { background: var(--sx-edge); }
+     3:1 contra el fondo real del track (--sx-sunk). Antes usaba var(--sx-edge)
+     a secas — el mismo token que .s-d, el último escalón real de la rampa de
+     arriba — y las dos muestras de la leyenda resolvían al MISMO color:
+     1.000:1 entre sí en las cuatro combinaciones, con dos nombres distintos
+     debajo. Legible no es lo mismo que distinguible: --sx-edge sobre
+     --sx-sunk pasaba de sobra (4.04:1 claro / 5.68:1 oscuro, cromo morado) y
+     el defecto seguía invisible porque nada comparaba dos tintas ENTRE sí —
+     ver «clase 2» en scripts/contrast.mjs.
+
+     La salida es un quinto escalón, más allá de --sx-edge: --sx-edge YA es el
+     más claro de los cuatro de la rampa (n-400, más claro que --sx-ink-3 en
+     n-500), así que seguir aclarando en la misma dirección — hacia --sx-sunk,
+     el fondo real del track — es la continuación natural del degradé, no un
+     color inventado, y encaja con lo que .rest significa: la ausencia de
+     dato, un paso más recesivo que cualquier segmento medido. Al 90% de
+     --sx-edge el peor caso de cada piso —no el mismo, en dos combinaciones
+     distintas de la matriz— da 3.27:1 contra --sx-sunk (claro, cromo gris;
+     piso 3.0) y 1.16:1 contra --sx-edge (oscuro, cromo gris; piso 1.05 de la
+     clase 2). Los dos números salen de `npm run contrast`, no de esta nota. */
+  .rest { background: color-mix(in srgb, var(--sx-edge) 90%, var(--sx-sunk)); }
 
   /* The family's estimate mark, on a fill instead of on a figure. */
   .est {
