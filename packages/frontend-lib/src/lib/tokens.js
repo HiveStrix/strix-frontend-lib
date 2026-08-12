@@ -301,17 +301,32 @@ export const TOKENS_DARK = {
   // panel — pero la dirección se invierte: en claro el thead es la superficie
   // con un tinte del 6%; en oscuro, oscurecer la superficie la hunde, y una
   // cabecera más oscura que su propia tarjeta se lee como un agujero recortado
-  // en la tarjeta, no como una banda posada sobre ella. Aclararla un 6% con
-  // blanco hace el mismo trabajo que el tinte del claro —una banda apenas
-  // distinta— pero en la dirección que en oscuro SÍ se ve como una banda:
-  // #393643 sobre #2C2937, 1.09:1 entre sí (no es texto, es ambiente; no está
-  // en el contrato duro por la misma razón que en claro).
+  // en la tarjeta, no como una banda posada sobre ella. Aclararla con blanco
+  // hace el mismo trabajo que el tinte del claro —una banda apenas distinta—
+  // pero en la dirección que en oscuro SÍ se ve como una banda.
+  //
+  // SUBIÓ DE 6% A 10%, y no por legibilidad — contra --sx-surface ya pasaba
+  // de sobra (1.09:1 citado acá antes era el número del CLARO copiado a este
+  // bloque; el real, con el 6%, medía 1.20:1). El motivo es el sexto caso:
+  // «pasa el contrato» no es lo mismo que «se distingue», y `--sx-thead`
+  // (blanco al 6% sobre la superficie) y `--sx-accent-soft` (el acento al 8%,
+  // y el acento del oscuro es un lavanda muy claro) llegaban por caminos
+  // independientes al MISMO color — 1.002:1 entre sí con la perilla morada,
+  // 1.000:1 con la gris — así que el hover de `.sortbtn` en `data/Table.svelte`
+  // era un no-op sobre una cabecera que ya se veía idéntica al estado que
+  // se supone debía reemplazar. Al 10 %: 1.14:1 morado / gris contra
+  // --sx-accent-soft (piso 1.05 de la clase 2, `scripts/contrast.mjs`) y
+  // 1.37:1 contra --sx-surface — todavía una banda, no un bloque. Se movió
+  // --sx-thead y no --sx-accent-soft porque --sx-accent-soft pinta el hover
+  // de casi toda la librería en oscuro; --sx-thead sólo mueve cabecera de
+  // tabla, cabecera de panel y pie de panel — el ajuste más chico que cierra
+  // el hueco.
   //
   // Se deriva de --sx-surface en vez de fijarse a hex porque no hay ningún
   // peldaño de otro tema tirando de él — es una banda nueva, no algo heredado
   // de la dirección vieja — así que puede seguir a la superficie si el gris de
   // base se recalibra.
-  '--sx-thead': 'color-mix(in srgb, #FFFFFF 6%, var(--sx-surface))',
+  '--sx-thead': 'color-mix(in srgb, #FFFFFF 10%, var(--sx-surface))',
   // LA FIRMA, en oscuro. Sigue resolviendo `var(--sx-accent)`, así que cuando
   // el acento se movió de casi-blanco a lavanda (ver --sx-accent abajo) este
   // token heredó el cambio sin tocarse — es justo el punto de que sea una
