@@ -34,7 +34,7 @@ export { default as Pill } from './Pill.svelte';
 // Surfaces, depth, air and order. Nothing here says anything, so that the
 // things that DO say something are the only things on screen with an opinion.
 export {
-  Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip,
+  Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip,
   Glyph, GLYPHS, GLYPH_PATHS
 } from './shell/index.js';
 

@@ -9,12 +9,13 @@
   // Es más corta que Formularios o Tablas a propósito, y eso también es honesto:
   // documenta cada componente en su forma principal y en el estado que lo rompe,
   // no en las quince combinaciones. Lo que falta está anotado en el README.
-  import { Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, Glyph, GLYPHS } from '../../lib/shell/index.js';
+  import { Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, Glyph, GLYPHS } from '../../lib/shell/index.js';
+  import { Stat, StatStrip } from '../../lib/metric/index.js';
   import Pill from '../../lib/Pill.svelte';
   import Button from '../../lib/action/Button.svelte';
 
   const TOC = [
-    ['card', 'Card'], ['panel', 'Panel'], ['well', 'Well'], ['aire', 'Stack · Row'],
+    ['hero', 'Hero'], ['card', 'Card'], ['panel', 'Panel'], ['well', 'Well'], ['aire', 'Stack · Row'],
     ['divider', 'Divider'], ['toolbar', 'Toolbar'], ['sheet', 'Sheet'],
     ['tooltip', 'Tooltip'], ['glyph', 'Glyph']
   ];
@@ -74,6 +75,50 @@
 
     <main>
       <!-- ═══ CARD ═══════════════════════════════════════════════════════ -->
+  <section id="hero">
+    <h2>Hero</h2>
+    <p class="stand">
+      El panel grande, el primero de una pantalla. Responde «¿cómo vamos?» antes
+      de que nadie lea una tabla. Dos columnas con pesos distintos —1.4 a 1, para
+      que la derecha se lea como secundaria— su propio campo, y más aire que
+      cualquier otra superficie. Hay uno por pantalla; por eso puede permitirse
+      traer color propio.
+    </p>
+
+    <Hero
+      title="Flota"
+      lede="Cuatro equipos vencidos y dos por vencer esta semana."
+      tone="critical">
+      <svelte:fragment slot="actions">
+        <Button variant="solid">Registrar lectura</Button>
+        <Button>Ver vencidos</Button>
+      </svelte:fragment>
+      <svelte:fragment slot="aside">
+        <StatStrip>
+          <Stat label="Vencidos" value={4} tone="critical" />
+          <Stat label="Por vencer" value={2} tone="attention" />
+          <Stat label="Al día" value={62} tone="positive" />
+        </StatStrip>
+      </svelte:fragment>
+    </Hero>
+
+    <p class="stand" style="margin-top: var(--sx-s-6)">
+      <b>Tres campos.</b> La diferencia entre ellos es de qué está hecho el fondo,
+      no de cuánto color lleva. Un producto elige uno y lo repite.
+    </p>
+
+    <Hero surface="ink" title="Cierre de mes" lede="Todo conciliado.">
+      <svelte:fragment slot="aside">
+        <StatStrip>
+          <Stat label="Órdenes" value={148} />
+          <Stat label="Sin cerrar" value={0} />
+        </StatStrip>
+      </svelte:fragment>
+    </Hero>
+
+    <Hero surface="plain" title="Repuestos" lede="Sin movimientos hoy." />
+  </section>
+
       <section id="card">
         <h2>Card</h2>
         <p class="why">

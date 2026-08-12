@@ -22,6 +22,7 @@
 // Imported from here rather than from a file path, so a component can move
 // without breaking every app in the ecosystem.
 
+export { default as Hero } from './Hero.svelte';
 export { default as Card } from './Card.svelte';
 export { default as Panel } from './Panel.svelte';
 export { default as Well } from './Well.svelte';
