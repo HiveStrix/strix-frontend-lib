@@ -11,8 +11,13 @@
    * `new Date('2026-08-05')` is parsed as UTC and lands on the 4th for anyone
    * west of Greenwich — which is all of Costa Rica, every day of the year. The
    * parts are read by hand so a date entered here is the date that shows.
+   *
+   * Exported because Calendar and DateRange need exactly this, and the whole
+   * point of solving a timezone bug once is that nothing downstream solves it
+   * again. `null` on anything that is not a real `YYYY-MM-DD` (optionally with
+   * a time), same as before.
    */
-  function toLocal(v) {
+  export function parseLocalDate(v) {
     const s = String(v ?? '');
     const m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?/);
     if (!m) return null;
@@ -95,7 +100,7 @@
   // would never be re-read by the statement below.
   $: fmt = (d) => (time ? LONG_TIME : LONG).format(d);
 
-  $: parsed = toLocal(value);
+  $: parsed = parseLocalDate(value);
 
   $: days = (() => {
     if (!parsed || !relative) return null;

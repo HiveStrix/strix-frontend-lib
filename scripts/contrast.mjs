@@ -118,6 +118,19 @@ const CHECKS = [
   ['--sx-edge',  '--sx-accent-pick', 3.0, 'borde de control sobre una fila elegida'],
   ['--sx-ink-3', '--sx-accent-pick', 4.5, 'texto terciario sobre una fila elegida'],
   ['--sx-ink-2', '--sx-accent-pick', 4.5, 'texto secundario sobre una fila elegida'],
+  // EL PAR QUE FALTABA, Y YA EXISTÍA. `Table.svelte` pinta `td.num` con
+  // --sx-ink (tinta PRINCIPAL, no -2 ni -3) y una fila seleccionada con
+  // --sx-accent-pick de fondo (`tbody tr.on td`) — así que --sx-ink YA se
+  // dibuja sobre accent-soft (hover/focus-within) y accent-pick (selección)
+  // en cualquier tabla con una columna numérica, desde antes de esta tarea.
+  // Sólo -2 y -3 estaban en el contrato; la tinta principal, la que MÁS se
+  // usa, no. `Calendar.svelte` repite el mismo par (el día elegido es
+  // --sx-accent-pick con texto --sx-ink) y fue lo que lo hizo visible — pero
+  // el defecto es de Table, no del calendario nuevo. Medido: 7.60:1 en el
+  // peor caso (oscuro, cromo gris, contra accent-pick), muy por encima del
+  // piso de 4.5.
+  ['--sx-ink', '--sx-accent-soft', 4.5, 'texto principal sobre un estado'],
+  ['--sx-ink', '--sx-accent-pick', 4.5, 'texto principal sobre una fila elegida'],
   // StackedBar.svelte, .rest: el segmento que dice cuánto falta es un dato, no
   // ambiente, y se pinta sobre el fondo REAL de .track (--sx-sunk) — no contra
   // --sx-surface, que no es lo que hay detrás de la barra. Antes de este arnés
