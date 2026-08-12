@@ -56,6 +56,16 @@ const TONES = ['positive', 'attention', 'critical', 'info', 'neutral'];
 const CHECKS = [
   ['--sx-edge',   '--sx-surface', 3.0, 'borde de control sobre superficie'],
   ['--sx-edge',   '--sx-ground',  3.0, 'borde de control sobre el fondo'],
+  // UN BORDE TIENE DOS LADOS. Las dos comprobaciones de arriba miden contra
+  // superficie y contra fondo, que hoy son el mismo blanco: es una sola medición
+  // escrita dos veces. Un control en hover, o un checkbox dentro de una fila
+  // seleccionada, tiene su borde rodeado del fondo del ESTADO. Ahí es donde el
+  // borde caía a 2.71 sin que nada avisara.
+  ['--sx-edge',  '--sx-accent-soft', 3.0, 'borde de control sobre un estado'],
+  // Y el texto que se dibuja ENCIMA de un estado. --sx-accent-soft pasó a ser
+  // fondo de texto en veintiún sitios y nadie lo estaba midiendo.
+  ['--sx-ink-3', '--sx-accent-soft', 4.5, 'texto terciario sobre un estado'],
+  ['--sx-ink-2', '--sx-accent-soft', 4.5, 'texto secundario sobre un estado'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
@@ -72,8 +82,9 @@ const CHECKS = [
 // (raya divisoria dentro de botón). Se informan aparte para que no pasen
 // inadvertidos, pero no rompen el build.
 const INFO = TONES.map((t) => [`--sx-${t}-edge`, '--sx-surface', `filo del tono ${t}`]);
-INFO.push(['--sx-accent-soft', '--sx-surface', 'hover sobre fila en reposo']);
+INFO.push(['--sx-thead', '--sx-surface', 'banda de encabezado sobre la tarjeta']);
 INFO.push(['--sx-accent-edge', '--sx-surface', 'filo del acento sobre superficie']);
+INFO.push(['--sx-accent', '--sx-surface', 'el acento pleno, para el anillo de selección']);
 
 let malas = 0;
 const ground = resolve(TOKENS['--sx-ground']);
