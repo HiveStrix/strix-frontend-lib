@@ -59,9 +59,9 @@
       id: 'formularios',
       name: 'Formularios',
       dir: 'form',
-      count: 13,
+      count: 14,
       component: Formularios,
-      says: 'Todo lo que una persona contesta. Trece controles que comparten un envoltorio, para que un formulario de nueve campos se lea como un formulario y no como nueve decisiones tomadas en nueve martes distintos.'
+      says: 'Todo lo que una persona contesta. Catorce controles, casi todos con un envoltorio compartido, para que un formulario de nueve campos se lea como un formulario y no como nueve decisiones tomadas en nueve martes distintos.'
     },
     {
       id: 'estructura',
@@ -312,7 +312,7 @@
         <p class="sx-cap">Strix · frontend-lib 0.1.0</p>
         <h1>Un sistema, no siete carpetas.</h1>
         <p class="lede">
-          Cincuenta y ocho componentes Svelte y un juego de tokens para todos los frontends
+          Cincuenta y siete componentes Svelte y un juego de tokens para todos los frontends
           del ecosistema Hivestrix: la Shell, los módulos Core que se dibujan dentro de un
           shadow root, y cualquier app de SvelteKit que venga después. Un solo vocabulario, para
           que alguien que pasa de mantenimiento a facturación no tenga que aprenderlo otra vez.

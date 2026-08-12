@@ -108,6 +108,77 @@
           componente que llama no llegaría hasta acá de todos modos —&nbsp;otro ámbito, y dentro de
           un Core otro shadow root&nbsp;— así que se compone con props y slots en vez de meter mano.
         </p>
+
+        <h3 class="sx-cap sub">tone — un canto, no un relleno</h3>
+        <p class="why">
+          Nueve componentes ya aceptaban <span class="sx-id">tone</span> —Pill, Well, Alert, Stat,
+          Bar…— y las dos superficies principales no: se podía decir «este pozo es crítico» y no
+          «esta tarjeta es crítica». Teñir la tarjeta entera la habría convertido en decoración de
+          fondo, compitiendo con lo que hay escrito encima —&nbsp;eso es lo que hace Well, a tamaño
+          de banda, donde el relleno ES el punto. Acá el tono es un cabo de tres píxeles en la
+          tinta plena del tono, arriba de la tarjeta.
+        </p>
+
+        <div class="demo">
+          <div class="cards">
+            <Card tone="critical">
+              <p class="cl">
+                <b>BAT014</b>
+                <Pill tone="critical" size="sm">Vencido</Pill>
+                <span>12 días sin cerrar el plan semestral.</span>
+              </p>
+            </Card>
+            <Card tone="attention">
+              <p class="cl">
+                <b>BAT001</b>
+                <Pill tone="attention" size="sm">Vence en 3 días</Pill>
+                <span>Cambio de aceite programado para el jueves.</span>
+              </p>
+            </Card>
+            <Card tone="positive">
+              <p class="cl">
+                <b>CL445926</b>
+                <Pill tone="positive" size="sm">Al día</Pill>
+                <span>Última lectura hace 4 días, dentro del intervalo.</span>
+              </p>
+            </Card>
+            <Card tone="info">
+              <p class="cl">
+                <b>CL336793</b>
+                <Pill tone="info" size="sm">Reasignado</Pill>
+                <span>Pasó de Alajuela a Heredia el 2 de agosto.</span>
+              </p>
+            </Card>
+            <Card tone="neutral">
+              <p class="cl">
+                <b>BAT022</b>
+                <Pill tone="neutral" size="sm" mark={false}>51 equipos</Pill>
+                <span>Un conteo, sin estado que reclamar.</span>
+              </p>
+            </Card>
+            <Card tone="critical">
+              <p class="cl">
+                <b>BAT019</b>
+                <Pill tone="critical" size="sm">Vencido</Pill>
+                <span>
+                  Texto largo a propósito, para ver que el canto no se mueve ni se corta con el
+                  contenido: sigue siendo tres píxeles arriba de la tarjeta sin importar cuántas
+                  líneas ocupe el párrafo que tiene debajo, porque es un overlay del tamaño entero
+                  de la Card, no una pieza que crece con el texto.
+                </span>
+              </p>
+            </Card>
+          </div>
+        </div>
+
+        <p class="note">
+          <b>El color nunca viaja solo, tampoco acá.</b> El canto acompaña a un <span class="sx-id">Pill</span>
+          o a una palabra que ya nombra el estado — no lo reemplaza. Una tarjeta teñida sin nada
+          adentro que diga qué significa ese color es exactamente lo que la regla prohíbe. Medido
+          con <span class="sx-id">pnpm contrast</span>: el canto de cada tono da entre 5.8:1 y 8.1:1
+          contra la superficie, en los dos temas — muy por encima del piso de 3:1 que pide 1.4.11
+          para identificar un componente.
+        </p>
       </section>
 
       <!-- ═══ PANEL ══════════════════════════════════════════════════════ -->
@@ -153,6 +224,25 @@
           <span class="sx-id">level=&#123;3&#125;</span> porque viven bajo el <span class="sx-id">h2</span>
           de esta sección.
         </p>
+
+        <h3 class="sx-cap sub">tone — el mismo canto, forwardeado a Card</h3>
+        <p class="why">
+          <span class="sx-id">tone</span> viaja a la <span class="sx-id">Card</span> de adentro tal
+          cual. El caso que de verdad prueba algo es éste, con encabezado: la banda de
+          <span class="sx-id">--sx-thead</span> es opaca y se dibuja encima, así que si el canto
+          fuera una sombra normal —detrás de los hijos— un panel con título se lo comería entero.
+          Se ve arriba de <em>este</em> panel porque el canto vive en un <span class="sx-id">::before</span>
+          que se pinta DESPUÉS del contenido en flujo — ver la cabecera de <span class="sx-id">Card.svelte</span>.
+        </p>
+
+        <div class="demo">
+          <Panel title="BAT014 · Batidora Guanacaste" sub="Plan semestral" icon="alert" level={3} tone="critical">
+            <svelte:fragment slot="actions">
+              <Pill tone="critical" size="sm">Vencido</Pill>
+            </svelte:fragment>
+            <p class="cl">12 días sin cerrar «Cambio de aceite 250 h». El canto de arriba es el único color nuevo en esta tarjeta — la palabra la dice el Pill.</p>
+          </Panel>
+        </div>
       </section>
 
       <!-- ═══ WELL ═══════════════════════════════════════════════════════ -->
@@ -510,6 +600,10 @@
   section { min-width: 0; scroll-margin-top: var(--sx-s-16); }
   h2 { margin: 0; font-size: var(--sx-t-xl); font-weight: var(--sx-w-bold); letter-spacing: -.025em; }
   .why { margin: var(--sx-s-3) 0 0; max-width: 68ch; font-size: var(--sx-t-md); line-height: 1.6; color: var(--sx-ink-2); }
+  /* Un sub-título dentro de una sección — «tone» adentro de Card, por ejemplo —
+     que separa dos demostraciones del mismo componente sin inventar un h2
+     nuevo (eso movería el índice; esto no tiene por qué). */
+  .sub { margin: var(--sx-s-8) 0 0; }
   .note {
     margin: var(--sx-s-5) 0 0;
     max-width: 72ch;

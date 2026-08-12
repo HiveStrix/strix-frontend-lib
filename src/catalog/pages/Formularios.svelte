@@ -16,7 +16,8 @@
   import Pill from '../../lib/Pill.svelte';
   import {
     Field, Input, NumberInput, Textarea, Select, Combobox,
-    Checkbox, Radio, Switch, DateInput, FileDrop, ChoiceCards, today
+    Checkbox, Radio, Switch, DateInput, FileDrop, ChoiceCards, today,
+    Calendar, DateRange
   } from '../../lib/form/index.js';
 
   // ── El índice ─────────────────────────────────────────────────────────────
@@ -31,6 +32,8 @@
     { id: 'select', label: 'Select' },
     { id: 'combobox', label: 'Combobox' },
     { id: 'date', label: 'DateInput' },
+    { id: 'calendar', label: 'Calendar' },
+    { id: 'daterange', label: 'DateRange' },
     { id: 'checkbox', label: 'Checkbox' },
     { id: 'radio', label: 'Radio' },
     { id: 'switch', label: 'Switch' },
@@ -143,6 +146,18 @@
   let repuesto = '';
   let fecha = hoy;
   let fechaMala = '2027-03-14';
+  // ── Calendar / DateRange ──────────────────────────────────────────────────
+  // Los estados feos que pide el pliego: sin elegir todavía, con días
+  // deshabilitados, un mes que empieza en domingo y uno que termina en lunes.
+  // Los dos últimos necesitan un mes puntual — `viewDate` lo abre sin elegir
+  // nada — en vez de depender de qué mes sea «hoy» cuando alguien mire esto.
+  let calVacio = '';
+  // Antes de «hoy» a propósito: esta demo pone `max={hoy}`, así que un elegido
+  // posterior a hoy sería un día a la vez elegido Y deshabilitado — un estado
+  // confuso para liderar la demostración, no uno que la aclare.
+  let calElegido = '2026-08-03';
+  let rangoDesde = '2026-08-20';
+  let rangoHasta = '2026-08-05'; // a propósito antes que «desde»: el estado roto.
   let cobrable = true;
   let todas = false;
   let medida = 'ambos';
@@ -272,6 +287,13 @@
     date: `<DateInput label="Fecha del servicio" bind:value={fecha} relative
            max={hoy} />`,
 
+    calendar: `<Calendar bind:value={fecha} label="Fecha del servicio" max={hoy} />`,
+
+    daterange: `<!-- La de fin no puede ser anterior a la de inicio, y si pasa,
+     el sistema lo dice en el campo — no adivina. -->
+<DateRange bind:start={desde} bind:end={hasta}
+           startLabel="Desde" endLabel="Hasta" />`,
+
     checkbox: `<Checkbox bind:checked={cobrable} label="Cobrable al cliente"
           hint="Entra en la factura de la orden con el 13 % de IVA." />`,
 
@@ -310,7 +332,7 @@
     <p class="sx-cap kicker">Familia · Entrada</p>
     <h1>Formularios</h1>
     <p class="stand">
-      Todo lo que una persona contesta. Trece componentes que comparten un solo envoltorio, para que
+      Todo lo que una persona contesta. Catorce componentes, casi todos con un solo envoltorio compartido, para que
       un formulario de nueve campos se lea como un formulario y no como nueve decisiones distintas
       tomadas en nueve martes distintos.
     </p>
@@ -957,6 +979,111 @@
           <pre><code>{C.date}</code></pre>
           <button class="copy" on:click={() => copy(C.date, 'date')}>
             {copied === 'date' ? 'Copiado' : failed === 'date' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
+          </button>
+        </div>
+      </section>
+
+      <!-- ═══ CALENDAR ════════════════════════════════════════════════════ -->
+      <section id="calendar">
+        <h2>Calendar</h2>
+        <p class="why">
+          El componente que no existía y que obligaba a cada producto a escribir el suyo. Una
+          rejilla de mes navegable por teclado —el patrón ARIA es el de <span class="sx-id">grid</span>,
+          leído de la especificación, no improvisado— con semana que empieza el lunes, como
+          corresponde en es-CR. Se puede usar sola, sin <span class="sx-id">Field</span> alrededor:
+          es un widget, no un control de texto.
+        </p>
+        <p class="why">
+          Reusa el parseo con corrección de zona horaria de <span class="sx-id">DateInput</span> — nada de
+          eso se resuelve dos veces— y los dos tokens que ya separaban lo pasajero de lo persistente
+          en <span class="sx-id">Table</span>: <span class="sx-id">--sx-accent-soft</span> bajo el
+          puntero o el foco, <span class="sx-id">--sx-accent-pick</span> en el día elegido. «Hoy» no
+          se pinta con relleno — eso es lo que significa «elegido» acá— es una marca pequeña, debajo
+          de la cifra. Sin rejilla dibujada: la alineación es aire, nunca una raya.
+        </p>
+
+        <div class="demo grid3">
+          <div class="stack">
+            <p class="hintline">Sin nada elegido todavía</p>
+            <Calendar value={calVacio} label="Fecha del servicio" />
+          </div>
+          <div class="stack">
+            <p class="hintline">Con días deshabilitados (no se puede ir al futuro)</p>
+            <Calendar value={calElegido} max={hoy} label="Fecha de la lectura" />
+          </div>
+          <div class="stack">
+            <p class="hintline">Un mes que empieza domingo</p>
+            <Calendar value="" viewDate="2026-02-01" label="Febrero de ejemplo" />
+          </div>
+          <div class="stack">
+            <p class="hintline">Un mes que termina lunes</p>
+            <Calendar value="" viewDate="2026-08-01" label="Agosto de ejemplo" />
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="when yes">
+            <h3 class="sx-cap">Usalo</h3>
+            <ul>
+              <li>Cuando la elección misma es la tarea — agendar, filtrar por período— y ver el mes entero ayuda a decidir.</li>
+              <li>Con <span class="sx-id">min</span>/<span class="sx-id">max</span> para acotar lo que se puede elegir, con la misma convención que <span class="sx-id">DateInput</span>.</li>
+              <li>Navegado <b>solo con teclado</b>: flechas por día, <span class="sx-id">Home</span>/<span class="sx-id">End</span> a los extremos de la semana, <span class="sx-id">PageUp</span>/<span class="sx-id">PageDown</span> por mes.</li>
+            </ul>
+          </div>
+          <div class="when no">
+            <h3 class="sx-cap">No lo usés</h3>
+            <ul>
+              <li>Para un dato que se escribe rápido y de memoria — «cuándo se hizo esto» es <span class="sx-id">DateInput</span>, que además abre el calendario nativo en una tablet.</li>
+              <li>Para un rango de dos fechas: eso es <span class="sx-id">DateRange</span>, que ya trae la regla entre ambas.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="code">
+          <pre><code>{C.calendar}</code></pre>
+          <button class="copy" on:click={() => copy(C.calendar, 'calendar')}>
+            {copied === 'calendar' ? 'Copiado' : failed === 'calendar' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
+          </button>
+        </div>
+      </section>
+
+      <!-- ═══ DATERANGE ═══════════════════════════════════════════════════ -->
+      <section id="daterange">
+        <h2>DateRange</h2>
+        <p class="why">
+          Dos <span class="sx-id">DateInput</span> no son un rango: un rango es dos fechas más la
+          regla que las une, y la regla es que la de fin no puede ser anterior a la de inicio.
+          Cuando eso pasa el sistema no adivina — lo dice, en el campo que está mal, con el mismo
+          par <span class="sx-id">error</span> + <span class="sx-id">fix</span> que ya usa el resto
+          de la librería: dos frases, porque «qué está mal» y «cómo se arregla» son dos frases
+          distintas.
+        </p>
+
+        <div class="demo">
+          <p class="hintline">Con la fecha de fin puesta antes que la de inicio, a propósito</p>
+          <DateRange bind:start={rangoDesde} bind:end={rangoHasta} />
+        </div>
+
+        <div class="two">
+          <div class="when yes">
+            <h3 class="sx-cap">Usalo</h3>
+            <ul>
+              <li>Para un período real: la ventana de un reporte, la vigencia de un alquiler.</li>
+              <li>Con <span class="sx-id">min</span>/<span class="sx-id">max</span> compartidos entre las dos puntas.</li>
+            </ul>
+          </div>
+          <div class="when no">
+            <h3 class="sx-cap">No lo usés</h3>
+            <ul>
+              <li>Para dos fechas que no son un tramo de lo mismo — «fecha de compra» y «fecha de garantía vencida» son dos hechos distintos, no un rango.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="code">
+          <pre><code>{C.daterange}</code></pre>
+          <button class="copy" on:click={() => copy(C.daterange, 'daterange')}>
+            {copied === 'daterange' ? 'Copiado' : failed === 'daterange' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
           </button>
         </div>
       </section>
