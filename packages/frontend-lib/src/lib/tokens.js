@@ -272,10 +272,25 @@ export const TOKENS_DARK = {
   // RETINTADO con la traza de --sx-chrome-tint al 6%. Es el que menos margen
   // tenía de los cinco hex fríos —está en el contrato duro contra tres
   // fondos, no sólo contra la superficie— así que se verificó el peor caso
-  // antes de tocarlo: contra --sx-accent-pick con la perilla en gris queda en
-  // 4.84 (piso 4.5, con 0.34 de margen). El resto sobra: 7.08/7.28 contra
+  // antes de tocarlo: contra --sx-accent-pick con la perilla en gris quedaba
+  // en 4.84 (piso 4.5, con 0.34 de margen). El resto sobraba: 7.08/7.28 contra
   // superficie, 5.88/6.04 contra --sx-accent-soft (gris/morado).
-  '--sx-ink-2': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #BCC1C4)',
+  //
+  // BASE SUBIDA DE #BCC1C4 A #CED2D4 — el sexto caso, no una falla de
+  // legibilidad. --sx-ink-3 (ver abajo) subió en su momento para pasar el
+  // piso sobre --sx-accent-pick, y este token se retintó por separado; las
+  // dos rutas independientes llegaron a valores casi iguales: 1.044:1 entre
+  // sí con la perilla morada, 1.003:1 con la gris (piso 1.05 de la clase 2,
+  // `scripts/contrast.mjs`) — la jerarquía de tres registros de texto se leía
+  // como dos. --sx-ink-3 no se podía bajar sin volver a romper el piso sobre
+  // --sx-accent-pick que lo subió la primera vez —es el más exigente de los
+  // dos—, así que subió éste: contra --sx-ink-3, 1.14:1 morado / 1.18:1
+  // gris. El resto mejora con el mismo movimiento, no se resiente: 5.87
+  // morado / 5.73 gris contra --sx-accent-pick, 7.16 / 6.96 contra
+  // --sx-accent-soft, 8.63 / 8.38 contra --sx-surface — todos con más margen
+  // que antes, porque un texto más claro sobre un fondo oscuro siempre da
+  // más contraste, nunca menos.
+  '--sx-ink-2': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #CED2D4)',
   // SUBIÓ DE #8E9498 A #BEBDC1. El valor viejo pasaba sobre --sx-surface
   // (4.62) pero fallaba sobre los dos estados que --sx-accent-pick y
   // --sx-accent-soft producen una vez que esos dos dejan de heredar del claro
@@ -294,7 +309,9 @@ export const TOKENS_DARK = {
   // Y ES UN HEX FIJO A PROPÓSITO, no un `var(--sx-n-400)`: n-400 es el peldaño
   // que --sx-edge (el claro) usa, y ya se movió dos veces en este trabajo por
   // razones que no tienen nada que ver con el oscuro — la próxima vez que se
-  // mueva por el claro, el oscuro no puede quedar colgando de ese ajuste.
+  // mueva por el claro, el oscuro no puede quedar colgando de ese ajuste. Es
+  // también por qué el arreglo de la convergencia con --sx-ink-2 de arriba se
+  // hizo del otro lado: este valor es el que ya no tenía margen para moverse.
   '--sx-ink-3': '#BEBDC1',
   '--sx-ink-on': 'var(--sx-n-900)',
   // EL ENCABEZADO. Mismo rol que en claro — separar cabecera de tabla, pie de

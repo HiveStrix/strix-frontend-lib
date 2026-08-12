@@ -105,7 +105,7 @@
   --sx-line: color-mix(in srgb, var(--sx-chrome-tint) 8%, #2C3134);
   --sx-edge: #9C9AA1;
   --sx-ink: color-mix(in srgb, var(--sx-chrome-tint) 4%, #EDEFF0);
-  --sx-ink-2: color-mix(in srgb, var(--sx-chrome-tint) 6%, #BCC1C4);
+  --sx-ink-2: color-mix(in srgb, var(--sx-chrome-tint) 6%, #CED2D4);
   --sx-ink-3: #BEBDC1;
   --sx-ink-on: var(--sx-n-900);
   --sx-thead: color-mix(in srgb, #FFFFFF 10%, var(--sx-surface));
