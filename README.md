@@ -1,6 +1,6 @@
 # Strix · frontend-lib
 
-El sistema de diseño de Strix: un juego de tokens y 54 componentes Svelte para todos los
+El sistema de diseño de Strix: un juego de tokens y 57 componentes Svelte para todos los
 frontends del ecosistema Hivestrix — la Shell, los módulos Core que se dibujan dentro de un
 shadow root, y cualquier app de SvelteKit que venga después.
 
@@ -464,9 +464,10 @@ src/lib/
 │                    Tooltip · Glyph          → catálogo: «Superficies»
 ├── action/    (5)   Button · ButtonGroup · IconButton · Menu · SplitButton
 │                                             → «Acciones»
-├── form/      (13)  Field · Input · NumberInput · Textarea · Select · Combobox ·
-│                    Checkbox · Radio · Switch · DateInput · FileDrop · ChoiceCards ·
-│                    today()                  → «Formularios»
+├── form/      (14)  Field · Input · NumberInput · Textarea · Select · Combobox ·
+│                    Checkbox · Radio · Switch · DateInput · Calendar · DateRange ·
+│                    FileDrop · ChoiceCards · today() · parseLocalDate()
+│                                             → «Formularios»
 ├── nav/       (9)   PageHeader · Breadcrumb · Tabs · Segmented · FilterChips ·
 │                    SearchField · Pagination · SideRail · ShortcutOverlay
 │                                             → «Estructura»

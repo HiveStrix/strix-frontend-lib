@@ -26,7 +26,13 @@ export { default as Radio } from './Radio.svelte';
 export { default as Switch } from './Switch.svelte';
 // `today()` travels with DateInput because the obvious way to write it —
 // `new Date().toISOString().slice(0, 10)` — is the UTC day, and every hour
-// after 6pm in Costa Rica that is tomorrow.
-export { default as DateInput, today } from './DateInput.svelte';
+// after 6pm in Costa Rica that is tomorrow. `parseLocalDate` is the other half
+// of that fix — the read, not the write — and Calendar and DateRange both
+// import it rather than re-solving the same timezone bug.
+export { default as DateInput, today, parseLocalDate } from './DateInput.svelte';
 export { default as FileDrop } from './FileDrop.svelte';
 export { default as ChoiceCards } from './ChoiceCards.svelte';
+// A month grid, keyboard-navigable on its own (see the file for the ARIA grid
+// pattern this follows), and the two-date span built on top of it plus DateInput.
+export { default as Calendar } from './Calendar.svelte';
+export { default as DateRange } from './DateRange.svelte';
