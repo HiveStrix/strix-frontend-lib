@@ -324,6 +324,15 @@ const INFO = TONES.map((t) => [`--sx-${t}-edge`, '--sx-surface', `filo del tono 
 INFO.push(['--sx-thead', '--sx-surface', 'banda de encabezado sobre la tarjeta']);
 INFO.push(['--sx-accent-edge', '--sx-surface', 'filo del acento sobre superficie']);
 INFO.push(['--sx-accent', '--sx-surface', 'el acento pleno, para el anillo de selección']);
+// EL PAR QUE TRAJO `PageHeader variant="banda"`. --sx-thead nunca había
+// tenido que separarse del CAMPO por su cuenta — hasta hoy siempre vivió
+// sobre --sx-surface, adentro de un Panel. `banda` reusa el mismo token, así
+// que hereda la misma restricción, y acá queda medida: contra --sx-ground
+// da 1.03–1.05 en claro, por debajo del piso de distinguibilidad (1.05) —
+// razón de más para que `banda`, como el `.head` de Panel, se apoye siempre
+// en una tarjeta. Informativo y no CHECKS/DISTINCT: el número documenta un
+// uso que la variante deliberadamente no soporta, no uno que produzca.
+INFO.push(['--sx-thead', '--sx-ground', 'PageHeader banda, si se usara sin tarjeta debajo — uso no soportado']);
 
 // Solo los tokens que SON un color. Una sombra o una fuente no se resuelven a
 // un color y pedirselo es ruido, no una comprobacion.

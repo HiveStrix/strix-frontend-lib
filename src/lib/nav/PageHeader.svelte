@@ -38,6 +38,41 @@
   // It does not own the figures (cumplimiento, MTTR, costo). Those are a data
   // component's job and they go through `meta`, so a header never becomes the
   // place where a fourth kind of layout gets invented.
+  //
+  // ─────────────────────────────────────────────────────────────────────────
+  // `variant`: LA MISMA LEY QUE `Card`, DICHA DESDE UN ENCABEZADO.
+  //
+  // Una superficie se separa de su fondo de tres maneras —luz, línea o
+  // tono— y el marco completo, con el argumento entero, vive en la cabecera
+  // de `Card` (`src/lib/shell/Card.svelte`). Acá la misma terna, el mismo
+  // default, la misma regla: `halo` no se toca.
+  //
+  //   halo   (default — NO SE TOCA) — la luz que ya cae con `--sx-halo`.
+  //
+  //   sarion — la línea. Adaptada de un ERP real, de donde salió el pedido
+  //   de dar esta salida: un encabezado de sección compacto, con
+  //   `border-bottom` en vez de halo. El problema que la origina: adentro
+  //   del contenido, donde no hay barra, el halo solo no alcanza y las
+  //   secciones se leen como una sola — «todo parece una sola sección», en
+  //   palabras de quien lo pidió. El gesto real de `sarion` no es la regla:
+  //   es la tipografía — el título en negativo (`-.015em`) contra el
+  //   subtítulo monoespaciado en positivo (`.04em`), el mismo contraste que
+  //   ya usa este sistema entre `.sx-id` (negativo, para un identificador
+  //   mono) y `.sx-cap`/`ChoiceCards` (positivo, para una etiqueta). `sarion`
+  //   NO agrega su propio padding horizontal — eso sigue siendo trabajo del
+  //   padre, como siempre en este componente — sólo cierra su propio ritmo
+  //   vertical antes de la línea.
+  //
+  //   banda  — el tono, igual que `--sx-thead` ya hace en `Panel`. Máxima
+  //   contención: relleno propio, radio propio, sin halo. SE APOYA EN UNA
+  //   TARJETA — nunca directo sobre el campo, igual que el `.head` de
+  //   `Panel`. Medido, no supuesto: `--sx-thead` contra `--sx-surface` da
+  //   1.09; contra `--sx-ground` da 1.03–1.05 en claro, bajo el piso de
+  //   distinguibilidad de este repo (1.05). Es la misma restricción que el
+  //   README ya documenta para `--sx-thead` — «no hay un valor de una sola
+  //   línea que sea seguro en los dos temas»— y `banda` la hereda en vez de
+  //   inventar un token nuevo sólo para esquivarla.
+  // ─────────────────────────────────────────────────────────────────────────
 
   /** The situation, in a sentence. Required — a header with no title is a gap. */
   export let title = '';
@@ -53,6 +88,14 @@
   export let sticky = false;
   /** Skeleton until the first payload lands. Keeps the layout from jumping. */
   export let loading = false;
+  /**
+   * halo | sarion | banda — HOW this header leaves its background: light,
+   * line or tone. `halo` is the default and is the law, not just what
+   * happens when nobody writes anything. See «`variant`» above.
+   */
+  export let variant = 'halo';
+
+  const VARIANTS = new Set(['halo', 'sarion', 'banda']);
 
   // `$:` and not `const`: a legacy reactive statement tracks only the names
   // written inside it, so a helper closing over `level` would be invisible to
@@ -61,9 +104,18 @@
   $: hasMeta = !!$$slots.meta;
   $: hasActions = !!$$slots.actions;
   $: hasCrumbs = !!$$slots.crumbs;
+  // A typo in `variant` fails SAFE (the law) not invisible.
+  $: v = VARIANTS.has(variant) ? variant : 'halo';
 </script>
 
-<header class="hd {tone}" class:sticky class:loading aria-busy={loading || undefined}>
+<header
+  class="hd {tone}"
+  class:sticky
+  class:loading
+  class:sarion={v === 'sarion'}
+  class:banda={v === 'banda'}
+  aria-busy={loading || undefined}
+>
   {#if hasCrumbs}
     <div class="crumbs"><slot name="crumbs" /></div>
   {/if}
@@ -183,6 +235,60 @@
 
   .attention .ttl { color: var(--sx-attention); }
   .critical .ttl { color: var(--sx-critical); }
+
+  /* ═══ VARIANT: sarion — la línea ══════════════════════════════════════════
+     `.hd.sarion`, no una redeclaración de `.hd`: la especificidad tiene que
+     ganarle al halo de arriba sin depender de en qué orden queda el bloque.
+     Ningún padding horizontal — eso lo sigue dando el padre, como en `halo` —
+     sólo el ritmo vertical antes de la línea. `--sx-line` y no `--sx-edge`
+     porque el README ya describe el trabajo exacto de `--sx-line`: «cierra
+     una cabecera, divide una fila» — es literalmente este caso, no un
+     préstamo forzado. */
+  .hd.sarion {
+    box-shadow: none;
+    border-bottom: 1px solid var(--sx-line);
+    padding-bottom: var(--sx-s-4);
+  }
+  /* 15px es --sx-t-md EXACTO; 700 es --sx-w-bold EXACTO. El tracking
+     (-.015em) no es un rgba: es una proporción, y coincide con la que ya usa
+     `.sx-id` en base.css para el mismo motivo — texto compacto y en negrita
+     se cierra un poco — así que no es un número sacado de contexto, es uno
+     que este sistema ya conocía. `max-width: none` porque el clamp de 26ch
+     de arriba está pensado para el título GRANDE (33px); a este tamaño la
+     referencia correcta es `Panel .t`, que tampoco clampea. */
+  .sarion .ttl {
+    font-size: var(--sx-t-md);
+    font-weight: var(--sx-w-bold);
+    letter-spacing: -.015em;
+    line-height: 1.3;
+    max-width: none;
+  }
+  /* El gesto real de la variante. Mono, chico, tracking POSITIVO — lo
+     opuesto del título — que es exactamente el contraste que le da carácter.
+     11px es --sx-t-2xs EXACTO. .04em ya es un valor del sistema (el badge de
+     `ChoiceCards`, `Divider label`), no uno inventado para esta variante. */
+  .sarion .sub {
+    margin-top: var(--sx-s-1);
+    font-family: var(--sx-font-mono);
+    font-size: var(--sx-t-2xs);
+    letter-spacing: .04em;
+    line-height: 1.4;
+    color: var(--sx-ink-3);
+  }
+
+  /* ═══ VARIANT: banda — el tono ════════════════════════════════════════════
+     El mismo `--sx-thead` que ya pinta el `.head` de Panel — no un color
+     nuevo — y por eso hereda la misma restricción: medido contra
+     `--sx-surface` da 1.09 (con margen); contra `--sx-ground` da 1.03–1.05 en
+     claro, bajo el piso de este repo. SE APOYA EN UNA TARJETA, nunca directo
+     sobre el campo — ver la cabecera de este archivo y el catálogo, donde se
+     demuestra adentro de una Card, igual que Panel. */
+  .hd.banda {
+    background: var(--sx-thead);
+    box-shadow: none;
+    padding: var(--sx-s-5) var(--sx-s-6) var(--sx-s-4);
+    border-radius: var(--sx-r-2);
+  }
 
   .crumbs { min-width: 0; }
   .meta { display: flex; flex-wrap: wrap; gap: var(--sx-s-2); margin-top: var(--sx-s-3); }
