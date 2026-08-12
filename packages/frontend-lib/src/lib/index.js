@@ -14,7 +14,7 @@
 // also where the argument for that family is written down — read those headers
 // before choosing a component; they are the actual documentation.
 //
-// This file used to export two things out of fifty-eight, which meant that in
+// This file used to export two things out of fifty-four, which meant that in
 // practice nobody could consume the library at all.
 // ═════════════════════════════════════════════════════════════════════════
 

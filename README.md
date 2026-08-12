@@ -11,7 +11,7 @@ ejemplo: enseña a usar algo que ya no existe así.
 strix-frontend/
 ├── packages/
 │   └── frontend-lib/          @strix/frontend-lib — el sistema
-│       ├── src/lib/           55 componentes y los tokens
+│       ├── src/lib/           54 componentes y los tokens
 │       ├── src/catalog/       el catálogo: cada componente y sus estados
 │       └── src/explore/       direcciones de diseño, para elegir una
 └── examples/
@@ -53,7 +53,7 @@ npm run tokens    # regenera tokens.css desde tokens.js
 
 ### `packages/frontend-lib/src/lib` — el sistema
 
-Los 55 componentes, los tokens y el vocabulario. Es lo único que un producto
+Los 54 componentes, los tokens y el vocabulario. Es lo único que un producto
 consume.
 
 La regla que sostiene todo lo demás: **el acento es un espacio vacío que cada
@@ -182,7 +182,7 @@ adentro: un componente puede estar perfecto y aun así ser fácil de usar mal.
 
 ## Estado
 
-**La librería** tiene 55 componentes y no tiene pruebas automatizadas. El README
+**La librería** tiene 54 componentes y no tiene pruebas automatizadas. El README
 de `packages/frontend-lib` lleva su propia lista de lo que falta.
 
 **La dirección visual es Nácar.** Fondo blanco, piezas que se levantan por
@@ -190,7 +190,7 @@ sombra en vez de por contorno, una barra que se separa por luz y no por raya.
 `src/explore` queda como el registro de las dieciséis direcciones que se
 compararon sobre el mismo contenido —de tarjetas flotantes a franjas sin caja
 a rejilla monoespaciada— y de por qué se eligió ésta y no otra; no se borra
-después de decidir. Los 55 componentes de hoy hablan Nácar. El detalle de la
+después de decidir. Los 54 componentes de hoy hablan Nácar. El detalle de la
 dirección —las tres capas de tokens, las tres perillas, qué copia de dónde—
 está en `packages/frontend-lib/README.md`.
 

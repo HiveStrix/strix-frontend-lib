@@ -1,6 +1,6 @@
 # Strix · frontend-lib
 
-El sistema de diseño de Strix: un juego de tokens y 58 componentes Svelte para todos los
+El sistema de diseño de Strix: un juego de tokens y 54 componentes Svelte para todos los
 frontends del ecosistema Hivestrix — la Shell, los módulos Core que se dibujan dentro de un
 shadow root, y cualquier app de SvelteKit que venga después.
 
@@ -149,8 +149,10 @@ Los tres niveles son custom properties: funcionan igual en el Shell (luz DOM) y 
   `--sx-sunk` a propósito: `--sx-sunk` también pinta los controles de formulario, así que si
   compartieran token, cambiarle el color al encabezado le cambiaba el color a los inputs de paso.
 - **`--sx-halo`.** La firma de la dirección: la luz que la barra superior deja caer en vez de una
-  raya (`box-shadow: 0 12px 28px -18px var(--sx-halo)` en `PageHeader`). Deriva del acento al 55 %
-  contra transparente; ligarlo a `transparent` la apaga sin tocar ninguna regla.
+  raya (`box-shadow: 0 12px 28px -18px var(--sx-halo)` en `PageHeader`). Deriva del acento al 70 %
+  contra transparente — subió desde 55 % al mirarlo en pantalla: sobre papel un resplandor se apaga
+  mucho más rápido que sobre un fondo teñido, y a 55 % quedaba por debajo del umbral en que se
+  percibe; ligarlo a `transparent` la apaga sin tocar ninguna regla.
 
 ### El acento ya no es casi negro
 
@@ -174,9 +176,10 @@ Antes `--sx-accent-soft` y `--sx-accent-edge` eran dos peldaños fijos de la ram
 ```
 
 El cambio de `--sx-accent-soft`/`-edge` existe porque el anterior fue el defecto más caro de toda
-esta reconstrucción: veintiún sitios de la librería se habían movido para que un estado interactivo
-se iluminara en vez de ensuciarse, apuntándolos a `--sx-accent-soft` — y como ese token era un gris
-fijo de la rampa, el arreglo no llegaba a hacer efecto. La regla que hay que llevarse: **un estado
+esta reconstrucción: una parte grande de la librería se había movido para que un estado interactivo
+se iluminara en vez de ensuciarse, apuntando a `--sx-accent-soft` en cada control con hover o
+selección (`grep -rl "var(--sx-accent-soft)" src/lib` da el número de hoy) — y como ese token era
+un gris fijo de la rampa, el arreglo no llegaba a hacer efecto. La regla que hay que llevarse: **un estado
 interactivo se pinta con `--sx-accent-soft`, nunca con `--sx-sunk`.** `--sx-sunk` es el fondo en
 reposo de un control; usarlo para un estado da una superficie más sucia, no una que responde.
 

@@ -101,8 +101,8 @@ El principio: **la librería sugiere, el producto decide.** Nada se congela.
 2. **Afinarlo** — se mueve una perilla:
    ```css
    --sx-accent: #B45309;        /* la marca del core */
-   --sx-chrome-tint: 0%;        /* grises neutros en vez de la traza violeta */
-   --sx-halo: 0%;               /* sin la firma de luz en la barra */
+   --sx-chrome-tint: #8E8E93;   /* grises neutros en vez de la traza violeta */
+   --sx-halo: transparent;      /* sin la firma de luz en la barra */
    --sx-thead: var(--sx-sunk);  /* encabezados con relleno */
    ```
 3. **Necesidad puntual** — se pisa un rol o una primitiva:
@@ -137,7 +137,7 @@ perilla y la documentación dice que no se haga.
 |---|---|
 | `--sx-halo` | La firma: la luz que deja caer la barra en vez de una raya. |
 | `--sx-thead` | El fondo de encabezado. Mueve cabecera de tabla y de panel a la vez. |
-| `--sx-chrome-tint` | Cuánta marca lleva el mobiliario. `0%` = grises neutros. |
+| `--sx-chrome-tint` | Cuánta marca lleva el mobiliario. Es un color, no un porcentaje; ligado a un neutro (`#8E8E93`) da grises neutros. |
 
 `--sx-thead` existe separado de `--sx-sunk` por una razón concreta: `--sx-sunk`
 también pinta los controles de formulario, así que cambiarle el color al
