@@ -127,7 +127,16 @@
 
   .rd.invalid .dot { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
 
-  .rd.disabled .dot { background: var(--sx-sunk); border-color: var(--sx-line); box-shadow: none; }
+  /* `--sx-line` — ambient, meant for a divider, not a limit — measured
+     against `--sx-sunk` on the real catalogue: 1.25:1 in light, and only
+     1.11:1 in dark, where the neutral ramp compresses; the ring all but
+     disappeared into its own fill, «Mejora» in the dark, error-toned Radio
+     group read as an unmarked smudge instead of a control. `--sx-edge` is
+     the token this system already measures at a real floor for exactly this
+     job (`CHECKS`, `scripts/contrast.mjs`, 3:1 against surface AND ground) —
+     3.9–5.7:1 against `--sx-sunk` across every theme × chrome combination,
+     so a disabled radio stays a circle, muted, never a blank. */
+  .rd.disabled .dot { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; }
   .rd.disabled input:checked + .dot::after { background: var(--sx-ink-3); }
 
   .say { display: flex; flex-direction: column; gap: 2px; min-width: 0; }

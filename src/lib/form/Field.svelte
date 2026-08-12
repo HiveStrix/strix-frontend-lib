@@ -238,7 +238,14 @@
 
   /* The ring is the second signal; the word underneath is the first. */
   .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
-  .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-line); box-shadow: none; color: var(--sx-ink-3); }
+  /* --sx-line contra --sx-sunk mide 1.25:1 en claro y 1.11:1 en oscuro —
+     visible acá sólo porque el marco es grande; el mismo par, en un radio o
+     checkbox de 16px, medía igual de mal y se leía como una mancha, no como
+     un control (ver Radio.svelte, arreglado con el mismo cambio, para los
+     números completos). --sx-edge es el token que este sistema ya mide a
+     3:1 para el límite de un control — más robusto acá también, no sólo
+     donde ya se había roto. */
+  .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; color: var(--sx-ink-3); }
   .frame.readonly { background: var(--sx-sunk); box-shadow: none; }
 
   /* The native form controls the slot drops in here. Scoped to this component,

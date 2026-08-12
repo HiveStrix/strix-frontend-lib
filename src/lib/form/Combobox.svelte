@@ -440,7 +440,11 @@
   :global([data-sx-theme='dark']) .frame:focus-within,
   :global(.sx-dark) .frame:focus-within { outline-color: var(--sx-n-0); border-color: var(--sx-n-0); }
   .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
-  .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-line); box-shadow: none; }
+  /* Mismo arreglo que Field.svelte/Radio.svelte: --sx-line contra --sx-sunk
+     mide 1.11:1 en oscuro — --sx-edge es el token de este sistema ya medido
+     a 3:1 para el límite de un control. Ver Radio.svelte para los números
+     completos. */
+  .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; }
 
   input {
     flex: 1 1 auto; min-width: 0; width: 100%;

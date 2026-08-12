@@ -140,7 +140,15 @@
 
   .cb.invalid .box { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
 
-  .cb.disabled .box { background: var(--sx-sunk); border-color: var(--sx-line); box-shadow: none; }
+  /* Mismo arreglo que Radio.svelte, con el mismo número detrás: --sx-line
+     contra --sx-sunk mide 1.25:1 en claro y 1.11:1 en oscuro —un anillo que
+     se funde con su propio relleno—, y esta fórmula era idéntica, char por
+     char, a la de Radio antes de su arreglo, así que heredaba el mismo
+     defecto sin que el barrido lo hubiera visto todavía acá (el catálogo no
+     tiene una demo de checkbox deshabilitado-sin-marcar para mostrarlo).
+     --sx-edge es el token que este sistema ya mide a 3:1 para el límite de
+     un control; ver Radio.svelte para los números completos. */
+  .cb.disabled .box { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; }
   .cb.disabled input:checked + .box,
   .cb.disabled input:indeterminate + .box { background: var(--sx-ink-3); border-color: var(--sx-ink-3); }
 

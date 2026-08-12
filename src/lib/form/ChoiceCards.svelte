@@ -199,7 +199,11 @@
     box-shadow: var(--sx-e-2), 0 0 0 1px var(--sx-accent);
     color: var(--sx-ink);
   }
-  .card:disabled { cursor: not-allowed; background: var(--sx-sunk); box-shadow: none; border-color: var(--sx-line); color: var(--sx-ink-3); }
+  /* Mismo arreglo que Field.svelte/Radio.svelte: --sx-line contra --sx-sunk
+     mide 1.11:1 en oscuro — --sx-edge es el token de este sistema ya medido
+     a 3:1 para el límite de un control. Ver Radio.svelte para los números
+     completos. */
+  .card:disabled { cursor: not-allowed; background: var(--sx-sunk); box-shadow: none; border-color: var(--sx-edge); color: var(--sx-ink-3); }
 
   .top { display: flex; align-items: center; gap: var(--sx-s-2); width: 100%; }
   .ttl {

@@ -998,7 +998,19 @@
     accent-color: var(--sx-accent);
     cursor: pointer;
   }
-  .chk input:disabled { cursor: not-allowed; opacity: .45; }
+  /* `opacity` alone on a NATIVE `<input type="checkbox">` is not safe: an
+     unchecked box has no styleable border of its own here (no
+     `appearance: none`, so its outline is whatever the browser/OS draws) —
+     fading an already-faint native outline by more than half left it with
+     zero visible trace in light theme, measured on the real catalogue at
+     ≈1.2:1. `box-shadow` draws a ring this system DOES own, in the same
+     token `--sx-edge` already measured at 3:1 (`CHECKS`, `scripts/
+     contrast.mjs`) for exactly this job — a control's limit — so a
+     disabled, unchecked checkbox still reads as a checkbox instead of a
+     blank cell. Opacity stays, softened, for the muted AFFECT disabled
+     already promises elsewhere in this system; the ring is what keeps the
+     SHAPE from disappearing along with it. */
+  .chk input:disabled { cursor: not-allowed; opacity: .6; box-shadow: 0 0 0 1px var(--sx-edge); }
   .chk input:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
   .chkw { font-size: var(--sx-t-sm); font-weight: var(--sx-w-medium); color: var(--sx-ink-2); }
 
