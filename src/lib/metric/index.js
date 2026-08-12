@@ -7,7 +7,7 @@
 // library rather than seven directories» means in practice — the seam was one
 // missing file, and nobody noticed because nothing rendered them.
 //
-// The family answers one question in four shapes:
+// The family answers one question in five shapes:
 //
 //   Stat        one figure, with what it counts, what it is measured in, and
 //               what it is being compared against. Never a bare number.
@@ -15,6 +15,10 @@
 //               one shadow — not five cards competing for the same eye.
 //   Bar         a length that states what it is a length of. `max` is not
 //               optional and the bound is printed, every time.
+//   Threshold   a line somebody must not cross. Bar and Stat both refused this
+//               job in their own headers — a colour that changes at a
+//               breakpoint is not a line at a position, and a delta never goes
+//               critical — so this is where a real crossing gets to be a state.
 //   StackedBar  parts of one whole, with the parts named. The legend is half
 //               the component and cannot be switched off.
 //   Sparkline   the shape of a series at the size of a word. No axis, so no
@@ -33,6 +37,7 @@
 export { default as Stat } from './Stat.svelte';
 export { default as StatStrip } from './StatStrip.svelte';
 export { default as Bar } from './Bar.svelte';
+export { default as Threshold } from './Threshold.svelte';
 export { default as StackedBar } from './StackedBar.svelte';
 export { default as Sparkline } from './Sparkline.svelte';
 

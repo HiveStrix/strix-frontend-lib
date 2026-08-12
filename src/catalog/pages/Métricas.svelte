@@ -4,13 +4,13 @@
   // La tercera que no existía, y la que peor consecuencia tenía: `src/lib/metric`
   // ni siquiera tenía un `index.js`, así que de las siete familias era la única
   // que un consumidor no podía importar. Nadie lo notó porque nada la renderizaba.
-  import { Stat, StatStrip, Bar, StackedBar, Sparkline } from '../../lib/metric/index.js';
+  import { Stat, StatStrip, Bar, Threshold, StackedBar, Sparkline } from '../../lib/metric/index.js';
   import { Card, Panel, Stack, Row, Well, Glyph } from '../../lib/shell/index.js';
   import Button from '../../lib/action/Button.svelte';
   import Pill from '../../lib/Pill.svelte';
 
   const TOC = [
-    ['stat', 'Stat'], ['strip', 'StatStrip'], ['bar', 'Bar'],
+    ['stat', 'Stat'], ['strip', 'StatStrip'], ['bar', 'Bar'], ['threshold', 'Threshold'],
     ['stacked', 'StackedBar'], ['spark', 'Sparkline'], ['estados', 'Los estados']
   ];
 
@@ -196,6 +196,70 @@
         </p>
       </section>
 
+      <!-- ═══ THRESHOLD ══════════════════════════════════════════════════ -->
+      <section id="threshold">
+        <h2>Threshold</h2>
+        <p class="why">
+          Una línea que alguien no debe cruzar. No es Bar con un color que cambia en un punto de
+          quiebre —&nbsp;eso ya existe, es la segunda fila del Panel de arriba&nbsp;— y no alcanza:
+          un color que cambia no dice <em>dónde</em> está el límite ni <em>cuánto</em> se cruzó.
+          Acá el límite se dibuja como una línea, en una posición que <b>no se mueve nunca</b>, y
+          el pie hace la resta que nadie más tiene que hacer.
+        </p>
+
+        <div class="demo two">
+          <Panel title="El caso real" sub="Horómetro con plan de mantenimiento" level={3}>
+            <Stack gap={4}>
+              <Threshold label="Horómetro de BAT014" value={312} limit={250} unit="h" overWord="Vencido" />
+              <Threshold label="Horómetro de BAT009" value={186} limit={250} unit="h" />
+              <Threshold label="Presupuesto del trimestre" value={3400000} limit={4200000}
+                unit="₡" unitBefore overWord="Sobrepasado" />
+            </Stack>
+          </Panel>
+
+          <Panel title="El caso que rompe" sub="Una cifra que se pasó MUCHO" level={3}>
+            <Stack gap={4}>
+              <Threshold label="Horas de BAT022 (24,8 % sobre el plan — el borde exacto de la banda)"
+                value={312} limit={250} unit="h" overWord="Vencido" />
+              <Threshold label="Horas de BAT031 (4× el plan)" value={1000} limit={250} unit="h" overWord="Vencido" />
+              <Threshold label="Horas de BAT044 (40× el plan)" value={10000} limit={250} unit="h" overWord="Vencido" />
+            </Stack>
+          </Panel>
+        </div>
+
+        <p class="note">
+          <b>La línea no se mueve.</b> Su posición es <span class="sx-id">1 / (1 + overRoom)</span>,
+          una fracción constante que no depende del valor —&nbsp;80&nbsp;% del ancho con el
+          <span class="sx-id">overRoom</span> por defecto (.25), siempre, esté la lectura debajo,
+          apenas arriba o muy arriba del límite. La primera fila del segundo panel <em>es</em> el
+          caso de BAT014 de la izquierda: 312 sobre 250 es 24,8&nbsp;% de sobra, el borde mismo de
+          la banda de holgura, elegido a propósito para que el ejemplo real de esta cabecera quede
+          a un píxel de necesitar la muesca — no un caso cómodo elegido para evitarla. Las dos
+          filas de abajo sí la necesitan: 1000&nbsp;h y 10&nbsp;000&nbsp;h contra el mismo límite de
+          250&nbsp;h clampan al mismo píxel — la muesca de Bar, prestada y no reinventada — y es la
+          palabra del pie, «superado por 750&nbsp;h» / «superado por 9750&nbsp;h», la que separa
+          una lectura de la otra cuando el dibujo ya no puede.
+        </p>
+        <p class="note">
+          <b>Cruzar la línea es un estado</b>, y el sistema ya tiene el vocabulario: tono, marca y
+          palabra, la ley de Pill, nunca menos de las tres. Por eso <span class="sx-id">overWord</span>
+          no tiene un default de dominio —&nbsp;«Vencido» es correcto para un horómetro y sería
+          falso para un presupuesto&nbsp;— cada producto pone la palabra que corresponde a lo que
+          está midiendo.
+        </p>
+
+        <Panel title="Los estados feos" sub="Los mismos cuatro que el resto de la familia" level={3}>
+          <div class="cols">
+            <Threshold label="Horómetro de BAT051" value={280} limit={250} unit="h" loading />
+            <Threshold label="Horómetro de BAT062" value={280} limit={250} unit="h"
+              error="No se pudo leer el plan de mantenimiento. Reintentá; si sigue igual avisá con el código del equipo." />
+            <Threshold label="Horómetro de BAT073" value={280} limit={null} unit="h" />
+            <Threshold label="Consumo proyectado" value={296} limit={250} unit="h" estimate
+              overWord="Vencido" note="Al ritmo de los últimos 30 días." />
+          </div>
+        </Panel>
+      </section>
+
       <!-- ═══ STACKEDBAR ═════════════════════════════════════════════════ -->
       <section id="stacked">
         <h2>StackedBar</h2>
@@ -307,7 +371,7 @@
 
       <!-- ═══ LOS ESTADOS ════════════════════════════════════════════════ -->
       <section id="estados">
-        <h2>Los cuatro estados, en los cinco componentes</h2>
+        <h2>Los cuatro estados, en los seis componentes</h2>
         <p class="why">
           Cargando, vacío, fallado y estimado se comportan igual en toda la familia, porque una
           franja donde una celda dice «—», otra da vueltas y otra muestra un cero es una franja que
@@ -317,7 +381,7 @@
         <div class="demo">
           <Row gap={3} align="center">
             <Button on:click={recargar} busy={cargando}>Simular una lectura</Button>
-            <span class="tiny">Dos segundos de estado cargando en las cinco piezas a la vez.</span>
+            <span class="tiny">Dos segundos de estado cargando en las seis piezas a la vez.</span>
           </Row>
 
           <StatStrip label="Los mismos cinco, cargando">
@@ -329,6 +393,7 @@
 
           <div class="cols">
             <Card pad={5}><Bar label="Horas del mes" value={cargando ? null : 186} max={200} unit="h" loading={cargando} /></Card>
+            <Card pad={5}><Threshold label="Horómetro de BAT014" value={cargando ? null : 312} limit={250} unit="h" loading={cargando} /></Card>
             <Card pad={5}>
               <StackedBar label="Composición" loading={cargando}
                 segments={cargando ? [] : [
@@ -359,12 +424,6 @@
       <section class="closing">
         <h2>Lo que esta familia todavía no tiene</h2>
         <ul>
-          <li>
-            <b>Threshold.</b> Bar y Stat se refieren a él en sus cabeceras —&nbsp;«una cifra que
-            cruzó una línea es trabajo de Threshold»&nbsp;— y no existe. Hoy la manera honesta de
-            decir «pasó el límite» es un Bar con <span class="sx-id">tone</span> y su
-            <span class="sx-id">toneWord</span>, que es lo que hace la segunda barra de más arriba.
-          </li>
           <li>
             <b>Una gráfica con ejes.</b> Sparkline no puede contestar «¿cuánto en marzo?» por
             diseño, y eso está bien: esa pregunta es de un gráfico con marcas, que vive en su

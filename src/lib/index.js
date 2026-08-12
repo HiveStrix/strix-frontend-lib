@@ -68,6 +68,6 @@ export {
 
 // ── metric · the figures ─────────────────────────────────────────────────
 export {
-  Stat, StatStrip, Bar, StackedBar, Sparkline,
+  Stat, StatStrip, Bar, Threshold, StackedBar, Sparkline,
   fmtNum, fmtShare, isBlank, numOf
 } from './metric/index.js';
