@@ -40,15 +40,31 @@ export const supportsPopover =
 // `hidePopover()` en uno que no lo está— tira `InvalidStateError`, así que
 // hace falta comprobar `:popover-open` antes de cada llamada.
 //
-// Esa guarda es idéntica en Menu, Tooltip y Combobox — los tres tienen un
-// elemento que se abre y se cierra muchas veces sobre el mismo nodo (no uno
-// que Svelte crea de nuevo en cada apertura), así que la comprobación de
-// «¿ya está en el estado que quiero?» es exactamente la misma pregunta las
-// tres veces. Vive acá una vez para que no queden tres copias a mano de la
-// misma guarda, con el riesgo de que una se escriba distinto.
+// Esa guarda es idéntica en Menu, Tooltip y Combobox, aunque no los tres
+// abren y cierran el MISMO nodo: Tooltip y Combobox sí reusan un único
+// elemento mientras el componente vive, pero el panel de Menu está dentro de
+// un `{#if open}` — Svelte lo construye de nuevo en cada apertura. Mismo nodo
+// reusado o nodo nuevo por apertura, la pregunta es la misma las tres veces
+// («¿ya está en el estado que quiero?»): dentro de una sola apertura el nodo
+// puede recibir varias llamadas (Menu recalcula en cada scroll/resize
+// mientras sigue abierto), y llamar `showPopover()`/`hidePopover()` cuando ya
+// se está en ese estado tira `InvalidStateError` sin importar si el nodo es
+// viejo o recién creado. Vive acá una vez para que no queden tres copias a
+// mano de la misma guarda, con el riesgo de que una se escriba distinto.
 export function syncPopover(el, open) {
   if (!supportsPopover || !el) return;
-  const isOpen = el.matches(':popover-open');
+  // `:popover-open` se agregó junto con `showPopover()`/`hidePopover()` en
+  // todo motor que los implementa hoy, así que esto no debería tirar — pero
+  // es un selector vía `matches()`, no una propiedad, y una implementación
+  // parcial futura (los métodos sin el selector) lo volvería un
+  // `SyntaxError` real en vez de un `false`. No es un objetivo real hoy;
+  // el try/catch alcanza para no dejarlo tirando por una hipótesis.
+  let isOpen;
+  try {
+    isOpen = el.matches(':popover-open');
+  } catch {
+    isOpen = false;
+  }
   if (open && !isOpen) el.showPopover();
   else if (!open && isOpen) el.hidePopover();
 }

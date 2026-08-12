@@ -212,7 +212,13 @@
     if (supportsPopover) panel.style.setProperty('--sx-menu-tw', `${t.width}px`);
     syncPopover(panel, true);
     const h = panel.offsetHeight;
-    const below = window.innerHeight - t.bottom;
+    // `document.documentElement.clientHeight`, no `window.innerHeight`:
+    // `getBoundingClientRect()` (arriba, en `t`) excluye las barras de
+    // scroll clásicas, pero `innerHeight` las incluye — mezclar los dos deja
+    // un offset de ~15px en cualquier sistema con barras clásicas. `clientHeight`
+    // sí las excluye, igual que `getBoundingClientRect()`.
+    const vh = document.documentElement.clientHeight;
+    const below = vh - t.bottom;
     up = below < h + 8 && t.top > below;
     if (!supportsPopover) return;
     // `align` decide con qué borde del disparador se alinea el panel; con
@@ -220,7 +226,7 @@
     // posicionado, así que los dos bordes se escriben en píxeles de viewport.
     panel.style.left = `${align === 'end' ? t.right - panel.offsetWidth : t.left}px`;
     if (up) {
-      panel.style.bottom = `${window.innerHeight - t.top}px`;
+      panel.style.bottom = `${vh - t.top}px`;
       panel.style.top = 'auto';
     } else {
       panel.style.top = `${t.bottom}px`;
@@ -565,6 +571,18 @@
 
   @media (pointer: coarse) {
     .item { min-height: var(--sx-touch); font-size: var(--sx-t-md); }
+    /* No borrar este guard: el `100%` de acá, bajo `position: absolute` (el
+       camino sin `popover`), resuelve contra el disparador — bajo `fixed`
+       resolvería contra el viewport, que es otra cosa. */
     .panel { min-width: max(100%, 26ch); }
+    /* `.panel.fx` (0,3,0 con el scoping de Svelte) le gana SIEMPRE a la regla
+       de arriba (0,2,0) tenga o no `pointer: coarse` la media query —la
+       especificidad decide antes que la media query, no hay «más tarde en el
+       archivo» que le gane a «más específico»—, así que en táctil con
+       soporte de `popover` el menú se quedaba con el piso de 22ch de `.fx` en
+       vez de 26ch. Misma trampa que ya se corrigió en Tooltip: repetir el
+       selector completo de `.fx` acá adentro, empatando especificidad y
+       ganando por orden. */
+    .panel.fx { min-width: max(var(--sx-menu-tw, 0px), 26ch); }
   }
 </style>

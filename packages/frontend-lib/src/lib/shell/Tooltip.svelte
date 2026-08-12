@@ -166,6 +166,14 @@
     }
     tipEl?.style.setProperty('--sx-tip-touch-a', `${h.bottom}px`);
     tipEl?.style.setProperty('--sx-tip-touch-c', `${cx}px`);
+    // `document.documentElement.clientWidth`/`clientHeight`, no `100vw`/`100vh`:
+    // `getBoundingClientRect()` (`h`, arriba) excluye las barras de scroll
+    // clásicas, pero los viewport units las incluyen — mezclarlos deja un
+    // offset de ~15px en cualquier sistema con barras clásicas. Se escriben
+    // siempre, aunque `place` no sea `top`/`left`, mismo criterio que
+    // `--sx-tip-touch-*`: más barato que decidir en JS cuál hace falta.
+    tipEl?.style.setProperty('--sx-tip-vw', `${document.documentElement.clientWidth}px`);
+    tipEl?.style.setProperty('--sx-tip-vh', `${document.documentElement.clientHeight}px`);
   }
 
   // `fixed` no sigue al disparador solo: si la página —o un contenedor con su
@@ -175,7 +183,13 @@
   $: if (typeof document !== 'undefined' && supportsPopover) {
     document.removeEventListener('scroll', onReposition, true);
     window.removeEventListener('resize', onReposition);
-    if (shown) {
+    // `place` entra en la condición sólo para volverse dependencia de este
+    // bloque — siempre es una de las cuatro direcciones, nunca falsy, así
+    // que no cambia qué rama corre. Sin esto, cambiar `placement` con el tip
+    // ya abierto actualiza la clase (`.top`/`.bottom`/`.left`/`.right`) pero
+    // `layout()` no vuelve a correr: las custom properties se quedan con las
+    // coordenadas del eje anterior, y una Y se lee como X.
+    if (shown && place) {
       layout();
       // En captura: `scroll` no burbujea, así que sólo un listener en el
       // camino de bajada desde `document` oye el de un contenedor interno.
@@ -311,10 +325,16 @@
        solid; overflow: auto; height: fit-content; inset: 0`), activa apenas
        el atributo está escrito — abierto o no. La más importante es `display:
        block`: sin ella, un `.tip` sin abrir sería `display: none` por esa
-       misma hoja, y este nodo tiene que seguir existiendo para quien lo lea
-       por `aria-describedby` aunque nadie lo esté viendo (ver la cabecera del
-       archivo). Nada de esto cambia nada en el camino sin `popover`: son los
-       valores que un `<span>` ya tenía. */
+       misma hoja — concretamente `[popover]:not(:popover-open):not(dialog[open])
+       { display: none; }`, sin `:where()` — y este nodo tiene que seguir
+       existiendo para quien lo lea por `aria-describedby` aunque nadie lo
+       esté viendo (ver la cabecera del archivo). Gana por ORIGEN de la
+       cascada, no por especificidad: esa regla es de la hoja del
+       user-agent, la prioridad más baja, así que una clase de autor cualquiera
+       la pisa sin competir en especificidad contra ella — no hace falta un
+       selector «fuerte» para esto, y sería un error escribir uno pensando
+       que sí hace falta. Nada de esto cambia nada en el camino sin
+       `popover`: son los valores que un `<span>` ya tenía. */
     display: block;
     inset: auto;
     margin: 0;
@@ -337,9 +357,17 @@
      no cambian: el margen sigue sumando la separación al borde fijado, y el
      `transform` es relativo a la caja propia del tip, no a `.wrap`. */
   .tip.fx { position: fixed; }
-  .tip.fx.top    { bottom: calc(100vh - var(--sx-tip-a, 0px)); left: var(--sx-tip-c, 0px); }
+  /* `var(--sx-tip-vh, 100vh)`/`var(--sx-tip-vw, 100vw)`, no `100vh`/`100vw` a
+     secas: `--sx-tip-a` viene de `getBoundingClientRect()`, que excluye las
+     barras de scroll clásicas, y los viewport units las incluyen — restar
+     uno del otro deja un offset de ~15px en cualquier sistema con barras
+     clásicas. `layout()` escribe `--sx-tip-vh`/`--sx-tip-vw` con
+     `document.documentElement.clientHeight`/`clientWidth`, que sí las
+     excluye; el `100vh`/`100vw` dentro de `var()` es sólo el respaldo antes
+     de la primera medición. */
+  .tip.fx.top    { bottom: calc(var(--sx-tip-vh, 100vh) - var(--sx-tip-a, 0px)); left: var(--sx-tip-c, 0px); }
   .tip.fx.bottom { top: var(--sx-tip-a, 0px); left: var(--sx-tip-c, 0px); }
-  .tip.fx.left   { right: calc(100vw - var(--sx-tip-a, 0px)); top: var(--sx-tip-c, 0px); }
+  .tip.fx.left   { right: calc(var(--sx-tip-vw, 100vw) - var(--sx-tip-a, 0px)); top: var(--sx-tip-c, 0px); }
   .tip.fx.right  { left: var(--sx-tip-a, 0px); top: var(--sx-tip-c, 0px); }
 
   @media (prefers-reduced-motion: reduce) {

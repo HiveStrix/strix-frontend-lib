@@ -181,11 +181,17 @@
     if (!wrapEl || typeof window === 'undefined') return;
     const r = wrapEl.getBoundingClientRect();
     const want = 320;
-    dropUp = r.bottom + want > window.innerHeight && r.top > window.innerHeight - r.bottom;
+    // `document.documentElement.clientHeight`, no `window.innerHeight`:
+    // `getBoundingClientRect()` (arriba, en `r`) excluye las barras de scroll
+    // clásicas, pero `innerHeight` las incluye — mezclar los dos deja un
+    // offset de ~15px en cualquier sistema con barras clásicas. `clientHeight`
+    // sí las excluye, igual que `getBoundingClientRect()`.
+    const vh = document.documentElement.clientHeight;
+    dropUp = r.bottom + want > vh && r.top > vh - r.bottom;
     if (!supportsPopover || !popEl) return;
     popEl.style.setProperty('--sx-pop-x', `${r.left}px`);
     popEl.style.setProperty('--sx-pop-w', `${r.width}px`);
-    popEl.style.setProperty('--sx-pop-y', `${dropUp ? window.innerHeight - r.top : r.bottom}px`);
+    popEl.style.setProperty('--sx-pop-y', `${dropUp ? vh - r.top : r.bottom}px`);
   }
 
   // Entrar y salir de la top layer es cosa aparte de `place()`: `close()` no
@@ -501,10 +507,10 @@
      ahora del lado de `margin` en vez de sumado dentro del `calc()` de `top`
      — igual que en Menu.
      `--sx-pop-y` YA trae la dirección resuelta desde `place()` — es
-     `r.bottom` bajando, o `innerHeight - r.top` subiendo — así que acá se usa
-     tal cual, sin volver a restarla de `100vh`: hacerlo de nuevo deshace la
-     cuenta que JS ya hizo y deja la lista mal colocada cuando abre para
-     arriba. */
+     `r.bottom` bajando, o `document.documentElement.clientHeight - r.top`
+     subiendo — así que acá se usa tal cual, sin volver a restarla de nada:
+     hacerlo de nuevo deshace la cuenta que JS ya hizo y deja la lista mal
+     colocada cuando abre para arriba. */
   .pop.fx {
     position: fixed;
     left: var(--sx-pop-x, 0px);
