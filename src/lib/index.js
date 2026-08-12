@@ -53,7 +53,7 @@ export {
 
 // ── nav · where am I, what am I looking at, how do I get to the other thing ─
 export {
-  PageHeader, Breadcrumb, Tabs, Segmented, FilterChips,
+  TopBar, Sidebar, PageHeader, Breadcrumb, Tabs, Segmented, FilterChips,
   SearchField, Pagination, SideRail, ShortcutOverlay
 } from './nav/index.js';
 

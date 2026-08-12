@@ -39,6 +39,12 @@
   // component's job and they go through `meta`, so a header never becomes the
   // place where a fourth kind of layout gets invented.
   //
+  // NOT `TopBar`. This is of the SCREEN — it changes on every route, a new
+  // title and a new eyebrow each time. `TopBar` (`../nav/TopBar.svelte`) is of
+  // the APPLICATION — the product's name, the tenant, the session — and does
+  // not change for as long as somebody stays signed in. A value that stays
+  // the same across every route was never this component's fact to hold.
+  //
   // ─────────────────────────────────────────────────────────────────────────
   // `variant`: LA MISMA LEY QUE `Card`, DICHA DESDE UN ENCABEZADO.
   //

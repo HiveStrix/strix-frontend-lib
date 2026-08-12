@@ -5,15 +5,16 @@
   // ellos tres —Tabs, Segmented y FilterChips— cuya diferencia es justamente lo
   // interesante y no se puede explicar sin ponerlos uno al lado del otro.
   import {
-    PageHeader, Breadcrumb, Tabs, Segmented, FilterChips,
+    TopBar, Sidebar, PageHeader, Breadcrumb, Tabs, Segmented, FilterChips,
     SearchField, Pagination, SideRail, ShortcutOverlay
   } from '../../lib/nav/index.js';
   import Pill from '../../lib/Pill.svelte';
   import Button from '../../lib/action/Button.svelte';
+  import Menu from '../../lib/action/Menu.svelte';
   import { Card, Stack, Row, Glyph, GLYPH_PATHS } from '../../lib/shell/index.js';
 
   const TOC = [
-    ['pageheader', 'PageHeader'], ['breadcrumb', 'Breadcrumb'],
+    ['topbar', 'TopBar'], ['sidebar', 'Sidebar'], ['pageheader', 'PageHeader'], ['breadcrumb', 'Breadcrumb'],
     ['tabs', 'Tabs vs Segmented'], ['chips', 'FilterChips'],
     ['search', 'SearchField'], ['pagination', 'Pagination'],
     ['rail', 'SideRail'], ['shortcuts', 'ShortcutOverlay']
@@ -69,6 +70,28 @@
   // ── Pagination ───────────────────────────────────────────────────────────
   let page = 3;
   let pageSize = 25;
+
+  // ── TopBar ───────────────────────────────────────────────────────────────
+  let qBarra = '';
+  const cuenta = [
+    { id: 'perfil', label: 'Mi perfil' },
+    { id: 'prefs', label: 'Preferencias' },
+    { sep: true },
+    { id: 'salir', label: 'Cerrar sesión', tone: 'critical' }
+  ];
+
+  // ── Sidebar (el primer nivel, junto a SideRail el segundo) ───────────────
+  let modulo = 'mantenimiento';
+  // Arranca colapsado — el default real del componente, no una elección de
+  // este catálogo. El botón de abajo prueba que el otro estado también existe.
+  let moduloAncho = true;
+  const modulos = [
+    { key: 'mantenimiento', label: 'Mantenimiento', icon: GLYPH_PATHS.wrench },
+    { key: 'documentos', label: 'Documentos', icon: GLYPH_PATHS.file, count: 7 },
+    { key: 'inventario', label: 'Inventario', icon: GLYPH_PATHS.box },
+    { key: 'indicadores', label: 'Indicadores', icon: GLYPH_PATHS.gauge },
+    { key: 'integraciones', label: 'Integraciones', icon: GLYPH_PATHS.layers, disabled: true }
+  ];
 
   // ── SideRail ─────────────────────────────────────────────────────────────
   let seccion = 'flota';
@@ -133,6 +156,16 @@
         </thead>
         <tbody>
           <tr>
+            <th scope="row"><span class="sx-id">TopBar</span></th>
+            <td>Nunca cambia. Identidad, tenant, búsqueda, sesión.</td>
+            <td>¿Sigue siendo cierto en la otra pantalla? Si no, es de PageHeader.</td>
+          </tr>
+          <tr>
+            <th scope="row"><span class="sx-id">Sidebar</span></th>
+            <td>El PRIMER nivel: en qué módulo estás.</td>
+            <td>¿Hay más de un módulo activo? Con uno solo no hace falta.</td>
+          </tr>
+          <tr>
             <th scope="row"><span class="sx-id">Tabs</span></th>
             <td>QUÉ estás mirando. Dueño de un panel.</td>
             <td>¿Le mandarías el enlace a alguien? Es una pestaña.</td>
@@ -172,6 +205,115 @@
     </nav>
 
     <main>
+      <!-- ═══ TOPBAR ═════════════════════════════════════════════════════ -->
+      <section id="topbar">
+        <h2>TopBar</h2>
+        <p class="why">
+          La barra de la aplicación, no de la pantalla. Identidad, tenant, búsqueda global,
+          sesión — las cuatro cosas que <b>no cambian</b> cuando la ruta cambia. Si un producto se
+          encuentra pasándole un <span class="sx-id">tenant</span> distinto en cada pantalla, ese
+          valor nunca fue de TopBar: es de PageHeader, que sí cambia con la ruta.
+        </p>
+
+        <div class="demo">
+          <Card pad={0}>
+            <TopBar product="Strix" tenant="Bodegas Opra" href="#/estructura">
+              <SearchField slot="search" bind:value={qBarra} placeholder="Buscar equipos, órdenes, documentos…" />
+              <Menu slot="session" label="Cuenta de María" align="end" items={cuenta}>
+                <span class="avatar" aria-hidden="true">M</span>
+                <span>María</span>
+              </Menu>
+            </TopBar>
+          </Card>
+        </div>
+
+        <p class="note">
+          <b>No reimplementa nada.</b> Lo que va en <span class="sx-id">slot="search"</span> es un
+          <span class="sx-id">SearchField</span> de verdad —&nbsp;con su <b>/</b>, su Escape, su
+          cuenta anunciada— y lo que va en <span class="sx-id">slot="session"</span> es un
+          <span class="sx-id">Menu</span> de verdad —&nbsp;con su trampa de foco, sus flechas, su
+          tipeo. TopBar da el lugar; el comportamiento ya estaba resuelto.
+        </p>
+
+        <h3 class="sx-cap sub">lo que colapsa primero</h3>
+        <p class="why">
+          El tenant es lo primero que se esconde —&nbsp;no se recorta a la mitad, que leería como
+          OTRO tenant— y el nombre del producto se queda. Achicá la ventana o mirá esta misma
+          barra encogida a 380px:
+        </p>
+        <div class="demo">
+          <div class="narrow">
+            <Card pad={0}>
+              <TopBar product="Strix" tenant="Bodegas Opra" href="#/estructura">
+                <SearchField slot="search" placeholder="Buscar…" />
+                <Menu slot="session" label="Cuenta de María" align="end" compact items={cuenta} />
+              </TopBar>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ SIDEBAR ════════════════════════════════════════════════════ -->
+      <section id="sidebar">
+        <h2>Sidebar</h2>
+        <p class="why">
+          El <em>primer</em> nivel de navegación — el que <span class="sx-id">SideRail</span>
+          llevaba años nombrando como «de la Shell» sin que existiera en ningún lado. Dice en qué
+          MÓDULO estás; <span class="sx-id">SideRail</span>, al lado, dice en qué SECCIÓN del
+          módulo. Los dos conviven sin competir por dos decisiones, no una: separan del fondo de
+          formas distintas —&nbsp;Sidebar con una LÍNEA, por ser marco; SideRail con LUZ, por ser
+          contenido&nbsp;— y Sidebar arranca <b>colapsado</b>, en su ancho de sólo íconos, para que
+          la suma de los dos niveles no sea un pasillo de 480px.
+        </p>
+
+        <div class="demo">
+          <!-- El marco exterior simula el borde real de la pantalla: Sidebar
+               vive a ras de ese borde, con su propia línea, nunca con una
+               sombra propia — la sombra de acá es del MARCO de la demo, no
+               del componente. SideRail, adentro, sigue flotando con luz
+               sobre el campo, como en su propia sección más abajo. -->
+          <div class="shellframe">
+            <Sidebar items={modulos} bind:value={modulo} label="Módulos" bind:collapsed={moduloAncho} />
+            <div class="shellbody">
+              <div class="railwrap">
+                <SideRail items={secciones} bind:value={seccion} label="Secciones del módulo" />
+                <Card pad={5}>
+                  <Stack gap={2}>
+                    <p class="sx-cap">Estás en</p>
+                    <p class="big">
+                      <b>{modulos.find((m) => m.key === modulo)?.label ?? '—'}</b>
+                      <span class="chev" aria-hidden="true">›</span>
+                      {secciones.find((s) => s.key === seccion)?.label ?? '—'}
+                    </p>
+                    <p class="tiny">
+                      Dos niveles anidados, dos veces la regla de la casa: ninguno de los dos dice
+                      «acá estás» sólo con color. Sidebar suma un cuarto trazo —&nbsp;el ícono se
+                      engruesa cuando su módulo está elegido&nbsp;— porque arranca colapsado y
+                      <span class="sx-id">font-weight</span> no se nota en una etiqueta que no está.
+                    </p>
+                    <Row gap={2}>
+                      <Button size="sm" variant="ghost" on:click={() => (moduloAncho = !moduloAncho)}>
+                        {moduloAncho ? 'Expandir Sidebar' : 'Colapsar Sidebar'}
+                      </Button>
+                    </Row>
+                  </Stack>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="note">
+          <b>Navegable sólo con teclado, de punta a punta.</b> Cada ítem es un
+          <span class="sx-id">&lt;button&gt;</span> o un <span class="sx-id">&lt;a href&gt;</span>
+          real —&nbsp;nunca un <span class="sx-id">&lt;div&gt;</span> con
+          <span class="sx-id">onclick</span>— así que Tab los alcanza en orden, Enter (y Espacio en
+          el botón) los activa, y el módulo o la sección elegidos llevan
+          <span class="sx-id">aria-current</span> sin que nadie lo escriba a mano. Probalo: Tab
+          desde el buscador de arriba entra directo a los íconos de Sidebar.
+        </p>
+      </section>
+
       <!-- ═══ PAGEHEADER ═════════════════════════════════════════════════ -->
       <section id="pageheader">
         <h2>PageHeader</h2>
@@ -478,10 +620,11 @@
       <section id="rail">
         <h2>SideRail</h2>
         <p class="why">
-          El <em>segundo</em> nivel de navegación. La Shell de Hivestrix ya es dueña del primero
-          —&nbsp;su barra lateral de 240&nbsp;px&nbsp;— así que un módulo que dibuja una segunda
-          barra de altura completa al lado construyó un pasillo. Un rail es para un módulo con
-          secciones de verdad separadas entre las que la gente se mueve todo el día.
+          El <em>segundo</em> nivel de navegación — <span class="sx-id">Sidebar</span>, más
+          arriba, es el primero. Un módulo que dibuja una barra de altura completa sin nada por
+          encima construyó un pasillo igual, así que un rail sigue siendo para un módulo con
+          secciones de verdad separadas entre las que la gente se mueve todo el día, con o sin
+          Sidebar al lado.
         </p>
 
         <div class="demo">
@@ -679,6 +822,39 @@
   .railwrap :global(.rail) { flex: none; }
   .railwrap > :global(*:last-child) { flex: 1 1 auto; min-width: 0; }
 
+  /* Sidebar (marco, sin sombra propia) junto a SideRail (contenido, con
+     Card) — los dos niveles anidados que este demo existe para probar que
+     conviven. El marco exterior es el único con radio y sombra: representa
+     el borde de la pantalla, no algo que Sidebar se pone encima. */
+  .shellframe {
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+    border-radius: var(--sx-r-3);
+    box-shadow: var(--sx-e-1);
+    overflow: hidden;
+  }
+  .shellframe :global(.side) { flex: none; }
+  .shellbody { flex: 1 1 auto; min-width: 0; padding: var(--sx-s-5); background: var(--sx-ground); }
+  .chev { margin: 0 var(--sx-s-1); color: var(--sx-ink-3); font-weight: var(--sx-w-normal); }
+
+  /* La barra encogida a mano, para mostrar el colapso sin depender de que
+     alguien de verdad achique la ventana del navegador. */
+  .narrow { max-width: 380px; border-radius: var(--sx-r-3); overflow: hidden; box-shadow: var(--sx-e-1); }
+
+  .avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: var(--sx-r-pill);
+    background: var(--sx-accent);
+    color: var(--sx-accent-ink);
+    font-size: var(--sx-t-2xs);
+    font-weight: var(--sx-w-semi);
+  }
+
   .closing { padding-top: var(--sx-s-8); box-shadow: inset 0 1px 0 var(--sx-line); }
   .closing ul { margin: var(--sx-s-4) 0 0; padding-left: var(--sx-s-5); max-width: 70ch; }
   .closing li { font-size: var(--sx-t-sm); line-height: 1.7; color: var(--sx-ink-2); }
@@ -697,5 +873,6 @@
        gastar: se apila arriba del contenido que gobierna. */
     .railwrap { flex-direction: column; }
     .railwrap :global(.rail) { width: 100%; }
+    .shellframe { flex-direction: column; }
   }
 </style>

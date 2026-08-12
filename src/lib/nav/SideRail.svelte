@@ -3,10 +3,17 @@
   //
   // WHAT IT IS FOR, AND WHAT IT IS NOT
   //
-  // This is the SECOND level of navigation. The Hivestrix Shell already owns the
-  // first one — its own 240px sidebar, which is how somebody gets from
-  // mantenimiento to facturación. A module that draws a second full-height
-  // sidebar beside it has built a corridor. So a rail belongs to a module with
+  // This is the SECOND level of navigation. For a long time this header said
+  // the first one belonged to the Hivestrix Shell — its own 240px sidebar,
+  // built outside this system. That was the plan back when the Shell was
+  // going to carry its own chrome; the ecosystem later settled on ONE
+  // identity instead, the Shell's chrome was never rebuilt to match, and the
+  // claim sat here describing a component that did not exist anywhere. It
+  // does now: `Sidebar.svelte`, right beside this file, is the first level —
+  // which module a tenant is in — and the two are meant to stand side by
+  // side without reading as the same idea twice; see Sidebar's own header for
+  // how. A module that draws a second full-height sidebar with NOTHING above
+  // it has still built a corridor, so a rail belongs to a module with
   // genuinely separate sections that people move between all day (Flota ·
   // Documentos · Catálogos · Indicadores), and it is the wrong control for:
   //
@@ -160,8 +167,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--sx-s-2);
-    /* 240px — the same width the Shell's own sidebar uses, so a rail beside it
-       reads as a second column and not as a different idea. */
+    /* 240px — the same figure Sidebar expands to, so the two levels read as
+       one system with two floors instead of two different ideas. */
     width: calc(var(--sx-s-20) * 3);
     flex: none;
     padding: var(--sx-s-3);
