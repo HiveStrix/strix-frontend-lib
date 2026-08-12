@@ -1,0 +1,29 @@
+# No hay más de un paquete acá — este archivo no describe un workspace.
+# Existe porque pnpm 10 movió a este archivo la configuración que antes iba
+# bajo la clave "pnpm" de package.json (todo salvo auth/registry, que sigue
+# yendo en .npmrc si hace falta).
+
+# Scripts de instalación bloqueados por defecto en pnpm 10 — la razón de ser
+# de esta migración. Verificado con node_modules y lockfile vacíos, no
+# supuesto: sólo esbuild queda listado en «Ignored build scripts» al
+# instalar. Se autoriza con el motivo escrito:
+onlyBuiltDependencies:
+  # Descarga el binario nativo de esbuild para la plataforma del que
+  # instala (postinstall: node install.js). Sin esto Vite no tiene con qué
+  # transformar nada: esbuild es su compilador.
+  - esbuild
+
+# rollup y acorn declaran un script "prepare" en su package.json, pero
+# "prepare" sólo corre cuando el paquete es la raíz del install o viene de
+# git — nunca para una dependencia bajada del registro, con npm o con pnpm.
+# Por eso ninguno de los dos aparece en «Ignored build scripts» y ninguno de
+# los dos entra en la lista: agregarlos autorizaría un script que jamás se
+# ejecuta acá, que es exactamente el cajón de sastre que esta lista tiene
+# que evitar. rollup, además, trae su binario nativo (@rollup/rollup-*)
+# precompilado por plataforma — sin script propio tampoco.
+
+# Retrasa instalar una versión recién publicada. La mayoría de los paquetes
+# maliciosos que se detectan, se detectan y se bajan del registro dentro de
+# la primera hora. 1440 minutos (24 horas) da margen de sobra a ese proceso
+# sin bloquear más de un día una versión legítima que alguien necesite.
+minimumReleaseAge: 1440

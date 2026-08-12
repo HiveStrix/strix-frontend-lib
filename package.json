@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "El sistema de diseño de Strix: tokens y componentes Svelte para todos los frontends del ecosistema.",
   "type": "module",
+  "packageManager": "pnpm@10.34.5",
   "private": true,
   "license": "UNLICENSED",
   "repository": {
