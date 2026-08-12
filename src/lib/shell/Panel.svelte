@@ -48,6 +48,37 @@
   // height from OUTSIDE — put the Panel in a grid row or a flex parent with a
   // definite height. A Panel told to scroll inside an unbounded parent simply
   // grows, which is the right failure: nothing is hidden.
+  //
+  // `headVariant`: EL HUECO QUE DEJABA «SARION» A MEDIAS.
+  //
+  // `PageHeader variant="sarion"` (ver ese archivo) es una barra: título
+  // apretado en negativo, subtítulo monoespaciado en positivo, una línea en
+  // vez de banda. Se pidió una segunda vez porque el catálogo sólo la
+  // mostraba así — la barra sola, en `Estructura` — y no hay forma de
+  // evaluar la pieza real (una cabecera de sección DENTRO de un objeto con
+  // cuerpo) mirando una barra suelta. La pieza real es un Panel con esa
+  // cabecera puesta, y Panel no la tenía: su `.head` siempre fue
+  // `--sx-thead`, la banda, sin salida — ni siquiera vía `variant`, que ya
+  // está tomado (ver la nota sobre `tone`/`variant` más abajo: reenvía a
+  // `Card`, la TARJETA entera, no el `.head`). Un prop nuevo, no una reforma
+  // del que ya existía — la regla de este repo es que una salida nueva es
+  // una dirección nueva, la vieja no se edita.
+  //
+  // `headVariant="sarion"` no reimporta `PageHeader` — lo intentó y no
+  // encajaba: `PageHeader.level` sólo entiende 1 y 2 (`h1`/`h2`, cualquier
+  // otro valor cae a `h1`), y el `level` de Panel entiende 2 a 6 porque un
+  // panel vive a cualquier profundidad real del documento. Forzar a
+  // `PageHeader` adentro le habría puesto un techo a la profundidad que
+  // Panel ya soporta hoy — una regresión para arreglar una ausencia. Así que
+  // `headVariant` es la MISMA fórmula tipográfica, calibrada con los mismos
+  // números (`--sx-t-md`/`--sx-w-bold`/`-.015em` para el título;
+  // `--sx-font-mono`/`--sx-t-2xs`/`.04em` para el subtítulo — ver el
+  // comentario de `sarion` en `PageHeader.svelte` para por qué esos números
+  // y no otros), aplicada sobre el propio `<svelte:element this={tag}>` de
+  // Panel — que ya resuelve 2 a 6 correctamente — en vez de sobre un
+  // componente ajeno. Dos archivos, un solo resultado visual.
+  //
+  // `banda` (default, no se toca) sigue siendo `--sx-thead` — lo de siempre.
   import Card from './Card.svelte';
   import Glyph from './Glyph.svelte';
 
@@ -71,12 +102,24 @@
   export let flush = false;
   /** The body owns its own scroll. Needs a bounded height from its parent. */
   export let scroll = false;
+  /**
+   * banda | sarion — HOW THE HEAD, and only the head, separates from the
+   * body: tone, or line. `banda` is the default and is `--sx-thead`, same as
+   * always. `sarion` swaps it for PageHeader's own sarion typography — see
+   * the note above this component's props for why it is its own formula and
+   * not `<PageHeader>` mounted inside `.head`.
+   */
+  export let headVariant = 'banda';
 
   const STEPS = new Set([1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20]);
   const step = (n) => (STEPS.has(Number(n)) ? `var(--sx-s-${n})` : '0px');
   const RADII = { 1: 'var(--sx-r-1)', 2: 'var(--sx-r-2)', 3: 'var(--sx-r-3)' };
+  const HEAD_VARIANTS = new Set(['banda', 'sarion']);
 
   $: tag = `h${Math.min(6, Math.max(1, Number(level) || 2))}`;
+  // A typo in headVariant fails SAFE (banda, the law) not invisible — same
+  // rule Card and PageHeader already hold for their own `variant`.
+  $: hv = HEAD_VARIANTS.has(headVariant) ? headVariant : 'banda';
   // The footer band and the flush body both have to round exactly like the card
   // they sit in, and the card's radius is a prop — so it travels down as a
   // variable rather than as three near-miss guesses.
@@ -86,7 +129,7 @@
 <Card pad={0} {elevation} {radius} {tone} {...$$restProps}>
   <div class="panel" style={css}>
     {#if title || $$slots.actions}
-      <div class="head">
+      <div class="head" class:sarion={hv === 'sarion'}>
         <div class="titles">
           <div class="tline">
             {#if icon}<span class="ic"><Glyph name={icon} size={16} /></span>{/if}
@@ -157,6 +200,39 @@
        and tabular digits inside a sentence read as a stutter. */
   }
   .acts { display: flex; align-items: center; gap: var(--sx-s-2); flex-wrap: wrap; }
+
+  /* ═══ headVariant: sarion — la línea ══════════════════════════════════════
+     Los mismos números que `.hd.sarion`/`.sarion .ttl`/`.sarion .sub` en
+     PageHeader.svelte, por lo que ese archivo ya deja escrito junto a cada
+     uno — acá no se repite el argumento, sólo el valor. `--sx-line`, no
+     `--sx-edge`: el README ya describe este trabajo exacto para `--sx-line`
+     («cierra una cabecera, divide una fila»), y PageHeader ya lo usa para lo
+     mismo. Combined-class (`.head.sarion`), no una redeclaración de `.head`,
+     para ganarle en especificidad a `background`/`padding` sin depender del
+     orden de las reglas. */
+  .head.sarion {
+    background: none;
+    border-radius: 0;
+    padding-bottom: var(--sx-s-4);
+    border-bottom: 1px solid var(--sx-line);
+  }
+  .head.sarion .t {
+    font-size: var(--sx-t-md);
+    font-weight: var(--sx-w-bold);
+    letter-spacing: -.015em;
+    line-height: 1.3;
+  }
+  /* Mono, chico, tracking POSITIVO — lo opuesto del título — es el
+     contraste que le da carácter a la variante. Reemplaza `.s`, no lo
+     extiende: la nota de arriba sobre «prosa, sin cifras tabulares» es del
+     registro `banda`; acá el subtítulo se lee como una referencia, no como
+     una oración. */
+  .head.sarion .s {
+    font-family: var(--sx-font-mono);
+    font-size: var(--sx-t-2xs);
+    letter-spacing: .04em;
+    line-height: 1.4;
+  }
 
   .body {
     padding: var(--panel-pad);

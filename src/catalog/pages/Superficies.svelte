@@ -280,6 +280,55 @@
           de esta sección.
         </p>
 
+        <h3 class="sx-cap sub">headVariant — el estilo Sarion, comparado con el default</h3>
+        <p class="why">
+          Se pidió ver la pieza trabajando, no la barra sola: <span class="sx-id">PageHeader
+          variant="sarion"</span> vive en <span class="sx-id">Estructura</span> como una cabecera
+          suelta, y una barra sola no alcanza para juzgar cómo se ve cerrando un Panel de verdad.
+          Panel no tenía esa cabecera — su <span class="sx-id">.head</span> siempre fue la banda de
+          <span class="sx-id">--sx-thead</span>, sin salida —, así que ahora es un prop propio,
+          <span class="sx-id">headVariant</span>, con la misma tipografía que
+          <span class="sx-id">PageHeader</span> ya calibró para <span class="sx-id">sarion</span>
+          (no <span class="sx-id">PageHeader</span> montado adentro: ver la nota en
+          <span class="sx-id">Panel.svelte</span> sobre por qué — en corto, su <span class="sx-id">level</span>
+          sólo entiende <span class="sx-id">h1</span>/<span class="sx-id">h2</span> y el de Panel
+          tiene que llegar hasta <span class="sx-id">h6</span>). Mismo título, mismo subtítulo,
+          mismas acciones, mismo cuerpo, mismo pie — sólo la cabecera cambia, para que se pueda
+          comparar en vez de sólo mirar dos cosas lindas.
+        </p>
+
+        <div class="demo two-up">
+          <Panel title="Servicios" sub="Los últimos 12 meses" icon="clipboard" level={3}>
+            <svelte:fragment slot="actions">
+              <Button size="sm" variant="ghost">Exportar CSV</Button>
+              <Button size="sm">Registrar</Button>
+            </svelte:fragment>
+            <Stack gap={2}>
+              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
+              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
+              <Row justify="between"><span>Canceladas</span><b class="sx-num">2</b></Row>
+            </Stack>
+            <svelte:fragment slot="footer">
+              <Row justify="between"><span>Costo del período</span><b class="sx-num">₡4 820 000</b></Row>
+            </svelte:fragment>
+          </Panel>
+
+          <Panel title="Servicios" sub="Los últimos 12 meses" icon="clipboard" level={3} headVariant="sarion">
+            <svelte:fragment slot="actions">
+              <Button size="sm" variant="ghost">Exportar CSV</Button>
+              <Button size="sm">Registrar</Button>
+            </svelte:fragment>
+            <Stack gap={2}>
+              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
+              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
+              <Row justify="between"><span>Canceladas</span><b class="sx-num">2</b></Row>
+            </Stack>
+            <svelte:fragment slot="footer">
+              <Row justify="between"><span>Costo del período</span><b class="sx-num">₡4 820 000</b></Row>
+            </svelte:fragment>
+          </Panel>
+        </div>
+
         <h3 class="sx-cap sub">tone — el mismo tinte, forwardeado a Card</h3>
         <p class="why">
           <span class="sx-id">tone</span> viaja a la <span class="sx-id">Card</span> de adentro tal
