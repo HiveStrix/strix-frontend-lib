@@ -234,6 +234,11 @@ const lookup = (key, tokens) => (key in tokens ? tokens[key] : key);
 // sobre qué rol, y el tema es sólo con qué diccionario se resuelve ese rol.
 const TONES = ['positive', 'attention', 'critical', 'info', 'neutral'];
 const CHECKS = [
+  // Estas dos primeras filas también son el anillo de `Card variant="crest"`
+  // (Card.svelte): el anillo vive en `box-shadow` en vez de en `border`,
+  // pero es el mismo --sx-edge, el mismo 3:1, y el mismo par — «superficie» y
+  // «fondo» son literalmente donde vive una Card. No hace falta una fila
+  // nueva para una variante que reusa el token tal cual.
   ['--sx-edge',   '--sx-surface', 3.0, 'borde de control sobre superficie'],
   ['--sx-edge',   '--sx-ground',  3.0, 'borde de control sobre el fondo'],
   // UN BORDE TIENE DOS LADOS. Las dos comprobaciones de arriba miden contra
@@ -403,6 +408,21 @@ const DISTINCT = [
     'color-mix(in srgb, var(--sx-edge) 90%, var(--sx-sunk))',
     '--sx-edge',
     '"resta" de StackedBar contra su propio último paso (.s-d)'
+  ],
+  // EL PAR QUE TRAJO `Card variant="filled"`. La ley de Nácar separa una
+  // Card de --sx-ground con SOMBRA; `filled` la separa con RELLENO en su
+  // lugar — así que, a diferencia de `--sx-sunk` en un Well o un control
+  // (que siempre viven sobre --sx-surface, ya medido arriba), acá el fondo
+  // real es el CAMPO, no la tarjeta. Con --sx-sunk a secas esto medía 1.042
+  // en oscuro con el acento por defecto — bajo el piso — y en ningún otro
+  // sitio del sistema hubiera aparecido, porque --sx-sunk nunca había tenido
+  // que separarse de --sx-ground por su cuenta. `--card-fill` (Card.svelte)
+  // le suma 8% de --sx-edge; esta fila es lo que evita que alguien lo
+  // retinte de vuelta a --sx-sunk puro sin que nada avise.
+  [
+    'color-mix(in srgb, var(--sx-edge) 8%, var(--sx-sunk))',
+    '--sx-ground',
+    'Card variant="filled": el relleno contra el campo, sin sombra que lo separe'
   ]
 ];
 

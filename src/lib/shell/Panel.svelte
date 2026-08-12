@@ -29,6 +29,16 @@
   // because a shadow is drawn OUTSIDE the card's box, never behind its
   // children — see `--card-glow` in Card.svelte.
   //
+  // `variant` (Card.svelte — «EL MARCO») ALSO FORWARDS, unlisted here on
+  // purpose: it is not one of this component's own props, so `$$restProps`
+  // carries it straight to the Card underneath, the same way it already
+  // carries `href` or `interactive`. `<Panel variant="crest" …>` is measured
+  // and correct — the ring lives on the outer Card, independent of `.head`.
+  // `<Panel variant="filled" …>` is NOT verified: `.head`/`.foot` paint
+  // `--sx-thead`, calibrated against `--sx-surface` (see the note in the
+  // README), and nobody has measured it against `--card-fill` yet. Treat it
+  // as untested, not as broken.
+  //
   // FLUSH is for content that owns the edge: a table, a list of rows, a chart.
   // The head keeps its padding, the body loses its horizontal one, and the
   // bottom corners are clipped so the last row follows the card's radius instead
