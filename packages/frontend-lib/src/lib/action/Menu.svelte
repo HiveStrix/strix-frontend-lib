@@ -165,6 +165,34 @@
     if (giveFocusBack && trigger?.isConnected) trigger.focus();
   }
 
+  // `open` es prop pública y bindable (ver más abajo) — un consumidor puede
+  // escribir `open = true` desde afuera sin pasar por `show()`. Sin este
+  // atado declarativo ese camino monta `popover="manual"` sin llamar nunca
+  // `showPopover()` — la hoja UA lo deja en `display: none` hasta el próximo
+  // `scroll`/`resize`, que sí llama `place()`, así que el menú aparecía de
+  // golpe en un momento arbitrario. `show()` y `hide()` siguen llamando a
+  // `syncPopover` a mano: el primero porque `place()` necesita el popover ya
+  // abierto ANTES de medir `panel.offsetHeight` (ver el comentario de abajo),
+  // el segundo porque la salida tiene que quedar en el mismo paso síncrono en
+  // que `hide()` limpia lo demás, antes de que Svelte desmonte el nodo. Este
+  // bloque es sólo la red de seguridad para el camino externo — llamar
+  // `syncPopover` de más no cuesta nada, comprueba `:popover-open` antes de
+  // actuar.
+  //
+  // `panel` todavía es `null` en el instante en que `open` pasa a `true`: el
+  // nodo recién existe después de que el `{#if open}` de más abajo se parcha,
+  // exactamente el mismo problema que `sheetEl` en Sheet.svelte, resuelto ahí
+  // con un `await tick()` antes de leerlo. Se replica ese mismo patrón acá en
+  // vez de confiar en que la sentencia reactiva se vuelva a ejecutar sola
+  // cuando `bind:this` complete la asignación — no vale la pena apostar a un
+  // detalle de scheduling de Svelte que no está verificado, cuando ya hay una
+  // forma probada de esperar el nodo en este mismo archivo.
+  async function syncExternalOpen(isOpen) {
+    await tick();
+    syncPopover(panel, isOpen);
+  }
+  $: syncExternalOpen(open);
+
   // Below or above? Measured once per opening, and again if the window changes
   // size while it is open. A menu on the last row of a long table opens upward
   // or it opens into nothing.
