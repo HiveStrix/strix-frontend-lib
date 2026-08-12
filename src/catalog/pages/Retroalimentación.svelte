@@ -364,12 +364,6 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
       el mensaje y terminás con la pantalla donde un guardado fallido es un toast, una lista vacía es un
       error, y un diálogo de confirmación cuida algo que se puede deshacer.
     </p>
-
-    <nav class="jump" aria-label="Componentes de esta página">
-      {#each NAV as [id, name] (id)}
-        <a href="#{id}" class="sx-id">{name}</a>
-      {/each}
-    </nav>
   </header>
 
   <section class="chooser" aria-labelledby="chooser-h">
@@ -414,8 +408,18 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
     </p>
   </section>
 
-  <!-- ══ DIALOG ══════════════════════════════════════════════════════════ -->
-  <section class="c" id="dialog">
+  <div class="body">
+    <nav class="toc" aria-label="Índice de la página">
+      <ul>
+        {#each NAV as [id, name] (id)}
+          <li><a href="#/retroalimentacion/{id}">{name}</a></li>
+        {/each}
+      </ul>
+    </nav>
+
+    <main>
+    <!-- ══ DIALOG ══════════════════════════════════════════════════════════ -->
+    <section class="c" id="dialog">
     <header class="chead">
       <h2><span class="sx-id">Dialog</span></h2>
       <p class="one">Lo único en una superficie Strix que de verdad flota, y por eso lo único con <span class="sx-id">--sx-e-3</span>.</p>
@@ -1070,7 +1074,9 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
         aterrice <span class="sx-id">Button</span>, esas tres reglas por archivo son exactamente lo que reemplaza.
       </li>
     </ul>
-  </section>
+    </section>
+    </main>
+  </div>
 </div>
 
 <!-- ══ Los diálogos vivos de la página ═══════════════════════════════════ -->
@@ -1160,7 +1166,12 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
 
 <style>
   .page {
-    max-width: 76ch;
+    /* Era 76ch: una medida de prosa, correcta para una página de un solo
+       texto corrido. Dejó de serlo en cuanto el índice necesitó una columna
+       al lado — la medida de lectura ahora la ponen los párrafos (siguen en
+       62/66/70ch, sin tocar), no el contenedor. Mismo ancho que Superficies
+       y Estructura, para que las siete páginas midan lo mismo. */
+    max-width: 1180px;
     margin: 0 auto;
     padding: var(--sx-s-10) var(--sx-s-5) var(--sx-s-20);
     display: flex;
@@ -1184,17 +1195,27 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
     color: var(--sx-ink-2);
     max-width: 62ch;
   }
-  .jump { display: flex; flex-wrap: wrap; gap: var(--sx-s-2); margin-top: var(--sx-s-6); }
-  .jump a {
-    padding: var(--sx-s-1) var(--sx-s-3);
-    background: var(--sx-sunk);
-    color: var(--sx-ink-2);
-    border-radius: var(--sx-r-pill);
-    font-size: var(--sx-t-xs);
+  /* ── El índice ──────────────────────────────────────────────────────────
+     Mismo componente que Superficies, Estructura y Métricas — antes esto
+     era una fila de links sueltos en la cabecera (`.jump`), que fijaba el
+     truco recién en el mismo hash de la familia y por eso nunca coincidía
+     con la ruta (ver App.svelte, «El índice que apuntaba a la portada»). */
+  .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); margin-top: 0; align-items: start; }
+
+  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .toc a {
+    display: block;
+    padding: var(--sx-s-2) var(--sx-s-3);
+    border-radius: var(--sx-r-1);
+    font-size: var(--sx-t-sm);
+    font-weight: var(--sx-w-medium);
+    color: var(--sx-ink-3);
     text-decoration: none;
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
-  .jump a:hover { background: var(--sx-neutral-band); color: var(--sx-ink); }
+  .toc a:hover { background: var(--sx-sunk); color: var(--sx-ink); }
+
+  main { display: flex; flex-direction: column; gap: var(--sx-s-16); min-width: 0; }
 
   /* ── La tabla de elección ────────────────────────────────────────────── */
   .chooser h2, .c h2 {
@@ -1451,6 +1472,12 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
   .acts-list li span:first-of-type { flex: 1; color: var(--sx-ink-2); }
   .dim { color: var(--sx-ink-3); font-size: var(--sx-t-xs); }
 
+  @media (max-width: 900px) {
+    .body { grid-template-columns: 1fr; gap: var(--sx-s-6); }
+    .toc { position: static; }
+    .toc ul { flex-direction: row; flex-wrap: wrap; gap: var(--sx-s-1); }
+  }
+
   /* ── Angosto ─────────────────────────────────────────────────────────── */
   @media (max-width: 720px) {
     .page { padding: var(--sx-s-6) var(--sx-s-4) var(--sx-s-16); gap: var(--sx-s-12); }
@@ -1465,7 +1492,6 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
   @media (pointer: coarse) {
     .btn { min-height: var(--sx-touch); }
     .btn.sm { min-height: var(--sx-touch); }
-    .jump a { min-height: var(--sx-touch); display: inline-flex; align-items: center; }
     .copy { min-height: var(--sx-s-8); }
     /* 16px, o iOS hace zoom a toda la página al enfocar el campo. El sistema no
        tiene un token de ese tamaño — `--sx-t-md` son 15 —, así que acá se toma

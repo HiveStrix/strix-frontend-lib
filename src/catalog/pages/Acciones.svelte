@@ -18,6 +18,17 @@
   import Menu from '../../lib/action/Menu.svelte';
   import SplitButton from '../../lib/action/SplitButton.svelte';
 
+  // ── El índice ─────────────────────────────────────────────────────────────
+  // Mismo componente que Superficies, Estructura, Métricas, Retroalimentación
+  // y Tablas. «Las dos pieles» entra — es una sección de verdad, no un anexo —
+  // y «Lo que esta familia no hace» se queda afuera, igual que el cierre de
+  // esas otras cinco páginas.
+  const TOC = [
+    ['regla', 'Un solo primario'], ['dos', 'Dos acciones iguales'], ['button', 'Button'],
+    ['estados', 'Los estados'], ['group', 'ButtonGroup'], ['iconbutton', 'IconButton'],
+    ['menu', 'Menu'], ['split', 'SplitButton'], ['pieles', 'Las dos pieles']
+  ];
+
   // ── Glyphs ────────────────────────────────────────────────────────────────
   // Inline on purpose: the icon family is somebody else's to build, and this
   // page needed marks before it existed. Inner markup on a 24×24 grid, stroked
@@ -237,8 +248,18 @@
     </ul>
   </header>
 
-  <!-- ── La regla ───────────────────────────────────────────────────────── -->
-  <section class="sec">
+  <div class="body">
+    <nav class="toc" aria-label="Índice de la página">
+      <ul>
+        {#each TOC as [id, name] (id)}
+          <li><a href="#/acciones/{id}">{name}</a></li>
+        {/each}
+      </ul>
+    </nav>
+
+    <main>
+    <!-- ── La regla ───────────────────────────────────────────────────────── -->
+    <section class="sec">
     <h2 id="regla">Una vista, un primario</h2>
     <p class="lede">
       Una pantalla tiene un solo botón sólido porque tiene una sola respuesta a «¿a qué vine?».
@@ -991,7 +1012,9 @@
       <li><b>Los dibujos son de otra familia.</b> Los de esta página están escritos a mano acá
         adentro para no adelantarme; cuando exista la familia de íconos, se cambian.</li>
     </ul>
-  </section>
+    </section>
+    </main>
+  </div>
 </article>
 
 <style>
@@ -999,14 +1022,38 @@
      registers. The components inside it may not, and do not. */
   .pg {
     /* A measure, not a pixel width: the tokens have no width scale, and
-       inventing one on a catalogue page would be a token by stealth. Wide
-       enough for the two-column comparisons; the prose inside keeps its own
-       narrower measure so nothing is read across 110 characters. */
-    max-width: 108ch;
+       inventing one on a catalogue page would be a token by stealth. Era
+       108ch hasta que el índice necesitó una columna al lado — 1180px deja
+       el mismo margen a las comparaciones de dos columnas que el 108ch
+       original más el ancho del índice, y hace que las siete páginas midan
+       lo mismo. La prosa adentro sigue con su propia medida (66ch, acá
+       abajo), así que nada se lee más ancho que antes. */
+    max-width: 1180px;
     margin: 0 auto;
     padding: var(--sx-s-8) var(--sx-s-5) var(--sx-s-20);
     color: var(--sx-ink);
   }
+
+  /* ── El índice ───────────────────────────────────────────────────────── */
+  /* Mismo componente que las otras seis páginas. */
+  .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); margin-top: var(--sx-s-16); align-items: start; }
+
+  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .toc a {
+    display: block;
+    padding: var(--sx-s-2) var(--sx-s-3);
+    border-radius: var(--sx-r-1);
+    font-size: var(--sx-t-sm);
+    font-weight: var(--sx-w-medium);
+    color: var(--sx-ink-3);
+    text-decoration: none;
+  }
+  .toc a:hover { background: var(--sx-sunk); color: var(--sx-ink); }
+
+  /* Block, no flex: `.sec` ya pone su propio `margin-top` (más abajo) y un
+     `gap` acá lo duplicaría. */
+  main { min-width: 0; }
 
   /* ── Type ────────────────────────────────────────────────────────────── */
   h1 {
@@ -1022,6 +1069,7 @@
     font-weight: var(--sx-w-bold);
     letter-spacing: -.028em;
     line-height: 1.15;
+    scroll-margin-top: var(--sx-s-16);
   }
   h3 {
     margin: var(--sx-s-8) 0 0;
@@ -1254,6 +1302,11 @@
      content column runs out long before the window does. Everything that was
      two or three columns becomes one, and nothing scrolls sideways except the
      code, which owns its own scroller. */
+  @media (max-width: 900px) {
+    .body { grid-template-columns: 1fr; gap: var(--sx-s-6); }
+    .toc { position: static; }
+    .toc ul { flex-direction: row; flex-wrap: wrap; gap: var(--sx-s-1); }
+  }
   @media (max-width: 760px) {
     .pg { padding-inline: var(--sx-s-4); }
     h1 { font-size: var(--sx-t-2xl); }

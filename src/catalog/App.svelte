@@ -23,7 +23,7 @@
   // would be scaffolding around them, and `vite preview` has no server to route
   // with. The hash also means every page in this catalogue has a URL somebody
   // can paste into a ticket.
-  import { onMount } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import Pill from '../lib/Pill.svelte';
 
   import Superficies from './pages/Superficies.svelte';
@@ -59,9 +59,9 @@
       id: 'formularios',
       name: 'Formularios',
       dir: 'form',
-      count: 14,
+      count: 15,
       component: Formularios,
-      says: 'Todo lo que una persona contesta. Catorce controles, casi todos con un envoltorio compartido, para que un formulario de nueve campos se lea como un formulario y no como nueve decisiones tomadas en nueve martes distintos.'
+      says: 'Todo lo que una persona contesta. Quince controles, casi todos con un envoltorio compartido, para que un formulario de nueve campos se lea como un formulario y no como nueve decisiones tomadas en nueve martes distintos.'
     },
     {
       id: 'estructura',
@@ -191,8 +191,22 @@
     '<style>{@html hostTokens() + hostBase()}</style>';
 
   // ── La ruta ──────────────────────────────────────────────────────────────
+  // El hash tiene DOS niveles: `#/familia` y, adentro de una familia,
+  // `#/familia/seccion` — el segundo segmento es lo que un índice de página
+  // necesita para ser un link de verdad («mandale a alguien la pieza exacta»,
+  // pide el catálogo). Antes esto leía el hash entero como una sola ruta, así
+  // que un link de índice como `#card` no coincidía con ninguna familia y
+  // el `$:` de abajo caía al `?? null` — la portada, no la sección. Cada
+  // índice de página apuntaba a la portada. Ver «Deuda de catálogo» en el
+  // README.
   let route = '';
-  const read = () => (route = (location.hash || '#/').replace(/^#\/?/, ''));
+  let section = '';
+  const read = () => {
+    const raw = (location.hash || '#/').replace(/^#\/?/, '');
+    const slash = raw.indexOf('/');
+    route = slash === -1 ? raw : raw.slice(0, slash);
+    section = slash === -1 ? '' : raw.slice(slash + 1);
+  };
 
   $: current = FAMILIES.find((f) => f.id === route) ?? null;
   $: title = current ? `${current.name} · Strix` : 'Strix · sistema de diseño';
@@ -223,13 +237,30 @@
   });
 
   // Going to another family must not leave the reader half-way down the old
-  // page. `$:` and not a click handler, so a pasted URL behaves the same way.
-  $: if (typeof window !== 'undefined' && route !== undefined) scrollTop(route);
+  // page, and going to a SECTION of the same family must not reset it to the
+  // top first — the two are the same «where does this link land» promise,
+  // so they share one function instead of two effects racing to call
+  // `scrollTo` last. `$:` and not a click handler, so a pasted URL behaves
+  // the same way as a click.
+  $: if (typeof window !== 'undefined' && route !== undefined) navigate(route, section);
   let lastRoute = null;
-  function scrollTop(r) {
-    if (r === lastRoute) return;
+  let lastSection = null;
+  async function navigate(r, s) {
+    const routeChanged = r !== lastRoute;
+    const sectionChanged = s !== lastSection;
     lastRoute = r;
-    queueMicrotask(() => window.scrollTo({ top: 0, behavior: 'instant' }));
+    lastSection = s;
+    if (!routeChanged && !sectionChanged) return;
+    if (s) {
+      // Esperá a que Svelte monte el componente de la familia antes de
+      // buscar el id: en un link fresco (`#/superficies/card`), `current`
+      // y la sección cambian en el mismo tick, y el `<section id="card">`
+      // todavía no existe en el DOM hasta que `tick()` resuelve.
+      await tick();
+      document.getElementById(s)?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    } else if (routeChanged) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   }
 </script>
 

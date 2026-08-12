@@ -67,7 +67,7 @@
     <nav class="toc" aria-label="Índice de la página">
       <ul>
         {#each TOC as [id, name] (id)}
-          <li><a href="#{id}">{name}</a></li>
+          <li><a href="#/superficies/{id}">{name}</a></li>
         {/each}
       </ul>
     </nav>

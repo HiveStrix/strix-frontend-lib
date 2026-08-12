@@ -9,6 +9,14 @@
   import Pill from '../../lib/Pill.svelte';
   import { Table, DataList, DataState, DataSkeleton } from '../../lib/data/index.js';
 
+  // ── El índice ────────────────────────────────────────────────────────────
+  // El cierre («Lo que no trae») queda fuera a propósito, igual que en
+  // Superficies, Estructura y Métricas: no es una pieza que se busque.
+  const TOC = [
+    ['table', 'Table'], ['estados', 'Los cuatro estados'], ['datalist', 'DataList'],
+    ['sueltos', 'DataState · DataSkeleton'], ['temas', 'Los dos temas']
+  ];
+
   // ── Formato ──────────────────────────────────────────────────────────────
   // Escrito acá y no en la librería a propósito: la moneda, la fecha y la
   // duración son del PRODUCTO. Una tabla que sabe formatear colones es una
@@ -322,8 +330,18 @@
     </article>
   </section>
 
-  <!-- ── Table ───────────────────────────────────────────────────────── -->
-  <section class="comp">
+  <div class="body">
+    <nav class="toc" aria-label="Índice de la página">
+      <ul>
+        {#each TOC as [id, name] (id)}
+          <li><a href="#/tablas/{id}">{name}</a></li>
+        {/each}
+      </ul>
+    </nav>
+
+    <main>
+    <!-- ── Table ───────────────────────────────────────────────────────── -->
+    <section class="comp">
     <div class="ctop">
       <h2 id="table">Table</h2>
       <p class="what">
@@ -818,7 +836,9 @@
         la vista, no la tabla.
       </li>
     </ul>
-  </section>
+    </section>
+    </main>
+  </div>
 </div>
 
 <style>
@@ -868,8 +888,27 @@
   .rules p { margin: 0; }
   .rules article > p:last-child { font-size: var(--sx-t-sm); color: var(--sx-ink-2); line-height: 1.6; }
 
+  /* ── El índice ───────────────────────────────────────────────────── */
+  /* Mismo componente que Superficies, Estructura, Métricas y Retroalimentación. */
+  .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); align-items: start; }
+
+  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  .toc a {
+    display: block;
+    padding: var(--sx-s-2) var(--sx-s-3);
+    border-radius: var(--sx-r-1);
+    font-size: var(--sx-t-sm);
+    font-weight: var(--sx-w-medium);
+    color: var(--sx-ink-3);
+    text-decoration: none;
+  }
+  .toc a:hover { background: var(--sx-sunk); color: var(--sx-ink); }
+
+  main { display: flex; flex-direction: column; gap: var(--sx-s-16); min-width: 0; }
+
   /* ── Secciones ───────────────────────────────────────────────────── */
-  .comp { display: flex; flex-direction: column; gap: var(--sx-s-6); }
+  .comp { display: flex; flex-direction: column; gap: var(--sx-s-6); min-width: 0; }
   .ctop { display: flex; flex-direction: column; gap: var(--sx-s-2); }
   .comp h2 {
     margin: 0;
@@ -877,6 +916,7 @@
     font-weight: var(--sx-w-bold);
     letter-spacing: -.03em;
     line-height: 1.1;
+    scroll-margin-top: var(--sx-s-16);
   }
   .what { margin: 0; font-size: var(--sx-t-md); color: var(--sx-ink-2); max-width: 68ch; line-height: 1.6; }
   .comp h3 { margin: 0; font-size: var(--sx-t-md); font-weight: var(--sx-w-semi); letter-spacing: -.01em; }
@@ -1129,6 +1169,12 @@
 
   @media (pointer: coarse) {
     .chip, .copy, .ract { min-height: var(--sx-touch); }
+  }
+
+  @media (max-width: 900px) {
+    .body { grid-template-columns: 1fr; gap: var(--sx-s-6); }
+    .toc { position: static; }
+    .toc ul { flex-direction: row; flex-wrap: wrap; gap: var(--sx-s-1); }
   }
 
   @media (max-width: 700px) {

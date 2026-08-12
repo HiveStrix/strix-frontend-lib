@@ -340,7 +340,7 @@
     <p class="sx-cap kicker">Familia · Entrada</p>
     <h1>Formularios</h1>
     <p class="stand">
-      Todo lo que una persona contesta. Catorce componentes, casi todos con un solo envoltorio compartido, para que
+      Todo lo que una persona contesta. Quince componentes, casi todos con un solo envoltorio compartido, para que
       un formulario de nueve campos se lea como un formulario y no como nueve decisiones distintas
       tomadas en nueve martes distintos.
     </p>
@@ -379,7 +379,7 @@
     <nav class="toc" aria-label="Índice de la página">
       <ul>
         {#each TOC as t (t.id)}
-          <li><a href={`#${t.id}`}>{t.label}</a></li>
+          <li><a href={`#/formularios/${t.id}`}>{t.label}</a></li>
         {/each}
       </ul>
     </nav>

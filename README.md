@@ -647,6 +647,19 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   lo rompe, y cada una cierra con una sección que dice qué le falta.
 - **«Acciones» usa un gutter de página distinto** al de las otras seis (`.pg` en vez de `.page`).
   Se ve al pasar de una a otra.
+- **Las siete páginas comparten ahora un solo patrón de índice.** Antes «Superficies»,
+  «Estructura» y «Métricas» ya lo tenían; «Acciones» y «Tablas» no tenían ninguno, y
+  «Retroalimentación» tenía uno propio y más liviano que enlazaba con `#id` en vez de
+  `#/familia/id` — y por eso nunca funcionó: el router del catálogo leía el hash entero como una
+  sola ruta, así que `#dialog` no coincidía con ninguna familia y la página caía a la portada en
+  vez de quedarse donde estaba. Las siete usan el mismo componente (`nav.toc` + `.body` en grid) y
+  el mismo formato de link, y el router distingue familia de sección (`read()`/`navigate()` en
+  `App.svelte`).
+- **El patrón de índice está copiado, no es un componente.** El bloque `.body`/`.toc`/`.toc a`
+  vive pegado, casi idéntico, en las siete páginas. `SideRail` no sirve para reemplazarlo — su
+  propia cabecera dice que es para las secciones de una app entre las que alguien navega todo el
+  día, no para saltar dentro de un documento largo —, así que hace falta un componente nuevo
+  (`PageIndex` o similar) el día que esto tenga que crecer a una octava página.
 - **Nada está probado automáticamente.** No hay tests. La verificación de este repo es mirar las
   siete páginas en los dos temas a 1200 y a 390 px, que es exactamente lo que hay que rehacer
   después de tocar algo.
