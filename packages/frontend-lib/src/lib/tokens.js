@@ -99,7 +99,15 @@ export const TOKENS = {
   '--sx-thead': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF)',
   // LA FIRMA de Nácar: la luz que deja caer la barra superior en vez de una
   // raya. Ligarlo a `transparent` la apaga sin tocar ninguna regla.
-  '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 55%, transparent)',
+  //
+  // SUBIÓ DE 55 A 70 % después de mirarlo en pantalla. El 55 % venía de partir a
+  // la mitad el valor de la dirección de origen (T · Halo claro, que lo pinta a
+  // opacidad plena), y sobre blanco quedaba por debajo del umbral en que se
+  // percibe: un resplandor sobre papel se apaga mucho más rápido que sobre un
+  // fondo teñido. La geometría NO se toca — está calibrada al límite de lo
+  // visible y bajarla no la hace discreta, la hace invisible. Lo que gradúa la
+  // discreción es este porcentaje y sólo éste.
+  '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 70%, transparent)',
 
   // EL HUECO DEL ACENTO. Un producto lo llena ligando estas cuatro propiedades
   // en su raíz; es el único color que un producto elige.

@@ -33,7 +33,7 @@
   --sx-ink-3: var(--sx-n-500);
   --sx-ink-on: var(--sx-n-0);
   --sx-thead: color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF);
-  --sx-halo: color-mix(in srgb, var(--sx-accent) 55%, transparent);
+  --sx-halo: color-mix(in srgb, var(--sx-accent) 70%, transparent);
   --sx-accent: #6541BE;
   --sx-accent-ink: #FFFFFF;
   --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF);
