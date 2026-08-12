@@ -22,11 +22,12 @@
   // <h2> is exactly the kind of lie that makes a screen reader's outline
   // useless. Pass `level`. The catalogue below every heading in this page does.
   //
-  // `tone` FORWARDS TO THE CARD UNDERNEATH — same rim, same rule: it is a cap
-  // along the top edge in the tone's own ink, and it needs a Pill or a sentence
-  // inside the panel that names the state, never the colour on its own. It
-  // survives Panel's own opaque `.head` because the rim is drawn on a
-  // `::before` overlay that paints ABOVE Card's children — see Card.svelte.
+  // `tone` FORWARDS TO THE CARD UNDERNEATH — same gesture, same rule: it tints
+  // the card's own shadow in the tone's colour, and it needs a Pill or a
+  // sentence inside the panel that names the state, never the colour on its
+  // own. It never fights Panel's own opaque `.head` the way a rim once did,
+  // because a shadow is drawn OUTSIDE the card's box, never behind its
+  // children — see `--card-glow` in Card.svelte.
   //
   // FLUSH is for content that owns the edge: a table, a list of rows, a chart.
   // The head keeps its padding, the body loses its horizontal one, and the

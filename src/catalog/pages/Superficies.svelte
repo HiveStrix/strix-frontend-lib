@@ -109,14 +109,20 @@
           un Core otro shadow root&nbsp;— así que se compone con props y slots en vez de meter mano.
         </p>
 
-        <h3 class="sx-cap sub">tone — un canto, no un relleno</h3>
+        <h3 class="sx-cap sub">tone — la sombra, teñida, no un canto</h3>
         <p class="why">
           Nueve componentes ya aceptaban <span class="sx-id">tone</span> —Pill, Well, Alert, Stat,
           Bar…— y las dos superficies principales no: se podía decir «este pozo es crítico» y no
           «esta tarjeta es crítica». Teñir la tarjeta entera la habría convertido en decoración de
           fondo, compitiendo con lo que hay escrito encima —&nbsp;eso es lo que hace Well, a tamaño
-          de banda, donde el relleno ES el punto. Acá el tono es un cabo de tres píxeles en la
-          tinta plena del tono, arriba de la tarjeta.
+          de banda, donde el relleno ES el punto. La primera versión de esto dibujaba un cabo de
+          tres píxeles en el borde superior, y el veredicto al verlo en pantalla fue preciso: una
+          franja de color en el canto de una tarjeta es de los patrones más repetidos que existen
+          — no dice nada de este sistema. La salida está en la propia ley de Nácar, que ya resolvió
+          el mismo problema en <span class="sx-id">PageHeader</span>: nada se separa con una línea
+          si puede separarse con luz. Acá el tono tiñe la sombra que la tarjeta ya proyecta
+          (<span class="sx-id">--sx-e-1/2/3</span>) en vez de agregar un borde — de cerca casi no
+          se nota, de lejos una grilla de tarjetas se lee por dónde está caliente.
         </p>
 
         <div class="demo">
@@ -156,15 +162,14 @@
                 <span>Un conteo, sin estado que reclamar.</span>
               </p>
             </Card>
-            <Card tone="critical">
+            <Card tone="critical" elevation={2}>
               <p class="cl">
                 <b>BAT019</b>
                 <Pill tone="critical" size="sm">Vencido</Pill>
                 <span>
-                  Texto largo a propósito, para ver que el canto no se mueve ni se corta con el
-                  contenido: sigue siendo tres píxeles arriba de la tarjeta sin importar cuántas
-                  líneas ocupe el párrafo que tiene debajo, porque es un overlay del tamaño entero
-                  de la Card, no una pieza que crece con el texto.
+                  Texto largo a propósito, y en e-2: el tinte vive en la sombra, no en el
+                  contenido, así que ni el largo del párrafo ni la altitud de la tarjeta lo mueven
+                  o lo cortan.
                 </span>
               </p>
             </Card>
@@ -172,12 +177,14 @@
         </div>
 
         <p class="note">
-          <b>El color nunca viaja solo, tampoco acá.</b> El canto acompaña a un <span class="sx-id">Pill</span>
-          o a una palabra que ya nombra el estado — no lo reemplaza. Una tarjeta teñida sin nada
-          adentro que diga qué significa ese color es exactamente lo que la regla prohíbe. Medido
-          con <span class="sx-id">pnpm contrast</span>: el canto de cada tono da entre 5.8:1 y 8.1:1
-          contra la superficie, en los dos temas — muy por encima del piso de 3:1 que pide 1.4.11
-          para identificar un componente.
+          <b>El color nunca viaja solo, tampoco acá.</b> El tinte acompaña a un <span class="sx-id">Pill</span>
+          o a una palabra que ya nombra el estado — no lo reemplaza. Una tarjeta cuya sombra está
+          teñida sin nada adentro que diga qué significa ese color es exactamente lo que la regla
+          prohíbe. El tinte es deliberadamente tenue —más todavía en oscuro, donde una luz de color
+          se nota antes que sobre blanco— y por eso no entra al contrato duro de
+          <span class="sx-id">pnpm contrast</span>: es una sombra difusa, como
+          <span class="sx-id">--sx-halo</span>, no un borde nítido contra el que medir 1.4.11. Ver
+          el comentario junto a <span class="sx-id">--card-glow</span> en <span class="sx-id">Card.svelte</span>.
         </p>
       </section>
 
@@ -225,14 +232,17 @@
           de esta sección.
         </p>
 
-        <h3 class="sx-cap sub">tone — el mismo canto, forwardeado a Card</h3>
+        <h3 class="sx-cap sub">tone — el mismo tinte, forwardeado a Card</h3>
         <p class="why">
           <span class="sx-id">tone</span> viaja a la <span class="sx-id">Card</span> de adentro tal
-          cual. El caso que de verdad prueba algo es éste, con encabezado: la banda de
-          <span class="sx-id">--sx-thead</span> es opaca y se dibuja encima, así que si el canto
-          fuera una sombra normal —detrás de los hijos— un panel con título se lo comería entero.
-          Se ve arriba de <em>este</em> panel porque el canto vive en un <span class="sx-id">::before</span>
-          que se pinta DESPUÉS del contenido en flujo — ver la cabecera de <span class="sx-id">Card.svelte</span>.
+          cual. Antes éste era el caso que de verdad probaba algo: la banda de
+          <span class="sx-id">--sx-thead</span> es opaca y se dibuja encima, así que si el canto se
+          hubiera dibujado detrás de los hijos, como una sombra normal, un panel con título se lo
+          comía entero — hacía falta un <span class="sx-id">::before</span> pintado DESPUÉS del
+          contenido para sobrevivir. Esa complicación desapareció sola: la sombra de la tarjeta se
+          dibuja por FUERA de su propia caja, nunca debajo de los hijos, así que la banda opaca del
+          encabezado nunca estuvo en su camino. Una ventaja de mudar el gesto a luz en vez de
+          contorno que no se buscaba, y que igual se llevó puesta.
         </p>
 
         <div class="demo">

@@ -16,22 +16,33 @@
   //   <Card href="/m/maintenance/BAT001">…</Card>        ← a real <a>
   //   <Card tone="critical"><Pill tone="critical">Vencido</Pill>…</Card>
   //
-  // `tone` IS A RIM, NOT A FILL. Nine components already accept `tone`; Card and
-  // Panel did not, which was an asymmetry, not a decision — you could say "this
-  // well is critical" and not "this card is critical". But a Card is a big
-  // surface, and tinting the whole thing turns the tone into background
-  // decoration that competes with whatever is written on top of it (that is
-  // exactly what Well does instead, at band size, where the fill IS the point).
-  // So here the tone is said with a THIN CAP along the top edge — three pixels
-  // of the tone's own ink colour, not its band, because a rim this narrow needs
-  // the strong version to still read at 3:1 against the surface (measured,
-  // `pnpm contrast`: 5.8:1 to 8.1:1 across every tone, both themes).
+  // `tone` IS THE CARD'S OWN SHADOW, TINTED — NOT A RIM, NOT A FILL. Nine
+  // components already accept `tone`; Card and Panel did not, which was an
+  // asymmetry, not a decision — you could say "this well is critical" and not
+  // "this card is critical". The first version of this said it with a THIN CAP
+  // along the top edge, three solid pixels of the tone's own ink — and it was
+  // wrong. A coloured stripe along the top of a card is the single most
+  // repeated pattern in every admin panel and every template ever sold; it says
+  // nothing about THIS system. Nácar's own law is the way out, because it
+  // already solved the identical problem for `PageHeader`: nothing separates
+  // with a line if it can separate with light — see `--sx-halo` and `.hd`
+  // there. A card carries state the same way a header carries its own weight:
+  // the shadow it already casts (`--sx-e-1/2/3`) picks up the tone's colour
+  // instead of staying neutral ink. Up close it barely registers; a whole grid
+  // of cards reads which ones are "hot" without reading a word.
+  //
+  // KEPT DELIBERATELY FAINT. A saturated glow around a card is worse than the
+  // stripe it replaces — it stops reading as "this system" and starts reading
+  // as noise. `--card-glow` mixes the tone at a low, conservative percentage,
+  // lower still under the dark theme: a tinted light reads sooner against a
+  // dark surface than against a light one, the same asymmetry `--sx-halo`
+  // already carries (70% light / 18% dark) for the same reason.
   //
   // AND COLOUR NEVER TRAVELS ALONE — that rule does not stop at Pill. A card
-  // with a coloured cap and nothing inside it that names the state is a colour
-  // loose in the room: put a `Pill` or a sentence with the word in it inside the
-  // card. `tone` decorates a claim the content already makes; it does not make
-  // the claim by itself.
+  // whose shadow is tinted with nothing inside it that names the state is a
+  // colour loose in the room: put a `Pill` or a sentence with the word in it
+  // inside the card. `tone` decorates a claim the content already makes; it
+  // does not make the claim by itself.
   //
   // ELEVATION IS ALTITUDE, NOT IMPORTANCE. e-1 is the page's own furniture —
   // rows, tiles, panels. e-2 is something that came forward: a menu, a hover, a
@@ -63,9 +74,9 @@
   /** Drawn as an accent ring, and said out loud with aria-pressed / aria-current. */
   export let selected = false;
   /**
-   * '' | positive | attention | critical | info | neutral. A rim along the top
-   * edge, in the tone's own ink — never a fill. See the note above: it has to
-   * ride alongside a Pill or a sentence that names the state, never alone.
+   * '' | positive | attention | critical | info | neutral. Tints the card's own
+   * shadow — never a rim, never a fill. See the note above: it has to ride
+   * alongside a Pill or a sentence that names the state, never alone.
    */
   export let tone = '';
 
@@ -79,11 +90,11 @@
   $: kind = href && !disabled ? 'a' : interactive || href ? 'button' : 'div';
   $: live = kind !== 'div' && !disabled;
   $: t = TONES.has(tone) ? tone : '';
-  // `--card-tone` carries the rim colour as a variable rather than a class per
-  // tone, because the rim is drawn on a `::before` overlay (see below) and one
-  // rule has to serve all five tones plus "none". Undefined resolves through
-  // the `transparent` fallback in the rule itself, so an untoned card pays for
-  // nothing.
+  // `--card-tone` carries the tone colour as a variable rather than a class per
+  // tone, because `--card-glow` (below) has to mix it in once for all five
+  // tones plus "none". Undefined resolves through the `transparent` fallback in
+  // the rule itself, so an untoned card pays for nothing — its glow layer is
+  // fully transparent and costs nothing visible.
   $: css = `--card-pad:${step(pad)}` + (t ? `;--card-tone:var(--sx-${t})` : '');
 </script>
 
@@ -122,33 +133,30 @@
     text-decoration: none;
     border: 0;
     position: relative;
+    /* THE GLOW. A low, conservative mix of the tone into transparent — an
+       untoned card resolves `--card-tone` through its `transparent` fallback,
+       so this costs nothing when `tone` is not set. Lower under the dark theme
+       below: coloured light reads sooner against a dark surface than a light
+       one (same reason `--sx-halo` is 70% on light and 18% on dark). Start
+       faint and raise the percentage later if it turns out to under-read — it
+       is one number, not a rewrite. */
+    --card-glow: color-mix(in srgb, var(--card-tone, transparent) 22%, transparent);
   }
 
-  /* THE RIM. A full-size overlay, not a sliver: a 3px sliver would need its own
-     border-radius, and a radius that big clamps to half its own 3px height —
-     1.5px — while the card's real corner (up to r-3, 22px) curves in far more
-     than that near the top, so the sliver's square corners would poke out past
-     the card's own rounded silhouette. Sizing the overlay to the FULL card and
-     drawing the rim as an INSET shadow inside it sidesteps that: box-shadow
-     clips to the element's own border-radius, and `inherit` copies the card's
-     real radius onto an element the same size as the card, so the clip is
-     exact. `position: absolute` puts it in the "positioned, z-index:auto"
-     paint layer, which paints AFTER normal in-flow children — the one property
-     that makes this survive Panel's own opaque header sitting on top of it.
-     Transparent when no tone is set, so an untoned card pays nothing. */
-  .card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow: inset 0 3px 0 0 var(--card-tone, transparent);
-    pointer-events: none;
+  :global([data-sx-theme='dark']) .card,
+  :global(.sx-dark) .card {
+    --card-glow: color-mix(in srgb, var(--card-tone, transparent) 12%, transparent);
   }
 
+  /* Same offset and blur `PageHeader` already uses for `--sx-halo` — the same
+     law, applied to a card instead of a bar: light falling, not a line. It
+     rides as an EXTRA layer alongside the card's own elevation shadow rather
+     than replacing it, so an untoned card (glow = transparent) still gets
+     exactly the shadow it always had, unchanged. */
   .e0 { box-shadow: none; }
-  .e1 { box-shadow: var(--sx-e-1); }
-  .e2 { box-shadow: var(--sx-e-2); }
-  .e3 { box-shadow: var(--sx-e-3); }
+  .e1 { box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow); }
+  .e2 { box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
+  .e3 { box-shadow: var(--sx-e-3), 0 12px 28px -18px var(--card-glow); }
 
   .r1 { border-radius: var(--sx-r-1); }
   .r2 { border-radius: var(--sx-r-2); }
@@ -158,9 +166,9 @@
      the exact footprint of an unselected one and a grid of them does not shift
      by two pixels when you pick one. `inset` also means it survives on top of a
      dark surface, where an outer ring would be lost in the shadow. */
-  .selected { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-1); }
-  .selected.e2 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2); }
-  .selected.e3 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3); }
+  .selected { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-1), 0 12px 28px -18px var(--card-glow); }
+  .selected.e2 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
+  .selected.e3 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3), 0 12px 28px -18px var(--card-glow); }
 
   .live {
     cursor: pointer;
@@ -170,9 +178,9 @@
   }
   /* One step of altitude on hover and a single pixel of lift: enough to say
      "this responds", not enough to move the row under the reader's eye. */
-  .live:hover { transform: translateY(-1px); box-shadow: var(--sx-e-2); }
-  .live.selected:hover { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2); }
-  .live:active { transform: none; box-shadow: var(--sx-e-1); }
+  .live:hover { transform: translateY(-1px); box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
+  .live.selected:hover { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
+  .live:active { transform: none; box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow); }
 
   .off { opacity: .5; cursor: not-allowed; }
 
