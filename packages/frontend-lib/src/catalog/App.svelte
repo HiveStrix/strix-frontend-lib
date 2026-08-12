@@ -133,14 +133,32 @@
   }
 
   // ── El acento ────────────────────────────────────────────────────────────
-  // Four properties, written on <html>. `soft` and `edge` are mixed WITH the
-  // surface rather than given as fixed colours, so one binding is correct on
-  // both themes — mix 12 % of the brand into whatever the surface currently is
-  // and you get a tint in light and a shade in dark, for free.
+  // Four properties, written on <html>. `soft` and `edge` mix against
+  // #FFFFFF FIJO — el mismo criterio que usa tokens.js para el acento sin
+  // ligar de la librería (ver README, «Ligar el acento»): es la receta de
+  // Nácar, una dirección de luz sobre blanco, no una fórmula que se re-liga
+  // sola en oscuro.
   //
-  // «Sin marca» removes them, which is the honest default: unbound, the accent
-  // resolves to the neutral ramp's deepest ink — a real, usable primary that no
-  // product has to configure before shipping.
+  // ACÁ MEZCLABA CONTRA `var(--sx-surface)` EN VEZ DE BLANCO FIJO, y era un
+  // defecto, no una mejora: parecía «auto-ajustarse» a los dos temas, pero
+  // sólo movía dos de los tres derivados del acento. El quinto —
+  // `--sx-accent-pick`, la fila seleccionada— no lo toca este interruptor;
+  // sigue la fórmula de tokens.js, que en oscuro mezcla al 16 % contra la
+  // superficie oscura, un porcentaje y una base distintos de los que este
+  // catálogo usaba para `soft`/`edge`. "Auto-ajustar" sólo dos de los tres
+  // no los alineaba con el tercero — los desalineaba de una forma nueva: con
+  // las tres marcas puestas, en oscuro, la fila seleccionada quedaba más
+  // débil que el hover por defecto (1.08–1.12 contra la superficie). Un
+  // producto con tema oscuro tiene que declarar su propio bloque de las
+  // cuatro propiedades bajo `[data-sx-theme="dark"]` — ver «Deuda de Nácar»
+  // en el README — precisamente porque no hay una fórmula que se re-ligue
+  // sola y deje a los tres derivados de acuerdo entre sí.
+  //
+  // «Sin marca» quita las cuatro, que es el default honesto: sin ligar nada,
+  // el acento resuelve al morado de Nácar (`#6541BE`) — un primario usable
+  // de verdad porque `--sx-chrome-tint` ya vale ese mismo morado — y no a la
+  // tinta más profunda de la rampa neutra, que era la fórmula de la
+  // dirección anterior y ya no la de ésta.
   const BRANDS = [
     { id: 'none', label: 'Sin marca', hex: '', ink: '' },
     { id: 'opra', label: 'Opra', hex: '#A33F26', ink: '#FFFFFF' },
@@ -161,8 +179,8 @@
     }
     root.setProperty('--sx-accent', b.hex);
     root.setProperty('--sx-accent-ink', b.ink);
-    root.setProperty('--sx-accent-soft', `color-mix(in srgb, ${b.hex} 12%, var(--sx-surface))`);
-    root.setProperty('--sx-accent-edge', `color-mix(in srgb, ${b.hex} 34%, var(--sx-surface))`);
+    root.setProperty('--sx-accent-soft', `color-mix(in srgb, ${b.hex} 10%, #FFFFFF)`);
+    root.setProperty('--sx-accent-edge', `color-mix(in srgb, ${b.hex} 28%, #FFFFFF)`);
   }
 
   // Written as a string constant rather than inline in the markup: the snippet
@@ -364,14 +382,14 @@
           <p>
             Apretá una marca arriba a la derecha y mirá esta tarjeta, el botón, la barra y la
             fila seleccionada. Después entrá a cualquier familia: sigue ligado. Sin marca ligada,
-            el acento resuelve a la tinta más profunda de la rampa neutra, que es un primario
-            usable de verdad y no un hueco vacío esperando configuración.
+            el acento resuelve al morado de Nácar, un primario usable de verdad y no un hueco
+            vacío esperando configuración.
           </p>
           <pre class="code"><code>{`:root {
   --sx-accent:      #A33F26;
   --sx-accent-ink:  #FFFFFF;
-  --sx-accent-soft: color-mix(in srgb, #A33F26 12%, var(--sx-surface));
-  --sx-accent-edge: color-mix(in srgb, #A33F26 34%, var(--sx-surface));
+  --sx-accent-soft: color-mix(in srgb, #A33F26 10%, #FFFFFF);
+  --sx-accent-edge: color-mix(in srgb, #A33F26 28%, #FFFFFF);
 }`}</code></pre>
         </div>
 
@@ -760,7 +778,15 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     font-size: var(--sx-t-sm);
     color: var(--sx-ink-2);
   }
-  .frow.on { background: var(--sx-accent-soft); color: var(--sx-ink); font-weight: var(--sx-w-medium); }
+  /* PASAJERO CONTRA PERSISTENTE — la distinción que el README dedica un
+     párrafo entero a no dejar mezclar (ya se cometió dos veces en la
+     librería, dice, y la salida es un relleno por cada duración). Esta fila
+     está marcada «seleccionada» en el marcado; pintarla con
+     --sx-accent-soft (el HOVER, pasajero) en vez de --sx-accent-pick (la
+     selección, persistente) hubiera sido la tercera vez, en la propia
+     demostración que el README señala como el ejemplo canónico. La muestra
+     de --sx-accent-soft ya tiene su propio bloque, .fsoft, ahí abajo. */
+  .frow.on { background: var(--sx-accent-pick); color: var(--sx-ink); font-weight: var(--sx-w-medium); }
   .fsoft {
     padding: var(--sx-s-3);
     border-radius: var(--sx-r-1);
