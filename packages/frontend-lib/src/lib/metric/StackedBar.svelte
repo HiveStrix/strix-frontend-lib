@@ -247,7 +247,14 @@
   .t-info      { background: var(--sx-info); }
   .t-neutral   { background: var(--sx-neutral); }
 
-  .rest { background: var(--sx-line); }
+  /* --sx-line es ambiente: separa filas, cierra cabeceras, y no lleva piso de
+     contraste porque una hairline decorativa no lo necesita. Este segmento no
+     es una hairline: pinta cuánto falta, que es un dato, y WCAG 1.4.11 le pide
+     3:1 contra el fondo real del track (--sx-sunk). --sx-edge es el token del
+     límite que SÍ tiene que verse — el mismo que ya pinta el último escalón de
+     la rampa acromática arriba (.s-d) — y resuelve a 4.04:1 en claro y 5.97:1
+     en oscuro contra --sx-sunk, contra el 1.15:1 / 1.26:1 que dejaba --sx-line. */
+  .rest { background: var(--sx-edge); }
 
   /* The family's estimate mark, on a fill instead of on a figure. */
   .est {

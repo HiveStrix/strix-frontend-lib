@@ -89,12 +89,20 @@ const CHECKS = [
   // borde caía a 2.71 sin que nada avisara.
   ['--sx-edge',  '--sx-accent-soft', 3.0, 'borde de control sobre un estado'],
   // Y el texto que se dibuja ENCIMA de un estado. --sx-accent-soft pasó a ser
-  // fondo de texto en veintiún sitios y nadie lo estaba midiendo.
+  // fondo de texto en buena parte de la librería (`grep -rl "var(--sx-accent-soft)"
+  // src/lib` da el número de hoy) y nadie lo estaba midiendo.
   ['--sx-ink-3', '--sx-accent-soft', 4.5, 'texto terciario sobre un estado'],
   ['--sx-ink-2', '--sx-accent-soft', 4.5, 'texto secundario sobre un estado'],
   ['--sx-edge',  '--sx-accent-pick', 3.0, 'borde de control sobre una fila elegida'],
   ['--sx-ink-3', '--sx-accent-pick', 4.5, 'texto terciario sobre una fila elegida'],
   ['--sx-ink-2', '--sx-accent-pick', 4.5, 'texto secundario sobre una fila elegida'],
+  // StackedBar.svelte, .rest: el segmento que dice cuánto falta es un dato, no
+  // ambiente, y se pinta con --sx-edge sobre el fondo REAL de .track
+  // (--sx-sunk) — no contra --sx-surface, que no es lo que hay detrás de la
+  // barra. Antes de este arnés .rest usaba --sx-line (ambiente, sin piso) y
+  // resolvía a 1.15:1; es el cuarto caso de un token usado para un trabajo que
+  // no es el suyo.
+  ['--sx-edge',  '--sx-sunk', 3.0, 'segmento "resta" de StackedBar sobre el fondo del track'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
