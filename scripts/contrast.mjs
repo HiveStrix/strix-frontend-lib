@@ -428,17 +428,13 @@ const DISTINCT = [
   // Card de --sx-ground con SOMBRA; `filled` la separa con RELLENO en su
   // lugar — así que, a diferencia de `--sx-sunk` en un Well o un control
   // (que siempre viven sobre --sx-surface, ya medido arriba), acá el fondo
-  // real es el CAMPO, no la tarjeta. Con --sx-sunk a secas esto medía 1.042
-  // en oscuro con el acento por defecto — bajo el piso — y en ningún otro
-  // sitio del sistema hubiera aparecido, porque --sx-sunk nunca había tenido
-  // que separarse de --sx-ground por su cuenta. `--card-fill` (Card.svelte)
-  // le suma 8% de --sx-edge; esta fila es lo que evita que alguien lo
-  // retinte de vuelta a --sx-sunk puro sin que nada avise.
-  [
-    'color-mix(in srgb, var(--sx-edge) 8%, var(--sx-sunk))',
-    '--sx-ground',
-    'Card variant="filled": el relleno contra el campo, sin sombra que lo separe'
-  ],
+  // real es el CAMPO, no la tarjeta. La primera versión mezclaba --sx-edge
+  // 8% sobre --sx-sunk — gris sobre gris, sin el tono que la variante
+  // promete — y esta fila medía exactamente esa fórmula. `--card-fill`
+  // (Card.svelte) ahora es var(--sx-accent-soft) tal cual; la fila se
+  // actualizó para seguir esa fórmula, no la vieja, que ya no se dibuja en
+  // pantalla.
+  ['--sx-accent-soft', '--sx-ground', 'Card variant="filled": el relleno (con acento) contra el campo, sin sombra que lo separe'],
   // SEXTA EXTENSIÓN DEL ARNÉS. La arista de `crest` (Card.svelte) usaba
   // --sx-e-inset — blanco al 90% sobre --sx-surface blanco en claro — y
   // nadie medía la arista CONTRA su propia superficie porque el par no
@@ -450,7 +446,17 @@ const DISTINCT = [
     'color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface))',
     '--sx-surface',
     'Card variant="crest": la arista contra su propia superficie'
-  ]
+  ],
+  // SÉPTIMA EXTENSIÓN DEL ARNÉS, Y LA TRAMPA DEL PAR DE ARRIBA. Si
+  // `--card-fill` hubiera usado --sx-accent-pick (el otro escalón medido,
+  // 18%) en vez de --sx-accent-soft, esta fila mediría 1.000:1 contra sí
+  // misma: --sx-accent-pick ya significa "elegido" en Table, Calendar y
+  // SideRail, y una Card sin seleccionar con el MISMO valor sería
+  // indistinguible de una fila elegida. No es hipotético — es la razón por
+  // la que se descartó --accent-pick al elegir la fórmula. Esta fila deja
+  // eso medido para que nadie retinte --card-fill a -pick sin que nada
+  // avise.
+  ['--sx-accent-soft', '--sx-accent-pick', 'Card variant="filled" contra "seleccionado": el relleno no puede leerse como fila elegida']
 ];
 
 // EL UMBRAL. WCAG no cubre este eje —no hay un piso que copiar— así que sale

@@ -112,13 +112,25 @@
   //
   //   filled — el tono. Sin sombra, o con la mínima: el relleno hace el
   //   trabajo que antes hacía la luz, así que una grilla de muchas tarjetas
-  //   no acumula sombra como ruido. El relleno NO es `--sx-sunk` a secas:
-  //   medido contra `--sx-ground` (donde vive una Card suelta) da 1.042 en
-  //   oscuro con el acento por defecto — bajo el piso de distinguibilidad de
-  //   este repo (1.05, ver `DISTINCT_MIN` en `scripts/contrast.mjs`).
-  //   `--card-fill`, más abajo, le suma un 8% de `--sx-edge`: separa a
-  //   1.15–1.20 en las cuatro combinaciones de tema y perilla, sin tocar un
-  //   solo token del sistema. Medido, no supuesto.
+  //   no acumula sombra como ruido. LA PRIMERA VERSIÓN TAMPOCO TENÍA TONO:
+  //   `--sx-edge` 8% sobre `--sx-sunk` es gris sobre gris — separaba de
+  //   `--sx-ground` (medido, 1.15–1.20) pero no llevaba el color que el
+  //   nombre de la variante promete, y las otras dos variantes ya cubren luz
+  //   (`raised`) y línea (`crest`): un tono gris es la misma escala neutra
+  //   otra vez, no un tercer mecanismo. `--card-fill` ahora es
+  //   `var(--sx-accent-soft)` — el mismo lavado al 10% que ya usan
+  //   `Combobox`/`ChoiceCards`/`Calendar` para su estado pasajero, reusado
+  //   tal cual, no un tercer escalón inventado. Ya estaba medido: legible
+  //   con `--sx-ink`/`-2`/`-3` encima (`CHECKS`, en las cuatro
+  //   combinaciones) y separado de `--sx-ground`/`--sx-surface` (`DISTINCT`).
+  //   LA TRAMPA, Y POR QUÉ NO ES `--sx-accent-pick`: ese es el OTRO
+  //   escalón medido (18%), y ya significa «esto está elegido» en
+  //   `Table`/`Calendar`/`SideRail` — si `filled` lo hubiera usado, una
+  //   Card sin seleccionar habría llevado el MISMO color que una fila
+  //   elegida, 1.000:1 contra sí mismo, cero distancia. `--sx-accent-soft`
+  //   contra `--sx-accent-pick` ya mide 1.14–1.22 en las cuatro
+  //   combinaciones — un par nuevo en `DISTINCT` deja esto medido, no
+  //   supuesto, para que nadie lo retinte a `-pick` sin que nada avise.
   //
   // POR QUÉ EL MARCO IMPORTA MÁS QUE LAS VARIANTES: sin él, `crest` y
   // `filled` son dos opciones que alguien elige por gusto, y a los seis
@@ -247,15 +259,19 @@
        Measured: 1.12–1.18 across theme × chrome-tint. See `pnpm contrast`. */
     --card-crest-line: color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface));
     /* THE FILL FOR `filled` ONLY — costs nothing when the variant is not
-       `filled` since nothing reads it otherwise. `--sx-sunk` alone measured
-       1.042 against `--sx-ground` in dark (below this repo's 1.05 floor);
-       +8% of `--sx-edge` clears every theme × chrome-tint combination with
-       margin (1.15–1.20) without touching a system token. No dark override
-       needed here, unlike `--card-glow` above: this formula is built ENTIRELY
-       from role tokens that already re-bind themselves under
-       `[data-sx-theme="dark"]`, so the same one-line declaration resolves
-       correctly in both themes on its own. See `pnpm contrast`. */
-    --card-fill: color-mix(in srgb, var(--sx-edge) 8%, var(--sx-sunk));
+       `filled` since nothing reads it otherwise. Carries the accent, not a
+       neutral mix: `raised` separates by light and `crest` by line, so
+       `filled` has to separate by TONE to be a third mechanism and not the
+       same grey scale again. Reuses `--sx-accent-soft` (10%) as-is — already
+       measured legible with `--sx-ink`/`-2`/`-3` on top (`CHECKS`) and
+       already distinct from `--sx-ground`/`--sx-surface` (`DISTINCT`).
+       Deliberately NOT `--sx-accent-pick` (18%): that token already means
+       "selected" in Table/Calendar/SideRail, and an unselected filled Card
+       carrying the same value would read as a selected one — see the new
+       `DISTINCT` pair that guards this. No dark override needed here, same
+       as the crest edge above: built entirely from role tokens that already
+       re-bind themselves under `[data-sx-theme="dark"]`. */
+    --card-fill: var(--sx-accent-soft);
   }
 
   :global([data-sx-theme='dark']) .card,
