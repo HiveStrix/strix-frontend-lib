@@ -36,3 +36,7 @@ export { default as ChoiceCards } from './ChoiceCards.svelte';
 // pattern this follows), and the two-date span built on top of it plus DateInput.
 export { default as Calendar } from './Calendar.svelte';
 export { default as DateRange } from './DateRange.svelte';
+// Field + Calendar + the top-layer popover Combobox already uses, composed
+// into a writable text field with the system's own calendar as its picker —
+// see the file for when this is the right call over DateInput.
+export { default as DatePicker } from './DatePicker.svelte';

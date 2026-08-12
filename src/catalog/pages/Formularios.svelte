@@ -17,7 +17,7 @@
   import {
     Field, Input, NumberInput, Textarea, Select, Combobox,
     Checkbox, Radio, Switch, DateInput, FileDrop, ChoiceCards, today,
-    Calendar, DateRange
+    Calendar, DateRange, DatePicker
   } from '../../lib/form/index.js';
 
   // ── El índice ─────────────────────────────────────────────────────────────
@@ -33,6 +33,7 @@
     { id: 'combobox', label: 'Combobox' },
     { id: 'date', label: 'DateInput' },
     { id: 'calendar', label: 'Calendar' },
+    { id: 'datepicker', label: 'DatePicker' },
     { id: 'daterange', label: 'DateRange' },
     { id: 'checkbox', label: 'Checkbox' },
     { id: 'radio', label: 'Radio' },
@@ -146,6 +147,9 @@
   let repuesto = '';
   let fecha = hoy;
   let fechaMala = '2027-03-14';
+  let dpVacio = '';
+  let dpElegido = '2026-08-05';
+  let dpInvalido = '';
   // ── Calendar / DateRange ──────────────────────────────────────────────────
   // Los estados feos que pide el pliego: sin elegir todavía, con días
   // deshabilitados, un mes que empieza en domingo y uno que termina en lunes.
@@ -288,6 +292,10 @@
            max={hoy} />`,
 
     calendar: `<Calendar bind:value={fecha} label="Fecha del servicio" max={hoy} />`,
+
+    datepicker: `<!-- El campo se escribe a mano — DD/MM/AAAA — y el botón abre
+     el Calendar del sistema en la top layer, para quien prefiera elegir. -->
+<DatePicker label="Fecha de nacimiento" bind:value={nacimiento} />`,
 
     daterange: `<!-- La de fin no puede ser anterior a la de inicio, y si pasa,
      el sistema lo dice en el campo — no adivina. -->
@@ -1043,6 +1051,69 @@
           <pre><code>{C.calendar}</code></pre>
           <button class="copy" on:click={() => copy(C.calendar, 'calendar')}>
             {copied === 'calendar' ? 'Copiado' : failed === 'calendar' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
+          </button>
+        </div>
+      </section>
+
+      <!-- ═══ DATEPICKER ══════════════════════════════════════════════════ -->
+      <section id="datepicker">
+        <h2>DatePicker</h2>
+        <p class="why">
+          <span class="sx-id">DateInput</span> abre el calendario de la plataforma — distinto en
+          cada navegador, pobre en Firefox de escritorio. Éste es el propio: un campo de texto en
+          la superficie del sistema más el botón que abre <span class="sx-id">Calendar</span> en la
+          top layer, con el mismo mecanismo que ya usa <span class="sx-id">Combobox</span> para su
+          lista. Composición, no invención — nada de esto escribe posicionamiento nuevo.
+        </p>
+        <p class="why">
+          <b>Escribir es la vía principal; el calendario es la ayuda.</b> Obligar a navegar doce
+          meses de a uno para poner una fecha de nacimiento es peor que el nativo, así que el campo
+          de texto lee y escribe solo — DD/MM/AAAA, el formato corto de es-CR — y el botón nunca se
+          abre por sí solo al escribir o enfocar, sólo con un click o un <span class="sx-id">Enter</span>
+          deliberados. Con el teclado alcanza para todo: abrir, moverse por la grilla, elegir con
+          <span class="sx-id">Enter</span>/<span class="sx-id">Espacio</span>, y <span class="sx-id">Escape</span>
+          cierra y devuelve el foco al campo.
+        </p>
+
+        <div class="demo grid2">
+          <div class="stack">
+            <p class="hintline">Vacío — click en el calendario o escribí, por ejemplo, 05/08/2026</p>
+            <DatePicker label="Fecha de nacimiento" bind:value={dpVacio} />
+          </div>
+          <div class="stack">
+            <p class="hintline">Con fecha ya elegida — cerrado, escrita a mano en el campo</p>
+            <DatePicker label="Fecha de la lectura" bind:value={dpElegido} max={hoy} />
+          </div>
+          <div class="stack">
+            <p class="hintline">Deshabilitado</p>
+            <DatePicker label="Fecha de cierre" value="2026-07-18" disabled />
+          </div>
+          <div class="stack">
+            <p class="hintline">Formato inválido — probá escribir «31/02/2026»</p>
+            <DatePicker label="Fecha del servicio" bind:value={dpInvalido} hint="Un 31 de febrero no existe: el campo no lo confirma." />
+          </div>
+        </div>
+
+        <div class="two">
+          <div class="when yes">
+            <h3 class="sx-cap">Usalo</h3>
+            <ul>
+              <li>En escritorio, o para una fecha lejos de hoy —una de nacimiento, una de instalación de hace años— donde girar la rueda nativa año por año es su propia forma de estar mal.</li>
+            </ul>
+          </div>
+          <div class="when no">
+            <h3 class="sx-cap">No lo usés</h3>
+            <ul>
+              <li>En un formulario que se llena desde el teléfono o la tablet: ahí <span class="sx-id">DateInput</span> abre el selector nativo, y ninguno propio le gana.</li>
+              <li>Para un rango o con hora — esto no los tiene. Un rango sigue siendo <span class="sx-id">DateRange</span>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="code">
+          <pre><code>{C.datepicker}</code></pre>
+          <button class="copy" on:click={() => copy(C.datepicker, 'datepicker')}>
+            {copied === 'datepicker' ? 'Copiado' : failed === 'datepicker' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
           </button>
         </div>
       </section>
