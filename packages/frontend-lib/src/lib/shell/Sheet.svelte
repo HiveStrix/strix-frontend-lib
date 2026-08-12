@@ -31,20 +31,32 @@
   // bubble, one press would close the sheet AND the screen behind it. One level
   // per press.
   //
-  // IT DOES NOT PORTAL, AND THAT IS DELIBERATE. Moving the node to document.body
-  // is the usual trick for escaping a clipped ancestor — and inside a Core it is
-  // fatal: the node would leave the shadow root and lose every style and every
-  // token with it. So the sheet renders where it is written, with
-  // `position: fixed` and `--sx-z-overlay`. THE COST, stated plainly: an
-  // ancestor with a `transform`, `filter` or `perspective` becomes the
-  // containing block for `fixed`, and the sheet will be trapped inside it. Do
-  // not put a Sheet inside a transformed card. Nothing else here can fix that.
+  // IT DOES NOT PORTAL, AND THAT IS STILL DELIBERATE. Moving the node to
+  // document.body is the usual trick for escaping a clipped ancestor — and
+  // inside a Core it is fatal: the node would leave the shadow root and lose
+  // every style and every token with it. So the sheet renders where it is
+  // written, with `position: fixed`.
+  //
+  // Lo que ANTES era el costo de esto —un ancestro con `transform`, `filter`
+  // o `perspective` se vuelve el bloque contenedor de `fixed` y atrapa el
+  // cajón adentro— ya no pasa donde existe `popover` (Chrome 114+, Safari
+  // 17+, Firefox 125+): `popover="manual"` saca el div a la TOP LAYER, fuera
+  // de cualquier contexto de apilado del documento, sin mover el nodo de
+  // donde el marcado lo escribió. `manual` y no `auto`, a propósito: `auto`
+  // trae su propio cierre por Escape, clic afuera y descarte automático, y
+  // este archivo ya tiene los tres, escritos con el cuidado de
+  // `composedPath()` que la versión del navegador no conoce — con `auto`
+  // correrían los dos y el orden entre ambos no está garantizado. Donde
+  // `popover` no existe, el cajón cae exactamente en lo de antes: sólo
+  // `position: fixed`, atrapado por un ancestro transformado. En esos
+  // navegadores, no metas un Sheet dentro de una tarjeta con `transform`.
   //
   // IT LEAVES AT ONCE. There is an enter animation and no exit one, because an
   // exit animation has to hold the node — and holding the node holds focus away
   // from the control that has to get it back.
   import { createEventDispatcher, onDestroy, tick } from 'svelte';
   import Glyph from './Glyph.svelte';
+  import { supportsPopover, syncPopover } from './toplayer.js';
 
   /** bind:open. The sheet is a controlled thing; the parent owns whether it exists. */
   export let open = false;
@@ -66,6 +78,7 @@
     'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),' +
     'textarea:not([disabled]),summary,[tabindex]:not([tabindex="-1"])';
 
+  let sheetEl;
   let panel;
   let opener = null;
   let wasOpen = false;
@@ -89,11 +102,23 @@
       prevOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
       await tick();
+      // `sheetEl` sólo existe después de que el bloque `{#if open}` se
+      // renderizó — por eso el `tick()` de arriba, la misma espera que ya
+      // necesitaba el foco de abajo. Entra a la top layer antes de enfocar,
+      // para no pedirle a un lector de pantalla que enfoque algo que todavía
+      // está apilado bajo lo que sea que envuelve al disparador.
+      syncPopover(sheetEl, true);
       // The panel itself, not the first control: landing on the dialog is what
       // makes a screen reader read its name and its role before its contents.
       panel?.focus({ preventScroll: true });
     } else {
       document.body.style.overflow = prevOverflow;
+      // Todavía montado acá: Svelte recién desarma el bloque `{#if}` en el
+      // parche que sigue a este statement reactivo, no antes. Salir de la top
+      // layer a mano, en vez de confiar en que sacar el nodo lo haga solo,
+      // evita que un Sheet reemplazado a mitad de apertura (un cambio de
+      // ruta) deje una entrada viva en la lista de la top layer.
+      syncPopover(sheetEl, false);
       const back = opener;
       opener = null;
       back?.focus?.({ preventScroll: true });
@@ -164,7 +189,11 @@
 </script>
 
 {#if open}
-  <div class="sheet">
+  <div
+    class="sheet"
+    bind:this={sheetEl}
+    popover={supportsPopover ? 'manual' : undefined}
+  >
     <!-- A surface to click past, not a control: no role, no tab stop, no
          keyboard duty of its own — Escape on the panel is the keyboard way out
          and the × is the pointer one, which is why these ignores are honest. It
@@ -211,6 +240,23 @@
     inset: 0;
     z-index: var(--sx-z-overlay);
     display: flex;
+    /* Los seis de abajo cancelan la hoja de estilos que trae `popover» —
+       `[popover] { margin: auto; border: solid; padding: .25em; overflow: auto;
+       color: CanvasText; background-color: Canvas; }`, activa apenas el
+       atributo está escrito, esté abierto o no. Cada una es un bug visible si
+       se deja: `margin: auto` pelea con `inset: 0` y termina centrando una
+       caja chica en vez de cubrir la pantalla; `border: solid` dibuja un filo
+       de ~3px que nadie pidió; `padding` encoge el área que el velo (`inset: 0`
+       contra ESTA caja) alcanza a cubrir; y `Canvas` pinta una placa opaca
+       detrás de `--sx-scrim`, que es translúcido a propósito. Nada de esto es
+       estilo nuevo: es lo que un `<div>` común ya tenía, repetido para que
+       `popover` no lo pueda pisar. */
+    margin: 0;
+    border: 0;
+    padding: 0;
+    overflow: visible;
+    color: inherit;
+    background: none;
   }
 
   .scrim {
