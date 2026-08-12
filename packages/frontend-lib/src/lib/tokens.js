@@ -244,14 +244,98 @@ export const TOKENS_DARK = {
   '--sx-surface': 'var(--sx-n-800)',
   '--sx-sunk': '#1B1F22',
   '--sx-line': '#2C3134',
-  '--sx-edge': '#3A3F43',
+  // FIJADO A HEX, y no a un peldaño de la rampa, por la misma razón que
+  // --sx-ink-3 más abajo: un borde tiene DOS LADOS y los tres fondos posibles
+  // debajo suyo (superficie, hover, selección) mandan el peor caso.
+  //     contra --sx-surface:      5.10  (piso 3.0)
+  //     contra --sx-ground:       5.91  (piso 3.0)
+  //     contra --sx-accent-soft:  3.98  (piso 3.0)
+  //     contra --sx-accent-pick:  3.05  (piso 3.0) — el que manda
+  // El valor viejo, #3A3F43, daba 1.33 contra superficie: un borde casi
+  // invisible sobre su propio fondo, que es la clase de defecto que este
+  // arnés existe para atrapar y que nada atrapaba porque nada lo medía en
+  // este tema.
+  '--sx-edge': '#9C9AA1',
   '--sx-ink': '#EDEFF0',
   '--sx-ink-2': '#BCC1C4',
-  '--sx-ink-3': '#8E9498',
+  // SUBIÓ DE #8E9498 A #BEBDC1. El valor viejo pasaba sobre --sx-surface
+  // (4.62) pero fallaba sobre los dos estados que --sx-accent-pick y
+  // --sx-accent-soft producen una vez que esos dos dejan de heredar del claro
+  // (ver abajo): 4.29 sobre hover, 2.99 sobre selección — el defecto que trajo
+  // esta tarea. Con #BEBDC1: 7.59 / 5.92 / 4.54, este último al límite porque
+  // --sx-accent-pick es el fondo más claro de los tres y el que menos margen
+  // deja.
+  //
+  // Y ES UN HEX FIJO A PROPÓSITO, no un `var(--sx-n-400)`: n-400 es el peldaño
+  // que --sx-edge (el claro) usa, y ya se movió dos veces en este trabajo por
+  // razones que no tienen nada que ver con el oscuro — la próxima vez que se
+  // mueva por el claro, el oscuro no puede quedar colgando de ese ajuste.
+  '--sx-ink-3': '#BEBDC1',
   '--sx-ink-on': 'var(--sx-n-900)',
+  // EL ENCABEZADO. Mismo rol que en claro — separar cabecera de tabla, pie de
+  // panel — pero la dirección se invierte: en claro el thead es la superficie
+  // con un tinte del 6%; en oscuro, oscurecer la superficie la hunde, y una
+  // cabecera más oscura que su propia tarjeta se lee como un agujero recortado
+  // en la tarjeta, no como una banda posada sobre ella. Aclararla un 6% con
+  // blanco hace el mismo trabajo que el tinte del claro —una banda apenas
+  // distinta— pero en la dirección que en oscuro SÍ se ve como una banda:
+  // #393643 sobre #2C2937, 1.09:1 entre sí (no es texto, es ambiente; no está
+  // en el contrato duro por la misma razón que en claro).
+  //
+  // Se deriva de --sx-surface en vez de fijarse a hex porque no hay ningún
+  // peldaño de otro tema tirando de él — es una banda nueva, no algo heredado
+  // de la dirección vieja — así que puede seguir a la superficie si el gris de
+  // base se recalibra.
+  '--sx-thead': 'color-mix(in srgb, #FFFFFF 6%, var(--sx-surface))',
+  // LA FIRMA, en oscuro. En claro el halo es el acento al 70% porque un
+  // resplandor morado sobre PAPEL se apaga rápido y necesita casi opacidad
+  // plena para notarse. En oscuro el acento es #EDEFF0 —casi blanco— y el
+  // fondo es oscuro: la relación de contraste ya está invertida y a favor del
+  // halo, así que la misma fuerza que en claro apenas se insinúa acá sería un
+  // foco de luz cayendo sobre la barra.
+  //
+  // 18% ES LA CIFRA QUE SE ELIGIÓ, no medida por el arnés —este token no está
+  // en el contrato duro ni en el informativo, porque no es una relación de
+  // texto ni de borde: es una sombra translúcida, y su intensidad es un juicio
+  // de diseño, no un número que un piso WCAG resuelva—. Se razonó así: el
+  // salto de --sx-accent-soft (8% de blanco) a --sx-accent-pick (16%) ya
+  // define cuánto “aclarado” se nota como estado interactivo en esta
+  // superficie; 18% cae apenas sobre ese techo, que para una sombra DECORATIVA
+  // (no un fondo sólido, con blur 28px y spread -18px difuminándola más
+  // todavía) debería leerse como una insinuación y no como una superficie
+  // encendida. Nadie lo confirmó todavía mirando la pantalla — ver el reporte.
+  '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 18%, transparent)',
   '--sx-accent': '#EDEFF0',
   '--sx-accent-ink': 'var(--sx-n-900)',
-  '--sx-accent-soft': '#2C3134',
+  // LA TRAMPA CENTRAL DE ESTE TEMA. En claro, --sx-accent-soft y
+  // --sx-accent-pick OSCURECEN el blanco mezclando el acento adentro: son
+  // fondos de estado que se separan de la superficie volviéndose más oscuros.
+  // En oscuro la superficie YA es oscura — oscurecerla más la funde con el
+  // fondo y el estado desaparece. El mismo nombre de token, el trabajo
+  // opuesto: acá ACLARAN la superficie mezclando blanco, no el acento.
+  //
+  // Por qué blanco y no --sx-accent: el acento en oscuro YA es casi blanco
+  // (#EDEFF0), así que mezclarlo daría casi lo mismo que mezclar blanco puro,
+  // pero decirlo con blanco es lo que describe el movimiento real —«aclarado»,
+  // no «teñido de marca»— y no ata el estado a lo que un producto decida hacer
+  // con su acento en oscuro.
+  //
+  // 8% para hover, 16% para selección — la misma proporción 1:2 que separa
+  // --sx-accent-soft (10%) de --sx-accent-pick (18%) en claro, adaptada a que
+  // acá el rango disponible antes de que el borde o la tinta empiecen a fallar
+  // es más angosto. Sobre la superficie oscura de Nácar (#2C2937):
+  //     --sx-accent-soft → #3D3A47   --sx-edge encima: 3.98 · --sx-ink-3: 5.92
+  //     --sx-accent-pick → #4E4B57   --sx-edge encima: 3.05 · --sx-ink-3: 4.54
+  // Los dos al límite de abajo, no de arriba: subir el porcentaje aclara de
+  // más y --sx-ink-3 es el primero en caer por debajo de 4.5.
+  '--sx-accent-soft': 'color-mix(in srgb, #FFFFFF 8%, var(--sx-surface))',
+  // ANTES DE ESTA TAREA, ESTE TOKEN NO EXISTÍA EN OSCURO Y HEREDABA EL DE
+  // CLARO: un lavanda pensado para OSCURECER blanco, cayendo sobre una
+  // superficie que ya era oscura. La fila seleccionada se pintaba con ese
+  // lavanda y encima la tinta oscura —pensada para leerse sobre gris oscuro,
+  // no sobre lavanda claro— caía a 2.99 contra un piso de 4.5. Es el defecto
+  // que dio origen a esta tarea.
+  '--sx-accent-pick': 'color-mix(in srgb, #FFFFFF 16%, var(--sx-surface))',
   '--sx-accent-edge': '#3A3F43',
   // The bands invert to low-chroma fills: a pale band with dark text does not
   // survive being dropped onto a dark ground.
@@ -259,7 +343,16 @@ export const TOKENS_DARK = {
   '--sx-attention': '#E7BE72', '--sx-attention-band': '#2E2415', '--sx-attention-edge': '#48381E',
   '--sx-critical': '#F0A79E', '--sx-critical-band': '#331B18', '--sx-critical-edge': '#4D2823',
   '--sx-info': '#ACADD6', '--sx-info-band': '#1F2033', '--sx-info-edge': '#33344F',
-  '--sx-neutral': 'var(--sx-n-400)', '--sx-neutral-band': '#23272A', '--sx-neutral-edge': '#3A3F43',
+  // APUNTABA A var(--sx-n-400) — el mismo peldaño de la rampa que --sx-edge
+  // (el claro) usa y que ya se movió dos veces por razones ajenas al oscuro.
+  // Colgado de ahí daba 3.37 contra --sx-neutral-band, por debajo del piso de
+  // 4.5, y encima quedaba a merced del próximo ajuste del claro. Se liga a
+  // --sx-ink-3 en vez de fijarse a un hex propio: son el mismo trabajo —una
+  // tinta gris clara, legible sobre superficies oscuras, que no puede depender
+  // de un peldaño ajeno— y «ninguno» hereda directamente la garantía ya
+  // verificada de --sx-ink-3 en lugar de duplicar el mismo número dos veces.
+  // Da 8.06 contra --sx-neutral-band (piso 4.5).
+  '--sx-neutral': 'var(--sx-ink-3)', '--sx-neutral-band': '#23272A', '--sx-neutral-edge': '#3A3F43',
   // Heavier in dark, and pure black rather than the ramp: on a near-black ground
   // the only thing that still reads as «behind» is more absence of light.
   '--sx-scrim': 'rgba(0, 0, 0, .62)',
