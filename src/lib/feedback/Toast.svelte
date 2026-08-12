@@ -181,9 +181,21 @@
     background: var(--sx-surface);
     color: var(--sx-ink);
     border-radius: var(--sx-r-2);
-    /* It floats, so it carries the floating elevation — plus the inset
-       highlight, which is what keeps a white card from dissolving into a white
-       ground on a cheap monitor. The tone is a bar in the fill, not a border. */
+    /* It floats, so it carries the floating elevation. What keeps a white
+       toast from dissolving into whatever is under it is `--sx-e-3` alone —
+       a real OUTER shadow, unrelated to the surface it floats over. This line
+       used to credit `--sx-e-inset` with that job too, and it does not do it:
+       resolved, in the light theme rgba(255,255,255,.9) over --sx-surface
+       (also white) composites to identical white, 1.000:1 — the exact defect
+       `Card.svelte` found and fixed for `crest` (see the note there), just
+       never measured here because nothing LOOKED broken — e-3 alone was
+       already enough to read the toast against its background. Reviewed
+       instead of copying that fix: in dark, the same reflection genuinely
+       works — 1.16–1.17:1 against --sx-surface, the same order as crest's
+       fixed edge — so the token stays. Removing it would cost dark theme a
+       real highlight to tidy up a light-theme layer that was already free: an
+       invisible white-on-white shadow costs nothing to draw, it just does
+       nothing. The tone is a bar in the fill, not a border. */
     box-shadow: var(--sx-e-3), var(--sx-e-inset);
     font-size: var(--sx-t-sm);
     line-height: 1.45;

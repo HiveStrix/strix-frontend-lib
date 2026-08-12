@@ -93,10 +93,22 @@
   //   porque el par no estaba medido — ver `DISTINCT` en
   //   `scripts/contrast.mjs`, ahora sí lo está.
   //   UN REFLEJO BLANCO NECESITA ALGO OSCURO DEBAJO. Por eso NO se tocó
-  //   `--sx-e-inset` — lo usan `Button.svelte` y `Toast.svelte` sobre
-  //   superficies donde el reflejo SÍ trabaja (el acento pleno, una sombra
-  //   `e-3` fuerte) y retocarlo ahí para arreglar acá habría repetido el
-  //   mismo error una vez más, sólo que en la dirección contraria. `crest`
+  //   `--sx-e-inset` — lo usa `Button.svelte` sobre el acento pleno
+  //   (`.solid`/`.danger`), oscuro en los dos temas, donde el reflejo SÍ
+  //   trabaja. `Toast.svelte` es un caso distinto y se revisó aparte
+  //   (ver el comentario junto a su propio `box-shadow`): medido, el mismo
+  //   defecto de acá — 1.000:1, blanco sobre blanco — se repite en claro,
+  //   porque su superficie también es `--sx-surface`. La diferencia es que
+  //   ahí no rompe nada: lo que separa un Toast de lo que tiene debajo es
+  //   `--sx-e-3`, una sombra EXTERIOR, ajena a si el reflejo INTERIOR se ve
+  //   — una sombra fuerte no hace leer un reflejo invisible, son dos capas
+  //   independientes, y decir lo contrario acá habría sido la misma clase de
+  //   copia sin verificar que rompió esta variante. En oscuro el reflejo del
+  //   Toast sí mide algo real (1.16–1.17:1, el mismo orden que el filo de
+  //   `crest` de abajo), así que retocar `--sx-e-inset` para «arreglar» esto
+  //   le habría quitado a Button y al Toast oscuro un reflejo que ahí sí
+  //   lee — el mismo error una vez más, sólo que en la dirección contraria.
+  //   `crest`
   //   tiene su propio token, `--card-crest-line`, definido como
   //   `color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface))` — un 6% de
   //   la TINTA sobre la SUPERFICIE, no un rgba fijo. Es opaco (no depende de
