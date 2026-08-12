@@ -215,6 +215,62 @@
           aguantando. «Flota» en tinta crítica es la regla rota: quien no separe el rojo del gris
           no aprende nada, y todos los demás aprenden que el color es ruido.
         </p>
+
+        <h3 class="sx-cap sub">variant — tres formas de encabezar</h3>
+        <p class="why">
+          El problema que las origina: adentro del contenido, donde no hay barra, un encabezado
+          que sólo se separa por el halo deja las secciones sin techo — «todo parece una sola
+          sección», en palabras de quien lo pidió. <span class="sx-id">halo</span>,
+          <span class="sx-id">sarion</span> y <span class="sx-id">banda</span> son la misma terna
+          que <span class="sx-id">Card</span>: luz, línea y tono. El marco completo está en la
+          cabecera de <span class="sx-id">Card.svelte</span>; la traducción a un encabezado, en la
+          de <span class="sx-id">PageHeader.svelte</span>.
+        </p>
+
+        <div class="demo three-up">
+          <Card pad={5}>
+            <PageHeader
+              level={3}
+              eyebrow="Servicios"
+              title="Los últimos 12 meses"
+              subtitle="18 preventivas, 7 correctivas, 2 canceladas."
+            />
+          </Card>
+          <Card pad={5}>
+            <PageHeader
+              level={3}
+              variant="sarion"
+              eyebrow="Servicios"
+              title="Los últimos 12 meses"
+              subtitle="OT-0042 · BAT007 · 18 jul 2026"
+            />
+          </Card>
+          <Card pad={5}>
+            <PageHeader
+              level={3}
+              variant="banda"
+              eyebrow="Servicios"
+              title="Los últimos 12 meses"
+              subtitle="18 preventivas, 7 correctivas, 2 canceladas."
+            />
+          </Card>
+        </div>
+
+        <p class="note">
+          <b>Cuándo usar cada una.</b> <span class="sx-id">halo</span>, para el encabezado de la
+          propia página — es el default por algo. <span class="sx-id">sarion</span> para un
+          encabezado de sección DENTRO del contenido, donde no hay barra que lo separe y hace
+          falta una línea real; el subtítulo monoespaciado es del sistema, no un identificador
+          cualquiera — usalo para algo que se lee como una cifra o una referencia, no como una
+          oración («OT-0042 · BAT007», arriba, no una frase). <span class="sx-id">banda</span>
+          cuando la sección tiene que leerse como un bloque cerrado, con máxima contención — y
+          siempre sobre una tarjeta, nunca directo sobre el fondo:
+          <span class="sx-id">--sx-thead</span> está calibrado contra
+          <span class="sx-id">--sx-surface</span>, no contra <span class="sx-id">--sx-ground</span>
+          (medido: 1.03–1.05 en claro, bajo el piso de distinguibilidad — <span class="sx-id">pnpm contrast</span>
+          lo deja escrito como informativo). Elegir una no es gusto: tres mecanismos mezclados sin
+          criterio, en la misma pantalla, es peor que uno solo.
+        </p>
       </section>
 
       <!-- ═══ BREADCRUMB ═════════════════════════════════════════════════ -->
@@ -612,6 +668,9 @@
   .tiny { margin: 0; font-size: var(--sx-t-xs); line-height: 1.6; color: var(--sx-ink-3); max-width: 66ch; }
 
   .demo { margin-top: var(--sx-s-6); display: flex; flex-direction: column; gap: var(--sx-s-4); }
+  /* Para poner variantes una al lado de la otra sobre el mismo contenido —
+     ver `Superficies.svelte`, que ya tiene el mismo patrón para Card. */
+  .demo.three-up { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); gap: var(--sx-s-4); }
   .panel p { margin: 0; font-size: var(--sx-t-sm); line-height: 1.6; color: var(--sx-ink-2); }
   .seg-out { margin: 0; font-size: var(--sx-t-sm); line-height: 1.6; color: var(--sx-ink-2); max-width: 68ch; }
   .big { margin: 0; font-size: var(--sx-t-xl); font-weight: var(--sx-w-semi); letter-spacing: -.025em; }

@@ -186,6 +186,54 @@
           <span class="sx-id">--sx-halo</span>, no un borde nítido contra el que medir 1.4.11. Ver
           el comentario junto a <span class="sx-id">--card-glow</span> en <span class="sx-id">Card.svelte</span>.
         </p>
+
+        <h3 class="sx-cap sub">variant — tres maneras de cerrar una superficie</h3>
+        <p class="why">
+          Luz, línea o tono: las tres maneras en que una superficie puede distinguirse de su
+          fondo. <span class="sx-id">raised</span> es la ley — la sombra — y no se toca.
+          <span class="sx-id">crest</span> y <span class="sx-id">filled</span> son salidas
+          explícitas, no un reemplazo: la misma tarjeta, el mismo contenido, separada del fondo
+          de otra manera. El argumento completo —por qué existen y por qué el marco importa más
+          que ellas— está en la cabecera de <span class="sx-id">Card.svelte</span>.
+        </p>
+
+        <div class="demo">
+          <div class="cards">
+            <Card>
+              <p class="cl">
+                <b>raised · default</b>
+                <span>BAT014 — la sombra. No se toca.</span>
+              </p>
+            </Card>
+            <Card variant="crest">
+              <p class="cl">
+                <b>crest</b>
+                <span>
+                  BAT014 — un anillo de 1&nbsp;px en la sombra, no en <span class="sx-id">border</span>,
+                  con un reflejo arriba. Adaptada de un ERP real, recompuesta con tokens de Nácar.
+                </span>
+              </p>
+            </Card>
+            <Card variant="filled">
+              <p class="cl">
+                <b>filled</b>
+                <span>BAT014 — el relleno, sin sombra. Para cuando muchas tarjetas juntas acumulan ruido.</span>
+              </p>
+            </Card>
+          </div>
+        </div>
+
+        <p class="note">
+          <b>Cuándo usar cada una.</b> <span class="sx-id">raised</span>, siempre que no haya un
+          motivo concreto para otra cosa — es el default por algo. <span class="sx-id">crest</span>
+          cuando una superficie tiene que leerse «cerrada» sin pedir más sombra —un formulario
+          compuesto, un panel de configuración— y el anillo hace ese trabajo mejor que otro
+          escalón de <span class="sx-id">elevation</span>. <span class="sx-id">filled</span> cuando
+          hay muchas tarjetas juntas —una grilla, un tablero— y la sombra de cada una deja de
+          separar y empieza a acumularse como ruido de fondo. Elegir una no es gusto: es decir con
+          qué mecanismo se separa esa superficie, a propósito — y una pantalla con las tres
+          mezcladas sin ese criterio es peor que una pantalla con una sola.
+        </p>
       </section>
 
       <!-- ═══ PANEL ══════════════════════════════════════════════════════ -->

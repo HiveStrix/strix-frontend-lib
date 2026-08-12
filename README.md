@@ -559,18 +559,30 @@ componente; son más cortas que este README y contestan mejor.
 
 ### El vocabulario de props
 
-Estas palabras significan lo mismo en toda la librería. Si encontrás una que no, es un bug.
+Estas palabras significan lo mismo en toda la librería, con una excepción marcada abajo. Si
+encontrás otra que no, es un bug.
 
 | Prop | Significa | Valores |
 |---|---|---|
 | `tone` | Qué estado semántico es | `positive` · `attention` · `critical` · `info` · `neutral` (o `none`, donde no reclamar estado es una opción) |
-| `variant` | Cuánto peso visual tiene una acción | `solid` (uno por vista) · `outline` (el de siempre) · `ghost` · `danger` |
+| `variant` * | Depende de la familia — ver abajo | ver cada componente |
 | `size` | Un paso de la misma escala | `sm` · `md` · `lg` |
 | `label` | El nombre accesible de un control o grupo | — |
 | `compact` | El mismo objeto, con menos aire | booleano |
 | `loading` / `busy` | Hay una petición en vuelo. **Nunca** `disabled` | booleano |
 | `error` + `fix` | El problema **y** la salida. Dos props, nunca una | — |
 | `noun` / `nounPlural` / `gender` | Para que el componente escriba en español correcto | `'m'` · `'f'` |
+
+\* **`variant` no es un solo eje.** En `Button` / `Menu` / `SplitButton` / `IconButton` es cuánto
+peso visual tiene una acción (`solid` uno por vista · `outline` el de siempre · `ghost` · `danger`).
+En `Skeleton` es qué forma dibuja (`text` · `circle` · …). En `Card` y `PageHeader` es CON QUÉ
+MECANISMO una superficie se separa de su fondo — luz, línea o tono — y el marco completo vive en
+la cabecera de `Card.svelte` (`raised` / `crest` / `filled`, y su espejo en `PageHeader`: `halo` /
+`sarion` / `banda`). Tres ejes bajo el mismo nombre es una tensión real, no un descuido: se
+prefirió reusar la palabra que ya existe en el vocabulario del sistema —«esta prop cambia CÓMO se
+ve, no QUÉ es»— antes que inventar una cuarta palabra (`shape`, `mechanism`) para decir casi lo
+mismo. Si esto termina confundiendo más de lo que ahorra, la salida es nombrar el eje de Card y
+PageHeader aparte; no se hizo acá porque el pedido que trajo estas dos variantes no lo pidió.
 
 ---
 
