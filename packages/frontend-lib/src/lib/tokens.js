@@ -46,7 +46,9 @@ export const TOKENS = {
   // neutro el margen era todavía más chico, así que la base tiene que aguantar
   // las dos configuraciones:
   //     contra blanco:            4.03 morado / 3.77 gris
-  //     contra --sx-accent-soft:  3.46 morado / 3.24 gris
+  //     contra --sx-accent-soft:  3.84 morado / 3.59 gris (hoy — medía 3.46 /
+  //                               3.24 cuando --sx-accent-soft todavía mezclaba
+  //                               al 16 %; bajó a 10 % después, ver ahí)
   // NO puede salir de la escala de tercios del resto del cromo: para llegar a
   // 3:1 mezclando marca haría falta un 64 %, que es un borde morado franco y no
   // mobiliario.
@@ -56,9 +58,12 @@ export const TOKENS = {
   // 3.05 morado / 2.86 gris. #7A7A7F da 3.38 / 3.16, y contra blanco sube de
   // 4.03 a 4.47.
   '--sx-n-400': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #7A7A7F)',
-  // n-500 es --sx-neutral, que se dibuja SOBRE n-100. Su base da 4.95:1 con la
-  // traza y 4.69:1 sin ella. En la dirección A daba 4.16 y estaba por debajo
-  // de AA sin que nadie lo hubiera medido.
+  // N-500 ES DONDE ATERRIZA --sx-ink-3, no --sx-neutral: --sx-neutral se fijó
+  // a hex (ver el bloque de tonos, más abajo) y ya no toca la rampa — el único
+  // consumidor de este peldaño hoy es --sx-ink-3, contra --sx-surface,
+  // --sx-accent-soft y --sx-accent-pick. Su base da 4.95:1 con la traza y
+  // 4.69:1 sin ella contra --sx-surface. En la dirección A daba 4.16 y estaba
+  // por debajo de AA sin que nadie lo hubiera medido.
   //
   // También se oscurece por --sx-accent-pick: sobre ese relleno, la base #66666C
   // daba 4.42 morado / 4.12 gris, por debajo de AA. #5E5E64 da 4.94 / 4.60.
@@ -109,8 +114,11 @@ export const TOKENS = {
   // discreción es este porcentaje y sólo éste.
   '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 70%, transparent)',
 
-  // EL HUECO DEL ACENTO. Un producto lo llena ligando estas cuatro propiedades
-  // en su raíz; es el único color que un producto elige.
+  // EL HUECO DEL ACENTO. Un producto lo llena ligando --sx-accent,
+  // --sx-accent-ink, --sx-accent-soft y --sx-accent-edge en su raíz; es el
+  // único color que un producto elige. --sx-accent-pick, más abajo, es un
+  // quinto derivado que casi nunca hace falta tocar — ver el README, «Ligar
+  // el acento».
   //
   // POR QUÉ EL DEFECTO YA NO ES CASI-NEGRO. Antes lo era, con el argumento de
   // que un acento sin ligar debía dar un primario usable. El argumento se cae en

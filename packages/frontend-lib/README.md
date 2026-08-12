@@ -127,8 +127,10 @@ problema:
    --sx-accent: #B45309;
    --sx-chrome-tint: #8E8E93;   /* grises neutros en vez de la traza violeta */
    --sx-halo: transparent;      /* sin la firma de luz en la barra */
-   --sx-thead: var(--sx-sunk);  /* encabezados con relleno */
    ```
+   `--sx-thead` no entra en esta lista: no hay un valor de una sola línea que
+   dé «encabezados con relleno» y sea seguro en los dos temas — ver la nota
+   junto a `--sx-thead` más abajo.
 3. **Necesidad puntual** — se pisa un rol o una primitiva:
    ```css
    --sx-line: #E0E0E0;
@@ -141,13 +143,25 @@ Los tres niveles son custom properties: funcionan igual en el Shell (luz DOM) y 
 ### Las tres perillas
 
 - **`--sx-chrome-tint`.** Es un color, no un porcentaje: el que se mezcla en cada peldaño de la
-  rampa neutra (`color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB)` en el más claro, hasta un
-  8 % en los intermedios). Por default vale el mismo morado que `--sx-accent`, `#6541BE`. Un core
-  que no quiera la traza violeta liga esta única propiedad a un gris y las once primitivas se
-  destiñen de una vez, no una por una.
+  rampa neutra salvo el más claro (`color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB)` en
+  `--sx-n-50`, hasta un 8 % en los intermedios — `--sx-n-0` es `#FFFFFF` fijo, sin mezcla: es el
+  blanco de la superficie, no un lugar para una traza). Por default vale el mismo morado que
+  `--sx-accent`, `#6541BE`. Un core que no quiera la traza violeta liga esta única propiedad a un
+  gris y las diez primitivas restantes se destiñen de una vez, no una por una.
 - **`--sx-thead`.** El fondo de encabezado, de tabla y de panel a la vez. Está separado de
   `--sx-sunk` a propósito: `--sx-sunk` también pinta los controles de formulario, así que si
   compartieran token, cambiarle el color al encabezado le cambiaba el color a los inputs de paso.
+  **No hay un valor de una sola línea para «encabezados con relleno» que sea seguro en los dos
+  temas** — versiones anteriores de esta guía sugerían `--sx-thead: var(--sx-sunk)`, y era un
+  defecto documentado como si fuera una perilla: en claro, `--sx-sunk` y el `--sx-thead` por
+  defecto resuelven casi al mismo valor (1.011:1 entre sí), así que la perilla no cambiaba nada
+  visible; en oscuro, `--sx-thead` por defecto se ACLARA respecto de la superficie y `--sx-sunk` se
+  OSCURECE —van en direcciones opuestas entre los dos temas, que es precisamente por qué
+  `--sx-thead` es un token propio y no un alias de `--sx-sunk`— así que la perilla invertía la
+  banda a más oscura que su propia tarjeta: un agujero recortado en la superficie, no una banda
+  posada sobre ella. Un producto que de verdad quiera un encabezado con relleno tiene que pisar
+  `--sx-thead` con su propio valor por tema, bajo `[data-sx-theme="dark"]` incluido — no hay un
+  atajo de una sola declaración.
 - **`--sx-halo`.** La firma de la dirección: la luz que la barra superior deja caer en vez de una
   raya (`box-shadow: 0 12px 28px -18px var(--sx-halo)` en `PageHeader`). Deriva del acento al 70 %
   contra transparente — subió desde 55 % al mirarlo en pantalla: sobre papel un resplandor se apaga
@@ -346,7 +360,7 @@ mano** — las dos formas salen de un solo origen justamente para que no puedan 
 | `@font-face` | Chrome y Safari lo ignoran adentro de un shadow root | La tipografía es una pila del sistema. La personalidad sale del tratamiento: contraste de peso, tracking negativo, cifras tabulares |
 | `document.activeElement` | Desde afuera de un shadow tree siempre reporta el host | `Dialog`, `Sheet` y `Menu` bajan por `getRootNode().activeElement` |
 | `contains(e.target)` en un evento de documento | Todo evento se re-apunta al host: da `true` para la página entera | `Menu` y `SearchField` usan `composedPath()` |
-| Portalear a `document.body` | El nodo sale del shadow root y pierde estilos y tokens | `Sheet` y `Menu` **no** portalean. El costo está documentado en cada archivo |
+| Portalear a `document.body` | El nodo sale del shadow root y pierde estilos y tokens | `Sheet`, `Menu`, `Tooltip` y `Combobox` **no** portalean. Donde el navegador soporta `popover`, escapan del recorte y del atrapamiento por la top layer en vez de portalear — ver *Resuelto*, más abajo. Donde no, caen en el costo de antes (recortados por `overflow: hidden`, atrapados por `transform`), documentado en `shell/toplayer.js` y en cada archivo |
 | `::backdrop` | No hereda de `:host` | `ShortcutOverlay` lleva un color de reserva |
 
 ---
@@ -541,10 +555,10 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   `--sx-ink-2`/`-3` medidos SOBRE los dos —un borde y un texto tienen que aguantar el fondo del
   estado en el que se dibujan, sea pasajero o persistente, no sólo la superficie en reposo— sí
   están en el contrato duro.
-- **`--sx-n-100` y `--sx-n-200` quedaron sin ningún consumidor**, desde que `--sx-neutral` se fijó
-  a hex y `--sx-accent-soft`/`-edge` pasaron a derivar del acento en vez de usarlos. Es higiene, no
-  un defecto: la rampa se mantiene completa a propósito, para que un producto que la necesite
-  entera la tenga.
+- **`--sx-n-100`, `--sx-n-200` y `--sx-n-300` quedaron sin ningún consumidor**, desde que
+  `--sx-neutral` se fijó a hex y `--sx-accent-soft`/`-edge` pasaron a derivar del acento en vez de
+  usarlos. Es higiene, no un defecto: la rampa se mantiene completa a propósito, para que un
+  producto que la necesite entera la tenga.
 - **La verificación visual de las siete páginas, a 1200 y 390 px, todavía no la hizo una persona.**
   Es la única parte del criterio de terminado que ningún script cubre — `npm run contrast` prueba
   que un color exista con el contraste que promete, no que la tabla, el panel o el formulario se
