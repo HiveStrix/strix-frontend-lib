@@ -366,8 +366,8 @@ estricto**, y ahí las dos maneras normales de traer CSS no sirven:
 
 Las custom properties *sí* heredan a través de la frontera, así que un módulo montado dentro de la
 Shell hereda los tokens del documento gratis. Pero un módulo también tiene que funcionar cuando
-nada arriba los definió. Entonces lleva su propia copia, **en línea**, en el `<style>` de su
-componente raíz:
+nada arriba los definió. Entonces lleva su propia copia, **en línea**, como una etiqueta `<style>`
+que el propio componente emite desde su marcado:
 
 ```svelte
 <!-- Root.svelte del módulo Core -->
@@ -378,13 +378,29 @@ componente raíz:
   import { PageHeader, Table } from '@strix/frontend-lib';
 </script>
 
-<style>
-  {@html hostTokens() + hostBase()}
-</style>
+{@html `<style>${hostTokens()}${hostBase()}</style>`}
 
 <PageHeader title="3 máquinas están vencidas." tone="critical" />
 <Table … />
 ```
+
+**Por qué no `<style>{@html hostTokens()}</style>`, que es lo primero que uno escribe.** Un bloque
+`<style>` de Svelte no es una expresión con CSS adentro: es CSS **estático**, que el compilador
+parsea en tiempo de compilación como si fuera un archivo `.css` propio. No hay forma de interpolar
+nada ahí dentro — ni una variable, ni un `{@html}` — y el compilador lo rechaza con
+`Expected a valid CSS identifier`, no con un error a medias. `{@html}` sólo es válido en **posición
+de marcado**, junto al resto de las etiquetas del componente, así que lo que hay que emitir desde
+ahí no es el contenido de un `<style>` sino la etiqueta `<style>` **completa**, como el string que
+es. Dentro de un shadow root eso sigue acotando igual — el navegador no distingue un `<style>`
+escrito a mano de uno insertado por `{@html}}` — así que el resultado es el mismo CSS, en el mismo
+lugar, sin el error de compilación.
+
+Verificado compilando ambas formas: la primera falla en `svelte/compiler` con
+`CompileError: Expected a valid CSS identifier`; la segunda compila, y `pnpm build` la procesa sin
+error en un componente `customElement` con `shadow: 'open'` como los de arriba. El código generado
+muestra por qué funciona: `customElements.define(...)` envuelve al componente con
+`{ mode: 'open' }`, y el `{@html}` que arma el `<style>` corre **dentro** de ese fragmento — el
+mismo mecanismo por el que cualquier otro nodo del componente aparece dentro del shadow root.
 
 - **`hostTokens(selector = ':host')`** — todas las variables, en el selector que le pases.
 - **`hostTokensDark(selector = ':host([data-sx-theme="dark"])')`** — el re-amarre oscuro.
