@@ -398,6 +398,12 @@ function evalContract(tokens) {
 // duración) y que tienen que leerse como DOS cosas. Ninguno se mide contra un
 // fondo — se miden entre sí.
 const DISTINCT = [
+  // EL ESCALÓN QUE SOSTIENE TODO LO DEMÁS, y que no se medía. Una tarjeta blanca
+  // sobre un campo blanco no tiene límite: es el defecto que un producto reportó
+  // después de construir un módulo entero. Se corrigió con un tinte en el campo
+  // y el primer valor elegido quedó por debajo de este mismo piso — nadie se dio
+  // cuenta porque el par no estaba acá. Ahora está.
+  ['--sx-surface', '--sx-ground', 'la superficie contra el campo'],
   ['--sx-thead', '--sx-accent-soft', 'cabecera contra el hover de su control'],
   ['--sx-thead', '--sx-surface', 'la banda contra la tarjeta'],
   ['--sx-accent-soft', '--sx-accent-pick', 'pasajero contra persistente'],

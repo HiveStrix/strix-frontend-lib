@@ -23,7 +23,7 @@
   --sx-n-700: color-mix(in srgb, var(--sx-chrome-tint) 8%, #414146);
   --sx-n-800: color-mix(in srgb, var(--sx-chrome-tint) 8%, #27272B);
   --sx-n-900: color-mix(in srgb, var(--sx-chrome-tint) 7%, #1B1B1E);
-  --sx-ground: color-mix(in srgb, var(--sx-chrome-tint) 3%, #FFFFFF);
+  --sx-ground: color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF);
   --sx-surface: var(--sx-n-0);
   --sx-sunk: var(--sx-n-50);
   --sx-line: var(--sx-n-150);

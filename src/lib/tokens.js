@@ -88,7 +88,13 @@ export const TOKENS = {
   // Un 3 % no es un color: es el escalón que hace que una superficie blanca se
   // lea como superficie. Prisma lo tenía al 5 % por esta misma razón; acá se
   // había quitado y hubo que devolverlo.
-  '--sx-ground': 'color-mix(in srgb, var(--sx-chrome-tint) 3%, #FFFFFF)',
+  // Es 6 % y no 3 %, y el número salió del propio piso del sistema. A 3 % el
+  // escalón contra --sx-surface daba 1.046 con la perilla morada y 1.029 con la
+  // gris, o sea por DEBAJO del 1.05 que este repo exige para que dos superficies
+  // se consideren distinguibles. El arreglo cumplía a ojo y no cumplía su propia
+  // regla. Con la perilla en gris ni el 5 % llega (1.049): 6 % es el mínimo que
+  // pasa en las dos configuraciones.
+  '--sx-ground': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF)',
   '--sx-surface': 'var(--sx-n-0)',
   '--sx-sunk': 'var(--sx-n-50)',
   // --sx-line separa filas y cierra cabeceras: es AMBIENTE y puede ser tenue.
