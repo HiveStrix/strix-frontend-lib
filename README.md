@@ -7,22 +7,65 @@ shadow root, y cualquier app de SvelteKit que venga después.
 Un solo vocabulario, para que alguien que pasa de mantenimiento a facturación no tenga que
 aprenderlo otra vez.
 
-```bash
-npm install          # dependencias
-npm run dev          # el catálogo, en caliente
-npm run build        # compila el catálogo a dist/
-npm run preview      # sirve dist/ en http://localhost:5180
-npm run tokens       # regenera src/lib/tokens.css desde src/lib/tokens.js
-```
+Este repo **es** la librería, en la raíz — no un monorepo, no un paquete escondido adentro de
+`packages/`. `src/lib` es lo que se instala; `src/catalog` es el showroom que se queda en este
+árbol y nunca viaja a ningún consumidor.
 
-**Para verlo:**
+## Cómo se corre este repo
+
+Requiere Node ≥ 18 y **pnpm 10** (fijado en `packageManager`; ver *pnpm 10, y por qué* más abajo).
 
 ```bash
-npm run build && npx vite preview --port 5180
+pnpm install    # dependencias
+pnpm dev        # el catálogo, en caliente — http://localhost:5180
+pnpm build      # compila el catálogo a dist/
+pnpm preview    # sirve dist/ en http://localhost:5180
+pnpm tokens     # regenera src/lib/tokens.css desde src/lib/tokens.js
+pnpm contrast   # el arnés: mide contraste real, no confía en la vista
 ```
 
-y abrí <http://localhost:5180>. El tema y la marca son enlazables:
-`http://localhost:5180/?theme=dark&brand=opra#/tablas`.
+El tema y la marca son enlazables: `http://localhost:5180/?theme=dark&brand=opra#/tablas`.
+
+## Cómo se instala esto desde otro repo
+
+No hay registry ni rama de publicación: se instala directo desde git, con el tag que corresponda.
+
+```bash
+npm install git+ssh://git@github.com/SantiagoHiveStrix/strix-frontend-example.git#v0.3.0
+```
+
+Funciona igual con pnpm o yarn — es una URL de git, no un paquete de un registry, así que no hace
+falta que el consumidor use el mismo gestor que este repo. El repo es privado: hace falta una
+**deploy key** (o el acceso SSH que ya tenga quien instala) para que el `git+ssh://` de arriba
+resuelva.
+
+Esto es posible *porque* la librería vive en la raíz. Con la lib adentro de `packages/frontend-lib/`
+no había forma de instalarla así — npm sabe clonar un repo git, pero no sabe entrar a un
+subdirectorio suyo. La única salida hubiera sido montar un registry, mantener una rama de
+publicación, o forzar a todo consumidor a usar pnpm. Mover la librería a la raíz cerró la pregunta
+en vez de rodearla.
+
+## pnpm 10, y por qué
+
+No es por distribución — eso lo resuelve la raíz, arriba. Es seguridad de la cadena de build.
+
+npm ejecuta `preinstall`/`install`/`postinstall` de **cualquier dependencia** sin preguntar. pnpm
+10 los bloquea por defecto y obliga a autorizarlos uno por uno en `onlyBuiltDependencies`
+(`pnpm-workspace.yaml`). Verificado con `node_modules` y lockfile vacíos, no asumido: sólo
+`esbuild` aparece en «Ignored build scripts» al instalar — baja el binario nativo de la
+plataforma, y sin él Vite no tiene con qué transformar nada. `rollup` y `acorn` declaran un script
+`prepare` en su `package.json`, pero `prepare` sólo corre cuando el paquete es la raíz del install
+o viene de git — nunca para una dependencia bajada del registro, ni con npm ni con pnpm. Los dos
+se quedaron afuera de la lista: agregarlos habría autorizado un script que jamás se ejecuta acá, y
+una lista de permisos sin uso real es el cajón de sastre que esta protección existe para evitar.
+
+`minimumReleaseAge` está en 1440 minutos (24 horas): la mayoría de los paquetes maliciosos que se
+publican en el registro se detectan y se bajan dentro de la primera hora, así que un día de margen
+cubre ese proceso sin demorar más de lo razonable una versión legítima que alguien necesite.
+
+`packageManager` en `package.json` fija la versión (`pnpm@10.34.5`) para que nadie instale una
+distinta a mano. Si en algún momento sólo hay pnpm 9 disponible, **no degradar**: las dos
+protecciones de arriba son de la 10, y sin ellas esta sección deja de tener motivo.
 
 ---
 
@@ -73,9 +116,10 @@ deliberadamente *no* tabular.
 ## La dirección: Nácar
 
 Las tres reglas de arriba son restricciones; Nácar es la silueta concreta que las lleva a un
-mobiliario. Se eligió comparando dieciséis direcciones sobre el mismo contenido —el registro queda
-en `explore.html`, ver *Estado* en el README raíz— y esto documenta en qué tokens vive, de dónde
-sale cada pieza, y qué perillas mueve un producto sin salir del sistema.
+mobiliario. Se eligió comparando dieciséis direcciones sobre el mismo contenido —vivían en
+`src/explore`, y ya cumplieron su función: el registro queda en el historial de git, no en el
+árbol de trabajo— y esto documenta en qué tokens vive, de dónde sale cada pieza, y qué perillas
+mueve un producto sin salir del sistema.
 
 ### La ley
 
@@ -94,7 +138,8 @@ distintas.
 - **La forma es de Prisma**: radio 12 y 22, superficies opacas, sombra real con desplazamiento,
   los pasteles de estado resueltos contra blanco.
 - **La tabla es de Prisma pastel (`Z`)**: copiada por valor, los 59 tokens de `[data-d='Z']`
-  acotados a `.tbl` en `explore/pages/Tablas.svelte`. Es la escalera de densidad de tres escalones
+  acotados a `.tbl` en la ficha de Tablas de esa dirección (ver el historial de git — vivía en
+  `src/explore/pages/Tablas.svelte`). Es la escalera de densidad de tres escalones
   que hace legible una tabla de ocho columnas, y no se podía tomar de Cristal — su superficie es
   `rgba(255,255,255,.56)` y esa escalera depende de un campo detrás que Nácar, sobre blanco, no
   tiene.
@@ -214,7 +259,7 @@ focus, `--sx-edge` sobre `--sx-accent-soft` da hoy **3.84:1** con el morado por 
 con la perilla en un neutro. `--sx-accent-pick` a 20 % hace caer `--sx-ink-3` a 4.45:1, por debajo
 de AA con la perilla en un neutro; a 18 % — el último escalón que aguanta las dos configuraciones —
 `--sx-edge` sobre `--sx-accent-pick` da **3.38:1** morado / **3.16:1** gris, y `--sx-ink-3` da
-**4.94:1** morado / **4.60:1** gris. `npm run contrast` mide las dos superficies para los tres
+**4.94:1** morado / **4.60:1** gris. `pnpm contrast` mide las dos superficies para los tres
 tokens que se dibujan encima (`--sx-edge`, `--sx-ink-2`, `--sx-ink-3`).
 
 ### `--sx-line` y `--sx-edge` hacen dos trabajos distintos
@@ -238,7 +283,7 @@ Un borde tiene dos lados, y el segundo casi se escapa: un control en hover tiene
 de `--sx-accent-soft` por los dos lados, no de blanco; un checkbox dentro de una fila *seleccionada*
 tiene el suyo rodeado de `--sx-accent-pick`, que es más fuerte todavía. `--sx-n-400` está calibrado
 para aguantar las dos — **3.84:1** morado / **3.59:1** gris contra `--sx-accent-soft`, **3.38:1**
-morado / **3.16:1** gris contra `--sx-accent-pick` — y `npm run contrast` mide las tres superficies,
+morado / **3.16:1** gris contra `--sx-accent-pick` — y `pnpm contrast` mide las tres superficies,
 no sólo la de reposo.
 
 La lección general, no sólo de este par: **una regla que dice `var(--sx-algo)` no dibuja un color,
@@ -250,7 +295,7 @@ números, no mirar el nombre de la variable y confiar en que suene razonable.
 
 ### La verificación
 
-`npm run contrast` es parte de la verificación, no un extra: resuelve cada token a color real y
+`pnpm contrast` es parte de la verificación, no un extra: resuelve cada token a color real y
 mide el contraste, en vez de confiar en que el nombre de la variable sea razonable. Corre el
 contrato duro (`--sx-edge` contra superficie, fondo, `--sx-accent-soft` Y `--sx-accent-pick` —un
 borde tiene dos lados, y dos estados distintos rodeándolo—, `--sx-ink`/`-2`/`-3` contra superficie
@@ -274,7 +319,7 @@ pensada para leerse sobre gris oscuro — 2.99 donde el piso es 4.5. Se veía ra
 fallaba el contrato; nadie lo vio porque nada lo medía en ese tema. Un tema que no se mide es un
 tema que se ve bien y falla.
 
-Sumale las siete páginas del catálogo a 1200 y 390 px, en los dos temas: `npm run contrast` prueba
+Sumale las siete páginas del catálogo a 1200 y 390 px, en los dos temas: `pnpm contrast` prueba
 que un color exista con el contraste que promete; no prueba que la pieza se vea bien. Las dos
 verificaciones son necesarias y ninguna reemplaza a la otra.
 
@@ -350,7 +395,7 @@ componente raíz:
   falla es silenciosa y fea: las etiquetas dejan de ser versalitas, las cifras dejan de alinearse,
   y cada nombre oculto de una `Table` se pinta en pantalla.
 
-`tokens.css` se genera desde `tokens.js` con `npm run tokens`. **Nunca edites `tokens.css` a
+`tokens.css` se genera desde `tokens.js` con `pnpm tokens`. **Nunca edites `tokens.css` a
 mano** — las dos formas salen de un solo origen justamente para que no puedan divergir.
 
 #### Lo que no funciona adentro de un shadow root, y por qué
@@ -524,7 +569,7 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
 
 ### Deuda de Nácar
 
-- **El modo oscuro de Nácar pasa el contrato Y lleva marca.** `npm run contrast` corre la matriz
+- **El modo oscuro de Nácar pasa el contrato Y lleva marca.** `pnpm contrast` corre la matriz
   completa: `CHECKS` × {claro, oscuro} × {`--sx-chrome-tint` morado por defecto, gris neutro
   `#8E8E93`}, cuatro combinaciones, y las cuatro dan verde. La matriz reemplazó a un arnés que
   sólo corría contra el morado — con el gris, `--sx-edge`, `--sx-ink-3` e `--sx-ink-2` caían bajo
@@ -543,14 +588,17 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   **nadie miró el resultado en pantalla** — pasar el contrato dice que un color existe con el
   contraste que promete, no que la cabecera, el halo o la fila seleccionada se vean bien; esa
   verificación, como con el claro, es humana y sigue sin hacerse.
-- **El bloque `.tbl` de Nácar está generado, no vinculado.** `explore/pages/Tablas.svelte` copia
-  los 59 tokens de `[data-d='Z']` por valor y los acota a `[data-d='AD'] .tbl`. Si `Z` cambia, este
-  bloque queda desactualizado y nada lo avisa.
+- **El bloque `.tbl` de Nácar está generado, no vinculado.** Se copiaron a mano los 59 tokens de
+  `[data-d='Z']` desde la ficha de Tablas de la dirección Z, explorada antes de elegir Nácar (ver
+  el historial de git — `src/explore` ya no está en el árbol de trabajo), y se acotaron a
+  `[data-d='AD'] .tbl`. Si `Z` hubiera cambiado antes de que `src/explore` se borrara, este bloque
+  habría quedado desactualizado sin que nada lo avisara — y ahora que `Z` no existe más en ninguna
+  forma, el bloque quedó fijo para siempre en el valor que copió.
 - **Los filos de tono (`--sx-positive-edge` y compañía) dan ~1.5:1**, y junto con
   `--sx-accent-edge` (1.56:1) quedan fuera del contrato duro a propósito. El argumento —WCAG
   1.4.11 pide 3:1 para el límite que hace falta para *identificar* un componente, y ni el filo de
   una insignia ya seleccionada identifica nada por sí solo, eso lo hacen la banda, la marca y la
-  palabra— está escrito en `scripts/contrast.mjs` y se informa en `npm run contrast` sin romper el
+  palabra— está escrito en `scripts/contrast.mjs` y se informa en `pnpm contrast` sin romper el
   build. `--sx-accent-soft` y `--sx-accent-pick` ya no son uno de estos: `--sx-edge` y
   `--sx-ink-2`/`-3` medidos SOBRE los dos —un borde y un texto tienen que aguantar el fondo del
   estado en el que se dibujan, sea pasajero o persistente, no sólo la superficie en reposo— sí
@@ -560,7 +608,7 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   usarlos. Es higiene, no un defecto: la rampa se mantiene completa a propósito, para que un
   producto que la necesite entera la tenga.
 - **La verificación visual de las siete páginas, a 1200 y 390 px, todavía no la hizo una persona.**
-  Es la única parte del criterio de terminado que ningún script cubre — `npm run contrast` prueba
+  Es la única parte del criterio de terminado que ningún script cubre — `pnpm contrast` prueba
   que un color exista con el contraste que promete, no que la tabla, el panel o el formulario se
   vean bien.
 
