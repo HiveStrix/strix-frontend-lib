@@ -8,6 +8,18 @@
   // would have to reimplement typeahead, wrapping, the Escape contract and the
   // way a phone lays it out, and would end up worse.
   //
+  // LO QUE SE VE EN macOS Y NO ES UN DEFECTO. En un Mac de escritorio el menú
+  // nativo NO baja: se abre encima del campo, centrado en la opción elegida,
+  // para que el puntero ya esté sobre ella. Se reportó como bug y no lo es —
+  // es cómo el sistema operativo dibuja un <select>, y no se puede cambiar
+  // desde CSS. Los desplegables que esta librería sí controla (Combobox, Menu,
+  // DatePicker) bajan, y sólo suben cuando no entran abajo.
+  //
+  // Se deja así a sabiendas: en la tablet que sostiene un técnico —el caso que
+  // manda acá— el nativo abre la rueda de la plataforma y le gana a cualquier
+  // lista propia. Cambiarlo por una lista nuestra arreglaría el escritorio y
+  // rompería el dispositivo donde de verdad se usa.
+  //
   // So the only thing this adds is the chrome: the box comes from Field, the
   // native arrow is replaced by the system's own chevron, and the placeholder is
   // a disabled option rather than an empty one you can go back to by accident.
