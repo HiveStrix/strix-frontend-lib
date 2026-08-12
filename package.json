@@ -1,22 +1,35 @@
 {
-  "name": "strix-frontend",
-  "private": true,
+  "name": "@strix/frontend-lib",
   "version": "0.1.0",
-  "description": "Monorepo del frontend de Strix: el sistema de diseño y los ejemplos que lo demuestran.",
+  "description": "El sistema de diseño de Strix: tokens y componentes Svelte para todos los frontends del ecosistema.",
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "examples/*"
-  ],
+  "exports": {
+    ".": "./src/lib/index.js",
+    "./tokens.css": "./src/lib/tokens.css",
+    "./base.css": "./src/lib/base.css",
+    "./tokens": "./src/lib/tokens.js",
+    "./marks": "./src/lib/marks.js",
+    "./shell": "./src/lib/shell/index.js",
+    "./action": "./src/lib/action/index.js",
+    "./form": "./src/lib/form/index.js",
+    "./nav": "./src/lib/nav/index.js",
+    "./data": "./src/lib/data/index.js",
+    "./feedback": "./src/lib/feedback/index.js",
+    "./metric": "./src/lib/metric/index.js"
+  },
   "scripts": {
-    "dev": "npm run dev --workspace=@strix/ejemplo-mantenimiento",
-    "dev:lib": "npm run dev --workspace=@strix/frontend-lib",
-    "build": "npm run build --workspace=@strix/frontend-lib && npm run build --workspace=@strix/ejemplo-mantenimiento",
-    "tokens": "npm run tokens --workspace=@strix/frontend-lib"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tokens": "node scripts/tokens.mjs",
+    "contrast": "node scripts/contrast.mjs"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "svelte": "^5.19.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "vite": "^6.0.0"
   }
 }
