@@ -92,6 +92,19 @@
        control that wraps to two lines has stopped being one control. */
     overflow-x: auto;
     scrollbar-width: none;
+    /* FOUND ON THE REAL CATALOGUE, 390px: four options («30 días · 3 meses ·
+       6 meses · 1 año») do not fit, `scrollbar-width: none` hides the one
+       native hint that there is more, and the track just cuts «1 año» to
+       «1 añ» at the box edge — a word that looks broken, not a control that
+       scrolls. The mask fades the last ~14px to transparent instead of a hard
+       edge, so a clipped label reads as «more, scroll for it» the way a
+       feathered edge always has, rather than as a missing letter. Left ~14px
+       too, for the symmetric case once scrolled. Always on, not only past
+       overflow — a control that already fits loses only its own rounded
+       corner's last couple of pixels, which the pill shape already curves
+       away; nothing legible is lost. */
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 14px, #000 calc(100% - 14px), transparent);
   }
   .seg::-webkit-scrollbar { display: none; }
 

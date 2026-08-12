@@ -256,6 +256,15 @@
     font-size: var(--sx-t-sm);
     color: var(--sx-ink);
     outline: none;
+    /* A placeholder is prose, not a value somebody typed, so it is the one
+       string in this box a product does not get to shorten for the width it
+       will render in. Found on the real catalogue at 390px: «Buscar equipos,
+       órdenes, documentos…» inside a TopBar with no `.narrow` wrapper simply
+       hard-clipped mid-word — no ellipsis, nothing to say more was cut. An
+       `<input>` never adds one on its own; `text-overflow` reaches the
+       placeholder the same as a typed value because both render in the same
+       box. */
+    text-overflow: ellipsis;
   }
   .in::placeholder { color: var(--sx-ink-3); }
   /* We draw our own clear button, and two of them side by side is a bug report. */
