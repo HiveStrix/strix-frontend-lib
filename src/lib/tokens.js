@@ -79,7 +79,16 @@ export const TOKENS = {
   // El fondo es BLANCO, no un peldaño de la rampa. Es la silueta de Nácar: la
   // tarjeta no se lee por diferencia de tono contra el campo sino por la sombra
   // que deja. Es la desviación deliberada respecto de Prisma pastel.
-  '--sx-ground': 'var(--sx-n-0)',
+  // EL CAMPO, CON UN TINTE MÍNIMO. Estuvo en blanco puro y el costo se vio
+  // construyendo un módulo real: en claro, --sx-surface y --sx-ground daban
+  // 1.000 entre sí —el MISMO blanco— así que una tarjeta no tenía ningún
+  // límite salvo una sombra suave. En oscuro el escalón existe (1.159) y por
+  // eso ahí todo se leía bien y en claro no se sabía dónde empezaba nada.
+  //
+  // Un 3 % no es un color: es el escalón que hace que una superficie blanca se
+  // lea como superficie. Prisma lo tenía al 5 % por esta misma razón; acá se
+  // había quitado y hubo que devolverlo.
+  '--sx-ground': 'color-mix(in srgb, var(--sx-chrome-tint) 3%, #FFFFFF)',
   '--sx-surface': 'var(--sx-n-0)',
   '--sx-sunk': 'var(--sx-n-50)',
   // --sx-line separa filas y cierra cabeceras: es AMBIENTE y puede ser tenue.
