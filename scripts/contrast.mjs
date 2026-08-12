@@ -143,7 +143,16 @@ const CHECKS = [
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
   ['--sx-accent-ink', '--sx-accent', 4.5, 'tinta sobre el acento'],
-  ...TONES.map((t) => [`--sx-${t}`, `--sx-${t}-band`, 4.5, `tono ${t} sobre su banda`])
+  ...TONES.map((t) => [`--sx-${t}`, `--sx-${t}-band`, 4.5, `tono ${t} sobre su banda`]),
+  // EL CANTO DE CARD Y PANEL. A diferencia del filo de Pill/Well (informativo,
+  // ~1.5:1 — ver INFO más abajo), el canto de una tarjeta NO tiene banda
+  // detrás: es el ÚNICO color en una superficie grande, así que tiene que
+  // identificar por sí solo a 3:1 (1.4.11), no reforzar una banda que ya
+  // identifica. Se dibuja con la tinta plena del tono (--sx-positive y
+  // compañía), no con su -edge, precisamente para llegar ahí — medido: entre
+  // 5.8:1 y 8.1:1 según el tono, el tema y la perilla del cromo, todos con
+  // margen de sobra sobre el piso.
+  ...TONES.map((t) => [`--sx-${t}`, '--sx-surface', 3.0, `canto del tono ${t} sobre la tarjeta`])
 ];
 // Los filos de tono (--sx-positive-edge y compania) y el filo del acento
 // (--sx-accent-edge) NO estan en el contrato, y vale escribir por que: 1.4.11

@@ -22,6 +22,12 @@
   // <h2> is exactly the kind of lie that makes a screen reader's outline
   // useless. Pass `level`. The catalogue below every heading in this page does.
   //
+  // `tone` FORWARDS TO THE CARD UNDERNEATH — same rim, same rule: it is a cap
+  // along the top edge in the tone's own ink, and it needs a Pill or a sentence
+  // inside the panel that names the state, never the colour on its own. It
+  // survives Panel's own opaque `.head` because the rim is drawn on a
+  // `::before` overlay that paints ABOVE Card's children — see Card.svelte.
+  //
   // FLUSH is for content that owns the edge: a table, a list of rows, a chart.
   // The head keeps its padding, the body loses its horizontal one, and the
   // bottom corners are clipped so the last row follows the card's radius instead
@@ -42,6 +48,8 @@
   export let level = 2;
   /** A name from Glyph, beside the title. Decoration only; the title carries the meaning. */
   export let icon = '';
+  /** '' | positive | attention | critical | info | neutral. Forwarded to Card — see the note above. */
+  export let tone = '';
   /** A step on the spacing scale, applied to head, body and footer alike. */
   export let pad = 5;
   /** 1 | 2 | 3 — see Card. A panel is page furniture: e-1 unless it came forward. */
@@ -64,7 +72,7 @@
   $: css = `--panel-pad:${step(pad)};--panel-r:${RADII[radius] ?? RADII[3]}`;
 </script>
 
-<Card pad={0} {elevation} {radius} {...$$restProps}>
+<Card pad={0} {elevation} {radius} {tone} {...$$restProps}>
   <div class="panel" style={css}>
     {#if title || $$slots.actions}
       <div class="head">

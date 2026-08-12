@@ -14,6 +14,24 @@
   //   <Card pad={6} elevation={2}>…</Card>
   //   <Card interactive selected on:click={…}>…</Card>   ← a real <button>
   //   <Card href="/m/maintenance/BAT001">…</Card>        ← a real <a>
+  //   <Card tone="critical"><Pill tone="critical">Vencido</Pill>…</Card>
+  //
+  // `tone` IS A RIM, NOT A FILL. Nine components already accept `tone`; Card and
+  // Panel did not, which was an asymmetry, not a decision — you could say "this
+  // well is critical" and not "this card is critical". But a Card is a big
+  // surface, and tinting the whole thing turns the tone into background
+  // decoration that competes with whatever is written on top of it (that is
+  // exactly what Well does instead, at band size, where the fill IS the point).
+  // So here the tone is said with a THIN CAP along the top edge — three pixels
+  // of the tone's own ink colour, not its band, because a rim this narrow needs
+  // the strong version to still read at 3:1 against the surface (measured,
+  // `pnpm contrast`: 5.8:1 to 8.1:1 across every tone, both themes).
+  //
+  // AND COLOUR NEVER TRAVELS ALONE — that rule does not stop at Pill. A card
+  // with a coloured cap and nothing inside it that names the state is a colour
+  // loose in the room: put a `Pill` or a sentence with the word in it inside the
+  // card. `tone` decorates a claim the content already makes; it does not make
+  // the claim by itself.
   //
   // ELEVATION IS ALTITUDE, NOT IMPORTANCE. e-1 is the page's own furniture —
   // rows, tiles, panels. e-2 is something that came forward: a menu, a hover, a
@@ -44,16 +62,29 @@
   export let disabled = false;
   /** Drawn as an accent ring, and said out loud with aria-pressed / aria-current. */
   export let selected = false;
+  /**
+   * '' | positive | attention | critical | info | neutral. A rim along the top
+   * edge, in the tone's own ink — never a fill. See the note above: it has to
+   * ride alongside a Pill or a sentence that names the state, never alone.
+   */
+  export let tone = '';
 
   const STEPS = new Set([1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20]);
   const step = (n) => (STEPS.has(Number(n)) ? `var(--sx-s-${n})` : '0px');
+  const TONES = new Set(['positive', 'attention', 'critical', 'info', 'neutral']);
 
   // A disabled link is not a thing: an <a> with no href is not focusable and an
   // <a> with one still navigates. So a card that is both a destination and
   // unavailable becomes a disabled button — inert, focusable-by-nothing, honest.
   $: kind = href && !disabled ? 'a' : interactive || href ? 'button' : 'div';
   $: live = kind !== 'div' && !disabled;
-  $: css = `--card-pad:${step(pad)}`;
+  $: t = TONES.has(tone) ? tone : '';
+  // `--card-tone` carries the rim colour as a variable rather than a class per
+  // tone, because the rim is drawn on a `::before` overlay (see below) and one
+  // rule has to serve all five tones plus "none". Undefined resolves through
+  // the `transparent` fallback in the rule itself, so an untoned card pays for
+  // nothing.
+  $: css = `--card-pad:${step(pad)}` + (t ? `;--card-tone:var(--sx-${t})` : '');
 </script>
 
 <svelte:element
@@ -91,6 +122,27 @@
     text-decoration: none;
     border: 0;
     position: relative;
+  }
+
+  /* THE RIM. A full-size overlay, not a sliver: a 3px sliver would need its own
+     border-radius, and a radius that big clamps to half its own 3px height —
+     1.5px — while the card's real corner (up to r-3, 22px) curves in far more
+     than that near the top, so the sliver's square corners would poke out past
+     the card's own rounded silhouette. Sizing the overlay to the FULL card and
+     drawing the rim as an INSET shadow inside it sidesteps that: box-shadow
+     clips to the element's own border-radius, and `inherit` copies the card's
+     real radius onto an element the same size as the card, so the clip is
+     exact. `position: absolute` puts it in the "positioned, z-index:auto"
+     paint layer, which paints AFTER normal in-flow children — the one property
+     that makes this survive Panel's own opaque header sitting on top of it.
+     Transparent when no tone is set, so an untoned card pays nothing. */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 3px 0 0 var(--card-tone, transparent);
+    pointer-events: none;
   }
 
   .e0 { box-shadow: none; }
