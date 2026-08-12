@@ -205,7 +205,7 @@
                 <span>BAT014 — la sombra. No se toca.</span>
               </p>
             </Card>
-            <Card variant="crest">
+            <Card variant="crest" crestColor="#2563EB">
               <p class="cl">
                 <b>crest</b>
                 <span>

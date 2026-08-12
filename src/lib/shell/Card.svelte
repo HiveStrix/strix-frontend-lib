@@ -192,6 +192,8 @@
    * the other two.
    */
   export let variant = 'raised';
+  /** El color de la barra de `crest`. Por defecto el acento del producto. */
+  export let crestColor = '';
 
   const STEPS = new Set([1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20]);
   const step = (n) => (STEPS.has(Number(n)) ? `var(--sx-s-${n})` : '0px');
@@ -213,7 +215,9 @@
   // tones plus "none". Undefined resolves through the `transparent` fallback in
   // the rule itself, so an untoned card pays for nothing — its glow layer is
   // fully transparent and costs nothing visible.
-  $: css = `--card-pad:${step(pad)}` + (t ? `;--card-tone:var(--sx-${t})` : '');
+  $: css = `--card-pad:${step(pad)}`
+    + (t ? `;--card-tone:var(--sx-${t})` : '')
+    + (crestColor ? `;--crest-c:${crestColor}` : '');
 </script>
 
 <svelte:element
@@ -413,4 +417,37 @@
     .live { transition: none; }
     .live:hover { transform: none; }
   }
+  /* ── crest · LA BARRA DE ARRIBA ───────────────────────────────────────────
+     Calcada de un ERP real, que la resuelve así:
+
+       height: 2px;
+       background: linear-gradient(90deg, transparent, ACENTO, transparent);
+
+     Dos píxeles de alto, en color, desvaneciéndose a transparente en los dos
+     extremos. Eso es lo que se ve desde el otro lado de la habitación.
+
+     LA VERSIÓN ANTERIOR ERA UN ANILLO GRIS DE 1px A 1.12 DE CONTRASTE. Cumplía
+     el piso del sistema y era invisible en la práctica: el humano miró la
+     pantalla tres veces y dijo que no veía nada. Tenía razón. Pasar un umbral
+     medido no es lo mismo que verse, y cuando las dos cosas se contradicen gana
+     la pantalla.
+
+     El color sale del acento del producto, así que cada módulo la tiñe con lo
+     suyo sin tocar la librería. `crestColor` la fuerza a otra cosa cuando hace
+     falta. */
+  .crest { position: relative; }
+  .crest::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: 2px;
+    border-radius: var(--sx-r-2) var(--sx-r-2) 0 0;
+    background: linear-gradient(90deg,
+      transparent,
+      var(--crest-c, var(--sx-accent)),
+      transparent);
+    opacity: .85;
+    pointer-events: none;
+  }
+
 </style>
