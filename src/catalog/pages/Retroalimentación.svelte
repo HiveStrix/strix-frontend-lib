@@ -527,7 +527,7 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
       <div><dt class="sx-id">reversible</dt><dd><code>true</code> solo si de verdad se puede revertir desde la interfaz. Cambia la última línea antes del botón.</dd></div>
       <div><dt class="sx-id">busy</dt><dd>La escritura va en camino: los dos botones se congelan y el diálogo se cierra por dentro.</dd></div>
       <div><dt class="sx-id">reasonLabel</dt><dd>Vacío (el default) ⇒ sin campo. Cualquier otro texto lo prende y lo etiqueta — ver la demo de «Cancelar la orden», abajo.</dd></div>
-      <div><dt class="sx-id">reasonRequired</dt><dd>Del que llama, nunca del componente. Si es <code>true</code>, «{action}» queda deshabilitado —con su motivo dicho en voz alta, no en silencio— hasta que haya texto.</dd></div>
+      <div><dt class="sx-id">reasonRequired</dt><dd>Del que llama, nunca del componente. Si es <code>true</code>, «<span class="sx-id">action</span>» queda deshabilitado —con su motivo dicho en voz alta, no en silencio— hasta que haya texto.</dd></div>
       <div><dt class="sx-id">reasonError</dt> · <dt class="sx-id">reasonFix</dt><dd>El mismo par de todo el sistema: qué está mal, cómo se arregla. Se reenvían directo al <span class="sx-id">Textarea</span> de adentro.</dd></div>
       <div><dt class="sx-id">on:confirm</dt><dd>El detalle trae <code>{'{ reason }'}</code> —vacío si <span class="sx-id">reasonLabel</span> nunca se usó— así que no hace falta leer una segunda variable aparte del evento.</dd></div>
     </dl>
