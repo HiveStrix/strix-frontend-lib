@@ -62,6 +62,26 @@
   // page that owns its own scroll container or inside a Core module in a
   // shadow root that must not assume it is welcome to fix itself to the
   // viewport. The product wires the position; this only draws the bar.
+  //
+  // `nav` — THE SIDEBAR'S OWN TRIGGER, NOT A GENERIC HAMBURGER SLOT.
+  //
+  // `Sidebar` (beside this file) turns into a `Sheet` below phone width and
+  // draws nothing where it used to be — there is no icon rail left to hold
+  // a button, so the button lives here instead. `nav` is opt-in, not
+  // automatic on every `TopBar`, because a product with no `Sidebar` at all
+  // must not grow a menu button that opens nothing: pass it only when this
+  // bar sits above one. `on:menu` fires on click; the product's own job is
+  // one line, `open = true`, on the SAME variable bound to `Sidebar`'s
+  // `open` — see that file's header for the full wiring.
+  //
+  // THE BUTTON'S OWN VISIBILITY AND `Sidebar`'S OWN SWITCH FROM COLUMN TO
+  // DRAWER ARE ONE CONDITION, WRITTEN TWICE BECAUSE CSS CANNOT IMPORT A
+  // NUMBER — see `PHONE_BREAK` in `Sidebar.svelte` for the full argument and
+  // the precedent (`toplayer.js`, `supportsPopover`) this is following. Both
+  // `@media` blocks read 560px; if one ever changes without the other, the
+  // result is a button that opens nothing or a drawer nothing can reach.
+  import { createEventDispatcher } from 'svelte';
+  import Glyph from '../shell/Glyph.svelte';
 
   /** The application's own name. Never changes with the route. */
   export let product = '';
@@ -71,6 +91,11 @@
   export let href = '';
   /** Rides the top of the scroll. Off by default — see the note above. */
   export let sticky = false;
+  /** This bar sits above a phone-drawer `Sidebar` — show its trigger below
+   *  560px and dispatch `on:menu` when it is pressed. See the note above. */
+  export let nav = false;
+
+  const dispatch = createEventDispatcher();
 
   $: hasSearch = !!$$slots.search;
   $: hasActions = !!$$slots.actions;
@@ -78,6 +103,21 @@
 </script>
 
 <header class="tb" class:sticky>
+  {#if nav}
+    <!-- data-phone-break: ver la misma nota en Sidebar.svelte — no cambia
+         nada por sí solo, es lo que deja comprobar desde afuera que los dos
+         560 siguen siendo el mismo número. -->
+    <button
+      type="button"
+      class="menu"
+      aria-label="Abrir navegación"
+      data-phone-break="560"
+      on:click={() => dispatch('menu')}
+    >
+      <Glyph name="menu" size={18} />
+    </button>
+  {/if}
+
   <div class="brand">
     {#if $$slots.brand}
       <slot name="brand" />
@@ -132,6 +172,37 @@
     position: sticky;
     top: 0;
     z-index: var(--sx-z-sticky);
+  }
+
+  /* Escondido por defecto, y sólo aparece bajo 560px — ver el prop `nav`
+     arriba. `@media`, a propósito, NO `@container` como el resto de este
+     archivo: `Sidebar`'s propio cambio de columna a cajón mide el VIEWPORT
+     (es furniture de aplicación, igual que este bar, no contenido de un
+     contenedor angosto), así que este botón tiene que medir lo mismo o los
+     dos pueden divergir en algún ancho intermedio — la caja de `.tb` casi
+     nunca ocupa la ventana entera cuando `Sidebar` está al lado, así que un
+     `@container` acá mediría un número distinto del que `Sidebar` usa. */
+  .menu {
+    display: none;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--sx-s-8);
+    height: var(--sx-s-8);
+    border: 0;
+    border-radius: var(--sx-r-pill);
+    background: var(--sx-sunk);
+    color: var(--sx-ink-2);
+    cursor: pointer;
+    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+  }
+  .menu:hover { background: var(--sx-neutral-band); color: var(--sx-ink); }
+  .menu:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
+  @media (max-width: 560px) {
+    .menu { display: inline-flex; }
+  }
+  @media (max-width: 560px) and (pointer: coarse) {
+    .menu { width: var(--sx-touch); height: var(--sx-touch); }
   }
 
   .brand { display: flex; align-items: center; min-width: 0; flex: none; }

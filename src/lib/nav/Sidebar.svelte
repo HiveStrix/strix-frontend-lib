@@ -72,7 +72,71 @@
   // COLLAPSING CLIPS THE LABEL, NEVER REMOVES IT — identical reasoning to
   // SideRail: the label IS the accessible name in both states, so there is
   // nothing to keep in sync with a hand-written `aria-label`.
+  //
+  // THE PHONE DRAWER, AND WHY IT IS NOT A SECOND ONE OF THOSE.
+  //
+  // 64px of icons is still a third of a 390px screen, and «collapsed» clips
+  // the label — which is exactly what this whole system refuses to ship: an
+  // icon with no word next to it. Below phone width `Sidebar` stops being a
+  // column at all and becomes the CONTENT of `shell/Sheet.svelte`, the
+  // drawer this library already has, already correct — trapped focus, an
+  // owned Escape, focus handed back on close. Building a second drawer here
+  // would leave the system with two things that open over a screen and
+  // close on Escape, answering to two different pieces of code — the exact
+  // defect this repo has spent all day correcting elsewhere. If Sheet were
+  // missing something this needed, the fix would belong in Sheet; it was
+  // not missing anything.
+  //
+  // WHERE THE BUTTON LIVES. `Sidebar` collapsed to a drawer draws NOTHING on
+  // a phone screen — there is no icon rail left to hold a trigger. The
+  // button that opens it has to live in `TopBar`, which is why `TopBar` grew
+  // its own `nav` prop and `on:menu` (see that file). Two components, one
+  // new piece of state: `open`, named to match Sheet's own prop because this
+  // literally IS a Sheet underneath.
+  //
+  // ONE CONDITION, NOT TWO. `TopBar`'s button and this component's own
+  // switch from column to drawer both have to agree on the SAME width, or
+  // one of two broken screens exists somewhere in between: a button with no
+  // drawer to open, or a drawer with no button to reach it. That is not a
+  // hypothetical — it is the exact shape of bug `toplayer.js` already fixed
+  // once for `popover` («LA CONDICIÓN NO SE PARTE», its own header), where
+  // two components independently deciding the same thing was the defect,
+  // not a detail. CSS cannot import a number, so the two `@media` rules
+  // below and in `TopBar.svelte` both hardcode the same 560px by hand — but
+  // it is not a new number invented for this: it is the one `Sheet`, `Toast`,
+  // `Dialog`, `EmptyState`, `ErrorState`, `Pagination` and `ReviewPanel`
+  // already use for «this is a phone». Reusing the system's own constant,
+  // named `PHONE_BREAK` below so the two files can grep for each other, is
+  // as close as two separate stylesheets get to reading one variable.
+  //
+  // CAN BE TURNED OFF. `drawer={false}` keeps `Sidebar` a fixed column
+  // always — a product that never wants it to disappear (a kiosk, a tablet
+  // permanently docked) says so with one prop, and `TopBar`'s `nav` simply
+  // is not passed in that product, so no orphaned button exists either.
+  //
+  // CLOSES ON PICK. Selecting a module while the drawer is open and leaving
+  // it open would cover the very screen the pick just opened — `pick()`
+  // below sets `open = false` unconditionally; it is a no-op the rest of
+  // the time, when there is no drawer to close.
+  //
+  // Importing `Sheet` is this file's first import from another family —
+  // `nav/index.js`'s own header used to say «nothing here imports another
+  // family» flatly; it now says why that changed, rather than going quietly
+  // out of date. The item list itself (icon, label, count, aria-current,
+  // the collapse geometry) is drawn once, by `SidebarItems.svelte` beside
+  // this file — an internal piece, not exported — because Svelte 5 will not
+  // let a component mix `<slot>` (this file's `header`/`footer`, part of the
+  // public API) with `{#snippet}` in the same file, and this file needs to
+  // draw that list TWICE: once in the fixed column, once inside the drawer.
   import { createEventDispatcher } from 'svelte';
+  import Sheet from '../shell/Sheet.svelte';
+  import SidebarItems from './SidebarItems.svelte';
+
+  /** El mismo umbral de teléfono que ya usan Sheet/Toast/Dialog/EmptyState/
+   *  ErrorState/Pagination/ReviewPanel — no uno nuevo. `TopBar.svelte` lo
+   *  repite a mano en su propio `@media` (ver el comentario de arriba, «ONE
+   *  CONDITION, NOT TWO», para por qué CSS no puede importar este número). */
+  const PHONE_BREAK = 560;
 
   /** [{ key, label, icon?, count?, disabled?, href? }] or { kind:'section', label } */
   export let items = [];
@@ -86,85 +150,38 @@
   export let collapsible = true;
   /** 'page' when picking a module changes route; 'true' when it swaps a view. */
   export let current = 'page';
+  /** Below `PHONE_BREAK`, become a Sheet instead of a squeezed column. Off
+   *  for a product that wants Sidebar fixed at every width — see the header. */
+  export let drawer = true;
+  /** The phone drawer's open state. Bindable, named like Sheet's own `open`
+   *  because this content IS a Sheet below `PHONE_BREAK`. Wire it from
+   *  wherever `TopBar`'s `on:menu` lives — see the header above. */
+  export let open = false;
 
   const dispatch = createEventDispatcher();
 
-  // `$:` so `value` lands in every statement's dependency list — a plain
-  // `const` would stick on whatever was selected at mount, the exact bug
-  // SideRail's own header warns this ecosystem has shipped three times.
-  $: isOn = (it) => it.key != null && it.key === value;
-
   function pick(it, e) {
     if (it.disabled) { e.preventDefault(); return; }
+    // Unconditional, not `if (open)`: cheaper to always write `false` than to
+    // check first, and correct either way — see «CLOSES ON PICK» above.
+    open = false;
     if (it.href) return;
     e.preventDefault();
     value = it.key;
     dispatch('select', { key: it.key, item: it });
   }
-
-  const initial = (s) => (s ?? '').trim().charAt(0).toUpperCase();
-
-  // Same reasoning as SideRail's own `activate`: the compiler cannot see
-  // which tag `<svelte:element>` resolves to, so it asks for an explicit
-  // role — but the only two possible tags, <a href> and <button>, already
-  // carry the right one, so the listener moves instead of the semantics.
-  function activate(node, it) {
-    let item = it;
-    const onclick = (e) => pick(item, e);
-    node.addEventListener('click', onclick);
-    return {
-      update: (next) => (item = next),
-      destroy: () => node.removeEventListener('click', onclick)
-    };
-  }
 </script>
 
-<nav class="side" class:tuck={collapsed} aria-label={label}>
-  {#if $$slots.header}
-    <div class="head"><slot name="header" /></div>
-  {/if}
-
-  <ul>
-    {#each items as it, i (it.key ?? `s-${i}`)}
-      {#if it.kind === 'section'}
-        <li class="sect"><span class="sx-cap">{it.label}</span></li>
-      {:else}
-        <li>
-          <svelte:element
-            this={it.href ? 'a' : 'button'}
-            class="it"
-            class:on={isOn(it)}
-            class:dis={it.disabled}
-            href={it.href || undefined}
-            type={it.href ? undefined : 'button'}
-            tabindex={it.disabled ? -1 : 0}
-            aria-current={isOn(it) ? current : undefined}
-            aria-disabled={it.disabled ? 'true' : undefined}
-            title={it.label}
-            use:activate={it}
-          >
-            <span class="ic" aria-hidden="true">
-              {#if it.icon}
-                <svg viewBox="0 0 24 24"><path d={it.icon} fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
-              {:else}
-                <span class="ini">{initial(it.label)}</span>
-              {/if}
-            </span>
-
-            <span class="lb">{it.label}</span>
-
-            {#if it.count != null}
-              <span class="n sx-num">{it.count}</span>
-            {/if}
-          </svelte:element>
-        </li>
-      {/if}
-    {/each}
-  </ul>
-
-  {#if $$slots.footer}
-    <div class="foot"><slot name="footer" /></div>
-  {/if}
+<!-- `data-phone-break` no hace nada por sí solo — CSS ya lo tiene grabado en
+     el `@media` de abajo. Está en el marcado para que se pueda comprobar
+     DESDE AFUERA (un script, una prueba) que este número y el que TopBar
+     pone en su propio botón siguen siendo el mismo, sin tener que leer las
+     dos hojas de estilo a ojo cada vez. -->
+<nav class="side" class:tuck={collapsed} class:phoneable={drawer} aria-label={label} data-phone-break={PHONE_BREAK}>
+  <SidebarItems {items} {value} {current} {collapsed} onPick={pick}>
+    <svelte:fragment slot="header"><slot name="header" /></svelte:fragment>
+    <svelte:fragment slot="footer"><slot name="footer" /></svelte:fragment>
+  </SidebarItems>
 
   {#if collapsible}
     <button class="tog" type="button" aria-expanded={!collapsed}
@@ -176,6 +193,17 @@
     </button>
   {/if}
 </nav>
+
+{#if drawer}
+  <Sheet side="left" bind:open title={label}>
+    <div class="side phone">
+      <SidebarItems {items} {value} {current} collapsed={false} phone onPick={pick}>
+        <svelte:fragment slot="header"><slot name="header" /></svelte:fragment>
+        <svelte:fragment slot="footer"><slot name="footer" /></svelte:fragment>
+      </SidebarItems>
+    </div>
+  </Sheet>
+{/if}
 
 <style>
   .side {
@@ -199,93 +227,34 @@
 
   .tuck { width: var(--sx-s-16); }
 
-  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-
-  .sect { padding: var(--sx-s-3) var(--sx-s-3) var(--sx-s-1); }
-  .tuck .sect { padding-inline: 0; text-align: center; overflow: hidden; }
-
-  .it {
-    display: flex;
-    align-items: center;
-    gap: var(--sx-s-3);
+  /* EL CAJÓN DE TELÉFONO no es un marco — es contenido DENTRO del panel de
+     Sheet, que ya trae su propio padding y su propio fondo (ver `.body` en
+     Sheet.svelte). Repetirlos acá encima sería padding doble y un fondo
+     pintado sobre otro fondo. Ancho `100%` en vez del 240px fijo: el panel
+     de Sheet ya decide cuánto mide, no esta clase. */
+  .side.phone {
     width: 100%;
-    min-height: var(--sx-s-10);
-    padding: var(--sx-s-2) var(--sx-s-3);
-    border: 0;
-    border-radius: var(--sx-r-2);
+    height: auto;
+    padding: 0;
     background: none;
-    color: var(--sx-ink-2);
-    font-size: var(--sx-t-sm);
-    font-weight: var(--sx-w-medium);
-    text-align: start;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    border-inline-end: 0;
   }
 
-  .it:hover:not(.dis) { background: var(--sx-accent-soft); color: var(--sx-ink); }
-
-  /* Elegido: relleno persistente (accent-pick, ya medido en el arnés) + tinta
-     plena + semibold + aria-current — el mismo escalón de dos pasos que
-     SideRail, sin cantos: ese arreglo ya se hizo una vez en esta misma
-     tarea (ver SideRail.svelte) y no hacía falta reinventarlo mal dos veces
-     en el mismo commit. La CUARTA señal, la que SideRail no necesita porque
-     no vive colapsado por defecto: el trazo del ícono se engrosa (2.3 en vez
-     de 1.7), una diferencia de FORMA que sigue viéndose cuando la etiqueta
-     está recortada. */
-  .it.on {
-    background: var(--sx-accent-pick);
-    color: var(--sx-ink);
-    font-weight: var(--sx-w-semi);
-  }
-  .it.on .ic svg { stroke-width: 2.3; }
-
-  .it.dis { opacity: .45; cursor: not-allowed; }
-
-  .ic { display: flex; align-items: center; justify-content: center; flex: none; width: 20px; height: 20px; }
-  .ic svg { width: 20px; height: 20px; transition: stroke-width var(--sx-fast) var(--sx-ease); }
-  .ini {
-    display: flex; align-items: center; justify-content: center;
-    width: 20px; height: 20px;
-    border-radius: var(--sx-r-1);
-    background: var(--sx-sunk);
-    font-size: var(--sx-t-2xs);
-    font-weight: var(--sx-w-semi);
-    line-height: 1;
+  /* Oculto bajo PHONE_BREAK cuando `drawer` está prendido — la mitad de la
+     condición única que describe el header de este archivo. La otra mitad
+     vive en TopBar.svelte, sobre el mismo número. `display:none`, no
+     `visibility`: saca la columna del orden de tabulación también, así que
+     un Tab desde el buscador de arriba no puede aterrizar en un ítem que ni
+     siquiera se ve. */
+  @media (max-width: 560px) {
+    .side.phoneable { display: none; }
   }
 
-  .lb { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-  .n {
-    flex: none;
-    font-size: var(--sx-t-2xs);
-    font-weight: var(--sx-w-semi);
-    color: var(--sx-ink-3);
-    background: var(--sx-sunk);
-    border-radius: var(--sx-r-pill);
-    padding: 1px var(--sx-s-2);
-  }
-  .it.on .n { color: var(--sx-ink-2); background: var(--sx-surface); }
-
-  /* THE COLLAPSE — identical mechanism to SideRail's, and it has to be: a
-     person moving between the two levels should not learn a second way a
-     label can hide. */
-  .tuck .it { justify-content: center; padding-inline: 0; position: relative; }
-  .tuck .lb {
-    position: absolute; width: 1px; height: 1px;
-    padding: 0; margin: -1px; overflow: hidden;
-    clip-path: inset(50%); white-space: nowrap; border: 0;
-  }
-  .tuck .n {
-    position: absolute;
-    inset-block-start: var(--sx-s-1);
-    inset-inline-end: var(--sx-s-2);
-    padding: 0 var(--sx-s-1);
-    line-height: 1.4;
-  }
-
-  .head, .foot { padding: var(--sx-s-2) var(--sx-s-3); min-width: 0; }
-  .foot { margin-top: auto; }
+  /* `ul`/`.sect`/`.it`/`.ic`/`.ini`/`.lb`/`.n`/`.head`/`.foot` — todo lo que
+     dibuja un ÍTEM, incluida la geometría de `.tuck` sobre ellos — vive en
+     `SidebarItems.svelte` ahora, no acá. Lo que queda en este archivo es
+     sólo el MARCO (`.side`, su ancho, su cajón de teléfono) y el interruptor
+     de colapso, que sigue siendo de `Sidebar`, no de la lista. */
 
   .tog {
     display: flex;
@@ -307,42 +276,33 @@
   .tog svg { width: 12px; height: 12px; transition: transform var(--sx-beat) var(--sx-ease); }
   .tog svg.flip { transform: rotate(180deg); }
 
-  .it:focus-visible, .tog:focus-visible {
+  .tog:focus-visible {
     outline: 2px solid var(--sx-ink);
     outline-offset: -2px;
     border-radius: var(--sx-r-2);
   }
 
   @media (pointer: coarse) {
-    .it, .tog { min-height: var(--sx-touch); }
+    .tog { min-height: var(--sx-touch); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .side, .it, .tog, .tog svg, .ic svg { transition: none; }
+    .side, .tog, .tog svg { transition: none; }
   }
 
   /* COLLAPSES FOR REAL, NOT JUST BY DEFAULT. `collapsed` is a starting point a
      product can override — a tenant that expands it deliberately should not
      have a 240px column reappear the moment a tablet is turned sideways. So
-     the icon-only geometry is forced here, unconditionally, past the point
-     where a full rail stops being furniture and starts being the screen:
-     every declaration below repeats `.tuck`'s, not `.tuck` itself, because
-     `collapsed` may well be `false` here and the class along with it. */
+     the icon-only WIDTH is forced here, unconditionally, past the point
+     where a full rail stops being furniture and starts being the screen —
+     the matching forced geometry for the ITEMS inside it lives in
+     `SidebarItems.svelte`'s own `@media`, guarded the same way.
+     `:not(.phone)`: below 560px `.phoneable` is already `display:none` and
+     this would be forcing icon-only width on a column nobody can see, but
+     the range 561–640px still needs it, AND the phone drawer's OWN copy
+     (`.side.phone`, inside Sheet) must never narrow — it is already the
+     whole screen; there is no width left to save by narrowing it. */
   @media (max-width: 640px) {
-    .side { width: var(--sx-s-16); }
-    .it { justify-content: center; padding-inline: 0; position: relative; }
-    .lb {
-      position: absolute; width: 1px; height: 1px;
-      padding: 0; margin: -1px; overflow: hidden;
-      clip-path: inset(50%); white-space: nowrap; border: 0;
-    }
-    .n {
-      position: absolute;
-      inset-block-start: var(--sx-s-1);
-      inset-inline-end: var(--sx-s-2);
-      padding: 0 var(--sx-s-1);
-      line-height: 1.4;
-    }
-    .sect { padding-inline: 0; text-align: center; overflow: hidden; }
+    .side:not(.phone) { width: var(--sx-s-16); }
   }
 </style>

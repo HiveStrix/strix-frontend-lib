@@ -28,9 +28,19 @@
 // anywhere a person could point at. These two components are that level,
 // filled in rather than left as a claim in someone else's header.
 //
-// Nothing here imports another family. FilterChips imports Pill, because a
-// filter over semantic states has to speak the same tone + mark + word the rest
-// of the system speaks, and Pill is where that vocabulary lives.
+// Nothing here imported another family, until the phone drawer. FilterChips
+// imports Pill, because a filter over semantic states has to speak the same
+// tone + mark + word the rest of the system speaks, and Pill is where that
+// vocabulary lives — that exception is old and stays. Two new ones joined it:
+// `Sidebar` imports `shell/Sheet.svelte` because a phone-width Sidebar IS a
+// Sheet (see that file's header for why building a second drawer here would
+// have been the wrong fix), and both `Sidebar` and `TopBar` import
+// `shell/Glyph.svelte` — the first for `GLYPH_VIEWBOX`, so its own inline
+// icons stop guessing a grid; the second for the drawer's trigger, drawn the
+// same way `Sheet`'s own close button is (a bare `<button>` plus `Glyph`,
+// not the full `Button`/`IconButton` machinery from `action`). Three imports
+// from `shell`, none from `action` or `form` — a boundary that moved once,
+// on purpose, not one that quietly stopped existing.
 export { default as TopBar } from './TopBar.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
 export { default as PageHeader } from './PageHeader.svelte';

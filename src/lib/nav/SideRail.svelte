@@ -46,11 +46,20 @@
   // and a dot is colour travelling alone with no word and no number attached.
   // «7» is smaller than a label and says more.
   //
-  // ICONS: pass `icon` as an SVG path `d` on a 24×24 grid. This family does not
-  // ship an icon set — that belongs to whoever owns iconography — and a rail
-  // without icons still works: collapsed, an item falls back to its own first
-  // letter.
+  // ICONS: pass `icon` as an SVG path `d`, and it has to be drawn against
+  // whatever `GLYPH_VIEWBOX` (Glyph.svelte) says — today 16×16, `GLYPH_PATHS`'
+  // own grid. This family does not ship an icon set — that belongs to
+  // whoever owns iconography — and a rail without icons still works:
+  // collapsed, an item falls back to its own first letter. THIS FILE USED TO
+  // SAY «a 24×24 grid» and hardcode `viewBox="0 0 24 24"` below, from before
+  // `Glyph` existed. `GLYPH_PATHS.wrench` and friends are 16-grid paths, so
+  // every icon this catalogue ever fed it (`Estructura.svelte`) landed
+  // small and shoved into the top-left corner of its own box — drawn, just
+  // not where anyone would see it drawn right. Fixed at the root: this file
+  // imports the SAME `GLYPH_VIEWBOX` `Glyph.svelte` uses instead of
+  // repeating a number that was never this file's to own.
   import { createEventDispatcher } from 'svelte';
+  import { GLYPH_VIEWBOX } from '../shell/Glyph.svelte';
 
   /** [{ key, label, icon?, count?, disabled?, href? }] or { kind:'section', label } */
   export let items = [];
@@ -129,7 +138,7 @@
           >
             <span class="ic" aria-hidden="true">
               {#if it.icon}
-                <svg viewBox="0 0 24 24"><path d={it.icon} fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                <svg viewBox={GLYPH_VIEWBOX}><path d={it.icon} fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
               {:else}
                 <span class="ini">{initial(it.label)}</span>
               {/if}

@@ -21,9 +21,8 @@
   // Exactly what these products point at: a search, a refresh, a settings, a
   // plus, a close, four chevrons, a check, an alert, and then the nouns of the
   // work — box, truck, clock, gauge, wrench, clipboard, file, layers — plus the
-  // four verbs that act on a row: trash, edit, download, filter. Twenty-three.
-  // Adding a twenty-fourth is a decision somebody argues for, the same way a
-  // fourth type register would be.
+  // four verbs that act on a row: trash, edit, download, filter. Twenty-four,
+  // with `menu` — the twenty-fourth, argued for below.
   //
   //   <Glyph name="wrench" />                        ← beside a word
   //   <button aria-label="Actualizar"><Glyph name="refresh" /></button>
@@ -34,18 +33,42 @@
   // default is `aria-hidden`, because the overwhelmingly common case is an icon
   // sitting next to text that already says it. Pass `label` only when the glyph
   // really is the only thing saying something, and then it must be true.
+  //
+  // `menu`, THE ARGUMENT. Sidebar's phone drawer (`nav/Sidebar.svelte`) needs a
+  // trigger in `TopBar`, and that trigger is a wordless button in a bar that is
+  // already tight at 390px — exactly the case this file's own header says a
+  // glyph is for. Three lines is not a rebus the way a wrench-inside-a-gear
+  // would be; it is closer to `search` or `close` than to a novel pictogram —
+  // the one navigation icon that reads before a person has learned this
+  // system at all. Drawing it inline inside `TopBar.svelte` instead would have
+  // repeated exactly the mistake this component exists to prevent — see this
+  // file's own «WHY DRAW THEM INSTEAD OF INSTALLING A SET» above.
 
   /** Every name in the set, in the order the catalogue shows them. */
   export const GLYPHS = [
     'search', 'filter', 'refresh', 'settings', 'plus', 'close', 'check', 'alert',
     'chevronUp', 'chevronRight', 'chevronDown', 'chevronLeft',
     'box', 'truck', 'clock', 'gauge', 'wrench', 'clipboard', 'file', 'layers',
-    'edit', 'trash', 'download'
+    'edit', 'trash', 'download', 'menu'
   ];
 
   // Drawn on a 16 × 16 grid with a ~1.4 margin, stroke centred, round caps and
   // joins. One path per glyph: every subpath shares the same stroke, so nothing
   // in the set can drift into a different weight from the rest of it.
+  //
+  // EL VIEWBOX VIAJA CON LOS PATHS. `GLYPH_VIEWBOX`, un poco más abajo, es la
+  // grilla contra la que estos números están dibujados — 16, no 24. Dos
+  // consumidores (`nav/Sidebar.svelte`, `nav/SideRail.svelte`) dibujan su
+  // propio `<svg>` en vez de montar este componente, porque reciben un `d`
+  // crudo en `items` y no un nombre de la lista de arriba; los dos escribían
+  // `viewBox="0 0 24 24"` a mano —una grilla que nunca fue la de este
+  // archivo— y el resultado era un ícono dibujado en el 67% superior-
+  // izquierdo de su caja: chico, y corrido hacia una esquina, no centrado.
+  // Los dos ahora importan `GLYPH_VIEWBOX` de acá en vez de repetir el
+  // número: si esta grilla cambiara alguna vez, cambia en un solo lugar en
+  // vez de en tres.
+  export const GLYPH_VIEWBOX = '0 0 16 16';
+
   const PATHS = {
     search: 'M11.5 7a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0M10.3 10.3 13.6 13.6',
     filter: 'M1.7 2.4h12.6L9.5 8.6v5.3l-3-1.6V8.6Z',
@@ -83,7 +106,8 @@
     trash:
       'M2.5 4h11M6.2 4V2.6a.8.8 0 0 1 .8-.8h2a.8.8 0 0 1 .8.8V4' +
       'M12.3 4l-.6 9.6a.9.9 0 0 1-.9.8H5.2a.9.9 0 0 1-.9-.8L3.7 4M6.6 6.9v4.6M9.4 6.9v4.6',
-    download: 'M13.7 10.4v2.3a.9.9 0 0 1-.9.9H3.2a.9.9 0 0 1-.9-.9v-2.3M4.9 7.2 8 10.3l3.1-3.1M8 10.3V2.3'
+    download: 'M13.7 10.4v2.3a.9.9 0 0 1-.9.9H3.2a.9.9 0 0 1-.9-.9v-2.3M4.9 7.2 8 10.3l3.1-3.1M8 10.3V2.3',
+    menu: 'M2.5 4.5h11M2.5 8h11M2.5 11.5h11'
   };
 
   export { PATHS as GLYPH_PATHS };
@@ -116,7 +140,7 @@
     class="g"
     width={size}
     height={size}
-    viewBox="0 0 16 16"
+    viewBox={GLYPH_VIEWBOX}
     fill="none"
     stroke="currentColor"
     stroke-width={sw}

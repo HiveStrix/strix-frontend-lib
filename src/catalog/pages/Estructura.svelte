@@ -85,6 +85,11 @@
   // Arranca colapsado — el default real del componente, no una elección de
   // este catálogo. El botón de abajo prueba que el otro estado también existe.
   let moduloAncho = true;
+  // El cajón de teléfono: la MISMA variable atada a `TopBar.on:menu` y a
+  // `Sidebar.open` — ver la nota junto al demo, más abajo, sobre por qué
+  // achicar este div no alcanza para verlo (el umbral es `@media`, no
+  // `@container`) y hace falta angostar la ventana de verdad.
+  let navOpen = false;
   const modulos = [
     { key: 'mantenimiento', label: 'Mantenimiento', icon: GLYPH_PATHS.wrench },
     { key: 'documentos', label: 'Documentos', icon: GLYPH_PATHS.file, count: 7 },
@@ -271,37 +276,58 @@
                vive a ras de ese borde, con su propia línea, nunca con una
                sombra propia — la sombra de acá es del MARCO de la demo, no
                del componente. SideRail, adentro, sigue flotando con luz
-               sobre el campo, como en su propia sección más abajo. -->
-          <div class="shellframe">
-            <Sidebar items={modulos} bind:value={modulo} label="Módulos" bind:collapsed={moduloAncho} />
-            <div class="shellbody">
-              <div class="railwrap">
-                <SideRail items={secciones} bind:value={seccion} label="Secciones del módulo" />
-                <Card pad={5}>
-                  <Stack gap={2}>
-                    <p class="sx-cap">Estás en</p>
-                    <p class="big">
-                      <b>{modulos.find((m) => m.key === modulo)?.label ?? '—'}</b>
-                      <span class="chev" aria-hidden="true">›</span>
-                      {secciones.find((s) => s.key === seccion)?.label ?? '—'}
-                    </p>
-                    <p class="tiny">
-                      Dos niveles anidados, dos veces la regla de la casa: ninguno de los dos dice
-                      «acá estás» sólo con color. Sidebar suma un cuarto trazo —&nbsp;el ícono se
-                      engruesa cuando su módulo está elegido&nbsp;— porque arranca colapsado y
-                      <span class="sx-id">font-weight</span> no se nota en una etiqueta que no está.
-                    </p>
-                    <Row gap={2}>
-                      <Button size="sm" variant="ghost" on:click={() => (moduloAncho = !moduloAncho)}>
-                        {moduloAncho ? 'Expandir Sidebar' : 'Colapsar Sidebar'}
-                      </Button>
-                    </Row>
-                  </Stack>
-                </Card>
+               sobre el campo, como en su propia sección más abajo. Un
+               TopBar real encima —&nbsp;no un mockup— porque el disparador
+               del cajón de teléfono vive ahí; ver la nota después del demo. -->
+          <div class="shellframe col">
+            <TopBar product="Strix" nav on:menu={() => (navOpen = true)} />
+            <div class="shellrow">
+              <Sidebar items={modulos} bind:value={modulo} label="Módulos" bind:collapsed={moduloAncho} bind:open={navOpen} />
+              <div class="shellbody">
+                <div class="railwrap">
+                  <SideRail items={secciones} bind:value={seccion} label="Secciones del módulo" />
+                  <Card pad={5}>
+                    <Stack gap={2}>
+                      <p class="sx-cap">Estás en</p>
+                      <p class="big">
+                        <b>{modulos.find((m) => m.key === modulo)?.label ?? '—'}</b>
+                        <span class="chev" aria-hidden="true">›</span>
+                        {secciones.find((s) => s.key === seccion)?.label ?? '—'}
+                      </p>
+                      <p class="tiny">
+                        Dos niveles anidados, dos veces la regla de la casa: ninguno de los dos dice
+                        «acá estás» sólo con color. Sidebar suma un cuarto trazo —&nbsp;el ícono se
+                        engruesa cuando su módulo está elegido&nbsp;— porque arranca colapsado y
+                        <span class="sx-id">font-weight</span> no se nota en una etiqueta que no está.
+                      </p>
+                      <Row gap={2}>
+                        <Button size="sm" variant="ghost" on:click={() => (moduloAncho = !moduloAncho)}>
+                          {moduloAncho ? 'Expandir Sidebar' : 'Colapsar Sidebar'}
+                        </Button>
+                      </Row>
+                    </Stack>
+                  </Card>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+        <p class="note">
+          <b>El cajón de teléfono no se ve angostando este marco.</b> El
+          interruptor de columna-a-cajón es un <span class="sx-id">@media</span>
+          contra el VIEWPORT —&nbsp;el mismo umbral que ya usan
+          <span class="sx-id">Sheet</span>/<span class="sx-id">Toast</span>/
+          <span class="sx-id">Dialog</span>, 560px—, no un
+          <span class="sx-id">@container</span> contra este div, así que
+          hace falta achicar la ventana de verdad (o abrir esta página en un
+          teléfono) para ver aparecer el botón de <span class="sx-id">TopBar</span>
+          y a Sidebar volverse cajón. El <span class="sx-id">TopBar</span> de
+          arriba y el <span class="sx-id">Sidebar</span> de abajo comparten
+          una sola variable —&nbsp;<span class="sx-id">navOpen</span>— para
+          los dos; ver la nota «ONE CONDITION, NOT TWO» en
+          <span class="sx-id">Sidebar.svelte</span> para por qué eso importa.
+        </p>
 
         <p class="note">
           <b>Navegable sólo con teclado, de punta a punta.</b> Cada ítem es un
@@ -834,6 +860,12 @@
     box-shadow: var(--sx-e-1);
     overflow: hidden;
   }
+  /* `.col`: TopBar arriba, Sidebar+contenido abajo — la forma real de un
+     shell, no sólo Sidebar suelto. `overflow:hidden` de `.shellframe` no
+     recorta el cajón de teléfono: `Sheet` sale por `position:fixed`/top
+     layer, fuera de esta caja por completo. */
+  .shellframe.col { flex-direction: column; }
+  .shellrow { display: flex; align-items: stretch; min-width: 0; }
   .shellframe :global(.side) { flex: none; }
   .shellbody { flex: 1 1 auto; min-width: 0; padding: var(--sx-s-5); background: var(--sx-ground); }
   .chev { margin: 0 var(--sx-s-1); color: var(--sx-ink-3); font-weight: var(--sx-w-normal); }
@@ -873,6 +905,6 @@
        gastar: se apila arriba del contenido que gobierna. */
     .railwrap { flex-direction: column; }
     .railwrap :global(.rail) { width: 100%; }
-    .shellframe { flex-direction: column; }
+    .shellrow { flex-direction: column; }
   }
 </style>
