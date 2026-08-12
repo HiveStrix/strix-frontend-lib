@@ -117,6 +117,21 @@ export const TOKENS = {
   // del panel quedaba blanco sobre una tarjeta blanca, la declaración de .head
   // era un no-op, y la cabecera de tabla no se separaba de sus filas.
   '--sx-thead': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF)',
+  // EL RESPLANDOR DE LAS SUPERFICIES, APAGADO POR DEFECTO. Es una perilla, no
+  // un efecto: en 0 no dibuja nada y el sistema se comporta como siempre. Un
+  // producto que quiera que sus tarjetas, paneles y pozos irradien sube este
+  // número y le llega a todas de una vez, sin tocar un componente.
+  //
+  // POR QUÉ EXISTE. Dos módulos del ecosistema comparten estos tokens y tienen
+  // que poder sentirse distintos; el resplandor es la palanca más barata para
+  // eso, porque cambia el carácter de una pantalla entera desde una sola línea.
+  // Va apagado por defecto porque una librería no impone un efecto: lo ofrece.
+  //
+  // El color sale del acento del producto, así que la perilla no elige el color
+  // —eso ya lo eligió el módulo— sino cuánta luz.
+  '--sx-glow': '0%',
+  '--sx-glow-color': 'var(--sx-accent)',
+
   // LA FIRMA de Nácar: la luz que deja caer la barra superior en vez de una
   // raya. Ligarlo a `transparent` la apaga sin tocar ninguna regla.
   //

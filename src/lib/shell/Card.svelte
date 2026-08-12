@@ -301,9 +301,9 @@
      than replacing it, so an untoned card (glow = transparent) still gets
      exactly the shadow it always had, unchanged. */
   .e0 { box-shadow: none; }
-  .e1 { box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow); }
-  .e2 { box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
-  .e3 { box-shadow: var(--sx-e-3), 0 12px 28px -18px var(--card-glow); }
+  .e1 { box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
+  .e2 { box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
+  .e3 { box-shadow: var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
 
   .r1 { border-radius: var(--sx-r-1); }
   .r2 { border-radius: var(--sx-r-2); }
@@ -313,9 +313,9 @@
      the exact footprint of an unselected one and a grid of them does not shift
      by two pixels when you pick one. `inset` also means it survives on top of a
      dark surface, where an outer ring would be lost in the shadow. */
-  .selected { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-1), 0 12px 28px -18px var(--card-glow); }
-  .selected.e2 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
-  .selected.e3 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3), 0 12px 28px -18px var(--card-glow); }
+  .selected { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
+  .selected.e2 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
+  .selected.e3 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
 
   .live {
     cursor: pointer;
@@ -325,9 +325,9 @@
   }
   /* One step of altitude on hover and a single pixel of lift: enough to say
      "this responds", not enough to move the row under the reader's eye. */
-  .live:hover { transform: translateY(-1px); box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
-  .live.selected:hover { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow); }
-  .live:active { transform: none; box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow); }
+  .live:hover { transform: translateY(-1px); box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
+  .live.selected:hover { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
+  .live:active { transform: none; box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
 
   .off { opacity: .5; cursor: not-allowed; }
 
@@ -341,41 +341,41 @@
      be flat and still show its line; that is the whole point of choosing a
      line over light) where `raised` shows nothing at `.e0` — altitude is not
      what identifies a crest card, the ring is. */
-  .crest.e0 { box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge); }
+  .crest.e0 { box-shadow: none; }
   .crest.e1 {
-    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
+    box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.e2 {
-    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
+    box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.e3 {
-    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-3), 0 12px 28px -18px var(--card-glow);
+    box-shadow: var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.selected {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
-      var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
+      0 0 0 2px var(--sx-accent) inset, none,
+      var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.selected.e2 {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
-      var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
+      0 0 0 2px var(--sx-accent) inset, none,
+      var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.selected.e3 {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
-      var(--sx-e-3), 0 12px 28px -18px var(--card-glow);
+      0 0 0 2px var(--sx-accent) inset, none,
+      var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.live:hover {
-    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
+    box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.live.selected:hover {
     box-shadow:
-      0 0 0 2px var(--sx-accent) inset, inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge),
-      var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
+      0 0 0 2px var(--sx-accent) inset, none,
+      var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .crest.live:active {
-    box-shadow: inset 0 1px 0 var(--card-crest-line), 0 0 0 1px var(--sx-edge), var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
+    box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
 
   /* ═══ VARIANT: filled — el tono ═══════════════════════════════════════════
@@ -390,19 +390,19 @@
      like the base rules above) — `.selected.e2`/`.selected.e3` exist for the
      same reason the base ones do: to stop depending on that tie at all. */
   .filled { background: var(--card-fill); }
-  .filled.e1 { box-shadow: 0 12px 28px -18px var(--card-glow); }
-  .filled.selected { box-shadow: 0 0 0 2px var(--sx-accent) inset, 0 12px 28px -18px var(--card-glow); }
+  .filled.e1 { box-shadow: 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
+  .filled.selected { box-shadow: 0 0 0 2px var(--sx-accent) inset, 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
   .filled.selected.e2 {
-    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow);
+    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
   .filled.selected.e3 {
-    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3), 0 12px 28px -18px var(--card-glow);
+    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
-  .filled.live:hover { box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow); }
+  .filled.live:hover { box-shadow: var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
   .filled.live.selected:hover {
-    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-1), 0 12px 28px -18px var(--card-glow);
+    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-1), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
   }
-  .filled.live:active { box-shadow: 0 12px 28px -18px var(--card-glow); }
+  .filled.live:active { box-shadow: 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
 
   /* base.css owns the focus ring for a document; a Core has no base.css, so the
      component states it again. Offset outward so the ring never sits on top of
