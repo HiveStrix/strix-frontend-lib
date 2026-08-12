@@ -36,12 +36,21 @@ export const TOKENS = {
   '--sx-n-150': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #EDEDF0)',
   '--sx-n-200': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #DDDDE2)',
   '--sx-n-300': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #BBBBC2)',
-  // n-400 es donde aterriza --sx-edge, el borde de un control. Su base está
-  // elegida para dar 3.47:1 contra blanco con la traza y 3.22:1 sin ella: los
-  // dos por encima del 3:1 de WCAG 1.4.11. NO puede salir de la escala de
-  // tercios del resto del cromo — para llegar a 3:1 mezclando marca haría falta
-  // un 64 %, que es un borde morado franco y no mobiliario.
-  '--sx-n-400': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #8E8E93)',
+  // n-400 es donde aterriza --sx-edge, el borde de un control.
+  //
+  // SU BASE SE OSCURECIÓ DE #8E8E93 A #828287, y la razón es que un borde tiene
+  // dos lados. El valor viejo daba 3.47:1 contra blanco y cumplía — pero un
+  // control en hover, o un checkbox dentro de una fila seleccionada, tiene su
+  // borde rodeado de --sx-accent-soft por los dos lados, y ahí caía a 2.71.
+  // Contra blanco cumplía y contra sí mismo no. Con la perilla del cromo en un
+  // neutro el margen era todavía más chico, así que la base tiene que aguantar
+  // las dos configuraciones:
+  //     contra blanco:            4.03 morado / 3.77 gris
+  //     contra --sx-accent-soft:  3.46 morado / 3.24 gris
+  // NO puede salir de la escala de tercios del resto del cromo: para llegar a
+  // 3:1 mezclando marca haría falta un 64 %, que es un borde morado franco y no
+  // mobiliario.
+  '--sx-n-400': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #828287)',
   // n-500 es --sx-neutral, que se dibuja SOBRE n-100. Su base da 4.95:1 con la
   // traza y 4.69:1 sin ella. En la dirección A daba 4.16 y estaba por debajo
   // de AA sin que nadie lo hubiera medido.
@@ -73,8 +82,13 @@ export const TOKENS = {
   '--sx-ink-on': 'var(--sx-n-0)',
   // EL ENCABEZADO. Token propio y no --sx-sunk, porque --sx-sunk también pinta
   // los controles de formulario: cambiarle el color al encabezado movía también
-  // los inputs. Mueve cabecera de tabla y de panel a la vez.
-  '--sx-thead': 'var(--sx-n-0)',
+  // los inputs. Mueve cabecera de tabla, cabecera de panel y pie de panel.
+  //
+  // ESTUVO EN BLANCO PURO Y ERA UN DEFECTO. La dirección pide un tinte al 6 %
+  // (explore, [data-d='AD']); en blanco, tres piezas dejaron de existir: el pie
+  // del panel quedaba blanco sobre una tarjeta blanca, la declaración de .head
+  // era un no-op, y la cabecera de tabla no se separaba de sus filas.
+  '--sx-thead': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF)',
   // LA FIRMA de Nácar: la luz que deja caer la barra superior en vez de una
   // raya. Ligarlo a `transparent` la apaga sin tocar ninguna regla.
   '--sx-halo': 'color-mix(in srgb, var(--sx-accent) 55%, transparent)',
@@ -90,20 +104,21 @@ export const TOKENS = {
   '--sx-accent': '#6541BE',
   // Blanco sobre este morado da 6.88:1 — por encima de 4.5 con margen.
   '--sx-accent-ink': '#FFFFFF',
-  // SIGUEN AL ACENTO, y esto es lo que la dirección vieja no hacía. Eran dos
-  // peldaños fijos de la rampa (n-100 y n-200), o sea grises: un estado
-  // interactivo pintado con ellos se lee como una superficie más sucia, no como
-  // una pieza que responde.
+  // SIGUEN AL ACENTO. Eran dos peldaños fijos de la rampa, o sea grises: un
+  // estado interactivo pintado con ellos se lee como una superficie más sucia,
+  // no como una pieza que responde.
   //
-  // EL PORCENTAJE ESTÁ MEDIDO, no elegido. Contra una fila blanca en reposo:
-  //   12 % → croma 15, distancia 16   (el valor de la exploración)
-  //   16 % → croma 20, distancia 21   ← éste
-  //   20 % → croma 25, distancia 27   (ya compite con una banda de estado)
-  // Sube de 12 a 16 porque acá el cromo YA está teñido con este mismo morado:
-  // los grises de la rampa llegan con croma 8, así que un tinte al 12 % aterriza
-  // casi encima y el hover se lee como un gris apenas más oscuro. El 16 % es el
-  // primer escalón que despega de forma inequívoca.
-  '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 16%, #FFFFFF)',
+  // EL 10 % ESTÁ MEDIDO Y NO ELEGIDO, y bajó desde 16 % por una razón que sólo
+  // se ve mirando lo que va ENCIMA. A 16 % este token hacía dos trabajos —el
+  // hover y el «seleccionado»— y para que el hover despegara tenía que gritar,
+  // con lo cual se comía el contraste de lo que se dibujaba encima:
+  //     --sx-edge  sobre accent-soft:  2.71  (piso 3.0)
+  //     --sx-ink-3 sobre accent-soft:  4.57, y 4.25 con la perilla en gris
+  // Al pasar «seleccionado» a un anillo de acento pleno (ver C1), este token se
+  // queda sólo con el hover, que es pasajero y no necesita gritar. A 10 %:
+  //     --sx-edge  sobre accent-soft:  3.46 morado / 3.24 gris
+  //     --sx-ink-3 sobre accent-soft:  5.02 morado / 4.67 gris
+  '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF)',
   '--sx-accent-edge': 'color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF)',
 
   // Semantic tones. Fixed across every product: "vencido" must look identical
