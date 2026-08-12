@@ -319,6 +319,13 @@ pensada para leerse sobre gris oscuro — 2.99 donde el piso es 4.5. Se veía ra
 fallaba el contrato; nadie lo vio porque nada lo medía en ese tema. Un tema que no se mide es un
 tema que se ve bien y falla.
 
+El contrato duro y su gemelo de distinguibilidad miden lo que YA es del sistema. Hay un tercer eje
+que ninguno de los dos toca: el acento, que no es del sistema — es un hueco que cada producto
+llena. `pnpm contrast` también mide eso ahora, con **ΔE2000** (distancia perceptual, no razón de
+contraste: acá el problema no es «¿se lee?», es «¿se confunden dos colores distintos?») contra los
+cinco tonos y sus bandas. Ver *Cuando el acento elegido choca con un tono*, más abajo, para el
+argumento completo y qué familias de acento colisionan con qué tono.
+
 Sumale las siete páginas del catálogo a 1200 y 390 px, en los dos temas: `pnpm contrast` prueba
 que un color exista con el contraste que promete; no prueba que la pieza se vea bien. Las dos
 verificaciones son necesarias y ninguna reemplaza a la otra.
@@ -461,6 +468,54 @@ desentona con lo que lo rodea. Un producto que no tiene marca todavía no tiene 
 El interruptor de la portada del catálogo hace exactamente esto y nada más: escribe cuatro
 propiedades en `<html>`. Todo lo demás —botones, filas seleccionadas, switches, barras de
 progreso, el anillo de una Card— lo sigue solo.
+
+### Cuando el acento elegido choca con un tono
+
+El acento es un hueco que cada producto llena — la primera regla del README lo dice así— pero
+hasta ahora nada comprobaba que ese hueco se pudiera llenar sin que el resultado se confundiera con
+uno de los cinco tonos del sistema. Un producto lo descubrió construyendo un módulo entero: con un
+acento amarillo y los porcentajes por defecto de esta librería, la fila seleccionada
+(`--sx-accent-pick`, 18 % contra blanco) y la banda de `attention` (el fondo de un Pill «por
+vencer») se leían como el mismo color. La razón de contraste nunca lo iba a atrapar —las dos
+superficies son claras, ninguna es texto— porque el problema no es legibilidad: es que dos colores
+*distintos* se parecen. Eso es distancia perceptual, y se mide con **ΔE2000**, no con una razón de
+contraste.
+
+`pnpm contrast` mide esto ahora: toma un acento, lo deriva con la misma fórmula que `soft`/`pick`
+de arriba, y compara el relleno de selección contra la banda de cada uno de los cinco tonos. Menos
+de **ΔE 5.3** (el piso, `ACCENT_MIN` en `scripts/contrast.mjs`, argumentado ahí con números —
+medir los choques que se sabían reales contra la separación legítima más sutil, y poner el corte en
+el hueco entre los dos) es una colisión, y el arnés la dice con el nombre del tono. Sólo el
+`--sx-accent` que esta librería envía sin ligar (el morado de Nácar) puede romper el build — es el
+único acento que es responsabilidad de este repo. Un juego de acentos representativos corre además,
+informativo, para dejar por escrito qué familias chocan:
+
+| Acento de prueba | Choca con | ΔE (selección vs. banda) |
+|---|---|---|
+| Rojo (`#DC2626`) | `critical` | 3.13 |
+| Naranja (`#C2410C`) | `critical` | 3.40 |
+| Verde (`#15803D`) | `positive` | 3.52 |
+| Amarillo/ámbar (`#F7B500`) | `attention` | 4.68 |
+
+Los cuatro son la misma historia contada cuatro veces: un acento y un tono de la **misma familia de
+color** —rojo de marca contra «vencido», verde de marca contra «al día», ámbar de marca contra «por
+vencer»— leen igual en su versión pálida aunque sean hex distintos. No es folklore de un solo
+producto: un acento rojo contra `critical` es tan sospechoso como el amarillo que lo encontró, y
+ahora los dos están medidos.
+
+**Si tu acento cae en una de estas familias, no hay atajo de una sola línea — la salida es subir el
+porcentaje de mezcla.** `--sx-accent-pick` por defecto mezcla al 18 % contra blanco; con más croma
+hay más margen para que la familia de color vuelva a distinguirse de la banda del tono en conflicto.
+Subilo hasta que la comprobación pase — `pnpm contrast` te dice el ΔE real cada vez que corrés, así
+que no hace falta adivinar cuánto alcanza. `--sx-accent-soft` (el hover, 10 % por defecto) es
+todavía más pálido y por eso más propenso a esto — tan propenso que **ni el morado por defecto de
+esta librería lo pasa contra `info` (ΔE 2.26) ni contra `neutral` (ΔE 2.23)**, sin que ninguno de
+los dos sea la misma familia de color que el morado. Por debajo del 18 % casi cualquier acento
+queda tan cerca del blanco que se acerca a casi cualquier banda, tenga o no relación de matiz; por
+eso el arnés mide `--sx-accent-soft` y lo informa, pero sólo `--sx-accent-pick` puede romper el
+build — bajarle el piso al hover para que pase habría sido la misma trampa que este párrafo
+denuncia, sólo que con el propio acento de la librería. El argumento completo, con los treinta pares
+medidos, vive en `scripts/contrast.mjs`, junto a `ACCENT_MIN`.
 
 ---
 
