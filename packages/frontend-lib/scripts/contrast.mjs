@@ -66,6 +66,9 @@ const CHECKS = [
   // fondo de texto en veintiún sitios y nadie lo estaba midiendo.
   ['--sx-ink-3', '--sx-accent-soft', 4.5, 'texto terciario sobre un estado'],
   ['--sx-ink-2', '--sx-accent-soft', 4.5, 'texto secundario sobre un estado'],
+  ['--sx-edge',  '--sx-accent-pick', 3.0, 'borde de control sobre una fila elegida'],
+  ['--sx-ink-3', '--sx-accent-pick', 4.5, 'texto terciario sobre una fila elegida'],
+  ['--sx-ink-2', '--sx-accent-pick', 4.5, 'texto secundario sobre una fila elegida'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],

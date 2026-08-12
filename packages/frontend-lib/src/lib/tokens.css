@@ -18,8 +18,8 @@
   --sx-n-150: color-mix(in srgb, var(--sx-chrome-tint) 6%, #EDEDF0);
   --sx-n-200: color-mix(in srgb, var(--sx-chrome-tint) 8%, #DDDDE2);
   --sx-n-300: color-mix(in srgb, var(--sx-chrome-tint) 8%, #BBBBC2);
-  --sx-n-400: color-mix(in srgb, var(--sx-chrome-tint) 8%, #828287);
-  --sx-n-500: color-mix(in srgb, var(--sx-chrome-tint) 8%, #66666C);
+  --sx-n-400: color-mix(in srgb, var(--sx-chrome-tint) 8%, #7A7A7F);
+  --sx-n-500: color-mix(in srgb, var(--sx-chrome-tint) 8%, #5E5E64);
   --sx-n-700: color-mix(in srgb, var(--sx-chrome-tint) 8%, #414146);
   --sx-n-800: color-mix(in srgb, var(--sx-chrome-tint) 8%, #27272B);
   --sx-n-900: color-mix(in srgb, var(--sx-chrome-tint) 7%, #1B1B1E);
@@ -37,6 +37,7 @@
   --sx-accent: #6541BE;
   --sx-accent-ink: #FFFFFF;
   --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF);
+  --sx-accent-pick: color-mix(in srgb, var(--sx-accent) 18%, #FFFFFF);
   --sx-accent-edge: color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF);
   --sx-positive: #2E6B3E;
   --sx-positive-band: #E4EFE2;

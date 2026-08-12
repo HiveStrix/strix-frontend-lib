@@ -50,11 +50,19 @@ export const TOKENS = {
   // NO puede salir de la escala de tercios del resto del cromo: para llegar a
   // 3:1 mezclando marca haría falta un 64 %, que es un borde morado franco y no
   // mobiliario.
-  '--sx-n-400': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #828287)',
+  //
+  // SEGUNDA VEZ QUE SE OSCURECE, y por el mismo motivo: apareció un estado nuevo
+  // debajo suyo. Con --sx-accent-pick (18 %) como fondo, la base #828287 daba
+  // 3.05 morado / 2.86 gris. #7A7A7F da 3.38 / 3.16, y contra blanco sube de
+  // 4.03 a 4.47.
+  '--sx-n-400': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #7A7A7F)',
   // n-500 es --sx-neutral, que se dibuja SOBRE n-100. Su base da 4.95:1 con la
   // traza y 4.69:1 sin ella. En la dirección A daba 4.16 y estaba por debajo
   // de AA sin que nadie lo hubiera medido.
-  '--sx-n-500': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #66666C)',
+  //
+  // También se oscurece por --sx-accent-pick: sobre ese relleno, la base #66666C
+  // daba 4.42 morado / 4.12 gris, por debajo de AA. #5E5E64 da 4.94 / 4.60.
+  '--sx-n-500': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #5E5E64)',
   '--sx-n-700': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #414146)',
   '--sx-n-800': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #27272B)',
   '--sx-n-900': 'color-mix(in srgb, var(--sx-chrome-tint) 7%, #1B1B1E)',
@@ -114,11 +122,24 @@ export const TOKENS = {
   // con lo cual se comía el contraste de lo que se dibujaba encima:
   //     --sx-edge  sobre accent-soft:  2.71  (piso 3.0)
   //     --sx-ink-3 sobre accent-soft:  4.57, y 4.25 con la perilla en gris
-  // Al pasar «seleccionado» a un anillo de acento pleno (ver C1), este token se
-  // queda sólo con el hover, que es pasajero y no necesita gritar. A 10 %:
-  //     --sx-edge  sobre accent-soft:  3.46 morado / 3.24 gris
-  //     --sx-ink-3 sobre accent-soft:  5.02 morado / 4.67 gris
+  // Al pasar «seleccionado» a su propio relleno, --sx-accent-pick (ver abajo),
+  // este token se queda sólo con el hover y el focus, que son pasajeros y no
+  // necesitan gritar. A 10 % (con las bases de n-400/n-500 ya oscurecidas por
+  // --sx-accent-pick, ver ahí):
+  //     --sx-edge  sobre accent-soft:  3.84 morado / 3.59 gris
+  //     --sx-ink-3 sobre accent-soft:  5.61 morado / 5.22 gris
   '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF)',
+  // EL RELLENO DE SELECCIÓN. Existe separado de --sx-accent-soft porque son dos
+  // estados distintos y compartir token los volvía indistinguibles: seleccionar
+  // una fila y pasar el puntero por la de al lado las dejaba iguales.
+  //
+  // POR QUÉ 18 %. Tiene que despegarse del hover (10 %) y aguantar lo que se
+  // dibuja ENCIMA. Medido contra las dos configuraciones de --sx-chrome-tint:
+  //     --sx-edge  encima:  3.38 morado / 3.16 gris   (piso 3.0)
+  //     --sx-ink-3 encima:  4.94 morado / 4.60 gris   (piso 4.5)
+  // A 20 % la tinta terciaria cae a 4.45 con la perilla en gris. 18 % es el
+  // último escalón que aguanta las dos.
+  '--sx-accent-pick': 'color-mix(in srgb, var(--sx-accent) 18%, #FFFFFF)',
   '--sx-accent-edge': 'color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF)',
 
   // Semantic tones. Fixed across every product: "vencido" must look identical
