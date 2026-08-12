@@ -107,6 +107,11 @@
     flex-wrap: wrap;
     padding: var(--panel-pad) var(--panel-pad) 0;
     flex: none;
+    /* Card no tiene overflow:hidden, así que una banda sin radio pinta esquinas
+       cuadradas encima de las redondeadas de la tarjeta en cuanto --sx-thead
+       deja de ser blanco puro (o la perilla se pone en --sx-sunk). El pie ya
+       hace este mismo redondeo abajo; esto es lo mismo arriba. */
+    border-radius: var(--panel-r) var(--panel-r) 0 0;
   }
   .titles { min-width: 0; }
   .tline { display: flex; align-items: center; gap: var(--sx-s-2); min-width: 0; }
@@ -156,9 +161,11 @@
     overscroll-behavior: contain;
   }
 
-  /* The footer is a recessed band, the same recess Well draws, because a footer
-     is a place where the panel has ended and something else — a total, two
-     buttons, a timestamp — is being said about it. */
+  /* The footer is a tinted band — --sx-thead, the same token the header uses —
+     because a footer is a place where the panel has ended and something else —
+     a total, two buttons, a timestamp — is being said about it. Not the same
+     recess Well draws: Well is --sx-sunk, and that token also paints form
+     controls, so it can't be reused here without dragging inputs along. */
   .foot {
     flex: none;
     padding: var(--sx-s-3) var(--panel-pad);

@@ -125,7 +125,6 @@
        se gradúa por --sx-halo y sólo por ahí.
        El z-index NO es opcional: sin él el fondo del hermano siguiente se pinta
        después en el orden natural y se come la luz justo donde tiene que caer. */
-    border-bottom: 0;
     box-shadow: 0 12px 28px -18px var(--sx-halo);
     position: relative;
     z-index: var(--sx-z-sticky);
@@ -139,7 +138,12 @@
     /* No declara box-shadow propio a propósito: .hd ya deja caer el halo, y
        pegada es cuando más tiene que notarse que hay contenido pasando por
        debajo. Redeclararlo acá con --sx-e-1 lo pisaba en silencio — la firma
-       de la dirección desaparecía justo cuando la barra se quedaba pegada. */
+       de la dirección desaparecía justo cuando la barra se quedaba pegada.
+       Pero un producto puede ligar --sx-halo a transparent (la perilla que el
+       README documenta) y entonces la barra pegada se queda sin raya, sin
+       sombra y sin halo. border-bottom es otra propiedad — convive con el
+       box-shadow de .hd sin pisarlo — y da un límite que no depende del halo. */
+    border-bottom: 1px solid var(--sx-line);
     padding-block: var(--sx-s-3);
     margin-inline: calc(var(--sx-s-4) * -1);
     padding-inline: var(--sx-s-4);

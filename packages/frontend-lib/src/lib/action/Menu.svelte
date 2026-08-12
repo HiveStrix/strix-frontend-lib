@@ -393,8 +393,10 @@
      roving focus is real and has to be visible, or the arrow keys move a
      highlight nobody can see. */
   /* Un ítem bajo el cursor o con foco se levanta, no se hunde: --sx-sunk daba
-     un gris sucio sobre blanco. --sx-accent-edge es la selección DUE a
-     teclado en focus-visible; esto es el reposo bajo puntero/roving focus. */
+     un gris sucio sobre blanco. Esto es el reposo bajo puntero/roving focus;
+     la selección por teclado se marca aparte, con el anillo de foco de
+     --sx-ink en :focus-visible más abajo — --sx-accent-edge no se usa en este
+     archivo. */
   .item:hover, .item:focus { background: var(--sx-accent-soft); outline: none; }
   .item:focus-visible {
     outline: 2px solid var(--sx-ink);

@@ -165,10 +165,10 @@ desentona con lo que lo rodea.
 ### `--sx-accent-soft` y `--sx-accent-edge` derivan del acento
 
 Antes eran dos peldaños fijos de la rampa de grises (`--sx-n-100` y `--sx-n-200`). Ahora se
-mezclan con el acento, al 16 % y al 28 % contra blanco:
+mezclan con el acento, al 10 % y al 28 % contra blanco:
 
 ```css
---sx-accent-soft: color-mix(in srgb, var(--sx-accent) 16%, #FFFFFF);
+--sx-accent-soft: color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF);
 --sx-accent-edge: color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF);
 ```
 
@@ -179,10 +179,13 @@ el arreglo no llegaba a hacer efecto. La regla que hay que llevarse: **un estado
 pinta con `--sx-accent-soft`, nunca con `--sx-sunk`.** `--sx-sunk` es el fondo en reposo de un
 control; usarlo para un estado da una superficie más sucia, no una que responde.
 
-Por qué 16 % y no el 12 % que se usó en la exploración: en Nácar el cromo ya está teñido con el
-mismo morado del acento, así que sus grises llegan con croma 8 y un tinte al 12 % aterriza casi
-encima — el hover se leía como un gris apenas más oscuro que el de reposo. A 16 % el croma sube a
-20 y el tinte despega.
+Por qué 10 % y no 16 %: `--sx-accent-soft` hacía dos trabajos, el hover Y «seleccionado», y para
+que el hover despegara tenía que gritar — a 16 % eso se comía el contraste de lo que se dibuja
+ENCIMA del estado (`--sx-edge` daba 2.71:1, por debajo del piso de 3.0). Desde esta ronda,
+«seleccionado» se dice con un anillo de acento pleno (`Table`, `SideRail`) y `--sx-accent-soft`
+queda sólo con el hover, que es pasajero y no necesita gritar. A 10 % pasa el contrato en las dos
+configuraciones de `--sx-chrome-tint`: `--sx-edge` sobre `--sx-accent-soft` da 3.46:1 con el morado
+por defecto y 3.24:1 con la perilla en un neutro.
 
 ### `--sx-line` y `--sx-edge` hacen dos trabajos distintos
 
@@ -198,7 +201,13 @@ y delimitar un control no son el mismo trabajo, aunque compartieran token en la 
 
 Compartir token fue el defecto: en A, donde `--sx-edge` colgaba del mismo peldaño que `--sx-line`,
 el borde de un input daba **1.52:1**. En Nácar `--sx-edge` salta a su propio peldaño de la rampa
-(`--sx-n-400`) en vez de acompañar a `--sx-line`, y hoy da **3.47:1**.
+(`--sx-n-400`) en vez de acompañar a `--sx-line`, y hoy da **4.03:1** contra blanco con la perilla
+en el morado por defecto (**3.77:1** con la perilla en un neutro).
+
+Un borde tiene dos lados, y el segundo casi se escapa: un control en hover, o un checkbox dentro de
+una fila seleccionada, tiene su borde rodeado de `--sx-accent-soft` por los dos lados, no de blanco.
+`--sx-n-400` está calibrado para aguantar también esa configuración —**3.46:1** morado / **3.24:1**
+gris— y `npm run contrast` mide las dos, no sólo la de superficie.
 
 La lección general, no sólo de este par: **una regla que dice `var(--sx-algo)` no dibuja un color,
 dibuja lo que ese token valga donde se lee.** Es el mismo error que costó cuatro intentos en la
@@ -211,13 +220,15 @@ números, no mirar el nombre de la variable y confiar en que suene razonable.
 
 `npm run contrast` es parte de la verificación, no un extra: resuelve cada token a color real y
 mide el contraste, en vez de confiar en que el nombre de la variable sea razonable. Corre el
-contrato duro (`--sx-edge` contra superficie y fondo, `--sx-ink`/`-2`/`-3`, la tinta sobre el
-acento, cada tono sobre su banda) y además informa —sin romper el build— el filo de cada tono y los
-dos derivados del acento, `--sx-accent-soft` y `--sx-accent-edge`. Esos dos quedan fuera del
-contrato duro a propósito: WCAG 1.4.11 pide 3:1 para el límite que hace falta para **identificar**
-un componente, y ni el filo de una insignia ya seleccionada ni un hover de fila identifican nada
-por sí solos — eso lo hacen la banda, la marca y la palabra (`Pill.svelte`), no el filo. El
-argumento completo vive en `scripts/contrast.mjs`.
+contrato duro (`--sx-edge` contra superficie, fondo Y `--sx-accent-soft` —un borde tiene dos
+lados—, `--sx-ink`/`-2`/`-3` contra superficie y `--sx-ink-2`/`-3` contra `--sx-accent-soft` —el
+texto que se dibuja encima de un estado—, la tinta sobre el acento, cada tono sobre su banda) y
+además informa —sin romper el build— el filo de cada tono, `--sx-thead` contra la tarjeta,
+`--sx-accent-edge` y el acento pleno que sostiene el anillo de selección. El filo de tono y
+`--sx-accent-edge` quedan fuera del contrato duro a propósito: WCAG 1.4.11 pide 3:1 para el límite
+que hace falta para **identificar** un componente, y ni el filo de una insignia ya seleccionada ni
+un hover de fila identifican nada por sí solos — eso lo hacen la banda, la marca y la palabra
+(`Pill.svelte`), no el filo. El argumento completo vive en `scripts/contrast.mjs`.
 
 Sumale las siete páginas del catálogo a 1200 y 390 px: `npm run contrast` prueba que un color
 exista con el contraste que promete; no prueba que la pieza se vea bien. Las dos verificaciones son
@@ -319,14 +330,15 @@ es todo lo que un producto liga — **una vez, en su raíz**:
 :root {                                   /* o :host, en un Core */
   --sx-accent:      #A33F26;
   --sx-accent-ink:  #FFFFFF;              /* la tinta que sobrevive ENCIMA del acento */
-  --sx-accent-soft: color-mix(in srgb, #A33F26 12%, var(--sx-surface));
-  --sx-accent-edge: color-mix(in srgb, #A33F26 34%, var(--sx-surface));
+  --sx-accent-soft: color-mix(in srgb, #A33F26 10%, #FFFFFF);
+  --sx-accent-edge: color-mix(in srgb, #A33F26 28%, #FFFFFF);
 }
 ```
 
-`soft` y `edge` se mezclan **con la superficie** en vez de darse como colores fijos: así una sola
-ligadura es correcta en los dos temas —un tinte en claro, una sombra en oscuro— sin escribir el
-bloque dos veces.
+`soft` y `edge` se mezclan **contra `#FFFFFF` fijo**, el mismo criterio que usa `tokens.js` para el
+acento sin ligar de la librería: es la receta de Nácar, una dirección de luz sobre blanco, no una
+fórmula que se re-liga sola en oscuro. Un producto con tema oscuro tiene que declarar su propio
+bloque de estas cuatro variables bajo `[data-sx-theme="dark"]` — ver *Deuda de Nácar*.
 
 **Sin ligar nada**, el acento resuelve a `#6541BE`, el morado de Nácar — no a `--sx-n-900` como
 en la dirección anterior. La razón es mecánica, no estética: `--sx-chrome-tint` ya vale ese mismo
@@ -462,23 +474,24 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
 
 ### Deuda de Nácar
 
-- **El modo oscuro de Nácar no existe.** `TOKENS_DARK` sigue siendo el oscuro de A —no se tocó, no
-  se declara compatible— y no se puede derivar de los valores claros: Nácar es una dirección de
-  luz (blanco, sombra suave, halo), y su versión oscura hay que diseñarla, no calcularla desde
-  ésta.
+- **El modo oscuro de Nácar no existe.** El objeto `TOKENS_DARK` es el mismo de A —no se tocó, no
+  se declara compatible—, pero sus valores resueltos no lo son: `--sx-ground` y `--sx-surface`
+  apuntan a `--sx-n-900`/`--sx-n-800`, y esa rampa ahora lleva la traza de `--sx-chrome-tint`, así
+  que el gris que pinta hoy no es el de A. No se puede derivar de los valores claros de Nácar:
+  Nácar es una dirección de luz (blanco, sombra suave, halo), y su versión oscura hay que
+  diseñarla, no calcularla desde ésta.
 - **El bloque `.tbl` de Nácar está generado, no vinculado.** `explore/pages/Tablas.svelte` copia
   los 59 tokens de `[data-d='Z']` por valor y los acota a `[data-d='AD'] .tbl`. Si `Z` cambia, este
   bloque queda desactualizado y nada lo avisa.
 - **Los filos de tono (`--sx-positive-edge` y compañía) dan ~1.5:1**, y junto con
-  `--sx-accent-edge` (1.56:1) y `--sx-accent-soft` (1.28:1) quedan fuera del contrato duro a
-  propósito. El argumento —WCAG 1.4.11 pide 3:1 para el límite que hace falta para *identificar*
-  un componente, y ni un hover ni el filo de una insignia ya seleccionada identifican nada por sí
-  solos, eso lo hacen la banda, la marca y la palabra— está escrito en `scripts/contrast.mjs` y se
-  informa en `npm run contrast` sin romper el build.
-- **El comentario de `--sx-accent-soft` en `tokens.js` cita una «distancia»** (16/21/27) calculada
-  con una métrica ad hoc —una media de diferencias por canal contra blanco— que ningún método
-  estándar reproduce. El croma sí es exacto (15/20/25, medido). Falta declarar el método de esa
-  distancia o borrar la cifra.
+  `--sx-accent-edge` (1.56:1) quedan fuera del contrato duro a propósito. El argumento —WCAG
+  1.4.11 pide 3:1 para el límite que hace falta para *identificar* un componente, y ni el filo de
+  una insignia ya seleccionada identifica nada por sí solo, eso lo hacen la banda, la marca y la
+  palabra— está escrito en `scripts/contrast.mjs` y se informa en `npm run contrast` sin romper el
+  build. `--sx-accent-soft` ya no es uno de estos: desde la última ronda de arreglos, `--sx-edge` y
+  `--sx-ink-2`/`-3` medidos SOBRE `--sx-accent-soft` —un borde y un texto tienen que aguantar el
+  fondo del estado en el que se dibujan, no sólo la superficie en reposo— sí están en el contrato
+  duro.
 - **`--sx-n-100` y `--sx-n-200` quedaron sin ningún consumidor**, desde que `--sx-neutral` se fijó
   a hex y `--sx-accent-soft`/`-edge` pasaron a derivar del acento en vez de usarlos. Es higiene, no
   un defecto: la rampa se mantiene completa a propósito, para que un producto que la necesite

@@ -258,7 +258,7 @@
     color: var(--sx-ink-3); border-radius: var(--sx-r-1);
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
-  .steps button:hover:not(:disabled) { background: var(--sx-sunk); color: var(--sx-ink); }
+  .steps button:hover:not(:disabled) { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .steps button:disabled { opacity: .35; cursor: not-allowed; }
   .steps svg { width: 12px; height: 12px; }
 
