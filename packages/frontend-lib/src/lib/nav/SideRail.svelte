@@ -201,10 +201,12 @@
      bajo el cursor el ítem se ilumina con el acento, no se hunde en gris. */
   .it:hover:not(.dis) { background: var(--sx-accent-soft); color: var(--sx-ink); }
 
-  /* Selected is a soft accent fill plus full ink plus aria-current. Three
-     signals, none of which is only colour. */
+  /* Selected is a soft accent fill plus a full-accent edge plus full ink plus
+     aria-current. El relleno solo compartía color con el hover — acá el canto
+     es lo que distingue seleccionado de hover al pasar el cursor. */
   .it.on {
     background: var(--sx-accent-soft);
+    box-shadow: inset 2px 0 0 var(--sx-accent);
     color: var(--sx-ink);
     font-weight: var(--sx-w-semi);
   }
