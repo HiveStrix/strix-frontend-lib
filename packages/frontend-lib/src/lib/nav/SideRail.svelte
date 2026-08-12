@@ -197,15 +197,17 @@
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
   }
 
-  /* El mismo tinte que .it.on usa para «seleccionado» (ver más abajo):
-     bajo el cursor el ítem se ilumina con el acento, no se hunde en gris. */
+  /* Bajo el cursor el ítem se ilumina con el acento, no se hunde en gris —
+     con --sx-accent-soft (10 %), el relleno pasajero. Seleccionado (ver más
+     abajo) usa un relleno propio, más fuerte, porque persiste. */
   .it:hover:not(.dis) { background: var(--sx-accent-soft); color: var(--sx-ink); }
 
-  /* Selected is a soft accent fill plus a full-accent edge plus full ink plus
-     aria-current. El relleno solo compartía color con el hover — acá el canto
-     es lo que distingue seleccionado de hover al pasar el cursor. */
+  /* Selected is --sx-accent-pick (18 %, persistente) plus a full-accent edge
+     plus full ink plus aria-current. Compartía relleno con el hover y los dos
+     estados eran indistinguibles; ahora cada uno tiene el suyo, y el canto
+     queda como refuerzo, no como única señal. */
   .it.on {
-    background: var(--sx-accent-soft);
+    background: var(--sx-accent-pick);
     box-shadow: inset 2px 0 0 var(--sx-accent);
     color: var(--sx-ink);
     font-weight: var(--sx-w-semi);

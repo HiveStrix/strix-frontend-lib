@@ -923,22 +923,12 @@
   tbody tr.row:hover { background: var(--sx-accent-soft); }
   tbody tr.row:focus-within { background: var(--sx-accent-soft); }
   tbody tr.opened td { box-shadow: none; }
-  /* SELECCIONADO SE DICE CON UN ANILLO, NO CON UN RELLENO. Compartía relleno con
-     el hover, así que los dos estados eran el mismo color y la selección dejaba
-     de leerse. El anillo es acento pleno —6.88:1, no depende de ningún tinte— y
-     es el mismo tratamiento que la variante tarjeta de este componente ya usa
-     abajo de 560px: el mismo componente decía «seleccionado» de dos maneras
-     según el ancho.
-
-     Va DESPUÉS de `tr.opened td` a propósito: una fila puede estar seleccionada
-     Y expandida a la vez (son estados independientes), y las dos reglas pintan
-     `td` con la misma especificidad. `tr.opened td` pone `box-shadow: none` para
-     fundirse con el detalle de abajo; sin este orden esa declaración ganaba por
-     posición y apagaba el anillo en cualquier fila que estuviera además abierta.
-     Seleccionado tiene que ganar esa carrera. */
-  tbody tr.on td { box-shadow: inset 0 2px 0 var(--sx-accent), inset 0 -2px 0 var(--sx-accent); }
-  tbody tr.on td:first-child { box-shadow: inset 0 2px 0 var(--sx-accent), inset 0 -2px 0 var(--sx-accent), inset 2px 0 0 var(--sx-accent); }
-  tbody tr.on td:last-child { box-shadow: inset 0 2px 0 var(--sx-accent), inset 0 -2px 0 var(--sx-accent), inset -2px 0 0 var(--sx-accent); }
+  /* SELECCIONADO ES UN RELLENO, el highlight de siempre. Se intentó con un
+     anillo para separarlo del hover, y un anillo alrededor de una fila de tabla
+     no se lee como highlight: se lee como un marco. La separación con el hover
+     la hace el token: --sx-accent-soft (10 %) para el puntero, que es pasajero,
+     y --sx-accent-pick (18 %) para la selección, que persiste. */
+  tbody tr.on td { background: var(--sx-accent-pick); }
 
   td.lead { padding-inline: var(--sx-s-3); }
   .raise { position: relative; z-index: 1; }
@@ -1050,7 +1040,7 @@
     flex-direction: column;
     gap: var(--sx-s-3);
   }
-  .card.on { box-shadow: var(--sx-e-1), 0 0 0 2px var(--sx-accent) inset; }
+  .card.on { background: var(--sx-accent-pick); box-shadow: var(--sx-e-1), 0 0 0 2px var(--sx-accent) inset; }
   .chead { display: flex; align-items: flex-start; gap: var(--sx-s-3); }
   .ctitle {
     margin: 0;
