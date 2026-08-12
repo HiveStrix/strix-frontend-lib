@@ -41,12 +41,28 @@
   // says why, rather than opening a blank box and making somebody wonder whether
   // it is loading.
   //
-  // ONE LIMIT WORTH KNOWING. The panel is absolutely positioned inside the
-  // trigger's own box, not portalled to the top of the document — so it travels
-  // correctly with scroll, but an ancestor with `overflow: hidden` will clip it.
-  // In a scrolling table, give the scroller `overflow: auto` and room.
+  // DÓNDE VIVE EL PANEL. Donde existe `popover` (Chrome 114+, Safari 17+,
+  // Firefox 125+) el panel abre en la TOP LAYER — `popover="manual"`, nunca
+  // `auto`: `auto` trae su PROPIO cierre por Escape, clic afuera y descarte
+  // automático, y este archivo ya tiene los tres arriba, escritos con el
+  // cuidado de `composedPath()` en shadow root que la versión del navegador
+  // no conoce; correr los dos a la vez es una carrera. `manual` da la top
+  // layer y nada más. La top layer queda fuera de cualquier contexto de
+  // apilado del documento, así que ni un `transform` ni un `overflow: hidden`
+  // de un ancestro la alcanzan — pero el panel deja de estar posicionado
+  // contra la caja del disparador como lo está un hijo absoluto, así que
+  // `place()` mide el disparador con `getBoundingClientRect()` y escribe
+  // coordenadas de `position: fixed` a mano, recalculadas en cada `scroll`
+  // (en captura, para oír también el de un contenedor propio dentro del
+  // ancestro del disparador — el scroll de la ventana sola no alcanza) y
+  // cada `resize` mientras está abierto. Donde `popover` no existe, nada de
+  // esto corre: el panel cae en exactamente lo de antes, posicionado
+  // absoluto contra la caja del disparador, recortado por un ancestro con
+  // `overflow: hidden`. En una tabla con scroll en esos navegadores, dale al
+  // contenedor `overflow: auto` y espacio.
   import { createEventDispatcher, tick, onDestroy, flushSync } from 'svelte';
   import Button from './Button.svelte';
+  import { supportsPopover, syncPopover } from '../shell/toplayer.js';
 
   /**
    * The list. Each item:
@@ -137,6 +153,11 @@
 
   function hide(giveFocusBack = true) {
     if (!open) return;
+    // `panel` todavía apunta al nodo que está por desmontarse — este tick
+    // reactivo no parchó el DOM todavía. Salir de la top layer acá, en vez de
+    // confiar en que sacar el nodo lo haga solo, deja esa salida en el mismo
+    // paso síncrono que todo lo demás que `hide()` ya hace.
+    syncPopover(panel, false);
     open = false;
     active = -1;
     typed = '';
@@ -147,12 +168,36 @@
   // Below or above? Measured once per opening, and again if the window changes
   // size while it is open. A menu on the last row of a long table opens upward
   // or it opens into nothing.
+  //
+  // Con `popover`, acá también se escriben las coordenadas del panel, y
+  // encima se recalculan en cada scroll. `syncPopover` tiene que correr ANTES
+  // de leer `panel.offsetHeight`: un popover sin abrir es `display: none` por
+  // la hoja de estilos del navegador, y un elemento `display: none` reporta
+  // cero en cualquier medida — medir primero haría que el panel crea que no
+  // tiene alto y decida siempre que abajo entra. El ancho del disparador se
+  // escribe en `--sx-menu-tw` antes de esa misma medición por la misma razón:
+  // el `min-width` depende de él, y el ancho cambia el ajuste de línea, que
+  // cambia el alto que se está por medir.
   function place() {
     if (!panel || !trigger) return;
     const t = trigger.getBoundingClientRect();
+    if (supportsPopover) panel.style.setProperty('--sx-menu-tw', `${t.width}px`);
+    syncPopover(panel, true);
     const h = panel.offsetHeight;
     const below = window.innerHeight - t.bottom;
     up = below < h + 8 && t.top > below;
+    if (!supportsPopover) return;
+    // `align` decide con qué borde del disparador se alinea el panel; con
+    // `fixed` eso ya no es `inset-inline-start/end: 0` contra un ancestro
+    // posicionado, así que los dos bordes se escriben en píxeles de viewport.
+    panel.style.left = `${align === 'end' ? t.right - panel.offsetWidth : t.left}px`;
+    if (up) {
+      panel.style.bottom = `${window.innerHeight - t.top}px`;
+      panel.style.top = 'auto';
+    } else {
+      panel.style.top = `${t.bottom}px`;
+      panel.style.bottom = 'auto';
+    }
   }
 
   function toggle() {
@@ -230,13 +275,26 @@
   }
 
   function onResize() { if (open) place(); }
+  // Las coordenadas de `fixed` quedan congeladas en el momento en que corrió
+  // `place()` — el panel ya no viaja con el scroll como lo hacía el viejo
+  // `position: absolute`. Sólo se conecta cuando `popover` está en juego: el
+  // camino de respaldo nunca movió el punto de referencia con el scroll y no
+  // necesita esto.
+  function onScroll() { if (open) place(); }
 
   $: if (typeof document !== 'undefined') {
     document.removeEventListener('pointerdown', onOutside, true);
     window.removeEventListener('resize', onResize);
+    document.removeEventListener('scroll', onScroll, true);
     if (open) {
       document.addEventListener('pointerdown', onOutside, true);
       window.addEventListener('resize', onResize);
+      // En captura, no en burbuja: el scroll de un contenedor interno nunca
+      // llega a `document` burbujeando —`scroll` no burbujea— así que sólo un
+      // listener en el camino DE BAJADA desde `document` lo escucha.
+      // `passive: true` porque esto nunca llama `preventDefault()` y el
+      // navegador no tiene por qué esperar a confirmarlo.
+      if (supportsPopover) document.addEventListener('scroll', onScroll, { capture: true, passive: true });
     }
   }
 
@@ -244,6 +302,7 @@
     if (typeof document === 'undefined') return;
     document.removeEventListener('pointerdown', onOutside, true);
     window.removeEventListener('resize', onResize);
+    document.removeEventListener('scroll', onScroll, true);
   });
 </script>
 
@@ -298,6 +357,8 @@
     <div
       class="panel {align}"
       class:up
+      class:fx={supportsPopover}
+      popover={supportsPopover ? 'manual' : undefined}
       id={pid}
       role="menu"
       aria-label={label}
@@ -366,10 +427,46 @@
     max-height: min(60vh, 26rem);
     overflow-y: auto;
     overscroll-behavior: contain;
+    /* Seis declaraciones que acá no hacen nada y en `.fx` lo hacen todo: el
+       atributo `popover` (más abajo) trae su propia hoja de estilos —
+       `[popover] { margin: auto; border: solid; overflow: auto; width:
+       fit-content; height: fit-content; ...}` — activa apenas el atributo
+       está escrito, esté abierto o no. Todo lo demás en esta regla ya tiene
+       un valor propio; sin estas seis, el panel con `popover` se llevaría un
+       borde de ~3px que nadie pidió, una caja que `margin: auto` encoge en
+       vez de dejar en su sitio, y un `overflow-x` que este menú nunca usó.
+       Nada de esto es estilo nuevo: es lo que el `<div>` ya tenía, repetido
+       para que `popover` no lo pueda pisar — la misma jugada que Sheet hace. */
+    margin: 0;
+    border: 0;
+    color: inherit;
+    width: auto;
+    height: auto;
+    overflow-x: visible;
   }
   .panel.start { inset-inline-start: 0; }
   .panel.end { inset-inline-end: 0; }
   .panel.up { top: auto; bottom: calc(100% + var(--sx-s-1)); }
+
+  /* Con `popover`, `top: calc(100% + …)` deja de leer nada — no hay ancestro
+     posicionado del que sea el 100%. `.fx` cambia a `position: fixed` con
+     `right`/`bottom` neutralizados (si no, el `inset: 0` de la hoja de estilos
+     del navegador para `[popover]` deja el panel también pegado al borde
+     derecho, en tensión con el `left` que `place()` escribe). `place()` fija
+     `left`/`top`/`bottom` en línea; el margen sigue siendo el mismo
+     `var(--sx-s-1)` de siempre, en CSS, sólo que ahora del lado de `margin`
+     en vez de sumado dentro del `calc()` de `top`. El ancho mínimo sí necesita
+     una custom property: `--sx-menu-tw` es el ancho del disparador medido por
+     `place()`, y `max()` decide entre ése y el piso de 22ch exactamente como
+     antes decidía entre el 100% (relativo al disparador) y 22ch. */
+  .panel.fx {
+    position: fixed;
+    right: auto;
+    bottom: auto;
+    margin-top: var(--sx-s-1);
+    min-width: max(var(--sx-menu-tw, 0px), 22ch);
+  }
+  .panel.fx.up { margin-top: 0; margin-bottom: var(--sx-s-1); }
 
   .item {
     display: flex;
