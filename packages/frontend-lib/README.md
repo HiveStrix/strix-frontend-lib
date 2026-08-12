@@ -524,12 +524,42 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   que un color exista con el contraste que promete, no que la tabla, el panel o el formulario se
   vean bien.
 
+### Resuelto
+
+- **`Menu`, `Sheet`, `Tooltip` y `Combobox` ya no dependen de que su ancestro se porte bien.**
+  Esta sección decía que un ancestro con `overflow: hidden` recorta el menú, uno con `transform`
+  atrapa el cajón, y que no había arreglo sin romper el shadow root. Sí había arreglo, y no era
+  subir un `z-index`: un `z-index` sólo compite DENTRO de su propio contexto de apilado, así que
+  ninguno de los dos casos se le movía un pelo. El arreglo es otra capa. El atributo `popover`
+  (Chrome 114+, Safari 17+, Firefox 125+) pone al elemento en la **top layer**, por encima de todo
+  el documento y fuera de cualquier contexto de apilado o recorte, sin mover el nodo del lugar
+  donde el marcado lo escribió — así que sigue funcionando dentro de un shadow root. Portalear a
+  `document.body` seguía sin ser una opción, y con esto dejó de hacer falta.
+- **Los cuatro usan `popover="manual"`, nunca `auto`.** `auto` trae su propio cierre por Escape,
+  clic afuera y descarte automático al abrirse otro popover — y los cuatro componentes ya tenían
+  las tres cosas, con su propio manejo de foco y de `aria-expanded`, escrito con el cuidado de
+  `composedPath()` en shadow root que la versión del navegador no conoce. Con `auto` cada cierre
+  hubiera corrido dos veces, una por el navegador y otra por el componente, sin que el orden entre
+  las dos esté garantizado. `manual` da la top layer y nada más, que es lo único que hacía falta.
+- **La consecuencia real fue la posición, no el atributo.** Un elemento en la top layer deja de
+  estar posicionado contra su ancestro: `Menu`, `Tooltip` y `Combobox` medían con
+  `position: absolute` contra un contenedor `relative`, y eso dejó de valer. Los tres pasaron a
+  `position: fixed` con coordenadas calculadas a mano desde `getBoundingClientRect()` del
+  disparador, recalculadas ante `scroll` —en captura, para oír también el de un contenedor
+  interno con su propio scroll— y `resize` mientras están abiertos, con los listeners dados de
+  baja al cerrar. `Sheet` no necesitó nada de esto: ya era `position: fixed; inset: 0`, y sólo le
+  hacía falta el atributo para escapar de un ancestro transformado.
+- **Dónde `popover` no existe, los cuatro caen en exactamente lo que hacían antes** — recortados
+  por `overflow: hidden`, atrapados por `transform` — nunca en un estado a medias donde el
+  atributo esté puesto pero la posición no lo acompañe, o al revés: `position: fixed` sin que el
+  elemento esté de verdad en la top layer deja el popup pegado en la esquina del viewport, que es
+  el mismo bug con otra cara. Los dos caminos leen la misma constante de soporte,
+  `shell/toplayer.js`, detectada una sola vez con
+  `typeof HTMLElement.prototype.showPopover === 'function'`.
+
 ### Sin resolver
 
 - **No hay un `Toast` global.** El componente es la *región* y hay que montarlo una vez en la raíz
   del producto y alimentarle la lista. No hay un store que lo haga; eso es del producto.
-- **`Menu` y `Sheet` no portalean**, así que un ancestro con `overflow: hidden` recorta el menú y
-  un ancestro con `transform` atrapa el cajón. Está documentado en cada archivo y no hay arreglo
-  posible sin romper el shadow root.
 - **`ShortcutOverlay` usa `::backdrop`**, que no hereda de `:host`. Adentro de un Core hay que
   ligar `--sx-scrim` también en `:root`, o se queda con el color de reserva.
