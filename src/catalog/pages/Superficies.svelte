@@ -698,7 +698,7 @@
       <section id="glyph">
         <h2>Glyph</h2>
         <p class="why">
-          Veintitrés dibujos, hechos <em>a</em> 16&nbsp;px, que es el tamaño al que se usan. Un
+          Veinticuatro dibujos, hechos <em>a</em> 16&nbsp;px, que es el tamaño al que se usan. Un
           juego prestado se dibuja en una grilla de 24 y después se escala: a 16&nbsp;px eso es un
           dibujo de 24 al 67&nbsp;%, los trazos se caen de la grilla de píxeles y el juego que se
           veía nítido en el README se ve embarrado en el monitor de ₡90&nbsp;000 de la oficina del

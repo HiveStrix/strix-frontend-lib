@@ -49,7 +49,7 @@
       dir: 'shell',
       count: 10,
       component: Superficies,
-      says: 'Dónde se apoya todo. La tarjeta, el panel, la banda hundida, el aire entre las cosas, el cajón lateral y los veintitrés íconos. Nada de esto dice nada — para que lo que sí dice algo sea lo único con opinión en la pantalla.'
+      says: 'Dónde se apoya todo. La tarjeta, el panel, la banda hundida, el aire entre las cosas, el cajón lateral y los veinticuatro íconos. Nada de esto dice nada — para que lo que sí dice algo sea lo único con opinión en la pantalla.'
     },
     {
       id: 'acciones',

@@ -80,6 +80,14 @@
   // the precedent (`toplayer.js`, `supportsPopover`) this is following. Both
   // `@media` blocks read 560px; if one ever changes without the other, the
   // result is a button that opens nothing or a drawer nothing can reach.
+  //
+  // `open` — OPTIONAL, ONLY FOR `aria-expanded`. The button already says
+  // `aria-haspopup="dialog"` without it; `open` is the SAME variable already
+  // bound to `Sidebar`'s own `open` (see above), passed a second time so the
+  // trigger can say truthfully whether the thing it opens is open. Omitting
+  // it does not break anything — `aria-expanded` just stays `false` — so a
+  // product in a hurry gets a correct button, and one that finishes the
+  // wiring gets a more honest one.
   import { createEventDispatcher } from 'svelte';
   import Glyph from '../shell/Glyph.svelte';
 
@@ -94,6 +102,9 @@
   /** This bar sits above a phone-drawer `Sidebar` — show its trigger below
    *  560px and dispatch `on:menu` when it is pressed. See the note above. */
   export let nav = false;
+  /** Mirrors `Sidebar`'s own `open`, only to feed `aria-expanded` — see the
+   *  note above. Not required for the button to work. */
+  export let open = false;
 
   const dispatch = createEventDispatcher();
 
@@ -111,6 +122,8 @@
       type="button"
       class="menu"
       aria-label="Abrir navegación"
+      aria-haspopup="dialog"
+      aria-expanded={open}
       data-phone-break="560"
       on:click={() => dispatch('menu')}
     >

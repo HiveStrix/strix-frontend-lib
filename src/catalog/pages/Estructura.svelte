@@ -280,7 +280,7 @@
                TopBar real encima —&nbsp;no un mockup— porque el disparador
                del cajón de teléfono vive ahí; ver la nota después del demo. -->
           <div class="shellframe col">
-            <TopBar product="Strix" nav on:menu={() => (navOpen = true)} />
+            <TopBar product="Strix" nav open={navOpen} on:menu={() => (navOpen = true)} />
             <div class="shellrow">
               <Sidebar items={modulos} bind:value={modulo} label="Módulos" bind:collapsed={moduloAncho} bind:open={navOpen} />
               <div class="shellbody">
