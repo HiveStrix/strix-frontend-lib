@@ -754,3 +754,17 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
   del producto y alimentarle la lista. No hay un store que lo haga; eso es del producto.
 - **`ShortcutOverlay` usa `::backdrop`**, que no hereda de `:host`. Adentro de un Core hay que
   ligar `--sx-scrim` también en `:root`, o se queda con el color de reserva.
+
+---
+
+## Licencia
+
+**© 2026 HiveStrix. Todos los derechos reservados.** Ver [`LICENSE`](LICENSE).
+
+Este repositorio es **público solo para referencia y transparencia**. Que el código
+sea visible **no** lo pone en dominio público ni otorga permiso para usarlo:
+fuera de HiveStrix y de los productos de su ecosistema, no se concede derecho a
+copiar, modificar ni distribuir esta librería sin permiso escrito.
+
+Los repos del ecosistema la consumen como dependencia pública de git —
+`github:hivestrix/strix-frontend-lib#vX`— sin deploy keys ni tokens.
