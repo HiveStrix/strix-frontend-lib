@@ -431,6 +431,37 @@ mano** — las dos formas salen de un solo origen justamente para que no puedan 
 | Portalear a `document.body` | El nodo sale del shadow root y pierde estilos y tokens | `Sheet`, `Menu`, `Tooltip` y `Combobox` **no** portalean. Donde el navegador soporta `popover`, escapan del recorte y del atrapamiento por la top layer en vez de portalear — ver *Resuelto*, más abajo. Donde no, caen en el costo de antes (recortados por `overflow: hidden`, atrapados por `transform`), documentado en `shell/toplayer.js` y en cada archivo |
 | `::backdrop` | No hereda de `:host` | `ShortcutOverlay` lleva un color de reserva |
 
+### Servir el bundle de un Core: el caché del borde no perdona el silencio
+
+Esto no es código de esta librería — la librería no sirve nada — pero es la trampa que espera a
+**todo** Core que la consuma, y ya cobró una vez (strix-expenses, 2026-08-17): un deploy en verde,
+el pod sirviendo la UI nueva, y el navegador mostrando la vieja durante cuatro horas.
+
+La mecánica, en abstracto:
+
+1. **El nombre del bundle es fijo por contrato.** El catálogo de la Shell apunta a
+   `/ui/<core>-app.js`; el cache-busting por nombre (`app.3f2a1c.js`) no está disponible sin
+   convertir cada deploy en una actualización del catálogo.
+2. **Un file server sobre assets embebidos no dice nada de caché.** Los archivos embebidos en el
+   binario tienen modtime cero: sin `Last-Modified`, sin `ETag`, sin `Cache-Control` — a menos que
+   alguien los escriba a mano.
+3. **Ante ese silencio, el borde decide solo.** Cloudflare cachea `.js` por defecto durante horas
+   cuando el origen no dice nada. La combinación de (1) + (2) + (3) es un deploy invisible hasta
+   que expire un TTL que nadie eligió.
+
+La salida es **revalidación, no «no cachear»**, y son dos headers en el handler que sirve el
+bundle, en el lenguaje que sea:
+
+- **`Cache-Control: no-cache`** — «servime del caché solo después de revalidar». El borde lo
+  respeta por encima de su default.
+- **`ETag` por hash del contenido** (calculado una vez al arrancar: el bundle embebido no cambia
+  en vida del proceso), más **`304 Not Modified`** cuando el `If-None-Match` del cliente trae el
+  hash vigente.
+
+Cada request cuesta a lo sumo un 304 sin cuerpo; en cuanto un deploy cambia el bundle, cambia el
+ETag y la UI nueva es lo que se sirve — al instante, no en cuatro horas. La implementación de
+referencia vive en `strix-expenses/internal/server/ui.go`; copiala al levantar el siguiente Core.
+
 ---
 
 ## Ligar el acento
