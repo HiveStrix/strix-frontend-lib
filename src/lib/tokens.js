@@ -19,23 +19,85 @@
 // file is written from THIS object at build time — never edit tokens.css by
 // hand; edit `TOKENS` and run `npm run tokens`.
 
+// ─────────────────────────────────────────────────────────────────────────
+// EL CROMO SE PRECOMPUTA EN JS, NO SE MEZCLA EN CSS. Hasta la v0.7.0 la rampa
+// se escribía como `color-mix(in srgb, var(--sx-chrome-tint) N%, base)` y la
+// perilla re-tintaba todo en runtime. Se cambió por un defecto REAL y
+// verificado, no por gusto: Chromium rasteriza un mismo color-mix de forma
+// DISTINTA según la capa compuesta en que caiga — el ground pintaba lila
+// donde un stacking context (el z-index de PageHeader) forzaba su propia
+// capa, y BLANCO plano en la capa base; en oscuro, el fondo de un botón
+// outline (--sx-surface → n-800, otro color-mix) salía blanco brillante.
+// Computed styles correctos, paint inconsistente — la misma familia del
+// defecto de container-type+sticky que TopBar ya corrigió. Un hex literal
+// pinta igual en todas las capas, siempre.
+//
+// LA PERILLA NO MURIÓ: CAMBIÓ DE FORMA. `--sx-chrome-tint` sigue declarada
+// (informativa), pero re-ligarla ya no re-tinta la rampa. Un producto que
+// quiera otra traza llama `chromeRamp(tint)` / `chromeRampDark(tint)` y pisa
+// en su raíz los peldaños que estas funciones devuelven — una decisión, un
+// lugar, mismo resultado, sin el color-mix roto. Los derivados del ACENTO
+// (--sx-accent-soft/pick/edge, --sx-halo) siguen siendo color-mix: el acento
+// es del producto y no se puede precomputar acá; pintan estados chicos donde
+// el artefacto de capas no se manifestó.
+// ─────────────────────────────────────────────────────────────────────────
+
+const TINT = '#6541BE';
+
+const rgbOf = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+/** La misma aritmética que color-mix(in srgb): lerp sobre los canales sRGB. */
+export const mixHex = (a, pct, b) => {
+  const A = rgbOf(a), B = rgbOf(b), p = pct / 100;
+  return '#' + A.map((c, i) => Math.round(c * p + B[i] * (1 - p)).toString(16).padStart(2, '0').toUpperCase()).join('');
+};
+
+// La receta del cromo, UNA vez: peldaño → [porcentaje de traza, base].
+export const CHROME_RECIPES = {
+  light: {
+    '--sx-n-50': [4, '#FAFAFB'], '--sx-n-100': [5, '#F4F4F6'], '--sx-n-150': [6, '#EDEDF0'],
+    '--sx-n-200': [8, '#DDDDE2'], '--sx-n-300': [8, '#BBBBC2'], '--sx-n-400': [8, '#7A7A7F'],
+    '--sx-n-500': [8, '#5E5E64'], '--sx-n-700': [8, '#414146'], '--sx-n-800': [8, '#27272B'],
+    '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [6, '#FFFFFF'], '--sx-thead': [6, '#FFFFFF']
+  },
+  dark: {
+    '--sx-sunk': [8, '#1B1F22'], '--sx-line': [8, '#2C3134'], '--sx-ink': [4, '#EDEFF0'],
+    '--sx-ink-2': [6, '#CED2D4'], '--sx-accent-edge': [8, '#3A3F43']
+  }
+};
+
+const rampOf = (tint, recipes) =>
+  Object.fromEntries(Object.entries(recipes).map(([k, [p, base]]) => [k, mixHex(tint, p, base)]));
+
+/** Los peldaños del cromo claro para una traza dada — lo que un producto pisa
+ *  en su raíz si no quiere el morado. Incluye la perilla informativa. */
+export const chromeRamp = (tint) => ({ '--sx-chrome-tint': tint, ...rampOf(tint, CHROME_RECIPES.light) });
+
+/** La mitad oscura. El thead oscuro deriva de la superficie (n-800 de la
+ *  misma traza), así que se recomputa acá con la receta completa. */
+export const chromeRampDark = (tint) => ({
+  ...rampOf(tint, CHROME_RECIPES.dark),
+  '--sx-thead': mixHex('#FFFFFF', 10, mixHex(tint, 8, '#27272B'))
+});
+
+const CHROME = chromeRamp(TINT);
+const CHROME_DARK = chromeRampDark(TINT);
+
 /** The light theme: role tokens, tones, and the scales. */
 export const TOKENS = {
-  // LA PERILLA DEL CROMO. Es un COLOR y no un porcentaje, a propósito: ligarla a
-  // un neutro devuelve grises puros, así que un core que no quiera la traza
-  // violeta cambia UNA propiedad y no once. Su valor por defecto es el morado de
-  // Nácar.
-  '--sx-chrome-tint': '#6541BE',
+  // LA PERILLA DEL CROMO, ahora INFORMATIVA: declara qué traza lleva la rampa,
+  // pero re-ligarla ya no re-tinta nada — ver el banner de arriba. Quien quiera
+  // otra traza usa chromeRamp()/chromeRampDark().
+  '--sx-chrome-tint': TINT,
 
   // La rampa: neutros con una traza de la perilla. No es "gris teñido de marca"
   // — la traza es del 4 al 8 %, que afina sin leerse como color. Un gris puro al
   // lado de un acento morado se lee verdoso; eso es lo que corrige.
   '--sx-n-0': '#FFFFFF',
-  '--sx-n-50': 'color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB)',
-  '--sx-n-100': 'color-mix(in srgb, var(--sx-chrome-tint) 5%, #F4F4F6)',
-  '--sx-n-150': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #EDEDF0)',
-  '--sx-n-200': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #DDDDE2)',
-  '--sx-n-300': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #BBBBC2)',
+  '--sx-n-50': CHROME['--sx-n-50'],
+  '--sx-n-100': CHROME['--sx-n-100'],
+  '--sx-n-150': CHROME['--sx-n-150'],
+  '--sx-n-200': CHROME['--sx-n-200'],
+  '--sx-n-300': CHROME['--sx-n-300'],
   // n-400 es donde aterriza --sx-edge, el borde de un control.
   //
   // SU BASE SE OSCURECIÓ DE #8E8E93 A #828287, y la razón es que un borde tiene
@@ -57,7 +119,7 @@ export const TOKENS = {
   // debajo suyo. Con --sx-accent-pick (18 %) como fondo, la base #828287 daba
   // 3.05 morado / 2.86 gris. #7A7A7F da 3.38 / 3.16, y contra blanco sube de
   // 4.03 a 4.47.
-  '--sx-n-400': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #7A7A7F)',
+  '--sx-n-400': CHROME['--sx-n-400'],
   // N-500 ES DONDE ATERRIZA --sx-ink-3, no --sx-neutral: --sx-neutral se fijó
   // a hex (ver el bloque de tonos, más abajo) y ya no toca la rampa — el único
   // consumidor de este peldaño hoy es --sx-ink-3, contra --sx-surface,
@@ -67,10 +129,10 @@ export const TOKENS = {
   //
   // También se oscurece por --sx-accent-pick: sobre ese relleno, la base #66666C
   // daba 4.42 morado / 4.12 gris, por debajo de AA. #5E5E64 da 4.94 / 4.60.
-  '--sx-n-500': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #5E5E64)',
-  '--sx-n-700': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #414146)',
-  '--sx-n-800': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #27272B)',
-  '--sx-n-900': 'color-mix(in srgb, var(--sx-chrome-tint) 7%, #1B1B1E)',
+  '--sx-n-500': CHROME['--sx-n-500'],
+  '--sx-n-700': CHROME['--sx-n-700'],
+  '--sx-n-800': CHROME['--sx-n-800'],
+  '--sx-n-900': CHROME['--sx-n-900'],
 
   // Los roles: qué es cada cosa, no de qué color es. Un producto que necesita
   // mover UNA cosa pisa el rol; uno que necesita mover todo lo que dependa de un
@@ -94,7 +156,7 @@ export const TOKENS = {
   // se consideren distinguibles. El arreglo cumplía a ojo y no cumplía su propia
   // regla. Con la perilla en gris ni el 5 % llega (1.049): 6 % es el mínimo que
   // pasa en las dos configuraciones.
-  '--sx-ground': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF)',
+  '--sx-ground': CHROME['--sx-ground'],
   '--sx-surface': 'var(--sx-n-0)',
   '--sx-sunk': 'var(--sx-n-50)',
   // --sx-line separa filas y cierra cabeceras: es AMBIENTE y puede ser tenue.
@@ -116,7 +178,7 @@ export const TOKENS = {
   // (explore, [data-d='AD']); en blanco, tres piezas dejaron de existir: el pie
   // del panel quedaba blanco sobre una tarjeta blanca, la declaración de .head
   // era un no-op, y la cabecera de tabla no se separaba de sus filas.
-  '--sx-thead': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF)',
+  '--sx-thead': CHROME['--sx-thead'],
   // EL RESPLANDOR DE LAS SUPERFICIES, APAGADO POR DEFECTO. Es una perilla, no
   // un efecto: en 0 no dibuja nada y el sistema se comporta como siempre. Un
   // producto que quiera que sus tarjetas, paneles y pozos irradien sube este
@@ -294,8 +356,8 @@ export const TOKENS_DARK = {
   // resto del sistema lleva, y por eso el oscuro se leía de otra familia que
   // el claro. `--sx-edge` sobre `--sx-sunk` sigue en el contrato duro
   // (piso 3.0) y aguanta de sobra: 5.68 morado / 5.35 gris.
-  '--sx-sunk': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #1B1F22)',
-  '--sx-line': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #2C3134)',
+  '--sx-sunk': CHROME_DARK['--sx-sunk'],
+  '--sx-line': CHROME_DARK['--sx-line'],
   // FIJADO A HEX, y no a un peldaño de la rampa, por la misma razón que
   // --sx-ink-3 más abajo: un borde tiene DOS LADOS y los tres fondos posibles
   // debajo suyo (superficie, hover, selección) mandan el peor caso. Medido
@@ -315,7 +377,7 @@ export const TOKENS_DARK = {
   // más liviana). Sigue dando 11.6:1 / 11.1:1 (morado/gris) contra
   // --sx-surface, muy por encima del piso de 4.5: había margen de sobra para
   // ganar coherencia sin arriesgar nada del contrato.
-  '--sx-ink': 'color-mix(in srgb, var(--sx-chrome-tint) 4%, #EDEFF0)',
+  '--sx-ink': CHROME_DARK['--sx-ink'],
   // RETINTADO con la traza de --sx-chrome-tint al 6%. Es el que menos margen
   // tenía de los cinco hex fríos —está en el contrato duro contra tres
   // fondos, no sólo contra la superficie— así que se verificó el peor caso
@@ -337,7 +399,7 @@ export const TOKENS_DARK = {
   // --sx-accent-soft, 8.63 / 8.38 contra --sx-surface — todos con más margen
   // que antes, porque un texto más claro sobre un fondo oscuro siempre da
   // más contraste, nunca menos.
-  '--sx-ink-2': 'color-mix(in srgb, var(--sx-chrome-tint) 6%, #CED2D4)',
+  '--sx-ink-2': CHROME_DARK['--sx-ink-2'],
   // SUBIÓ DE #8E9498 A #BEBDC1. El valor viejo pasaba sobre --sx-surface
   // (4.62) pero fallaba sobre los dos estados que --sx-accent-pick y
   // --sx-accent-soft producen una vez que esos dos dejan de heredar del claro
@@ -386,11 +448,11 @@ export const TOKENS_DARK = {
   // tabla, cabecera de panel y pie de panel — el ajuste más chico que cierra
   // el hueco.
   //
-  // Se deriva de --sx-surface en vez de fijarse a hex porque no hay ningún
-  // peldaño de otro tema tirando de él — es una banda nueva, no algo heredado
-  // de la dirección vieja — así que puede seguir a la superficie si el gris de
-  // base se recalibra.
-  '--sx-thead': 'color-mix(in srgb, #FFFFFF 10%, var(--sx-surface))',
+  // Se deriva de la superficie (n-800 de la misma traza) en vez de fijarse a
+  // un hex suelto — la derivación vive en chromeRampDark(), precomputada por
+  // el banner de arriba, así que sigue a la receta de la superficie si el
+  // gris de base se recalibra.
+  '--sx-thead': CHROME_DARK['--sx-thead'],
   // LA FIRMA, en oscuro. Sigue resolviendo `var(--sx-accent)`, así que cuando
   // el acento se movió de casi-blanco a lavanda (ver --sx-accent abajo) este
   // token heredó el cambio sin tocarse — es justo el punto de que sea una
@@ -468,7 +530,7 @@ export const TOKENS_DARK = {
   // (ChoiceCards.svelte) y como raya divisoria (SplitButton.svelte), ninguno
   // de los dos es lo que identifica el componente— así que no hay piso que
   // verificar; el retinte es coherencia de familia, no una comprobación.
-  '--sx-accent-edge': 'color-mix(in srgb, var(--sx-chrome-tint) 8%, #3A3F43)',
+  '--sx-accent-edge': CHROME_DARK['--sx-accent-edge'],
   // The bands invert to low-chroma fills: a pale band with dark text does not
   // survive being dropped onto a dark ground.
   '--sx-positive': '#8FCB9B', '--sx-positive-band': '#1D2C21', '--sx-positive-edge': '#2E4436',

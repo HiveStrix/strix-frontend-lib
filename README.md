@@ -170,9 +170,11 @@ problema:
 2. **Afinarlo** — se mueve una perilla:
    ```css
    --sx-accent: #B45309;
-   --sx-chrome-tint: #8E8E93;   /* grises neutros en vez de la traza violeta */
    --sx-halo: transparent;      /* sin la firma de luz en la barra */
    ```
+   La traza del cromo ya no se mueve por custom property (ver la perilla abajo):
+   quien quiera grises neutros pisa los peldaños que devuelven
+   `chromeRamp('#8E8E93')` / `chromeRampDark('#8E8E93')` — de `@strix/frontend-lib/tokens`.
    `--sx-thead` no entra en esta lista: no hay un valor de una sola línea que
    dé «encabezados con relleno» y sea seguro en los dos temas — ver la nota
    junto a `--sx-thead` más abajo.
@@ -187,12 +189,20 @@ Los tres niveles son custom properties: funcionan igual en el Shell (luz DOM) y 
 
 ### Las tres perillas
 
-- **`--sx-chrome-tint`.** Es un color, no un porcentaje: el que se mezcla en cada peldaño de la
-  rampa neutra salvo el más claro (`color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB)` en
-  `--sx-n-50`, hasta un 8 % en los intermedios — `--sx-n-0` es `#FFFFFF` fijo, sin mezcla: es el
-  blanco de la superficie, no un lugar para una traza). Por default vale el mismo morado que
-  `--sx-accent`, `#6541BE`. Un core que no quiera la traza violeta liga esta única propiedad a un
-  gris y las diez primitivas restantes se destiñen de una vez, no una por una.
+- **`--sx-chrome-tint`.** Es un color, no un porcentaje: la traza que lleva cada peldaño de la
+  rampa neutra salvo el más claro (4 % en `--sx-n-50`, hasta un 8 % en los intermedios —
+  `--sx-n-0` es `#FFFFFF` fijo, sin mezcla). Por default vale el mismo morado que `--sx-accent`,
+  `#6541BE`. **Desde v0.7.1 la rampa viaja PRECOMPUTADA a hex y esta propiedad es informativa**:
+  re-ligarla ya no destiñe nada. El motivo es un defecto real y verificado, no una preferencia —
+  Chromium rasteriza un mismo `color-mix()` de forma distinta según la capa compuesta en que
+  caiga (el ground pintaba lila bajo el stacking context de un PageHeader y blanco plano en la
+  capa base; un botón outline en oscuro salía blanco brillante), con computed styles correctos y
+  paint inconsistente. Un hex literal pinta igual en todas las capas. La perilla cambió de forma,
+  no de promesa: `chromeRamp(tint)` y `chromeRampDark(tint)` (exportadas desde
+  `@strix/frontend-lib/tokens`) devuelven los peldaños recalculados para pisarlos en la raíz del
+  producto — una decisión, un lugar. Los derivados del ACENTO (`--sx-accent-soft/pick/edge`,
+  `--sx-halo`) siguen siendo `color-mix` en runtime: el acento es del producto y pinta estados
+  chicos donde el artefacto no se manifestó.
 - **`--sx-thead`.** El fondo de encabezado, de tabla y de panel a la vez. Está separado de
   `--sx-sunk` a propósito: `--sx-sunk` también pinta los controles de formulario, así que si
   compartieran token, cambiarle el color al encabezado le cambiaba el color a los inputs de paso.
