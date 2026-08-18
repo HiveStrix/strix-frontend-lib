@@ -49,12 +49,27 @@
   // WHEN NOT TO USE IT: for a control that is its own label — a Switch in a
   // settings row, a Checkbox with its text beside it. Those carry their own
   // label and a Field around them would name the same thing twice.
+  //
+  // POR QUÉ ESTE ARCHIVO IMPORTA DE `shell`. `Field` no importaba de otra
+  // familia; `hintDot` agrega la primera arista, hacia `shell/InfoDot.svelte`.
+  // Es deliberada y de la misma clase que las que `nav` ya documenta: InfoDot
+  // (como Tooltip) es una «reparación» compartida, la pieza que premia una
+  // etiqueta escueta guardando su explicación en un ⓘ en vez de un párrafo.
+  // Un formulario es precisamente donde vive la prosa que este sistema quiere
+  // achicar, así que la ayuda del campo pudiendo ser un punto es exactamente
+  // lo que corresponde reusar acá, no reimplementar.
   import { createEventDispatcher } from 'svelte';
+  import InfoDot from '../shell/InfoDot.svelte';
 
   /** The name of the answer. Sentence case, no colon — the box is the colon. */
   export let label = '';
   /** What the field will accept, said BEFORE it is filled. Never the error. */
   export let hint = '';
+  /** Colapsa `hint` en un ⓘ junto a la etiqueta, en vez de un párrafo bajo
+   *  ella — premia una etiqueta escueta sin perder la ayuda. Sólo aplica si
+   *  hay `label`; sin etiqueta a la que pegarse, `hint` cae al párrafo de
+   *  siempre y esta prop no hace nada. */
+  export let hintDot = false;
   /** The problem, in the person's words. «El código ya lo tiene BAT004.» */
   export let error = '';
   /** The recovery, in the same breath. Without this an error is half the help. */
@@ -100,31 +115,45 @@
 
   $: invalid = !!error;
   $: message = error || warning;
+  // `hintDot` sólo se activa con una etiqueta a la que pegar el punto; sin
+  // ella, la ayuda vuelve al párrafo inline (y a `aria-describedby`). Cuando el
+  // punto SÍ se muestra, la explicación la carga el InfoDot —su propio tooltip
+  // la pone como descripción de su botón—, así que el párrafo no se dibuja y no
+  // hay `hintId` al que apuntar: el input queda escueto y la ayuda vive a un
+  // gesto, en el ⓘ de al lado, que es el objetivo de la prop.
+  $: showHintDot = !!(hint && hintDot && label);
+  $: showInlineHint = !!(hint && !showHintDot);
   // undefined, never '': an empty aria-describedby points at nothing and some
   // screen readers read the field name twice trying.
   $: describedBy =
-    [hint && hintId, message && msgId, origin && originId].filter(Boolean).join(' ') || undefined;
+    [showInlineHint && hintId, message && msgId, origin && originId].filter(Boolean).join(' ') || undefined;
 </script>
 
 <div class="field" class:disabled class:no-frame={!frame}>
   {#if label}
     <div class="head">
-      <svelte:element
-        this={group ? 'span' : 'label'}
-        class="lbl sx-cap"
-        class:tap={!group}
-        id={labelId}
-        for={group ? undefined : fid}
-      >
-        {label}
-        {#if required}<span class="req" aria-hidden="true">*</span><span class="sr">, obligatorio</span>{/if}
-        {#if optional && !required}<span class="opt">opcional</span>{/if}
-      </svelte:element>
+      <span class="lblwrap">
+        <svelte:element
+          this={group ? 'span' : 'label'}
+          class="lbl sx-cap"
+          class:tap={!group}
+          id={labelId}
+          for={group ? undefined : fid}
+        >
+          {label}
+          {#if required}<span class="req" aria-hidden="true">*</span><span class="sr">, obligatorio</span>{/if}
+          {#if optional && !required}<span class="opt">opcional</span>{/if}
+        </svelte:element>
+        <!-- El punto va FUERA del <label>, como hermano: un control interactivo
+             dentro de un <label> hereda su clic (tocar el punto activaría el
+             campo). Junto a la etiqueta, no adentro. -->
+        {#if showHintDot}<InfoDot text={hint} label={`Más información: ${label}`} />{/if}
+      </span>
       {#if $$slots.action}<span class="act"><slot name="action" /></span>{/if}
     </div>
   {/if}
 
-  {#if hint}<p class="hint" id={hintId}>{hint}</p>{/if}
+  {#if showInlineHint}<p class="hint" id={hintId}>{hint}</p>{/if}
 
   <!-- `id` is the COMPUTED one, never the raw prop: a caller that passed nothing
        must still get a real id, and every consumer writes `let:id`. -->
@@ -188,6 +217,10 @@
   /* The caption register, one shade darker than a caption. A label on a chart is
      read once; a label on a field is read while somebody is deciding what to
      type into it, and ink-3 at 11px is not enough contrast for that job. */
+  /* Etiqueta + su punto de ayuda, agrupados a la izquierda del `.head` para
+     que `justify-content: space-between` empuje sólo el slot de acción a la
+     derecha. El punto se centra con la mayúscula de la etiqueta. */
+  .lblwrap { display: inline-flex; align-items: center; gap: var(--sx-s-2); min-width: 0; }
   .lbl { display: inline-flex; align-items: baseline; gap: var(--sx-s-1); color: var(--sx-ink-2); min-width: 0; }
   .tap { cursor: pointer; }
   .field.disabled .lbl { color: var(--sx-ink-3); }

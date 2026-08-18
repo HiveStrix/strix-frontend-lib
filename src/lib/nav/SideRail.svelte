@@ -180,6 +180,18 @@
        one system with two floors instead of two different ideas. */
     width: calc(var(--sx-s-20) * 3);
     flex: none;
+    /* LLEGA AL FONDO, NO SE CORTA EN EL AIRE. Un carril desprendido que mide
+       sólo lo que miden sus ítems flota más corto que la columna de contenido
+       de al lado y se lee inacabado. Con `align-self: stretch` (el default de
+       una fila `align-items: stretch`) se estira a la altura de su columna;
+       `max-height: 100%` + `min-height: 0` dejan que, si un shell de altura
+       fija es más bajo que la lista, el desborde caiga DENTRO del carril (ver
+       `ul`, más abajo) en vez de empujar la fila. Donde el contenedor no fija
+       altura, la fila mide lo del hijo más alto y el carril nunca queda más
+       corto que su propio contenido: no se recorta ningún ítem. */
+    align-self: stretch;
+    max-height: 100%;
+    min-height: 0;
     padding: var(--sx-s-3);
     background: var(--sx-surface);
     border-radius: var(--sx-r-3);
@@ -189,7 +201,11 @@
 
   .tuck { width: var(--sx-s-16); }
 
-  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  /* La lista toma el alto que sobra y, sólo si un shell la aprieta, hace su
+     propio scroll — así el pie/toggle quedan fijos abajo cuando el carril se
+     estira, y una lista larga se desliza DENTRO del carril en vez de estirar
+     la pantalla. `min-height: 0` es lo que habilita ese scroll en un hijo flex. */
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
   .sect { padding: var(--sx-s-3) var(--sx-s-3) var(--sx-s-1); }
   .tuck .sect { padding-inline: 0; text-align: center; overflow: hidden; }

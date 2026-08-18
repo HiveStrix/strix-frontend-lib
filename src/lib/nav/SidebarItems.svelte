@@ -100,9 +100,16 @@
 </div>
 
 <style>
-  .items { display: flex; flex-direction: column; gap: var(--sx-s-2); min-width: 0; }
+  /* Crece para llenar el alto del carril desprendido (ver `.side` en
+     Sidebar.svelte): así el toggle de colapso, que vive DESPUÉS de esta pieza
+     en `Sidebar`, queda fijo abajo en vez de flotar a media altura con aire
+     muerto debajo. `min-height: 0` habilita el scroll interno de `ul`. */
+  .items { display: flex; flex-direction: column; gap: var(--sx-s-2); min-width: 0; flex: 1 1 auto; min-height: 0; }
 
-  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  /* La lista toma el alto sobrante y hace su propio scroll si un tenant tiene
+     más módulos de los que entran — el pie (`.foot`, `margin-top:auto`) sigue
+     abajo y nada empuja la pantalla. */
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
   .sect { padding: var(--sx-s-3) var(--sx-s-3) var(--sx-s-1); }
   .tuck .sect { padding-inline: 0; text-align: center; overflow: hidden; }

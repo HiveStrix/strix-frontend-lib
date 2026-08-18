@@ -12,7 +12,11 @@
 //   DataState  empty · filtered-to-nothing · error. Three different pieces of
 //              news that must never be written as one sentence.
 //   DataSkeleton  a placeholder with the shape of the answer.
+//   Schedule   los registros que tienen FECHA, leídos en el tiempo: un mes con
+//              sus eventos, o la agenda de lo que viene. No es el `Calendar`
+//              de `form` — ese elige una fecha; éste muestra lo que cae en ellas.
 export { default as Table } from './Table.svelte';
 export { default as DataList } from './DataList.svelte';
 export { default as DataState } from './DataState.svelte';
 export { default as DataSkeleton } from './DataSkeleton.svelte';
+export { default as Schedule } from './Schedule.svelte';

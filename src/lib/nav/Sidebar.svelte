@@ -24,24 +24,30 @@
   // `Sidebar` answers «¿en qué módulo estoy?»; `SideRail`, beside it, answers
   // «¿en qué sección del módulo estoy?». A tenant with three active modules
   // and a module with five sections needs BOTH on screen at once, and they
-  // have to read as two different kinds of thing or the screen reads as one
-  // long, confusing corridor of two rails.
+  // have to read as two clearly different rails — one narrow and icon-only,
+  // one wide with labelled sections — or the screen reads as one long,
+  // confusing corridor of two rails. (See point 1 below for how that
+  // distinction survives now that both float.)
   //
   // HOW THE TWO STAY OUT OF EACH OTHER'S WAY
   //
   // Three separate decisions, not one clever trick:
   //
-  //   1. DIFFERENT LAW OF SEPARATION. Card and PageHeader already wrote the
-  //      rule: a surface leaves its background by light, by line or by tone —
-  //      never by all three at once, or a screen has three ideas of what a
-  //      surface is. `SideRail` is CONTENT — it floats within the padded
-  //      column, so it separates the way content does, with light (`--sx-e-1`,
-  //      a card). `Sidebar` is FRAME — it is flush against the actual edge of
-  //      the screen, the same kind of object `TopBar` is, so it separates the
-  //      way frame does, with a line (`border-inline-end`, no shadow, no
-  //      radius on the edge that touches the glass). Even in a screenshot with
-  //      no words in it, a floating card and a flush panel do not read as the
-  //      same idea.
+  //   1. DOS CARRILES FLOTANTES, DISTINTOS POR ANCHO Y CONTENIDO. Este archivo
+  //      decía antes que los dos niveles se separaban por LEYES distintas —
+  //      `SideRail` como contenido (luz, una tarjeta) y `Sidebar` como marco
+  //      (una línea a ras del borde, sin radio ni sombra) — para que no se
+  //      leyeran como «un corredor». El pedido que originó esta revisión pidió
+  //      lo contrario: los DOS flotando, estilo Apple, tarjetas redondeadas
+  //      con márgenes, llegando al fondo. Así que ahora los dos son el MISMO
+  //      objeto flotante (radio grande, `--sx-e-1`), y lo que los mantiene sin
+  //      leerse como un solo pasillo es lo que este sistema YA usaba de todos
+  //      modos: `Sidebar` arranca colapsado a 64px de sólo íconos y `SideRail`
+  //      mide 240px con encabezados de sección. Un carril de íconos angosto
+  //      junto a uno ancho con etiquetas no se lee como el mismo control, aun
+  //      sin una palabra en pantalla. El margen que los despega del borde y
+  //      entre sí lo garantiza el layout del shell (ver el CONTRACT), no un
+  //      borde que cada carril se dibuje encima.
   //   2. COLLAPSED BY DEFAULT. A 240px rail beside another 240px rail is 480px
   //      before a single row of content — the exact corridor `SideRail`'s own
   //      header warns a SECOND full-height sidebar would build, one level up.
@@ -213,15 +219,28 @@
     /* Expanded, the same 240px SideRail uses — the two levels sharing one
        figure is what lets a person read them as one system. */
     width: calc(var(--sx-s-20) * 3);
-    height: 100%;
     flex: none;
+    /* CARRIL DESPRENDIDO, DE ALTURA COMPLETA — ver «DOS CARRILES FLOTANTES»
+       en la cabecera. Se estira a la altura de su columna (`align-self:
+       stretch`, el default de una fila `align-items: stretch`) para llegar al
+       fondo, y `max-height: 100%` + `min-height: 0` mandan cualquier desborde
+       a su propio scroll interno (la lista, en SidebarItems) en vez de
+       estirar la pantalla. El margen que lo separa del borde y del carril
+       vecino es trabajo del layout del shell, no de este componente: ver el
+       CONTRACT. */
+    align-self: stretch;
+    max-height: 100%;
+    min-height: 0;
     padding: var(--sx-s-3);
-    /* FRAME, NOT CONTENT — see «HOW THE TWO STAY OUT OF EACH OTHER'S WAY» in
-       the header. No radius, no shadow: a line on the one edge that borders
-       the content column is the whole separation, the same mechanism
-       PageHeader's `sarion` variant uses for the identical reason. */
+    /* TARJETA, COMO SIDERAIL. Antes era un marco a ras (una línea, sin radio)
+       para diferenciarse del carril-contenido de al lado; el pedido unificó
+       los dos al mismo objeto flotante y ahora se distinguen por lo que el
+       sistema YA usaba de todos modos — este arranca colapsado a 64px de sólo
+       íconos, SideRail mide 240px con encabezados de sección. Radio grande +
+       la elevación de tarjeta (`--sx-e-1`), la misma que SideRail. */
     background: var(--sx-surface);
-    border-inline-end: 1px solid var(--sx-line);
+    border-radius: var(--sx-r-3);
+    box-shadow: var(--sx-e-1);
     transition: width var(--sx-beat) var(--sx-ease);
   }
 
@@ -235,9 +254,13 @@
   .side.phone {
     width: 100%;
     height: auto;
+    max-height: none;
     padding: 0;
     background: none;
-    border-inline-end: 0;
+    /* Adentro del Sheet no es una tarjeta: es contenido del panel, que ya
+       trae su fondo, su radio y su elevación. Se resetean los tres. */
+    border-radius: 0;
+    box-shadow: none;
   }
 
   /* Oculto bajo PHONE_BREAK cuando `drawer` está prendido — la mitad de la

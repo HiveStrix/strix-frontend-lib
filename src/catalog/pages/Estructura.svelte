@@ -272,15 +272,23 @@
         </p>
 
         <div class="demo">
-          <!-- El marco exterior simula el borde real de la pantalla: Sidebar
-               vive a ras de ese borde, con su propia línea, nunca con una
-               sombra propia — la sombra de acá es del MARCO de la demo, no
-               del componente. SideRail, adentro, sigue flotando con luz
-               sobre el campo, como en su propia sección más abajo. Un
-               TopBar real encima —&nbsp;no un mockup— porque el disparador
-               del cajón de teléfono vive ahí; ver la nota después del demo. -->
+          <!-- El marco exterior simula el borde real de la pantalla. Adentro,
+               los TRES objetos flotan sobre el campo con el MISMO margen —
+               Sidebar (colapsado, sólo íconos), SideRail (ancho, con
+               secciones) y la Card de contenido—: tarjetas redondeadas que
+               llegan al fondo, el patrón «estilo Apple» que el layout del
+               shell garantiza (padding + gap parejos en `.shellrow`), no cada
+               componente por su cuenta. Un TopBar real encima —&nbsp;no un
+               mockup— porque el disparador del cajón de teléfono vive ahí;
+               ver la nota después del demo. -->
           <div class="shellframe col">
-            <TopBar product="Strix" nav open={navOpen} on:menu={() => (navOpen = true)} />
+            <TopBar product="Strix" tenant="Bodegas Opra" nav open={navOpen} on:menu={() => (navOpen = true)}>
+              <SearchField slot="search" placeholder="Buscar equipos, órdenes…" />
+              <Menu slot="session" label="Cuenta de María" align="end" compact items={cuenta}>
+                <span class="avatar" aria-hidden="true">M</span>
+                <span>María</span>
+              </Menu>
+            </TopBar>
             <div class="shellrow">
               <Sidebar items={modulos} bind:value={modulo} label="Módulos" bind:collapsed={moduloAncho} bind:open={navOpen} />
               <div class="shellbody">
@@ -350,8 +358,13 @@
           situación es a lo que alguien vino.
         </p>
 
+        <!-- Sobre una superficie SIN padding a propósito: así se ve el gutter
+             garantizado del componente — el texto respira por los cuatro lados
+             aunque el contenedor no ponga nada. Antes, acá el título rozaba el
+             borde. Dentro de una Card que YA rellena, en cambio, se pasa
+             `bleed` (ver el three-up de variantes más abajo). -->
         <div class="demo">
-          <Card pad={5}>
+          <div class="bare">
             <PageHeader
               level={3}
               eyebrow="Flota"
@@ -369,11 +382,11 @@
                 <Button variant="solid">Registrar servicio</Button>
               </svelte:fragment>
             </PageHeader>
-          </Card>
+          </div>
 
-          <Card pad={5}>
+          <div class="bare">
             <PageHeader level={3} eyebrow="Flota" title="Cargando" loading />
-          </Card>
+          </div>
         </div>
 
         <p class="note">
@@ -395,10 +408,15 @@
           de <span class="sx-id">PageHeader.svelte</span>.
         </p>
 
+        <!-- Acá cada encabezado va DENTRO de una Card que ya rellena, así que
+             halo y sarion se pasan con `bleed`: el padding lo pone la Card, no
+             el encabezado, y no hay doble margen. banda no lleva `bleed` — su
+             relleno es su piel de color, parte de la variante. -->
         <div class="demo three-up">
           <Card pad={5}>
             <PageHeader
               level={3}
+              bleed
               eyebrow="Servicios"
               title="Los últimos 12 meses"
               subtitle="18 preventivas, 7 correctivas, 2 canceladas."
@@ -408,6 +426,7 @@
             <PageHeader
               level={3}
               variant="sarion"
+              bleed
               eyebrow="Servicios"
               title="Los últimos 12 meses"
               subtitle="OT-0042 · BAT007 · 18 jul 2026"
@@ -431,14 +450,46 @@
           falta una línea real; el subtítulo monoespaciado es del sistema, no un identificador
           cualquiera — usalo para algo que se lee como una cifra o una referencia, no como una
           oración («OT-0042 · BAT007», arriba, no una frase). <span class="sx-id">banda</span>
-          cuando la sección tiene que leerse como un bloque cerrado, con máxima contención — y
-          siempre sobre una tarjeta, nunca directo sobre el fondo:
-          <span class="sx-id">--sx-thead</span> está calibrado contra
-          <span class="sx-id">--sx-surface</span>, no contra <span class="sx-id">--sx-ground</span>
-          (medido: 1.03–1.05 en claro, bajo el piso de distinguibilidad — <span class="sx-id">pnpm contrast</span>
-          lo deja escrito como informativo). Elegir una no es gusto: tres mecanismos mezclados sin
-          criterio, en la misma pantalla, es peor que uno solo.
+          cuando la sección tiene que leerse como un bloque cerrado y <b>con color</b>: relleno de
+          acento pleno por defecto, o la banda de un tono semántico
+          (<span class="sx-id">critical</span>/<span class="sx-id">attention</span>/<span class="sx-id">positive</span>/<span class="sx-id">info</span>)
+          cuando el estado lo amerita. Ahora lleva color de verdad —&nbsp;antes era casi
+          blanca&nbsp;— así que se sostiene sola sobre el campo. Elegir una no es gusto: tres
+          mecanismos mezclados sin criterio, en la misma pantalla, es peor que uno solo.
         </p>
+
+        <h3 class="sx-cap sub">banda grande y completa</h3>
+        <p class="why">
+          El default toma el <b>acento entero</b>: la anatomía completa —&nbsp;eyebrow, título,
+          subtítulo y meta&nbsp;— sobre el color de marca, con aire de sobra y el radio grande.
+          Directo sobre el campo, sin prestarle una tarjeta.
+        </p>
+        <div class="demo">
+          <PageHeader
+            variant="banda"
+            eyebrow="Flota · Bodegas Opra"
+            title="Resumen de mantenimiento"
+            subtitle="Cierre del período — 18 equipos activos, 3 con planes vencidos."
+          >
+            <svelte:fragment slot="meta">
+              <Pill tone="critical" size="sm">3 vencidos</Pill>
+              <Pill tone="positive" size="sm">92% cumplimiento</Pill>
+            </svelte:fragment>
+          </PageHeader>
+        </div>
+
+        <h3 class="sx-cap sub">banda con tono semántico</h3>
+        <p class="why">
+          Cuando el estado urge, la banda toma el tono —&nbsp;su color claro, su tinta oscura y su
+          canto&nbsp;—: con color y legible, porque el par banda/tinta ya está medido en el sistema
+          para Pill y Panel. El título ya dice la palabra, así que el color es la regla aguantando,
+          no ruido.
+        </p>
+        <div class="demo three-up">
+          <PageHeader variant="banda" tone="critical" level={3} eyebrow="Flota" title="3 máquinas vencidas." subtitle="BAT014 lleva 12 días sin servicio." />
+          <PageHeader variant="banda" tone="attention" level={3} eyebrow="Inventario" title="Stock bajo en 5 insumos." subtitle="Aceite 15W-40 bajo el mínimo." />
+          <PageHeader variant="banda" tone="positive" level={3} eyebrow="Cierre" title="Período sin incidencias." subtitle="Todos los planes al día." />
+        </div>
       </section>
 
       <!-- ═══ BREADCRUMB ═════════════════════════════════════════════════ -->
@@ -844,7 +895,19 @@
   .seg-out { margin: 0; font-size: var(--sx-t-sm); line-height: 1.6; color: var(--sx-ink-2); max-width: 68ch; }
   .big { margin: 0; font-size: var(--sx-t-xl); font-weight: var(--sx-w-semi); letter-spacing: -.025em; }
 
-  .railwrap { display: flex; gap: var(--sx-s-4); align-items: start; }
+  /* Superficie de demostración SIN padding, a propósito: el margen que separa
+     el texto del borde lo pone el GUTTER del propio PageHeader, no esta caja.
+     Es lo que deja ver que el encabezado ya no roza el borde aunque el
+     contenedor no ponga nada. */
+  .bare { background: var(--sx-surface); border-radius: var(--sx-r-3); box-shadow: var(--sx-e-1); }
+
+  /* `align-items: stretch` (no `start`): el carril desprendido se estira a la
+     altura del contenido de al lado y llega al fondo, en vez de flotar más
+     corto y cortarse en el aire. La fila mide lo del hijo más alto, así que el
+     carril nunca queda más corto que su propia lista — no se esconde ningún
+     ítem. `min-height` le da una columna alta que llenar aunque el contenido
+     sea breve, para que el «llega al fondo» se vea. */
+  .railwrap { display: flex; gap: var(--sx-s-4); align-items: stretch; min-height: 340px; }
   .railwrap :global(.rail) { flex: none; }
   .railwrap > :global(*:last-child) { flex: 1 1 auto; min-width: 0; }
 
@@ -865,9 +928,23 @@
      recorta el cajón de teléfono: `Sheet` sale por `position:fixed`/top
      layer, fuera de esta caja por completo. */
   .shellframe.col { flex-direction: column; }
-  .shellrow { display: flex; align-items: stretch; min-width: 0; }
+  /* El área de contenido del shell: fondo de campo, un gutter parejo por los
+     cuatro lados (padding) y entre los carriles (gap), y una altura mínima
+     para que los carriles desprendidos se vean llegar al fondo. Los tres
+     objetos flotantes —Sidebar, SideRail y la Card— quedan con el MISMO
+     margen contra el borde y entre sí: eso es lo «estilo Apple» que se pidió,
+     garantizado por el layout, no por cada componente. */
+  .shellrow {
+    display: flex;
+    align-items: stretch;
+    min-width: 0;
+    gap: var(--sx-s-4);
+    padding: var(--sx-s-4);
+    min-height: 380px;
+    background: var(--sx-ground);
+  }
   .shellframe :global(.side) { flex: none; }
-  .shellbody { flex: 1 1 auto; min-width: 0; padding: var(--sx-s-5); background: var(--sx-ground); }
+  .shellbody { flex: 1 1 auto; min-width: 0; }
   .chev { margin: 0 var(--sx-s-1); color: var(--sx-ink-3); font-weight: var(--sx-w-normal); }
 
   /* La barra encogida a mano, para mostrar el colapso sin depender de que
