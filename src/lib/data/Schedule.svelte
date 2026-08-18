@@ -83,6 +83,11 @@
   export let label = '';
   /** Lo que dice la agenda cuando no hay ningún evento. */
   export let emptyLabel = 'No hay nada agendado.';
+  /** El título de la vista agenda. `Agenda` por defecto, a propósito NEUTRO: la
+   *  lista muestra TODOS los eventos, también los pasados, así que afirmar
+   *  «Próximos» sería mentir sobre datos que ya ocurrieron. Pasá «Próximos
+   *  eventos» sólo si tus datos son de verdad a futuro. */
+  export let agendaTitle = 'Agenda';
   /** Cuántos chips muestra una casilla de mes antes de cerrar con «+N más». */
   export let maxPerDay = 3;
 
@@ -198,6 +203,10 @@
   $: agenda = [...byDate.keys()].sort().map((iso) => ({
     iso,
     head: dayHead(iso),
+    // Un día anterior a hoy es pasado — se marca en su cabecera para que
+    // vencido y por-venir no se lean idénticos (sin atenuar el evento en sí:
+    // en mantenimiento un servicio pasado y sin hacer es lo MÁS urgente).
+    past: iso < todayIso,
     events: byDate.get(iso)
   }));
 
@@ -259,7 +268,7 @@
   <header class="bar">
     <div class="lead">
       {#if view === 'agenda'}
-        <p class="mth">Próximos eventos</p>
+        <p class="mth">{agendaTitle}</p>
       {:else}
         <p class="mth sx-num" aria-live="polite">{view === 'week' ? weekLabel : monthYearLabel}</p>
         <div class="nav">
@@ -363,8 +372,8 @@
     {#if agenda.length}
       <div class="agenda">
         {#each agenda as g (g.iso)}
-          <section class="grp" aria-label={g.head}>
-            <p class="ghead"><span class="gh sx-cap">{g.head}</span></p>
+          <section class="grp" class:past={g.past} aria-label={g.past ? `${g.head}, pasado` : g.head}>
+            <p class="ghead"><span class="gh sx-cap">{g.head}</span>{#if g.past}<span class="pasado sx-cap">pasado</span>{/if}</p>
             <ul class="rows">
               {#each g.events as ev (ev.key ?? ev.label)}
                 <li>
@@ -530,8 +539,19 @@
   /* ── AGENDA ────────────────────────────────────────────────────────────── */
   .agenda { display: flex; flex-direction: column; gap: var(--sx-s-4); }
   .grp { display: flex; flex-direction: column; gap: var(--sx-s-1); min-width: 0; }
-  .ghead { margin: 0 0 var(--sx-s-1); }
+  .ghead { margin: 0 0 var(--sx-s-1); display: flex; align-items: baseline; gap: var(--sx-s-2); }
   .gh { color: var(--sx-ink-3); }
+  /* Marca de «pasado» en la cabecera del día: dice que ya ocurrió sin atenuar
+     los eventos (un servicio pasado y sin hacer sigue siendo lo más urgente). */
+  .pasado {
+    flex: none;
+    padding: 0 var(--sx-s-1);
+    border-radius: var(--sx-r-1);
+    background: var(--sx-sunk);
+    color: var(--sx-ink-3);
+    font-size: var(--sx-t-2xs);
+    letter-spacing: .04em;
+  }
   .rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1px; }
 
   .row {
