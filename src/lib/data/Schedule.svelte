@@ -27,17 +27,29 @@
   //     { date: '2026-08-20', label: 'Vence plan BAT007', tone: 'attention' }
   //   ]} on:select={(e) => abrir(e.detail.event)} />
   //
-  // DOS VISTAS, UN CONMUTADOR QUE YA EXISTE. `Segmented` es literalmente «la
+  // TRES VISTAS, UN CONMUTADOR QUE YA EXISTE. `Segmented` es literalmente «la
   // misma cosa, dibujada de otra forma» (su propia cabecera lo dice), que es
-  // exactamente la relación entre mes y agenda: los mismos eventos, una grilla
-  // o una lista. Se reusa en vez de inventar un toggle propio.
+  // exactamente la relación entre mes, semana y agenda: los mismos eventos, una
+  // grilla, siete columnas o una lista. Se reusa en vez de inventar un toggle.
   //
   //   · MES — la grilla del mes con los eventos de cada día en chips. Aire, no
   //     líneas (la ley de Nácar): las 7×N casillas se alinean por espaciado,
-  //     nunca por bordes que compitan con lo que dice cada día.
+  //     nunca por bordes que compitan con lo que dice cada día. Un día lleno
+  //     cierra con «+N más».
+  //   · SEMANA — siete columnas con más aire por día, donde los eventos se ven
+  //     enteros (sin «+N más»). Bajo cierto ancho la fila hace scroll horizontal
+  //     DENTRO de la tarjeta, nunca en el body.
   //   · AGENDA — la lista cronológica de TODOS los eventos, agrupada por día,
   //     con cabeceras relativas (Hoy · Mañana · la fecha). Sirve en una columna
   //     angosta donde una grilla no entra.
+  //
+  // NAVEGAR ES ESCRIBIR `viewDate`. Prev/Next se mueven en la unidad de la
+  // vista (un mes, una semana) y el botón Hoy vuelve al presente, todos
+  // escribiendo el ancla `viewDate`, que es bindable. Por eso un DatePicker
+  // atado afuera —`bind:viewDate` contra el mismo valor que su `value`— salta
+  // el calendario a cualquier fecha sin que este componente tenga que importar
+  // un selector: el catálogo lo demuestra, la misma división que TopBar hace
+  // con su búsqueda.
   //
   // EL COLOR DE UN CHIP NO VIAJA SOLO, PERO ACÁ LA PALABRA ES EL EVENTO. La
   // regla 2 pide que un tono llegue con su palabra; en un chip de evento la
@@ -60,10 +72,12 @@
 
   /** [{ date:'YYYY-MM-DD', label, tone?, time?, key?, href? }] */
   export let events = [];
-  /** 'month' | 'agenda'. Bindable. */
+  /** 'month' | 'week' | 'agenda'. Bindable. */
   export let view = 'month';
-  /** 'YYYY-MM-DD' — qué mes abre. Sólo se lee al montar (como `defaultValue`);
-   *  después Prev/Next y el botón Hoy son dueños de la vista. */
+  /** 'YYYY-MM-DD' — el ANCLA de la vista (el día visible). Bindable en dos
+   *  direcciones: Prev/Next/Hoy la escriben, y un control externo —un
+   *  `DatePicker`, ver el catálogo— puede escribirla para SALTAR a una fecha.
+   *  Vacío = hoy. La vista mes muestra el mes del ancla; la semana, su semana. */
   export let viewDate = '';
   /** Nombra la región para un lector de pantalla. */
   export let label = '';
@@ -99,12 +113,14 @@
   });
 
   const toneOf = (e) => (TONES.has(e?.tone) ? e.tone : 'neutral');
+  const MON_SHORT = new Intl.DateTimeFormat('es-CR', { month: 'short' });
 
-  // Qué mes está en pantalla. `viewIso` es el único origen; Prev/Next/Hoy lo mueven.
-  let viewIso = viewDate || today();
-
+  // El ancla de la vista sale de `viewDate` (bindable). Vacío = hoy. Todo lo
+  // demás —el mes, la semana, sus etiquetas— se deriva de acá; Prev/Next/Hoy y
+  // un DatePicker externo mueven la vista escribiendo `viewDate`.
   $: todayIso = today();
-  $: viewD = parseLocalDate(viewIso) ?? new Date();
+  $: anchorIso = viewDate || todayIso;
+  $: viewD = parseLocalDate(anchorIso) ?? new Date();
   $: vy = viewD.getFullYear();
   $: vm = viewD.getMonth();
   $: monthStart = new Date(vy, vm, 1);
@@ -150,6 +166,31 @@
     return out;
   })();
 
+  // La semana que contiene el ancla — lunes a domingo, la misma que arranca el
+  // mes, para que las dos vistas empiecen la semana igual.
+  $: weekStart = addDays(viewD, -mondayIndex(viewD));
+  $: weekDays = Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(weekStart, i);
+    const iso = today(d);
+    return {
+      iso,
+      day: d.getDate(),
+      weekday: WD_SHORT.format(d).replace(/\.$/, ''),
+      isToday: iso === todayIso,
+      inMonth: d.getMonth() === vm,
+      events: byDate.get(iso) || []
+    };
+  });
+  // El rango de la semana como título, colapsando el mes/año cuando se repite:
+  // «11–17 Ago 2026», o «28 Jul – 3 Ago 2026» al cruzar de mes.
+  $: weekLabel = (() => {
+    const a = parseLocalDate(weekDays[0].iso), b = parseLocalDate(weekDays[6].iso);
+    const y = b.getFullYear();
+    if (a.getMonth() === b.getMonth()) return `${a.getDate()}–${b.getDate()} ${cap1(MON_SHORT.format(a))} ${y}`;
+    if (a.getFullYear() === y) return `${a.getDate()} ${MON_SHORT.format(a)} – ${b.getDate()} ${MON_SHORT.format(b)} ${y}`;
+    return `${a.getDate()} ${MON_SHORT.format(a)} ${a.getFullYear()} – ${b.getDate()} ${MON_SHORT.format(b)} ${y}`;
+  })();
+
   // La agenda muestra TODOS los eventos, no sólo los del mes visible: es la
   // vista para «¿qué viene?», y recortarla al mes en pantalla escondería lo de
   // la semana que viene si cae en el mes siguiente. ISO ordena cronológicamente
@@ -177,8 +218,14 @@
     return s;
   }
 
-  const panMonths = (n) => { viewIso = today(addMonths(parseLocalDate(viewIso) ?? new Date(), n)); };
-  const goToday = () => { viewIso = today(); };
+  // Prev/Next se mueven en la unidad de la vista: un mes en «mes», una semana
+  // en «semana». Escriben `viewDate` (bindable), así un DatePicker atado afuera
+  // se entera del salto.
+  function pan(n) {
+    const base = parseLocalDate(anchorIso) ?? new Date();
+    viewDate = today(view === 'week' ? addDays(base, n * 7) : addMonths(base, n));
+  }
+  const goToday = () => { viewDate = today(); };
 
   // Un evento es un enlace si trae `href`, un botón si trae `key` (y avisa por
   // `on:select`), o texto plano si no es navegable — el mismo criterio que
@@ -211,19 +258,19 @@
 <section class="sched" aria-label={label || 'Calendario'}>
   <header class="bar">
     <div class="lead">
-      {#if view === 'month'}
-        <p class="mth sx-num" aria-live="polite">{monthYearLabel}</p>
+      {#if view === 'agenda'}
+        <p class="mth">Próximos eventos</p>
+      {:else}
+        <p class="mth sx-num" aria-live="polite">{view === 'week' ? weekLabel : monthYearLabel}</p>
         <div class="nav">
-          <IconButton label="Mes anterior" size="sm" on:click={() => panMonths(-1)}>
+          <IconButton label={view === 'week' ? 'Semana anterior' : 'Mes anterior'} size="sm" on:click={() => pan(-1)}>
             <Glyph name="chevronLeft" size={16} />
           </IconButton>
           <button class="hoy" type="button" on:click={goToday}>Hoy</button>
-          <IconButton label="Mes siguiente" size="sm" on:click={() => panMonths(1)}>
+          <IconButton label={view === 'week' ? 'Semana siguiente' : 'Mes siguiente'} size="sm" on:click={() => pan(1)}>
             <Glyph name="chevronRight" size={16} />
           </IconButton>
         </div>
-      {:else}
-        <p class="mth">Próximos eventos</p>
       {/if}
     </div>
 
@@ -231,7 +278,7 @@
       label="Vista del calendario"
       size="sm"
       bind:value={view}
-      items={[{ key: 'month', label: 'Mes' }, { key: 'agenda', label: 'Agenda' }]}
+      items={[{ key: 'month', label: 'Mes' }, { key: 'week', label: 'Semana' }, { key: 'agenda', label: 'Agenda' }]}
     />
   </header>
 
@@ -262,7 +309,7 @@
                           type={ev.key != null && !ev.href ? 'button' : undefined}
                           title={ev.time ? `${ev.time} · ${ev.label}` : ev.label}
                           use:activate={ev}
-                        >{#if ev.time}<b class="t sx-num">{ev.time}</b>{/if}{ev.label}</svelte:element>
+                        >{#if ev.time}<b class="t sx-num">{ev.time}</b>{/if}<span class="evlbl">{ev.label}</span></svelte:element>
                       </li>
                     {/each}
                     {#if d.events.length > maxPerDay}
@@ -276,6 +323,42 @@
         {/each}
       </tbody>
     </table>
+  {:else if view === 'week'}
+    <!-- Siete columnas con más aire por día que el mes: acá los eventos se ven
+         enteros, sin «+N más». Bajo cierto ancho la fila no entra y hace su
+         propio scroll horizontal DENTRO de la tarjeta (nunca el body). -->
+    <div class="weekwrap">
+      <div class="week">
+        {#each weekDays as d (d.iso)}
+          <div class="wday" class:today={d.isToday} class:out={!d.inMonth}>
+            <p class="wdh">
+              <span class="wn sx-cap" aria-hidden="true">{d.weekday}</span>
+              <span class="wnum sx-num" class:dot={d.isToday} aria-hidden="true">{d.day}</span>
+              <span class="sr">{dayAria(d)}</span>
+            </p>
+            {#if d.events.length}
+              <ul class="wevs">
+                {#each d.events as ev (ev.key ?? ev.label)}
+                  <li>
+                    <svelte:element
+                      this={tagFor(ev)}
+                      class="ev t-{toneOf(ev)}"
+                      class:act={ev.href || ev.key != null}
+                      href={ev.href || undefined}
+                      type={ev.key != null && !ev.href ? 'button' : undefined}
+                      title={ev.time ? `${ev.time} · ${ev.label}` : ev.label}
+                      use:activate={ev}
+                    >{#if ev.time}<b class="t sx-num">{ev.time}</b>{/if}<span class="evlbl">{ev.label}</span></svelte:element>
+                  </li>
+                {/each}
+              </ul>
+            {:else}
+              <p class="wnone" aria-hidden="true">·</p>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    </div>
   {:else}
     {#if agenda.length}
       <div class="agenda">
@@ -379,7 +462,7 @@
   .evs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
   /* El chip: banda del tono + canto del tono + la etiqueta (la palabra que
-     lleva el significado). Trunca dentro de su casilla — sin desborde. */
+     lleva el significado). */
   .ev {
     display: flex; align-items: baseline; gap: var(--sx-s-1);
     width: 100%; min-width: 0;
@@ -389,9 +472,14 @@
     background: var(--sx-neutral-band); color: var(--sx-ink-2);
     font: inherit; font-size: var(--sx-t-2xs); line-height: 1.35;
     text-align: start; text-decoration: none;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; overflow: hidden;
   }
   .ev .t { flex: none; font-weight: var(--sx-w-semi); color: var(--sx-ink-3); }
+  /* La elipsis va en la etiqueta, no en `.ev`: un contenedor flex IGNORA
+     `text-overflow`, así que el recorte tiene que vivir en el hijo de texto —
+     el mismo arreglo que la fila de agenda ya usa. Sin esto, el nombre se
+     cortaba a media palabra (viola la cláusula 2 del CONTRACT). */
+  .evlbl { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ev.act { cursor: pointer; }
   .ev.act:hover { filter: saturate(1.15) brightness(.98); }
   .ev.act:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
@@ -403,6 +491,41 @@
   .t-neutral   { background: var(--sx-neutral-band);   border-inline-start-color: var(--sx-neutral); }
 
   .more { font-size: var(--sx-t-2xs); color: var(--sx-ink-3); font-weight: var(--sx-w-medium); padding-inline-start: var(--sx-s-1); }
+
+  /* ── SEMANA ────────────────────────────────────────────────────────────────
+     Siete columnas. El scroll horizontal, si hace falta, vive DENTRO de la
+     tarjeta (`.weekwrap`), nunca en el body — la regla responsiva de la casa. */
+  .weekwrap { overflow-x: auto; }
+  .week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(9ch, 1fr));
+    gap: var(--sx-s-1);
+    min-width: 46ch;
+  }
+  .wday {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sx-s-1);
+    /* Igual alto por columna: una semana no queda despareja porque un día
+       tenga cinco eventos y otro ninguno (linealidad). */
+    min-height: calc(var(--sx-s-20) * 2);
+    padding: var(--sx-s-2) var(--sx-s-1);
+    border-radius: var(--sx-r-2);
+    background: var(--sx-sunk);
+  }
+  .wday.today { background: var(--sx-accent-soft); }
+  .wday.out { opacity: .72; }
+  .wdh { display: flex; align-items: baseline; gap: var(--sx-s-1); margin: 0 0 var(--sx-s-1); padding-inline: var(--sx-s-1); }
+  .wn { color: var(--sx-ink-3); }
+  .wnum { font-size: var(--sx-t-sm); font-weight: var(--sx-w-semi); color: var(--sx-ink-2); position: relative; }
+  .wnum.dot { color: var(--sx-ink); }
+  .wnum.dot::after {
+    content: ''; position: absolute; inset-block-end: -3px; inset-inline-start: 50%;
+    width: 3px; height: 3px; border-radius: var(--sx-r-pill);
+    background: var(--sx-accent); transform: translateX(-50%);
+  }
+  .wevs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .wnone { margin: auto 0; text-align: center; color: var(--sx-ink-3); font-size: var(--sx-t-md); }
 
   /* ── AGENDA ────────────────────────────────────────────────────────────── */
   .agenda { display: flex; flex-direction: column; gap: var(--sx-s-4); }

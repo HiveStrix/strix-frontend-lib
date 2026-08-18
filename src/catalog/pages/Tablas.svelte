@@ -8,6 +8,7 @@
   // hace que un sistema de diseño se pudra.
   import Pill from '../../lib/Pill.svelte';
   import { Table, DataList, DataState, DataSkeleton, Schedule } from '../../lib/data/index.js';
+  import { DatePicker } from '../../lib/form/index.js';
 
   // ── El índice ────────────────────────────────────────────────────────────
   // El cierre («Lo que no trae») queda fuera a propósito, igual que en
@@ -133,6 +134,7 @@
   // Hoy/Mañana relativos a la fecha real. El día 12 lleva cinco eventos a
   // propósito: es la casilla que demuestra el «+N más».
   let vistaCal = 'month';
+  let calCursor = '2026-08-18'; // el ancla compartida entre el DatePicker y el Schedule
   let ultimoEvento = '';
   const eventos = [
     { date: '2026-08-06', label: 'Servicio BAT007',        tone: 'positive',  time: '08:30', key: 'ot-45' },
@@ -799,15 +801,32 @@
       <p class="what">
         Los registros que tienen FECHA, leídos en el tiempo. No es el <code>Calendar</code> de
         <code>form</code> —&nbsp;ése <em>elige</em> un día&nbsp;—: éste muestra lo que <em>cae</em> en
-        cada día. Dos vistas, un <code>Segmented</code> que ya existe: el mes en grilla o la agenda
-        en lista, los mismos eventos dibujados de otra forma. Probá el conmutador de arriba a la derecha.
+        cada día. <b>Tres vistas</b> conmutadas con un <code>Segmented</code>: el <b>mes</b> en grilla,
+        la <b>semana</b> en siete columnas, o la <b>agenda</b> en lista —&nbsp;los mismos eventos
+        dibujados de otra forma. Probá el conmutador de arriba a la derecha.
       </p>
     </div>
 
     <div class="schedstage">
+      <!-- El selector de fecha NO vive dentro del Schedule: es un DatePicker del
+           sistema (Field + Calendar + popover) atado por `bind` al MISMO valor
+           que el ancla `viewDate` del calendario. Elegir una fecha salta la
+           vista; Prev/Next/Hoy del calendario mueven el campo. La misma división
+           que TopBar hace con la búsqueda: el componente da el lugar, la pieza
+           que ya existe hace el trabajo. -->
+      <div class="schedtop">
+        <div class="schedgo">
+          <DatePicker bind:value={calCursor} label="Ir a fecha" />
+        </div>
+        <p class="schedhint">
+          Elegí una fecha y el calendario salta a su mes/semana; <code>Prev</code>/<code>Next</code>/<code>Hoy</code>
+          mueven el campo de vuelta. Un <code>bind:viewDate</code>, en las dos direcciones.
+        </p>
+      </div>
+
       <Schedule
         label="Agenda de mantenimiento"
-        viewDate="2026-08-01"
+        bind:viewDate={calCursor}
         bind:view={vistaCal}
         events={eventos}
         on:select={(e) => (ultimoEvento = e.detail.event.label)}
@@ -1209,6 +1228,11 @@
     padding: var(--sx-s-5);
     margin-top: var(--sx-s-5);
   }
+  /* La fila del selector de fecha: el DatePicker a un ancho de campo, su
+     explicación al lado, envolviéndose bajo él en angosto. */
+  .schedtop { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sx-s-3) var(--sx-s-5); margin-bottom: var(--sx-s-5); }
+  .schedgo { flex: none; width: min(16rem, 100%); }
+  .schedhint { margin: 0; flex: 1 1 22ch; min-width: 0; align-self: center; font-size: var(--sx-t-xs); line-height: 1.6; color: var(--sx-ink-3); }
 
   /* ── Lo que no trae ──────────────────────────────────────────────── */
   .out { margin: 0; padding-left: var(--sx-s-5); display: flex; flex-direction: column; gap: var(--sx-s-3); }
