@@ -1,6 +1,6 @@
 # Strix · frontend-lib
 
-El sistema de diseño de Strix: un juego de tokens y 57 componentes Svelte para todos los
+El sistema de diseño de Strix: un juego de tokens y 62 componentes Svelte para todos los
 frontends del ecosistema Hivestrix — la Shell, los módulos Core que se dibujan dentro de un
 shadow root, y cualquier app de SvelteKit que venga después.
 
@@ -31,13 +31,13 @@ El tema y la marca son enlazables: `http://localhost:5180/?theme=dark&brand=opra
 No hay registry ni rama de publicación: se instala directo desde git, con el tag que corresponda.
 
 ```bash
-npm install git+ssh://git@github.com/SantiagoHiveStrix/strix-frontend-example.git#v0.3.0
+npm install "github:HiveStrix/strix-frontend-lib#v0.6.0"
 ```
 
 Funciona igual con pnpm o yarn — es una URL de git, no un paquete de un registry, así que no hace
-falta que el consumidor use el mismo gestor que este repo. El repo es privado: hace falta una
-**deploy key** (o el acceso SSH que ya tenga quien instala) para que el `git+ssh://` de arriba
-resuelva.
+falta que el consumidor use el mismo gestor que este repo. El repo es **público** (solo para
+referencia — ver *Licencia*), así que no hacen falta deploy keys ni tokens; los repos del
+ecosistema lo consumen tal cual.
 
 Esto es posible *porque* la librería vive en la raíz. Con la lib adentro de `packages/frontend-lib/`
 no había forma de instalarla así — npm sabe clonar un repo git, pero no sabe entrar a un
@@ -562,22 +562,22 @@ src/lib/
 ├── Pill.svelte        LA FIRMA — tono + marca + palabra. No pertenece a una familia:
 │                      es el vocabulario que las familias hablan
 │
-├── shell/     (10)  Card · Panel · Well · Stack · Row · Divider · Toolbar · Sheet ·
-│                    Tooltip · Glyph          → catálogo: «Superficies»
+├── shell/     (11)  Hero · Card · Panel · Well · Stack · Row · Divider · Toolbar ·
+│                    Sheet · Tooltip · Glyph  → catálogo: «Superficies»
 ├── action/    (5)   Button · ButtonGroup · IconButton · Menu · SplitButton
 │                                             → «Acciones»
-├── form/      (14)  Field · Input · NumberInput · Textarea · Select · Combobox ·
+├── form/      (15)  Field · Input · NumberInput · Textarea · Select · Combobox ·
 │                    Checkbox · Radio · Switch · DateInput · Calendar · DateRange ·
-│                    FileDrop · ChoiceCards · today() · parseLocalDate()
+│                    DatePicker · FileDrop · ChoiceCards · today() · parseLocalDate()
 │                                             → «Formularios»
-├── nav/       (9)   PageHeader · Breadcrumb · Tabs · Segmented · FilterChips ·
-│                    SearchField · Pagination · SideRail · ShortcutOverlay
-│                                             → «Estructura»
+├── nav/       (11)  TopBar · Sidebar · PageHeader · Breadcrumb · Tabs · Segmented ·
+│                    FilterChips · SearchField · Pagination · SideRail ·
+│                    ShortcutOverlay          → «Estructura»
 ├── data/      (4)   Table · DataList · DataState · DataSkeleton     → «Tablas»
 ├── feedback/  (9)   Dialog · Confirm · Toast · Alert · EmptyState · ErrorState ·
 │                    Skeleton · Progress · ReviewPanel               → «Retroalimentación»
-└── metric/    (5)   Stat · StatStrip · Bar · StackedBar · Sparkline · format.js
-                                              → «Métricas»
+└── metric/    (6)   Stat · StatStrip · Bar · Threshold · StackedBar · Sparkline ·
+                     format.js                → «Métricas»
 
 src/catalog/
 ├── App.svelte         el shell: navegación, tema, acento
@@ -642,12 +642,12 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
 
 ### Componentes que otros componentes prometen y que no existen
 
-- **`Threshold`.** `Bar` y `Stat` se refieren a él en sus cabeceras —«una cifra que cruzó una
-  línea es trabajo de Threshold»— y no existe. Hoy la forma honesta de decir «pasó el límite» es
-  un `Bar` con `tone` y `toneWord`.
 - **`Timeline`.** Los ejemplos de `Tabs` la usan. No está.
 - **Un gráfico con ejes.** `Sparkline` no puede contestar «¿cuánto en marzo?» *por diseño*. Esa
   pregunta necesita un gráfico con marcas, y ese vive en su propia pantalla.
+
+(`Threshold` estuvo en esta lista — «Bar y Stat se refieren a él y no existe» — y ya no: existe,
+se exporta desde `/metric`, y es el que dibuja una cifra contra la línea que no debía cruzar.)
 
 ### Deuda de estructura
 

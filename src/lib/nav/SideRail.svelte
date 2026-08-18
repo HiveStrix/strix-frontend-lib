@@ -24,13 +24,18 @@
   //   · A page under ~700px of content column. There is no room, and the honest
   //     answer at that width is Tabs, not a rail squeezed to icons nobody reads.
   //
+  //   import { GLYPH_PATHS } from '@strix/frontend-lib';
+  //
   //   <SideRail bind:value label="Secciones" collapsible bind:collapsed items={[
   //     { kind: 'section', label: 'Operación' },
-  //     { key: 'flota',      label: 'Flota',       icon: ICONS.truck },
-  //     { key: 'documentos', label: 'Documentos',  icon: ICONS.doc, count: 7 },
+  //     { key: 'flota',      label: 'Flota',       icon: GLYPH_PATHS.truck },
+  //     { key: 'documentos', label: 'Documentos',  icon: GLYPH_PATHS.file, count: 7 },
   //     { kind: 'section', label: 'Configuración' },
-  //     { key: 'catalogos',  label: 'Catálogos',   icon: ICONS.box }
+  //     { key: 'catalogos',  label: 'Catálogos',   icon: GLYPH_PATHS.box }
   //   ]} on:select={(e) => go(e.detail.key)} />
+  //
+  //   `icon` es un path SVG crudo en la grilla 16×16 de Glyph.svelte; los del
+  //   sistema viven en GLYPH_PATHS (no existe ningún export `ICONS`).
   //
   // THE COLLAPSED STATE, AND THE ONE DETAIL EVERYBODY GETS WRONG
   //

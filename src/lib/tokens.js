@@ -273,7 +273,16 @@ export const TOKENS = {
   '--sx-touch': '44px',
   '--sx-z-sticky': '40',
   '--sx-z-overlay': '900',
-  '--sx-z-toast': '1100'
+  '--sx-z-toast': '1100',
+
+  // NO ES UNA CUSTOM PROPERTY, y está acá a propósito: los widgets NATIVOS
+  // —el checkbox de Table, el date picker de DateInput, el dropdown de Select,
+  // los scrollbars— no leen ningún token; leen `color-scheme`. Sin esta
+  // declaración el navegador los pinta claros dentro del tema oscuro (un
+  // checkbox blanco brillante en una tabla oscura), porque el atributo
+  // `data-sx-theme` re-liga variables pero no le dice nada al motor. Viaja en
+  // TOKENS para salir por las DOS formas a la vez: tokens.css y hostTokens().
+  'color-scheme': 'light'
 };
 
 /** Dark is a re-binding of the roles, never a second stylesheet. */
@@ -482,7 +491,12 @@ export const TOKENS_DARK = {
   '--sx-e-1': '0 1px 2px rgba(0,0,0,.4)',
   '--sx-e-2': '0 6px 16px -4px rgba(0,0,0,.5), 0 2px 6px -2px rgba(0,0,0,.4)',
   '--sx-e-3': '0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45)',
-  '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.05)'
+  '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.05)',
+
+  // La otra mitad de `color-scheme: light` en TOKENS — ver el comentario ahí.
+  // Es lo que oscurece los widgets nativos (checkbox, date picker, scrollbar)
+  // cuando el tema es oscuro; sin esto quedan pintados con la carcasa clara.
+  'color-scheme': 'dark'
 };
 
 const decls = (o) => Object.entries(o).map(([k, v]) => `  ${k}: ${v};`).join('\n');

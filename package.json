@@ -8,7 +8,7 @@
   "license": "UNLICENSED",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SantiagoHiveStrix/strix-frontend-example.git"
+    "url": "git+https://github.com/HiveStrix/strix-frontend-lib.git"
   },
   "files": [
     "src/lib"

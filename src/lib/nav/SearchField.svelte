@@ -98,6 +98,13 @@
   }
 
   // The global hotkey. Two guards, and both of them matter:
+  //
+  // CON DOS INSTANCIAS EN PANTALLA — el buscador global de un TopBar y el de
+  // la toolbar de una página, que es exactamente el par que la doc de TopBar
+  // sugiere — las dos oyen la misma tecla y gana la ÚLTIMA montada (su focus()
+  // corre después). Eso suele ser la más local, que es defendible, pero es un
+  // accidente del orden de montaje, no una decisión: el producto decide
+  // pasándole `hotkey=""` a la que no deba ganar, y ese es el contrato.
   //   · not while somebody is typing somewhere else — otherwise `/` disappears
   //     out of every note field on the page;
   //   · not while a modal dialog is open — the field is behind the scrim, and
