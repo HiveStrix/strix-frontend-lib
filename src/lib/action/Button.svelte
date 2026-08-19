@@ -308,13 +308,28 @@
     z-index: 1;
   }
 
-  /* ── Unavailable ───────────────────────────────────────────────────────── */
+  /* ── Unavailable ─────────────────────────────────────────────────────────
+     Los variantes RELLENOS no se apagan con opacity: morado al 48% con texto
+     blanco al 48% sobre blanco es un botón lavado con el label ilegible — se
+     vio en pantalla («Evaluar», «Guardar compra») antes de corregirse. Un
+     relleno indisponible suelta su color y queda mobiliario gris con tinta
+     legible; los planos (outline/ghost) sí pueden atenuarse, porque su tinta
+     parte de un contraste mucho más alto. */
   .sx-btn:disabled,
   .sx-btn.off {
-    opacity: .48;
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
+  }
+  .outline:disabled, .outline.off,
+  .ghost:disabled, .ghost.off {
+    opacity: .48;
+  }
+  .solid:disabled, .solid.off,
+  .danger:disabled, .danger.off {
+    background: var(--sx-sunk);
+    color: var(--sx-ink-3);
+    border-color: var(--sx-line);
   }
   /* Working is not unavailable: it keeps its weight and only says it is thinking. */
   .sx-btn.busy { cursor: progress; }

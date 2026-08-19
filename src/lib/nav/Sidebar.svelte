@@ -13,11 +13,17 @@
   // a person could point at. Not broken: absent. `SideRail`'s own header has
   // been updated to say so; this file is what fills the hole it named.
   //
+  //   import { GLYPH_PATHS } from '@strix/frontend-lib';
+  //
   //   <Sidebar bind:value={modulo} label="Módulos" items={[
-  //     { key: 'mantenimiento', label: 'Mantenimiento', icon: ICONS.wrench },
-  //     { key: 'facturacion',   label: 'Facturación',   icon: ICONS.file, count: 3 },
-  //     { key: 'inventario',    label: 'Inventario',    icon: ICONS.box }
+  //     { key: 'mantenimiento', label: 'Mantenimiento', icon: GLYPH_PATHS.wrench },
+  //     { key: 'facturacion',   label: 'Facturación',   icon: GLYPH_PATHS.file, count: 3 },
+  //     { key: 'inventario',    label: 'Inventario',    icon: GLYPH_PATHS.box }
   //   ]} on:select={(e) => go(e.detail.key)} />
+  //
+  //   `icon` es un path SVG crudo dibujado en la grilla 16×16 de Glyph.svelte
+  //   (GLYPH_VIEWBOX). GLYPH_PATHS trae los veinticuatro del sistema; un ícono
+  //   propio se dibuja contra esa misma grilla o sale corrido de su caja.
   //
   // NOT A REPLACEMENT FOR SIDERAIL — THE LEVEL ABOVE IT
   //
@@ -296,8 +302,19 @@
     transition: color var(--sx-fast) var(--sx-ease);
   }
   .tog:hover { color: var(--sx-ink); }
-  .tog svg { width: 12px; height: 12px; transition: transform var(--sx-beat) var(--sx-ease); }
+  .tog svg { width: 12px; height: 12px; flex: none; transition: transform var(--sx-beat) var(--sx-ease); }
   .tog svg.flip { transform: rotate(180deg); }
+
+  /* COLAPSADO, EL LABEL DEL INTERRUPTOR SE RECORTA IGUAL QUE EL DE UN ÍTEM —
+     la misma promesa («collapsing clips the label, never removes it») y el
+     mismo mecanismo que `.tuck .lb` en SidebarItems.svelte. Sin esto,
+     «Expandir» desbordaba el riel de 64px y flotaba sobre el contenido. */
+  .tuck .tog { position: relative; }
+  .tuck .tog .lb {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
 
   .tog:focus-visible {
     outline: 2px solid var(--sx-ink);

@@ -58,7 +58,12 @@
 </script>
 
 <div class="sw" class:disabled={locked}>
-  <div class="say">
+  <!-- El texto togglea igual que el control, como lo haría un <label for> —
+       que acá no aplica porque el control es un <button role="switch">, no un
+       input. El click es cortesía de puntero; el foco y el teclado siguen
+       viviendo solo en el botón, así que no hay segundo tab stop. -->
+  <!-- svelte-ignore a11y-no-static-element-interactions a11y-click-events-have-key-events -->
+  <div class="say" on:click={toggle}>
     <span class="lb" id={labelId}>{label}<slot /></span>
     {#if hint}<span class="hint" id={hintId}>{hint}</span>{/if}
   </div>
@@ -100,7 +105,8 @@
     display: flex; align-items: center; justify-content: space-between;
     gap: var(--sx-s-5); min-width: 0; padding: var(--sx-s-1) 0;
   }
-  .say { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .say { display: flex; flex-direction: column; gap: 2px; min-width: 0; cursor: pointer; }
+  .sw.disabled .say { cursor: not-allowed; }
   .lb { font-size: var(--sx-t-sm); color: var(--sx-ink); line-height: 1.45; }
   .hint { font-size: var(--sx-t-xs); color: var(--sx-ink-3); line-height: 1.5; max-width: 60ch; }
   .sw.disabled .lb { color: var(--sx-ink-3); }

@@ -336,7 +336,9 @@ INFO.push(['--sx-thead', '--sx-ground', 'PageHeader banda, si se usara sin tarje
 
 // Solo los tokens que SON un color. Una sombra o una fuente no se resuelven a
 // un color y pedirselo es ruido, no una comprobacion.
-const NO_COLOR = /^--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch)/;
+// `color-scheme` no es custom property ni color: es la señal para los widgets
+// nativos (ver tokens.js). Entra en la exención por lo mismo que una sombra.
+const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch)|color-scheme$)/;
 
 // EL TERCER HUECO. Este archivo ya se extendió dos veces por la misma razón —
 // primero medía `--sx-edge` contra dos fondos que resolvían al mismo blanco

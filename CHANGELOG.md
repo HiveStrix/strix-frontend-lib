@@ -1,8 +1,13 @@
 # Changelog
 
-Las versiones se instalan por tag (`npm install …#v0.7.0`). Ver el README.
+Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
+Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
+en la 0.8.0.
 
-## v0.7.0 — 2026-08-18
+## v0.8.0 — 2026-08-18
+
+> Construida **sobre `v0.7.2`**: incorpora sus arreglos (tokens con el cromo
+> precomputado a hex, `Table`, `TopBar`) y le suma lo de abajo.
 
 ### Nuevo
 - **`InfoDot`** (`shell`) — la ayuda `ⓘ`/`?` que envuelve al `Tooltip` existente;
@@ -39,7 +44,7 @@ Las versiones se instalan por tag (`npm install …#v0.7.0`). Ver el README.
 - La agenda ya no afirma «Próximos» sobre días pasados: título neutro `Agenda`
   (prop `agendaTitle`) y marca «pasado» por día (crítica P3).
 
-### Notas de migración (0.6 → 0.7)
+### Notas de migración (0.7.2 → 0.8.0)
 - **Rieles:** un shell que suelte `Sidebar`/`SideRail` en un contenedor plano los
   verá flotar y no llegar al fondo. Dales una fila flex con
   `align-items: stretch`, una altura de la que estirarse, y un `padding`+`gap`

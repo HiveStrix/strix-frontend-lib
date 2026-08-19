@@ -774,7 +774,12 @@
     clip-path: inset(50%); white-space: nowrap; border: 0;
   }
 
-  .wrap { display: flex; flex-direction: column; gap: var(--sx-s-3); min-width: 0; }
+  /* div-calificado, no `.wrap` a secas: la raíz del componente y la celda
+     `td.wrap` (col.wrap) comparten el nombre, y sin el calificador esta regla
+     convertía cada td.wrap en flex — el td dejaba de ser table-cell y la
+     columna entera se apilaba fuera del flujo de la tabla, superpuesta a su
+     vecina. Se vio en pantalla (roles/asignar en el Shell) antes de cazarlo. */
+  div.wrap { display: flex; flex-direction: column; gap: var(--sx-s-3); min-width: 0; }
 
   .showing {
     margin: 0;

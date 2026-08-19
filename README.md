@@ -1,6 +1,6 @@
 # Strix · frontend-lib
 
-El sistema de diseño de Strix: un juego de tokens y 57 componentes Svelte para todos los
+El sistema de diseño de Strix: un juego de tokens y 62 componentes Svelte para todos los
 frontends del ecosistema Hivestrix — la Shell, los módulos Core que se dibujan dentro de un
 shadow root, y cualquier app de SvelteKit que venga después.
 
@@ -31,13 +31,13 @@ El tema y la marca son enlazables: `http://localhost:5180/?theme=dark&brand=opra
 No hay registry ni rama de publicación: se instala directo desde git, con el tag que corresponda.
 
 ```bash
-npm install git+ssh://git@github.com/SantiagoHiveStrix/strix-frontend-example.git#v0.3.0
+npm install "github:HiveStrix/strix-frontend-lib#v0.6.0"
 ```
 
 Funciona igual con pnpm o yarn — es una URL de git, no un paquete de un registry, así que no hace
-falta que el consumidor use el mismo gestor que este repo. El repo es privado: hace falta una
-**deploy key** (o el acceso SSH que ya tenga quien instala) para que el `git+ssh://` de arriba
-resuelva.
+falta que el consumidor use el mismo gestor que este repo. El repo es **público** (solo para
+referencia — ver *Licencia*), así que no hacen falta deploy keys ni tokens; los repos del
+ecosistema lo consumen tal cual.
 
 Esto es posible *porque* la librería vive en la raíz. Con la lib adentro de `packages/frontend-lib/`
 no había forma de instalarla así — npm sabe clonar un repo git, pero no sabe entrar a un
@@ -175,9 +175,11 @@ problema:
 2. **Afinarlo** — se mueve una perilla:
    ```css
    --sx-accent: #B45309;
-   --sx-chrome-tint: #8E8E93;   /* grises neutros en vez de la traza violeta */
    --sx-halo: transparent;      /* sin la firma de luz en la barra */
    ```
+   La traza del cromo ya no se mueve por custom property (ver la perilla abajo):
+   quien quiera grises neutros pisa los peldaños que devuelven
+   `chromeRamp('#8E8E93')` / `chromeRampDark('#8E8E93')` — de `@strix/frontend-lib/tokens`.
    `--sx-thead` no entra en esta lista: no hay un valor de una sola línea que
    dé «encabezados con relleno» y sea seguro en los dos temas — ver la nota
    junto a `--sx-thead` más abajo.
@@ -192,12 +194,20 @@ Los tres niveles son custom properties: funcionan igual en el Shell (luz DOM) y 
 
 ### Las tres perillas
 
-- **`--sx-chrome-tint`.** Es un color, no un porcentaje: el que se mezcla en cada peldaño de la
-  rampa neutra salvo el más claro (`color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB)` en
-  `--sx-n-50`, hasta un 8 % en los intermedios — `--sx-n-0` es `#FFFFFF` fijo, sin mezcla: es el
-  blanco de la superficie, no un lugar para una traza). Por default vale el mismo morado que
-  `--sx-accent`, `#6541BE`. Un core que no quiera la traza violeta liga esta única propiedad a un
-  gris y las diez primitivas restantes se destiñen de una vez, no una por una.
+- **`--sx-chrome-tint`.** Es un color, no un porcentaje: la traza que lleva cada peldaño de la
+  rampa neutra salvo el más claro (4 % en `--sx-n-50`, hasta un 8 % en los intermedios —
+  `--sx-n-0` es `#FFFFFF` fijo, sin mezcla). Por default vale el mismo morado que `--sx-accent`,
+  `#6541BE`. **Desde v0.7.1 la rampa viaja PRECOMPUTADA a hex y esta propiedad es informativa**:
+  re-ligarla ya no destiñe nada. El motivo es un defecto real y verificado, no una preferencia —
+  Chromium rasteriza un mismo `color-mix()` de forma distinta según la capa compuesta en que
+  caiga (el ground pintaba lila bajo el stacking context de un PageHeader y blanco plano en la
+  capa base; un botón outline en oscuro salía blanco brillante), con computed styles correctos y
+  paint inconsistente. Un hex literal pinta igual en todas las capas. La perilla cambió de forma,
+  no de promesa: `chromeRamp(tint)` y `chromeRampDark(tint)` (exportadas desde
+  `@strix/frontend-lib/tokens`) devuelven los peldaños recalculados para pisarlos en la raíz del
+  producto — una decisión, un lugar. Los derivados del ACENTO (`--sx-accent-soft/pick/edge`,
+  `--sx-halo`) siguen siendo `color-mix` en runtime: el acento es del producto y pinta estados
+  chicos donde el artefacto no se manifestó.
 - **`--sx-thead`.** El fondo de encabezado, de tabla y de panel a la vez. Está separado de
   `--sx-sunk` a propósito: `--sx-sunk` también pinta los controles de formulario, así que si
   compartieran token, cambiarle el color al encabezado le cambiaba el color a los inputs de paso.
@@ -436,6 +446,37 @@ mano** — las dos formas salen de un solo origen justamente para que no puedan 
 | Portalear a `document.body` | El nodo sale del shadow root y pierde estilos y tokens | `Sheet`, `Menu`, `Tooltip` y `Combobox` **no** portalean. Donde el navegador soporta `popover`, escapan del recorte y del atrapamiento por la top layer en vez de portalear — ver *Resuelto*, más abajo. Donde no, caen en el costo de antes (recortados por `overflow: hidden`, atrapados por `transform`), documentado en `shell/toplayer.js` y en cada archivo |
 | `::backdrop` | No hereda de `:host` | `ShortcutOverlay` lleva un color de reserva |
 
+### Servir el bundle de un Core: el caché del borde no perdona el silencio
+
+Esto no es código de esta librería — la librería no sirve nada — pero es la trampa que espera a
+**todo** Core que la consuma, y ya cobró una vez (strix-expenses, 2026-08-17): un deploy en verde,
+el pod sirviendo la UI nueva, y el navegador mostrando la vieja durante cuatro horas.
+
+La mecánica, en abstracto:
+
+1. **El nombre del bundle es fijo por contrato.** El catálogo de la Shell apunta a
+   `/ui/<core>-app.js`; el cache-busting por nombre (`app.3f2a1c.js`) no está disponible sin
+   convertir cada deploy en una actualización del catálogo.
+2. **Un file server sobre assets embebidos no dice nada de caché.** Los archivos embebidos en el
+   binario tienen modtime cero: sin `Last-Modified`, sin `ETag`, sin `Cache-Control` — a menos que
+   alguien los escriba a mano.
+3. **Ante ese silencio, el borde decide solo.** Cloudflare cachea `.js` por defecto durante horas
+   cuando el origen no dice nada. La combinación de (1) + (2) + (3) es un deploy invisible hasta
+   que expire un TTL que nadie eligió.
+
+La salida es **revalidación, no «no cachear»**, y son dos headers en el handler que sirve el
+bundle, en el lenguaje que sea:
+
+- **`Cache-Control: no-cache`** — «servime del caché solo después de revalidar». El borde lo
+  respeta por encima de su default.
+- **`ETag` por hash del contenido** (calculado una vez al arrancar: el bundle embebido no cambia
+  en vida del proceso), más **`304 Not Modified`** cuando el `If-None-Match` del cliente trae el
+  hash vigente.
+
+Cada request cuesta a lo sumo un 304 sin cuerpo; en cuanto un deploy cambia el bundle, cambia el
+ETag y la UI nueva es lo que se sirve — al instante, no en cuatro horas. La implementación de
+referencia vive en `strix-expenses/internal/server/ui.go`; copiala al levantar el siguiente Core.
+
 ---
 
 ## Ligar el acento
@@ -536,22 +577,22 @@ src/lib/
 ├── Pill.svelte        LA FIRMA — tono + marca + palabra. No pertenece a una familia:
 │                      es el vocabulario que las familias hablan
 │
-├── shell/     (10)  Card · Panel · Well · Stack · Row · Divider · Toolbar · Sheet ·
-│                    Tooltip · Glyph          → catálogo: «Superficies»
+├── shell/     (11)  Hero · Card · Panel · Well · Stack · Row · Divider · Toolbar ·
+│                    Sheet · Tooltip · Glyph  → catálogo: «Superficies»
 ├── action/    (5)   Button · ButtonGroup · IconButton · Menu · SplitButton
 │                                             → «Acciones»
-├── form/      (14)  Field · Input · NumberInput · Textarea · Select · Combobox ·
+├── form/      (15)  Field · Input · NumberInput · Textarea · Select · Combobox ·
 │                    Checkbox · Radio · Switch · DateInput · Calendar · DateRange ·
-│                    FileDrop · ChoiceCards · today() · parseLocalDate()
+│                    DatePicker · FileDrop · ChoiceCards · today() · parseLocalDate()
 │                                             → «Formularios»
-├── nav/       (9)   PageHeader · Breadcrumb · Tabs · Segmented · FilterChips ·
-│                    SearchField · Pagination · SideRail · ShortcutOverlay
-│                                             → «Estructura»
+├── nav/       (11)  TopBar · Sidebar · PageHeader · Breadcrumb · Tabs · Segmented ·
+│                    FilterChips · SearchField · Pagination · SideRail ·
+│                    ShortcutOverlay          → «Estructura»
 ├── data/      (4)   Table · DataList · DataState · DataSkeleton     → «Tablas»
 ├── feedback/  (9)   Dialog · Confirm · Toast · Alert · EmptyState · ErrorState ·
 │                    Skeleton · Progress · ReviewPanel               → «Retroalimentación»
-└── metric/    (5)   Stat · StatStrip · Bar · StackedBar · Sparkline · format.js
-                                              → «Métricas»
+└── metric/    (6)   Stat · StatStrip · Bar · Threshold · StackedBar · Sparkline ·
+                     format.js                → «Métricas»
 
 src/catalog/
 ├── App.svelte         el shell: navegación, tema, acento
@@ -616,12 +657,12 @@ Esto no es una lista de deseos: es lo que un desarrollador se va a encontrar.
 
 ### Componentes que otros componentes prometen y que no existen
 
-- **`Threshold`.** `Bar` y `Stat` se refieren a él en sus cabeceras —«una cifra que cruzó una
-  línea es trabajo de Threshold»— y no existe. Hoy la forma honesta de decir «pasó el límite» es
-  un `Bar` con `tone` y `toneWord`.
 - **`Timeline`.** Los ejemplos de `Tabs` la usan. No está.
 - **Un gráfico con ejes.** `Sparkline` no puede contestar «¿cuánto en marzo?» *por diseño*. Esa
   pregunta necesita un gráfico con marcas, y ese vive en su propia pantalla.
+
+(`Threshold` estuvo en esta lista — «Bar y Stat se refieren a él y no existe» — y ya no: existe,
+se exporta desde `/metric`, y es el que dibuja una cifra contra la línea que no debía cruzar.)
 
 ### Deuda de estructura
 

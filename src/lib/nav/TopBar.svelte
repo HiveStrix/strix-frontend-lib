@@ -114,6 +114,14 @@
 </script>
 
 <header class="tb" class:sticky>
+<!-- El container query vive en este div interno y NO en el <header>, que es
+     quien pinta el fondo. Con las dos cosas en el mismo nodo (más `sticky`),
+     Chromium deja a veces el subtree pintado con los valores VIEJOS de las
+     custom properties cuando el tema cambia por atributo en :root — computed
+     styles correctos, paint del tema anterior, de forma intermitente. Separar
+     «el que mide» de «el que pinta» es lo que lo evita; el ancho medido es el
+     mismo porque este div ocupa todo el bar. -->
+<div class="cq">
   {#if nav}
     <!-- data-phone-break: ver la misma nota en Sidebar.svelte — no cambia
          nada por sí solo, es lo que deja comprobar desde afuera que los dos
@@ -157,10 +165,25 @@
       {#if hasSession}<div class="sess"><slot name="session" /></div>{/if}
     </div>
   {/if}
+</div>
 </header>
 
 <style>
   .tb {
+    /* FRAME, not content — the same line-based law Sidebar states for itself
+       right beside this file, because a TopBar and a Sidebar are the same
+       KIND of object (application chrome) and have to agree on how that
+       object separates from the field under it.
+
+       Este nodo SOLO pinta. El container query vive en `.cq`, adentro — ver
+       el comentario en el markup: container-type + sticky + fondo por
+       custom property en el mismo nodo dispara un defecto de invalidación
+       de paint en Chromium al cambiar el tema. */
+    background: var(--sx-surface);
+    border-bottom: 1px solid var(--sx-line);
+  }
+
+  .cq {
     /* A container query, not a media query — the same reasoning DataList
        already wrote down for the identical trap: this bar is usually
        rendering beside Sidebar's own column, or inside a Core module that
@@ -173,12 +196,6 @@
     gap: var(--sx-s-3) var(--sx-s-5);
     min-height: var(--sx-s-12);
     padding: var(--sx-s-2) var(--sx-s-4);
-    /* FRAME, not content — the same line-based law Sidebar states for itself
-       right beside this file, because a TopBar and a Sidebar are the same
-       KIND of object (application chrome) and have to agree on how that
-       object separates from the field under it. */
-    background: var(--sx-surface);
-    border-bottom: 1px solid var(--sx-line);
   }
 
   .sticky {

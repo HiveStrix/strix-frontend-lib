@@ -13,17 +13,17 @@
 :root {
   --sx-chrome-tint: #6541BE;
   --sx-n-0: #FFFFFF;
-  --sx-n-50: color-mix(in srgb, var(--sx-chrome-tint) 4%, #FAFAFB);
-  --sx-n-100: color-mix(in srgb, var(--sx-chrome-tint) 5%, #F4F4F6);
-  --sx-n-150: color-mix(in srgb, var(--sx-chrome-tint) 6%, #EDEDF0);
-  --sx-n-200: color-mix(in srgb, var(--sx-chrome-tint) 8%, #DDDDE2);
-  --sx-n-300: color-mix(in srgb, var(--sx-chrome-tint) 8%, #BBBBC2);
-  --sx-n-400: color-mix(in srgb, var(--sx-chrome-tint) 8%, #7A7A7F);
-  --sx-n-500: color-mix(in srgb, var(--sx-chrome-tint) 8%, #5E5E64);
-  --sx-n-700: color-mix(in srgb, var(--sx-chrome-tint) 8%, #414146);
-  --sx-n-800: color-mix(in srgb, var(--sx-chrome-tint) 8%, #27272B);
-  --sx-n-900: color-mix(in srgb, var(--sx-chrome-tint) 7%, #1B1B1E);
-  --sx-ground: color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF);
+  --sx-n-50: #F4F3F9;
+  --sx-n-100: #EDEBF3;
+  --sx-n-150: #E5E3ED;
+  --sx-n-200: #D3D1DF;
+  --sx-n-300: #B4B1C2;
+  --sx-n-400: #787584;
+  --sx-n-500: #5F5C6B;
+  --sx-n-700: #444150;
+  --sx-n-800: #2C2937;
+  --sx-n-900: #201E29;
+  --sx-ground: #F6F4FB;
   --sx-surface: var(--sx-n-0);
   --sx-sunk: var(--sx-n-50);
   --sx-line: var(--sx-n-150);
@@ -32,7 +32,7 @@
   --sx-ink-2: var(--sx-n-700);
   --sx-ink-3: var(--sx-n-500);
   --sx-ink-on: var(--sx-n-0);
-  --sx-thead: color-mix(in srgb, var(--sx-chrome-tint) 6%, #FFFFFF);
+  --sx-thead: #F6F4FB;
   --sx-glow: 0%;
   --sx-glow-color: var(--sx-accent);
   --sx-halo: color-mix(in srgb, var(--sx-accent) 70%, transparent);
@@ -98,25 +98,26 @@
   --sx-z-sticky: 40;
   --sx-z-overlay: 900;
   --sx-z-toast: 1100;
+  color-scheme: light;
 }
 
 :root[data-sx-theme="dark"], .sx-dark {
   --sx-ground: var(--sx-n-900);
   --sx-surface: var(--sx-n-800);
-  --sx-sunk: color-mix(in srgb, var(--sx-chrome-tint) 8%, #1B1F22);
-  --sx-line: color-mix(in srgb, var(--sx-chrome-tint) 8%, #2C3134);
+  --sx-sunk: #21222E;
+  --sx-line: #31323F;
   --sx-edge: #9C9AA1;
-  --sx-ink: color-mix(in srgb, var(--sx-chrome-tint) 4%, #EDEFF0);
-  --sx-ink-2: color-mix(in srgb, var(--sx-chrome-tint) 6%, #CED2D4);
+  --sx-ink: #E8E8EE;
+  --sx-ink-2: #C8C9D3;
   --sx-ink-3: #BEBDC1;
   --sx-ink-on: var(--sx-n-900);
-  --sx-thead: color-mix(in srgb, #FFFFFF 10%, var(--sx-surface));
+  --sx-thead: #413E4B;
   --sx-halo: color-mix(in srgb, var(--sx-accent) 18%, transparent);
   --sx-accent: #D1C6EC;
   --sx-accent-ink: var(--sx-n-900);
   --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 8%, var(--sx-surface));
   --sx-accent-pick: color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface));
-  --sx-accent-edge: color-mix(in srgb, var(--sx-chrome-tint) 8%, #3A3F43);
+  --sx-accent-edge: #3D3F4D;
   --sx-positive: #8FCB9B;
   --sx-positive-band: #1D2C21;
   --sx-positive-edge: #2E4436;
@@ -137,4 +138,5 @@
   --sx-e-2: 0 6px 16px -4px rgba(0,0,0,.5), 0 2px 6px -2px rgba(0,0,0,.4);
   --sx-e-3: 0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45);
   --sx-e-inset: inset 0 1px 0 rgba(255,255,255,.05);
+  color-scheme: dark;
 }
