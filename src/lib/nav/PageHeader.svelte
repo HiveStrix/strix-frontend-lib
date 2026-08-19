@@ -206,10 +206,17 @@
        claro — bajarla más no la hace discreta, la hace invisible. La discreción
        se gradúa por --sx-halo y sólo por ahí.
        El z-index NO es opcional: sin él el fondo del hermano siguiente se pinta
-       después en el orden natural y se come la luz justo donde tiene que caer. */
+       después en el orden natural y se come la luz justo donde tiene que caer.
+       Pero es `1`, NO `--sx-z-sticky`: sólo tiene que ganarle al hermano de
+       abajo (auto/0), no al cromo pegajoso. Con el token de sticky (40) un
+       PageHeader normal, al hacer scroll por debajo de una TopBar fija del
+       mismo z, quedaba por ENCIMA de ella y le tapaba el texto —«3 máquinas
+       vencidas» montándose sobre la barra. La barra PEGADA (`.sticky`, abajo)
+       sí sube a `--sx-z-sticky`, porque ahí sí tiene que montar el contenido
+       que pasa por debajo. */
     box-shadow: 0 12px 28px -18px var(--sx-halo);
     position: relative;
-    z-index: var(--sx-z-sticky);
+    z-index: 1;
   }
 
   /* La salida del gutter: un encabezado dentro de un padre que ya rellena no
