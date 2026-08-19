@@ -32,10 +32,11 @@
   // exactamente la relación entre mes, semana y agenda: los mismos eventos, una
   // grilla, siete columnas o una lista. Se reusa en vez de inventar un toggle.
   //
-  //   · MES — la grilla del mes con los eventos de cada día en chips. Aire, no
-  //     líneas (la ley de Nácar): las 7×N casillas se alinean por espaciado,
-  //     nunca por bordes que compitan con lo que dice cada día. Un día lleno
-  //     cierra con «+N más».
+  //   · MES — la grilla del mes con los eventos de cada día en chips. Cada día
+  //     es una casilla apenas HUNDIDA (`--sx-sunk`) separada por AIRE del resto
+  //     —tono y espacio, nunca un borde dibujado que compita con lo que dice el
+  //     día: sigue siendo «aire, no líneas», la misma piel que la vista semana.
+  //     Un día lleno cierra con «+N más».
   //   · SEMANA — siete columnas con más aire por día, donde los eventos se ven
   //     enteros (sin «+N más»). Bajo cierto ancho la fila hace scroll horizontal
   //     DENTRO de la tarjeta, nunca en el body.
@@ -439,7 +440,9 @@
   /* ── MES ──────────────────────────────────────────────────────────────────
      Sin bordes en la grilla: la ley de Nácar (aire, no líneas). Las columnas se
      alinean solas por ser una tabla; el ritmo lo da el espaciado. */
-  .grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  /* `separate` + `border-spacing`: el aire entre días. No es un borde dibujado
+     —es espacio— que deja ver cada casilla como su propia baldosa hundida. */
+  .grid { width: 100%; border-collapse: separate; border-spacing: var(--sx-s-1); table-layout: fixed; }
   .grid th { padding: 0 var(--sx-s-1) var(--sx-s-2); text-align: start; }
   .wd { color: var(--sx-ink-3); }
 
@@ -451,6 +454,9 @@
     vertical-align: top;
     padding: var(--sx-s-1);
     border-radius: var(--sx-r-1);
+    /* Cada día, una baldosa apenas hundida — la misma piel que las columnas de
+       la vista semana, para que los días se lean separados por tono + aire. */
+    background: var(--sx-sunk);
   }
   .num {
     display: inline-flex; align-items: center; justify-content: center;
@@ -466,7 +472,11 @@
     background: var(--sx-accent); transform: translateX(-50%);
   }
   .cell.out .num { color: var(--sx-ink-3); font-weight: var(--sx-w-normal); }
-  .cell.out { opacity: .72; }
+  /* Los días de otro mes conservan su baldosa —para que la grilla se lea pareja,
+     sin un borde irregular— pero atenuada, así el mes en curso pesa más. */
+  .cell.out { opacity: .55; }
+  /* Hoy: baldosa teñida de acento, igual que la columna de hoy en la semana. */
+  .cell.today { background: var(--sx-accent-soft); }
 
   .evs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
