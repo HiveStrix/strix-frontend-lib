@@ -74,6 +74,11 @@ protecciones de arriba son de la 10, y sin ellas esta sección deja de tener mot
 No son principios; son restricciones que los componentes ya hacen cumplir. Cada una se puede
 verificar en el catálogo sin leer una línea de código.
 
+> Las tres reglas dicen cómo se **ve** el sistema. Cómo se **usa** —los márgenes
+> garantizados, el texto que no se desborda, la linealidad, premiar lo escueto y
+> los carriles que llegan al fondo— vive en **[`CONTRACT.md`](CONTRACT.md)**: el
+> contrato que sostiene quien implementa la librería.
+
 ### 1 · El cromo es acromático
 
 El fondo, las líneas y la profundidad son neutros. El único color que aparece es **vocabulario**:

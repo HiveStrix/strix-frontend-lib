@@ -7,14 +7,15 @@
   // porque un catálogo que sólo enseña el camino feliz es exactamente lo que
   // hace que un sistema de diseño se pudra.
   import Pill from '../../lib/Pill.svelte';
-  import { Table, DataList, DataState, DataSkeleton } from '../../lib/data/index.js';
+  import { Table, DataList, DataState, DataSkeleton, Schedule } from '../../lib/data/index.js';
+  import { DatePicker } from '../../lib/form/index.js';
 
   // ── El índice ────────────────────────────────────────────────────────────
   // El cierre («Lo que no trae») queda fuera a propósito, igual que en
   // Superficies, Estructura y Métricas: no es una pieza que se busque.
   const TOC = [
     ['table', 'Table'], ['estados', 'Los cuatro estados'], ['datalist', 'DataList'],
-    ['sueltos', 'DataState · DataSkeleton'], ['temas', 'Los dos temas']
+    ['sueltos', 'DataState · DataSkeleton'], ['schedule', 'Schedule'], ['temas', 'Los dos temas']
   ];
 
   // ── Formato ──────────────────────────────────────────────────────────────
@@ -127,6 +128,31 @@
   let hecho = '';          // la última acción de fila
   const iva = (t) => Math.round(t * 0.13 / 1.13);
   const neto = (t) => t - iva(t);
+
+  // ── Datos para Schedule ────────────────────────────────────────────────────
+  // Anclados a agosto de 2026 para que el mes abra poblado y la agenda muestre
+  // Hoy/Mañana relativos a la fecha real. El día 12 lleva cinco eventos a
+  // propósito: es la casilla que demuestra el «+N más».
+  let vistaCal = 'month';
+  let calCursor = '2026-08-18'; // el ancla compartida entre el DatePicker y el Schedule
+  let ultimoEvento = '';
+  const eventos = [
+    { date: '2026-08-06', label: 'Servicio BAT007',        tone: 'positive',  time: '08:30', key: 'ot-45' },
+    { date: '2026-08-12', label: 'Preventiva BAT002',      tone: 'attention', time: '08:00', key: 'ot-52' },
+    { date: '2026-08-12', label: 'Revisión CL445926',                          time: '10:00', key: 'ot-53' },
+    { date: '2026-08-12', label: 'Cambio de filtro BAT019', tone: 'attention', time: '12:00', key: 'ot-54' },
+    { date: '2026-08-12', label: 'Inspección CL336793',    tone: 'info',       time: '15:00', key: 'ot-55' },
+    { date: '2026-08-12', label: 'Cierre OT-0039',         tone: 'positive',   time: '17:00', key: 'ot-56' },
+    { date: '2026-08-14', label: 'Cambio de aceite BAT014', tone: 'attention', time: '09:00', key: 'ot-46' },
+    { date: '2026-08-14', label: 'Revisión CL445926',                          time: '14:00', key: 'ot-47' },
+    { date: '2026-08-18', label: 'Vence plan BAT019',      tone: 'critical',                  key: 'plan-19' },
+    { date: '2026-08-18', label: 'Servicio BAT002',        tone: 'attention',  time: '10:15', key: 'ot-48' },
+    { date: '2026-08-19', label: 'Inspección CL336793',                        time: '07:45', key: 'ot-49' },
+    { date: '2026-08-20', label: 'Vence garantía BAT022',  tone: 'critical',                  key: 'gar-22' },
+    { date: '2026-08-20', label: 'Preventiva BAT007',      tone: 'attention',  time: '11:00', key: 'ot-50' },
+    { date: '2026-08-25', label: 'Auditoría de flota',     tone: 'info',       time: '09:00', key: 'aud-1' },
+    { date: '2026-08-27', label: 'Servicio BAT002',        tone: 'attention',  time: '13:30', key: 'ot-51' }
+  ];
 
   function abrir(e) {
     // El link es un link de verdad: se puede abrir en otra pestaña, copiar la
@@ -768,6 +794,58 @@
     </p>
   </section>
 
+  <!-- ── Schedule ────────────────────────────────────────────────────── -->
+  <section class="comp">
+    <div class="ctop">
+      <h2 id="schedule">Schedule</h2>
+      <p class="what">
+        Los registros que tienen FECHA, leídos en el tiempo. No es el <code>Calendar</code> de
+        <code>form</code> —&nbsp;ése <em>elige</em> un día&nbsp;—: éste muestra lo que <em>cae</em> en
+        cada día. <b>Tres vistas</b> conmutadas con un <code>Segmented</code>: el <b>mes</b> en grilla,
+        la <b>semana</b> en siete columnas, o la <b>agenda</b> en lista —&nbsp;los mismos eventos
+        dibujados de otra forma. Probá el conmutador de arriba a la derecha.
+      </p>
+    </div>
+
+    <div class="schedstage">
+      <!-- El selector de fecha NO vive dentro del Schedule: es un DatePicker del
+           sistema (Field + Calendar + popover) atado por `bind` al MISMO valor
+           que el ancla `viewDate` del calendario. Elegir una fecha salta la
+           vista; Prev/Next/Hoy del calendario mueven el campo. La misma división
+           que TopBar hace con la búsqueda: el componente da el lugar, la pieza
+           que ya existe hace el trabajo. -->
+      <div class="schedtop">
+        <div class="schedgo">
+          <DatePicker bind:value={calCursor} label="Ir a fecha" />
+        </div>
+        <p class="schedhint">
+          Elegí una fecha y el calendario salta a su mes/semana; <code>Prev</code>/<code>Next</code>/<code>Hoy</code>
+          mueven el campo de vuelta. Un <code>bind:viewDate</code>, en las dos direcciones.
+        </p>
+      </div>
+
+      <Schedule
+        label="Agenda de mantenimiento"
+        bind:viewDate={calCursor}
+        bind:view={vistaCal}
+        events={eventos}
+        on:select={(e) => (ultimoEvento = e.detail.event.label)}
+      />
+    </div>
+
+    {#if ultimoEvento}
+      <p class="pull">Abriste <b>{ultimoEvento}</b> — en un producto real esto llevaría a la orden o al plan.</p>
+    {/if}
+
+    <p class="pull">
+      Reusa la matemática del mes y la corrección de zona horaria de <code>Calendar</code> /
+      <code>DateInput</code>, y <code>Segmented</code> para el conmutador. Respeta el
+      <a href="CONTRACT.md">contrato</a>: los chips truncan (sin desborde), un día lleno cierra con
+      «+N más» y toda casilla tiene un piso de alto (linealidad), y el color de un chip nunca viaja
+      solo —&nbsp;la etiqueta del evento es la palabra que lo acompaña.
+    </p>
+  </section>
+
   <!-- ── Los dos temas ───────────────────────────────────────────────── -->
   <section class="comp">
     <div class="ctop">
@@ -1140,6 +1218,21 @@
     border-radius: var(--sx-r-3);
     padding: var(--sx-s-6);
   }
+
+  /* La superficie donde se apoya Schedule: una tarjeta que YA rellena, así el
+     gutter lo pone el padre (la cláusula 1 del contrato) y el componente no. */
+  .schedstage {
+    background: var(--sx-surface);
+    border-radius: var(--sx-r-3);
+    box-shadow: var(--sx-e-1);
+    padding: var(--sx-s-5);
+    margin-top: var(--sx-s-5);
+  }
+  /* La fila del selector de fecha: el DatePicker a un ancho de campo, su
+     explicación al lado, envolviéndose bajo él en angosto. */
+  .schedtop { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sx-s-3) var(--sx-s-5); margin-bottom: var(--sx-s-5); }
+  .schedgo { flex: none; width: min(16rem, 100%); }
+  .schedhint { margin: 0; flex: 1 1 22ch; min-width: 0; align-self: center; font-size: var(--sx-t-xs); line-height: 1.6; color: var(--sx-ink-3); }
 
   /* ── Lo que no trae ──────────────────────────────────────────────── */
   .out { margin: 0; padding-left: var(--sx-s-5); display: flex; flex-direction: column; gap: var(--sx-s-3); }

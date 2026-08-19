@@ -1,6 +1,6 @@
 {
   "name": "@strix/frontend-lib",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "El sistema de diseño de Strix: tokens y componentes Svelte para todos los frontends del ecosistema.",
   "type": "module",
   "packageManager": "pnpm@10.34.5",

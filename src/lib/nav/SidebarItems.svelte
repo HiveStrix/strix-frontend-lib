@@ -100,9 +100,16 @@
 </div>
 
 <style>
-  .items { display: flex; flex-direction: column; gap: var(--sx-s-2); min-width: 0; }
+  /* Crece para llenar el alto del carril desprendido (ver `.side` en
+     Sidebar.svelte): así el toggle de colapso, que vive DESPUÉS de esta pieza
+     en `Sidebar`, queda fijo abajo en vez de flotar a media altura con aire
+     muerto debajo. `min-height: 0` habilita el scroll interno de `ul`. */
+  .items { display: flex; flex-direction: column; gap: var(--sx-s-2); min-width: 0; flex: 1 1 auto; min-height: 0; }
 
-  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+  /* La lista toma el alto sobrante y hace su propio scroll si un tenant tiene
+     más módulos de los que entran — el pie (`.foot`, `margin-top:auto`) sigue
+     abajo y nada empuja la pantalla. */
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
 
   .sect { padding: var(--sx-s-3) var(--sx-s-3) var(--sx-s-1); }
   .tuck .sect { padding-inline: 0; text-align: center; overflow: hidden; }
@@ -133,18 +140,26 @@
      SideRail, sin cantos. La CUARTA señal, la que SideRail no necesita porque
      no vive colapsado por defecto: el trazo del ícono se engrosa (2.3 en vez
      de 1.7), una diferencia de FORMA que sigue viéndose cuando la etiqueta
-     está recortada. */
+     está recortada.
+     APUNTA AL `path`, NO AL `svg`. El `<path>` trae su propio atributo de
+     presentación `stroke-width="1.7"`, y un atributo de presentación gana sobre
+     el valor HEREDADO del `<svg>` — así que `.it.on .ic svg { stroke-width }`
+     se dibujaba pero el path seguía en 1.7 y la señal no aparecía. Una regla de
+     autor sobre el propio `path` sí pisa el atributo (los atributos de
+     presentación son la prioridad más baja de la cascada SVG). */
   .it.on {
     background: var(--sx-accent-pick);
     color: var(--sx-ink);
     font-weight: var(--sx-w-semi);
   }
-  .it.on .ic svg { stroke-width: 2.3; }
+  .it.on .ic svg path { stroke-width: 2.3; }
 
   .it.dis { opacity: .45; cursor: not-allowed; }
 
   .ic { display: flex; align-items: center; justify-content: center; flex: none; width: 20px; height: 20px; }
-  .ic svg { width: 20px; height: 20px; transition: stroke-width var(--sx-fast) var(--sx-ease); }
+  .ic svg { width: 20px; height: 20px; }
+  /* La transición vive en el `path`, que es donde cambia el `stroke-width`. */
+  .ic svg path { transition: stroke-width var(--sx-fast) var(--sx-ease); }
   .ini {
     display: flex; align-items: center; justify-content: center;
     width: 20px; height: 20px;
@@ -199,7 +214,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .it, .ic svg { transition: none; }
+    .it, .ic svg path { transition: none; }
   }
 
   /* Repite la geometría forzada de `Sidebar.svelte` para el mismo rango

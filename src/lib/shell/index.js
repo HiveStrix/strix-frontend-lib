@@ -17,6 +17,7 @@
 //   Toolbar   what you are looking at / what you can do        — the bar
 //   Sheet     a side drawer that hands focus back              — the second surface
 //   Tooltip   the label for the control that lost its word     — the repair
+//   InfoDot   ⓘ/? — la guía que premia a un elemento escueto   — the repair, marked
 //   Glyph     twenty-three icons drawn at 16 for this system   — the hand
 //
 // Imported from here rather than from a file path, so a component can move
@@ -32,4 +33,5 @@ export { default as Divider } from './Divider.svelte';
 export { default as Toolbar } from './Toolbar.svelte';
 export { default as Sheet } from './Sheet.svelte';
 export { default as Tooltip } from './Tooltip.svelte';
+export { default as InfoDot } from './InfoDot.svelte';
 export { default as Glyph, GLYPHS, GLYPH_PATHS } from './Glyph.svelte';

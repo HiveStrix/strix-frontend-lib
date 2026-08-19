@@ -9,7 +9,7 @@
   // Es más corta que Formularios o Tablas a propósito, y eso también es honesto:
   // documenta cada componente en su forma principal y en el estado que lo rompe,
   // no en las quince combinaciones. Lo que falta está anotado en el README.
-  import { Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, Glyph, GLYPHS } from '../../lib/shell/index.js';
+  import { Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, InfoDot, Glyph, GLYPHS } from '../../lib/shell/index.js';
   import { Stat, StatStrip } from '../../lib/metric/index.js';
   import Pill from '../../lib/Pill.svelte';
   import Button from '../../lib/action/Button.svelte';
@@ -17,7 +17,7 @@
   const TOC = [
     ['hero', 'Hero'], ['card', 'Card'], ['panel', 'Panel'], ['well', 'Well'], ['aire', 'Stack · Row'],
     ['divider', 'Divider'], ['toolbar', 'Toolbar'], ['sheet', 'Sheet'],
-    ['tooltip', 'Tooltip'], ['glyph', 'Glyph']
+    ['tooltip', 'Tooltip'], ['infodot', 'InfoDot'], ['glyph', 'Glyph']
   ];
 
   let sheet = false;
@@ -694,6 +694,37 @@
         </p>
       </section>
 
+      <!-- ═══ INFODOT ════════════════════════════════════════════════════ -->
+      <section id="infodot">
+        <h2>InfoDot</h2>
+        <p class="why">
+          El mismo Tooltip, con disparador propio: un <b>ⓘ</b> (o <b>?</b>) chico que premia a un
+          elemento por decir poco. Hover, tap o foco lo abren —&nbsp;los tres, porque el disparador
+          es un botón de verdad, no un manejador nuevo&nbsp;—: el rótulo queda limpio y la
+          explicación vive a un gesto. No es el <span class="sx-id">?</span> global de
+          <span class="sx-id">ShortcutOverlay</span> —&nbsp;ese abre toda la hoja de atajos; éste
+          explica un solo elemento&nbsp;— y por eso su marca por defecto es <span class="sx-id">ⓘ</span>.
+        </p>
+
+        <div class="demo">
+          <Row gap={6} align="center">
+            <span class="idrow">Costo unitario <InfoDot text="Promedio ponderado de las últimas 12 compras." /></span>
+            <span class="idrow">Margen bruto <InfoDot text="Ventas menos costo, antes de gastos operativos." placement="bottom" /></span>
+            <span class="idrow">Prioridad <InfoDot mark="help" text="Se calcula por criticidad del equipo y días vencidos." placement="right" /></span>
+          </Row>
+        </div>
+
+        <p class="note">
+          <b>No reimplementa nada.</b> Le pasa a <span class="sx-id">Tooltip</span> su botón en el
+          slot y hereda entero lo difícil: la capa superior, el <span class="sx-id">aria-describedby</span>,
+          el Escape, la moción reducida, el reposicionamiento en scroll. La marca es un carácter
+          centrado que escala con el <span class="sx-id">em</span> del texto de al lado —&nbsp;junto a
+          una etiqueta chica es chico&nbsp;— así que no hay una prop de tamaño que mantener.
+          En <span class="sx-id">Formularios</span>, <span class="sx-id">Field</span> lo usa vía
+          <span class="sx-id">hintDot</span> para que la ayuda de un campo sea un punto y no un párrafo.
+        </p>
+      </section>
+
       <!-- ═══ GLYPH ══════════════════════════════════════════════════════ -->
       <section id="glyph">
         <h2>Glyph</h2>
@@ -821,6 +852,9 @@
 
   .demo { margin-top: var(--sx-s-6); display: flex; flex-direction: column; gap: var(--sx-s-4); }
   .demo.two-up, .demo.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr)); gap: var(--sx-s-4); }
+  /* Una etiqueta con su punto de ayuda al lado, para mostrar el InfoDot en su
+     contexto natural: un rótulo escueto que guarda su explicación en el ⓘ. */
+  .idrow { display: inline-flex; align-items: center; gap: var(--sx-s-2); font-size: var(--sx-t-sm); font-weight: var(--sx-w-medium); color: var(--sx-ink-2); }
 
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); gap: var(--sx-s-3); }
   .cl { margin: 0; display: flex; flex-direction: column; gap: var(--sx-s-1); font-size: var(--sx-t-sm); color: var(--sx-ink-2); }

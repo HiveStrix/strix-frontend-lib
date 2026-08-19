@@ -69,15 +69,17 @@
   //   padre, como siempre en este componente — sólo cierra su propio ritmo
   //   vertical antes de la línea.
   //
-  //   banda  — el tono, igual que `--sx-thead` ya hace en `Panel`. Máxima
-  //   contención: relleno propio, radio propio, sin halo. SE APOYA EN UNA
-  //   TARJETA — nunca directo sobre el campo, igual que el `.head` de
-  //   `Panel`. Medido, no supuesto: `--sx-thead` contra `--sx-surface` da
-  //   1.09; contra `--sx-ground` da 1.03–1.05 en claro, bajo el piso de
-  //   distinguibilidad de este repo (1.05). Es la misma restricción que el
-  //   README ya documenta para `--sx-thead` — «no hay un valor de una sola
-  //   línea que sea seguro en los dos temas»— y `banda` la hereda en vez de
-  //   inventar un token nuevo sólo para esquivarla.
+  //   banda  — el tono, ahora CON color de verdad. Antes pintaba con
+  //   `--sx-thead` (~6% del tinte sobre blanco) y se veía casi blanca; el
+  //   pedido fue una tarjeta de encabezado grande y realmente teñida. Default:
+  //   relleno de ACENTO pleno con tinta `--sx-accent-ink`. Con `tone`: la
+  //   banda semántica de ese tono (`--sx-*-band` claro) + su tinta oscura para
+  //   el título + su canto (`--sx-*-edge`) — pares ya medidos en el sistema
+  //   para Pill y Panel, así que «con color» no cuesta legibilidad. Todo el
+  //   color sale de cuatro custom properties (fill/ink/ink-soft/edge) que cada
+  //   tono reasigna; la anatomía las lee sin repetir un color por regla.
+  //   NO es `Hero`: Hero es el bloque de tablero a dos columnas con cifras al
+  //   lado; banda es un encabezado de ruta a una columna.
   // ─────────────────────────────────────────────────────────────────────────
 
   /** The situation, in a sentence. Required — a header with no title is a gap. */
@@ -100,6 +102,21 @@
    * happens when nobody writes anything. See «`variant`» above.
    */
   export let variant = 'halo';
+  /**
+   * GUTTER GARANTIZADO — POR QUÉ ESTE ARCHIVO YA NO DICE «EL PADDING ES DEL
+   * PADRE». Durante mucho tiempo `halo` y `sarion` no ponían padding
+   * horizontal propio: el argumento era que el encabezado ya vive dentro de
+   * una columna con su padding, así que sumar el suyo sería padding doble.
+   * En la práctica eso dejaba el título/eyebrow/subtítulo ROZANDO el borde en
+   * cuanto alguien soltaba el componente sobre un contenedor sin padding —
+   * el defecto que este cambio vino a cerrar. Ahora el gutter (por los cuatro
+   * lados) es la GARANTÍA: nada de texto toca el borde. `bleed` es la salida
+   * para el caso que el argumento viejo describía bien —&nbsp;un encabezado
+   * dentro de una `Card` que YA rellena— donde el padding propio sería doble:
+   * lo apaga. `banda` no se ve afectada: su relleno es parte de su piel
+   * (la banda de color necesita aire propio), así que `bleed` la deja igual.
+   */
+  export let bleed = false;
 
   const VARIANTS = new Set(['halo', 'sarion', 'banda']);
 
@@ -120,6 +137,7 @@
   class:loading
   class:sarion={v === 'sarion'}
   class:banda={v === 'banda'}
+  class:bleed
   aria-busy={loading || undefined}
 >
   {#if hasCrumbs}
@@ -177,16 +195,33 @@
     display: flex;
     flex-direction: column;
     gap: var(--sx-s-3);
+    /* EL GUTTER GARANTIZADO. Padding propio por los cuatro lados para que el
+       texto nunca roce el borde del contenedor — ver la nota de `bleed` en el
+       script. No afecta a la luz de la firma (una sombra cae por fuera de la
+       caja, no la empuja el padding). `banda` lo pisa con su propio relleno;
+       `sticky` con el suyo; `bleed` lo apaga. */
+    padding: var(--sx-s-4) var(--sx-s-5);
     /* LA FIRMA. La barra no se separa con una línea: se separa con la luz que
        deja caer. La geometría está calibrada al límite de lo visible sobre
        claro — bajarla más no la hace discreta, la hace invisible. La discreción
        se gradúa por --sx-halo y sólo por ahí.
        El z-index NO es opcional: sin él el fondo del hermano siguiente se pinta
-       después en el orden natural y se come la luz justo donde tiene que caer. */
+       después en el orden natural y se come la luz justo donde tiene que caer.
+       Pero es `1`, NO `--sx-z-sticky`: sólo tiene que ganarle al hermano de
+       abajo (auto/0), no al cromo pegajoso. Con el token de sticky (40) un
+       PageHeader normal, al hacer scroll por debajo de una TopBar fija del
+       mismo z, quedaba por ENCIMA de ella y le tapaba el texto —«3 máquinas
+       vencidas» montándose sobre la barra. La barra PEGADA (`.sticky`, abajo)
+       sí sube a `--sx-z-sticky`, porque ahí sí tiene que montar el contenido
+       que pasa por debajo. */
     box-shadow: 0 12px 28px -18px var(--sx-halo);
     position: relative;
-    z-index: var(--sx-z-sticky);
+    z-index: 1;
   }
+
+  /* La salida del gutter: un encabezado dentro de un padre que ya rellena no
+     quiere padding doble. No toca a `banda` — su relleno es parte de su piel. */
+  .hd.bleed:not(.banda) { padding: 0; }
 
   .sticky {
     position: sticky;
@@ -282,19 +317,47 @@
     color: var(--sx-ink-3);
   }
 
-  /* ═══ VARIANT: banda — el tono ════════════════════════════════════════════
-     El mismo `--sx-thead` que ya pinta el `.head` de Panel — no un color
-     nuevo — y por eso hereda la misma restricción: medido contra
-     `--sx-surface` da 1.09 (con margen); contra `--sx-ground` da 1.03–1.05 en
-     claro, bajo el piso de este repo. SE APOYA EN UNA TARJETA, nunca directo
-     sobre el campo — ver la cabecera de este archivo y el catálogo, donde se
-     demuestra adentro de una Card, igual que Panel. */
+  /* ═══ VARIANT: banda — el tono, ahora CON color de verdad ══════════════════
+     Antes `banda` pintaba con `--sx-thead` (~6% del tinte sobre blanco): tan
+     tenue que no se leía como «con color». Ahora es una tarjeta de encabezado
+     REALMENTE teñida, y todo el color sale de cuatro custom properties que
+     cada tono reasigna —fill, ink, ink-soft y edge— así que la anatomía
+     (título, eyebrow, subtítulo) las lee sin repetir un color por regla.
+
+     · Default (tono neutro): relleno de ACENTO pleno, tinta `--sx-accent-ink`.
+       El único bloque de la pantalla que puede permitirse el acento entero,
+       como `Hero` — con la diferencia de que Hero es el bloque de tablero a
+       dos columnas y esto es un encabezado de ruta a una (ver la cabecera).
+     · Tono semántico (positive/attention/critical/info): la BANDA de ese tono
+       (`--sx-*-band`, clara) con su tinta oscura para el título y su canto
+       (`--sx-*-edge`). Con color y legible: el par band/ink ya está medido en
+       el sistema para Pill y Panel. */
   .hd.banda {
-    background: var(--sx-thead);
-    box-shadow: none;
-    padding: var(--sx-s-5) var(--sx-s-6) var(--sx-s-4);
-    border-radius: var(--sx-r-2);
+    --banda-fill: var(--sx-accent);
+    --banda-ink: var(--sx-accent-ink);
+    --banda-ink-soft: color-mix(in srgb, var(--sx-accent-ink) 76%, transparent);
+    --banda-edge: transparent;
+    background: var(--banda-fill);
+    color: var(--banda-ink);
+    border: 1px solid var(--banda-edge);
+    box-shadow: var(--sx-e-1);
+    /* Grande: más aire que halo/sarion y el radio grande de la escala — es una
+       tarjeta cerrada, no una barra. */
+    padding: var(--sx-s-6);
+    border-radius: var(--sx-r-3);
   }
+  .hd.banda.positive  { --banda-fill: var(--sx-positive-band);  --banda-ink: var(--sx-positive);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-positive-edge); }
+  .hd.banda.attention { --banda-fill: var(--sx-attention-band); --banda-ink: var(--sx-attention); --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-attention-edge); }
+  .hd.banda.critical  { --banda-fill: var(--sx-critical-band);  --banda-ink: var(--sx-critical);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-critical-edge); }
+  .hd.banda.info      { --banda-fill: var(--sx-info-band);      --banda-ink: var(--sx-info);      --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-info-edge); }
+
+  /* La anatomía lee las cuatro variables. `.hd.banda .ttl` (0,2,1) le gana a
+     `.critical .ttl` (0,2,0), así que el título de una banda toma SIEMPRE su
+     `--banda-ink` (el tono ya viajó al relleno y al canto, no sólo a la
+     tinta), sin romper el `tone` de un encabezado que no es banda. */
+  .hd.banda .ttl { color: var(--banda-ink); }
+  .hd.banda .eyebrow { color: var(--banda-ink-soft); }
+  .hd.banda .sub { color: var(--banda-ink-soft); }
 
   .crumbs { min-width: 0; }
   .meta { display: flex; flex-wrap: wrap; gap: var(--sx-s-2); margin-top: var(--sx-s-3); }

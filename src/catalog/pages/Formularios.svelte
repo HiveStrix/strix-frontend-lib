@@ -452,6 +452,23 @@
         </div>
 
         <p class="aside">
+          <b>hintDot — la ayuda como un punto.</b> La <span class="sx-id">pista</span> como párrafo
+          debajo de la etiqueta es prosa que alarga cada campo y desalinea una fila cuando una pista
+          es más larga que otra. Con <span class="sx-id">hintDot</span> se colapsa en un
+          <span class="sx-id">ⓘ</span> pegado a la etiqueta: el campo queda escueto, la ayuda vive a
+          un gesto, y el <span class="sx-id">aria-describedby</span> del control se mantiene. Misma
+          pista, dos formas —&nbsp;inline a la izquierda, como punto a la derecha:
+        </p>
+        <div class="demo grid2">
+          <Field label="Costo unitario" hint="Promedio ponderado de las últimas 12 compras." let:id let:describedBy>
+            <input {id} value="₡ 1.240" aria-describedby={describedBy} />
+          </Field>
+          <Field label="Costo unitario" hint="Promedio ponderado de las últimas 12 compras." hintDot let:id let:describedBy>
+            <input {id} value="₡ 1.240" aria-describedby={describedBy} />
+          </Field>
+        </div>
+
+        <p class="aside">
           Para un grupo, <span class="sx-id">group</span> deja de emitir <span class="sx-id">for</span> y
           entrega <span class="sx-id">labelId</span>: un radiogroup se nombra por
           <span class="sx-id">aria-labelledby</span>, nunca por <span class="sx-id">for</span>, porque no
