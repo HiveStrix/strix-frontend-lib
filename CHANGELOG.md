@@ -4,7 +4,24 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
-## v0.8.0 — 2026-08-18
+## v0.8.2 — 2026-08-20
+
+> Construida **sobre `v0.8.0`**.
+
+### Nuevo
+- **`Tabs` gana los tab-desplegables.** Un ítem con su propio `items` se dibuja
+  como una pestaña con caret que abre un menú de sus hijos — una válvula de
+  presión para el «dos a seis» cuando el riel se queda sin ancho y dos destinos
+  emparentados, consultados seguido pero no a diario, pueden compartir un lugar.
+  Elegir un hijo dispara `change` con su `key`, igual que una pestaña hoja, y la
+  pestaña-grupo se ve seleccionada cuando `value` es uno de sus hijos. Es un solo
+  tab-stop en el orden roving (← → la alcanzan, ↓/Enter la abren), con foco,
+  Escape, Tab y click-afuera correctos —medido por `composedPath` para el shadow
+  root—, y el menú sale por la **top layer** (`shell/toplayer.js`) para que el
+  scroll horizontal del propio riel no lo recorte. Los ítems sin `items` no
+  cambian en nada; es aditivo.
+
+
 
 > Construida **sobre `v0.7.2`**: incorpora sus arreglos (tokens con el cromo
 > precomputado a hex, `Table`, `TopBar`) y le suma lo de abajo.

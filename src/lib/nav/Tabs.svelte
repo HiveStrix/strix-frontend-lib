@@ -30,6 +30,25 @@
   //     {#if value === 'servicios'}<Ledger … />{/if}
   //   </Tabs>
   //
+  // A GROUP TAB — a tab that owns a dropdown instead of a panel. When a rail
+  // runs out of width, two related destinations that are consulted often but not
+  // daily can share one slot: an item with its own `items` renders as a tab with
+  // a caret that opens a menu of its children. Selecting a child fires `change`
+  // with the child's key, exactly like a leaf tab; the group tab shows selected
+  // whenever `value` is one of its children. It is one tab-stop in the roving
+  // order (← → reach it, ↓/Enter open it), and the menu escapes the rail's own
+  // horizontal scroll through the top layer, so it is never clipped.
+  //
+  //   { key: 'catalogo', label: 'Catálogo', items: [
+  //       { key: 'equipos',  label: 'Equipos',  count: assets.length },
+  //       { key: 'familias', label: 'Familias', count: families.length }
+  //   ] }
+  //
+  // Reach for it only when a real slot shortage forces the merge: a menu costs a
+  // click before its contents are even legible, so a destination that earns its
+  // own tab keeps it. It is the pressure valve for «two to six», not a way to
+  // fold six tabs into two dropdowns.
+  //
   // THE PANEL IS PART OF THE COMPONENT, on purpose. A tablist whose
   // `aria-controls` points at an id somebody forgot to render is the single
   // most common broken tab implementation, and it is invisible until a screen
@@ -42,12 +61,16 @@
   // default when panels are already-loaded client state. If a tab costs a
   // network round trip, pass `manual` and the arrow keys move focus only, with
   // Enter or Space to commit — otherwise arrowing across five tabs fires five
-  // requests.
-  import { createEventDispatcher, tick } from 'svelte';
+  // requests. A group tab never auto-activates: arrowing onto it only focuses
+  // it, because there is no one child that «arriving» should pick.
+  import { createEventDispatcher, tick, onDestroy, flushSync } from 'svelte';
+  import { supportsPopover, syncPopover } from '../shell/toplayer.js';
 
-  /** [{ key, label, count?, disabled? }] */
+  /** [{ key, label, count?, disabled?, items? }]. An item with `items` is a
+      group tab: a dropdown of leaf items `[{ key, label, count?, disabled? }]`. */
   export let items = [];
-  /** The selected key. Bindable. */
+  /** The selected key. Bindable. Always a LEAF key — a normal tab or a child of
+      a group, never a group's own key. */
   export let value = undefined;
   /** aria-label for the tablist. Required in spirit: «Registro», «Ficha». */
   export let label = '';
@@ -61,32 +84,53 @@
   const dispatch = createEventDispatcher();
 
   const uid = id || `sx-tabs-${Math.random().toString(36).slice(2, 9)}`;
+  const CHEV = 'M5 9.5 12 16.5 19 9.5';
 
-  let btns = {};       // key → the real button, so focus never goes through a selector
-  let focusKey = null; // where the arrow keys are, when `manual`
+  const isGroup = (t) => Array.isArray(t?.items) && t.items.length > 0;
+
+  let btns = {};       // top-level key → the real button, so focus never goes through a selector
+  let focusKey = null; // where the arrow keys are, when roving
 
   $: enabled = items.filter((t) => !t.disabled);
-  // If the bound value names a tab that is gone (a filter removed it, the user
+
+  // The keys `value` may legally hold: every leaf. A group contributes its
+  // children, never its own key — so the fallback below can never seat `value`
+  // on a group, which owns no panel and no single child to show.
+  $: leaves = items.flatMap((t) =>
+    isGroup(t) ? t.items.filter((s) => !s.disabled).map((s) => s.key) : t.disabled ? [] : [t.key]
+  );
+  // If the bound value names a leaf that is gone (a filter removed it, the user
   // lost a permission), fall back rather than render a tablist with nothing
   // selected — a tablist with no selected tab has no keyboard entry point.
-  $: if (items.length && !items.some((t) => t.key === value && !t.disabled)) {
-    value = enabled[0]?.key;
-  }
+  $: if (items.length && !leaves.includes(value)) value = leaves[0];
+
+  // Which TOP-LEVEL item is current: a leaf whose key is `value`, or the group
+  // that owns it. The underline, the roving home and the panel's label all read
+  // this, so a group shows selected exactly when one of its children is.
+  $: activeTop = items.find((t) => (isGroup(t) ? t.items.some((s) => s.key === value) : t.key === value));
+  $: activeTopKey = activeTop?.key ?? enabled[0]?.key;
+
   $: hasPanel = !!$$slots.default;
-  // `$:` so `value` and `focusKey` are in the dependency list of everything that
-  // calls it. As a plain `const` the roving tabindex froze on the first tab.
-  $: isTabStop = (t) => (manual ? (focusKey ?? value) === t.key : value === t.key);
+  // `$:` so `focusKey` and `activeTopKey` are in the dependency list of everything
+  // that calls it. As a plain `const` the roving tabindex froze on the first tab.
+  $: isTabStop = (t) => (focusKey ?? activeTopKey) === t.key;
 
   const tabId = (k) => `${uid}-t-${k}`;
 
+  function ownerOf(leafKey) {
+    return items.find((t) => (isGroup(t) ? t.items.some((s) => s.key === leafKey) : t.key === leafKey));
+  }
+
   function select(key) {
+    // The roving home follows the selection to the top-level item that owns it,
+    // so ← → resume from the tab that is lit, group or leaf.
+    focusKey = ownerOf(key)?.key ?? key;
     if (key === value) return;
     value = key;
-    focusKey = key;
     dispatch('change', { key });
   }
 
-  async function focusTab(key) {
+  async function focusTop(key) {
     focusKey = key;
     await tick(); // the roving tabindex has to land before the focus does
     const el = btns[key];
@@ -96,26 +140,160 @@
     el?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
-  function onKeydown(e) {
-    const keys = enabled.map((t) => t.key);
-    if (!keys.length) return;
-    const at = Math.max(0, keys.indexOf(manual ? (focusKey ?? value) : value));
-    let next = null;
-
-    if (e.key === 'ArrowRight') next = keys[(at + 1) % keys.length];
-    else if (e.key === 'ArrowLeft') next = keys[(at - 1 + keys.length) % keys.length];
-    else if (e.key === 'Home') next = keys[0];
-    else if (e.key === 'End') next = keys[keys.length - 1];
-    else if (manual && (e.key === 'Enter' || e.key === ' ')) {
-      e.preventDefault();
-      select(focusKey ?? value);
-      return;
-    } else return;
-
-    e.preventDefault();
-    if (!manual) select(next);
-    focusTab(next);
+  function moveTop(nextKey) {
+    const t = items.find((i) => i.key === nextKey);
+    // Auto-activate only leaf tabs; a group takes focus and waits to be opened,
+    // because «arriving» at a dropdown has no one child to commit to.
+    if (!manual && t && !isGroup(t)) select(nextKey);
+    else focusKey = nextKey;
+    focusTop(nextKey);
   }
+
+  function onTabKeydown(e, t) {
+    const keys = enabled.map((x) => x.key);
+    if (!keys.length) return;
+    const at = Math.max(0, keys.indexOf(focusKey ?? activeTopKey));
+
+    if (e.key === 'ArrowRight') { e.preventDefault(); moveTop(keys[(at + 1) % keys.length]); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); moveTop(keys[(at - 1 + keys.length) % keys.length]); }
+    else if (e.key === 'Home') { e.preventDefault(); moveTop(keys[0]); }
+    else if (e.key === 'End') { e.preventDefault(); moveTop(keys[keys.length - 1]); }
+    else if (isGroup(t) && (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault(); openGroup(t, false);
+    }
+    else if (isGroup(t) && e.key === 'ArrowUp') { e.preventDefault(); openGroup(t, true); }
+    else if (!isGroup(t) && manual && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); select(t.key); }
+  }
+
+  // ── The group dropdown ───────────────────────────────────────────────────
+  // One group open at a time. The panel lives in the top layer so the rail's
+  // own `overflow-x` cannot clip it — the same reason Menu and Combobox do.
+  let openKey = null;   // which group is open
+  let panel = null;
+  let openTrigger = null; // the open group's tab, for place() and focus-back
+  let subNodes = [];
+  let subActive = -1;
+  let up = false;
+
+  $: openItem = openKey ? items.find((t) => t.key === openKey) : null;
+  $: subItems = openItem?.items ?? [];
+
+  const focusableSub = (i) => !!subItems[i] && !subItems[i].disabled;
+  function setSub(i) { subActive = i; subNodes[i]?.focus?.(); }
+  function stepSub(from, delta) {
+    const n = subItems.length;
+    for (let k = 0; k < n; k++) {
+      const i = ((from + delta * (k + 1)) % n + n) % n;
+      if (focusableSub(i)) return setSub(i);
+    }
+  }
+  function edgeSub(fromEnd) {
+    const n = subItems.length;
+    for (let k = 0; k < n; k++) {
+      const i = fromEnd ? n - 1 - k : k;
+      if (focusableSub(i)) return setSub(i);
+    }
+  }
+
+  async function openGroup(t, fromEnd) {
+    if (openKey === t.key) return;
+    openKey = t.key;
+    openTrigger = btns[t.key];
+    subActive = -1;
+    await tick();
+    place();
+    edgeSub(fromEnd);
+  }
+
+  function closeGroup(giveFocusBack = true) {
+    if (!openKey) return;
+    // Leave the top layer in the same synchronous step as everything else hide
+    // does, before Svelte unmounts the node the `{#if}` is about to drop.
+    syncPopover(panel, false);
+    const trg = openTrigger;
+    openKey = null;
+    subActive = -1;
+    openTrigger = null;
+    if (giveFocusBack && trg?.isConnected) trg.focus();
+  }
+
+  // `openKey` can also change from an external write; keep the popover state in
+  // step. `panel` is still null the instant `openKey` flips, so wait a tick.
+  async function syncExternalOpen(k) { await tick(); syncPopover(panel, !!k); }
+  $: syncExternalOpen(openKey);
+
+  // Below or above? `syncPopover` runs BEFORE reading offsetHeight: an unopened
+  // popover is `display: none` and measures zero, which would always decide that
+  // below fits. The trigger width goes into `--sx-tabmenu-tw` first for the same
+  // reason — the min-width depends on it and width changes the height being read.
+  function place() {
+    if (!panel || !openTrigger) return;
+    const t = openTrigger.getBoundingClientRect();
+    if (supportsPopover) panel.style.setProperty('--sx-tabmenu-tw', `${t.width}px`);
+    syncPopover(panel, true);
+    const h = panel.offsetHeight;
+    const vh = document.documentElement.clientHeight;
+    const below = vh - t.bottom;
+    up = below < h + 8 && t.top > below;
+    if (!supportsPopover) return;
+    // With `fixed`, both edges are viewport pixels; the group menu always
+    // aligns to the trigger's start.
+    panel.style.left = `${t.left}px`;
+    if (up) { panel.style.bottom = `${vh - t.top}px`; panel.style.top = 'auto'; }
+    else { panel.style.top = `${t.bottom}px`; panel.style.bottom = 'auto'; }
+  }
+
+  function chooseSub(s, i) {
+    if (s.disabled) { setSub(i); return; }
+    select(s.key);
+    closeGroup(true);
+  }
+
+  function onPanelKey(e) {
+    const k = e.key;
+    if (k === 'Escape') { e.preventDefault(); e.stopPropagation(); closeGroup(true); return; }
+    // Tab means Tab: close, then continue. `flushSync` is load-bearing — without
+    // it the panel is still in the DOM when the browser computes where Tab goes,
+    // so focus lands inside the vanishing menu and then drops on <body>.
+    if (k === 'Tab') { closeGroup(true); flushSync(); return; }
+    if (k === 'ArrowDown') { e.preventDefault(); stepSub(subActive, 1); return; }
+    if (k === 'ArrowUp') { e.preventDefault(); stepSub(subActive, -1); return; }
+    if (k === 'Home') { e.preventDefault(); edgeSub(false); return; }
+    if (k === 'End') { e.preventDefault(); edgeSub(true); return; }
+  }
+
+  // Outside = not on the composed path. Inside a shadow root `e.target` at
+  // document level is always the host, so `contains()` lies; the trigger and the
+  // top-layer panel are separate nodes, so both are checked.
+  function onOutside(e) {
+    if (!openKey) return;
+    const path = typeof e.composedPath === 'function' ? e.composedPath() : [];
+    if (path.includes(panel) || path.includes(openTrigger)) return;
+    const here = panel?.getRootNode?.()?.activeElement ?? null;
+    closeGroup(!!(here && panel?.contains(here)));
+  }
+  function onResize() { if (openKey) place(); }
+  function onScroll() { if (openKey) place(); }
+
+  $: if (typeof document !== 'undefined') {
+    document.removeEventListener('pointerdown', onOutside, true);
+    window.removeEventListener('resize', onResize);
+    document.removeEventListener('scroll', onScroll, true);
+    if (openKey) {
+      document.addEventListener('pointerdown', onOutside, true);
+      window.addEventListener('resize', onResize);
+      // In capture: `scroll` does not bubble, so only the way down from document
+      // hears an inner container scroll. Passive because it never preventDefaults.
+      if (supportsPopover) document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    }
+  }
+
+  onDestroy(() => {
+    if (typeof document === 'undefined') return;
+    document.removeEventListener('pointerdown', onOutside, true);
+    window.removeEventListener('resize', onResize);
+    document.removeEventListener('scroll', onScroll, true);
+  });
 </script>
 
 <div class="tabs">
@@ -129,17 +307,26 @@
         role="tab"
         id={tabId(t.key)}
         class="tab"
-        class:on={t.key === value}
-        aria-selected={t.key === value}
-        aria-controls={hasPanel ? `${uid}-p` : undefined}
+        class:on={t.key === activeTopKey}
+        class:group={isGroup(t)}
+        aria-selected={t.key === activeTopKey}
+        aria-controls={isGroup(t)
+          ? (openKey === t.key ? `${uid}-m` : undefined)
+          : (hasPanel ? `${uid}-p` : undefined)}
+        aria-haspopup={isGroup(t) ? 'menu' : undefined}
+        aria-expanded={isGroup(t) ? (openKey === t.key ? 'true' : 'false') : undefined}
         tabindex={isTabStop(t) ? 0 : -1}
         disabled={t.disabled || undefined}
         bind:this={btns[t.key]}
-        on:keydown={onKeydown}
-        on:click={() => select(t.key)}
+        on:keydown={(e) => onTabKeydown(e, t)}
+        on:click={() => (isGroup(t) ? (openKey === t.key ? closeGroup(true) : openGroup(t, false)) : select(t.key))}
       >
         <span class="lb">{t.label}</span>
-        {#if t.count != null}
+        {#if isGroup(t)}
+          <svg class="cv" class:open={openKey === t.key} viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true"><path d={CHEV} /></svg>
+        {:else if t.count != null}
           <!-- The figure sits beside another figure in the next tab, so it is
                tabular: «7» and «11» have to line up or the eye cannot compare
                them at a glance. -->
@@ -149,13 +336,44 @@
     {/each}
   </div>
 
+  {#if openKey}
+    <div
+      class="menu"
+      class:up
+      class:fx={supportsPopover}
+      popover={supportsPopover ? 'manual' : undefined}
+      id="{uid}-m"
+      role="menu"
+      aria-label={openItem?.label}
+      tabindex="-1"
+      bind:this={panel}
+      on:keydown={onPanelKey}
+    >
+      {#each subItems as s, i (s.key)}
+        <button
+          class="item"
+          class:off={s.disabled}
+          bind:this={subNodes[i]}
+          type="button"
+          role="menuitem"
+          tabindex={i === subActive ? 0 : -1}
+          aria-disabled={s.disabled ? 'true' : undefined}
+          on:click={() => chooseSub(s, i)}
+        >
+          <span class="ml">{s.label}</span>
+          {#if s.count != null}<span class="mc sx-num">{s.count}</span>{/if}
+        </button>
+      {/each}
+    </div>
+  {/if}
+
   {#if hasPanel}
     <!-- Focusable on purpose. A panel that is only a table of text has nothing
          to tab to, and without a tab stop a keyboard user arrives at the tab,
          presses Tab, and lands past the very thing the tab just revealed. -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
     <div class="panel" id="{uid}-p" role="tabpanel" tabindex="0"
-      aria-labelledby={value != null ? tabId(value) : undefined}>
+      aria-labelledby={activeTopKey != null ? tabId(activeTopKey) : undefined}>
       <slot {value} />
     </div>
   {/if}
@@ -224,6 +442,18 @@
     cursor: not-allowed;
   }
 
+  /* The caret of a group tab. Turns when its menu is open, so «this one has more
+     under it» and «it is open right now» read at a glance. */
+  .cv {
+    width: 14px;
+    height: 14px;
+    margin-inline-start: calc(-1 * var(--sx-s-1));
+    color: var(--sx-ink-3);
+    transition: transform var(--sx-fast) var(--sx-ease);
+  }
+  .cv.open { transform: rotate(180deg); }
+  .tab.on .cv { color: var(--sx-ink-2); }
+
   .c {
     font-size: var(--sx-t-2xs);
     font-weight: var(--sx-w-medium);
@@ -243,14 +473,90 @@
     border-radius: var(--sx-r-1);
   }
 
+  /* ── The group menu ─────────────────────────────────────────────────────── */
+  /* Same top-layer machinery as Menu: `position: absolute` as the floor, `.fx`
+     lifts it to `fixed` in the top layer when `popover` is supported. The six
+     neutralising declarations undo the UA `[popover]` sheet (border, margin:auto,
+     fit-content) so the box `place()` positions is the box that was styled. */
+  .menu {
+    position: absolute;
+    top: calc(100% + var(--sx-s-1));
+    left: 0;
+    z-index: var(--sx-z-overlay);
+    min-width: max(100%, 12ch);
+    max-width: min(86vw, 32ch);
+    padding: var(--sx-s-1);
+    background: var(--sx-surface);
+    border-radius: var(--sx-r-2);
+    box-shadow: var(--sx-e-3);
+    max-height: min(60vh, 26rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    margin: 0;
+    border: 0;
+    color: inherit;
+    width: auto;
+    height: auto;
+    overflow-x: visible;
+  }
+  .menu.up { top: auto; bottom: calc(100% + var(--sx-s-1)); }
+  .menu.fx {
+    position: fixed;
+    right: auto;
+    bottom: auto;
+    margin-top: var(--sx-s-1);
+    min-width: max(var(--sx-tabmenu-tw, 0px), 12ch);
+  }
+  .menu.fx.up { margin-top: 0; margin-bottom: var(--sx-s-1); }
+
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sx-s-4);
+    width: 100%;
+    padding: var(--sx-s-2) var(--sx-s-3);
+    background: transparent;
+    border: 0;
+    border-radius: var(--sx-r-1);
+    color: var(--sx-ink);
+    font-size: var(--sx-t-sm);
+    font-weight: var(--sx-w-medium);
+    line-height: 1.2;
+    text-align: start;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background var(--sx-fast) var(--sx-ease);
+  }
+  .item:hover, .item:focus { background: var(--sx-accent-soft); outline: none; }
+  .item:focus-visible {
+    outline: 2px solid var(--sx-ink);
+    outline-offset: -2px;
+    border-radius: var(--sx-r-1);
+  }
+  .item.off { color: var(--sx-ink-3); cursor: not-allowed; }
+  .item.off:hover { background: transparent; }
+
+  .mc {
+    font-size: var(--sx-t-2xs);
+    font-weight: var(--sx-w-medium);
+    color: var(--sx-ink-3);
+    background: var(--sx-sunk);
+    padding: 1px var(--sx-s-2);
+    border-radius: var(--sx-r-pill);
+  }
+
   .panel { padding-top: var(--sx-s-4); min-width: 0; }
   .panel:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; border-radius: var(--sx-r-1); }
 
   @media (pointer: coarse) {
     .tab { min-height: var(--sx-touch); padding-inline: var(--sx-s-4); }
+    .item { min-height: var(--sx-touch); font-size: var(--sx-t-md); }
+    .menu { min-width: max(100%, 26ch); }
+    .menu.fx { min-width: max(var(--sx-tabmenu-tw, 0px), 26ch); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .tab { transition: none; }
+    .tab, .cv, .item { transition: none; }
   }
 </style>
