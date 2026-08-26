@@ -63,12 +63,13 @@
   //
   // `headVariant`: EL HUECO QUE DEJABA «SARION» A MEDIAS.
   //
-  // `PageHeader variant="sarion"` (ver ese archivo) es una barra: título
-  // apretado en negativo, subtítulo monoespaciado en positivo, una línea en
-  // vez de banda. Se pidió una segunda vez porque el catálogo sólo la
-  // mostraba así — la barra sola, en `Estructura` — y no hay forma de
-  // evaluar la pieza real (una cabecera de sección DENTRO de un objeto con
-  // cuerpo) mirando una barra suelta. La pieza real es un Panel con esa
+  // El estilo compacto de sección —adaptado de un ERP real (Sarion)— es una
+  // barra: título apretado en negativo, subtítulo monoespaciado en positivo,
+  // una línea en vez de banda. Vive en dos lugares con la MISMA tipografía:
+  // acá, en `headVariant`, y suelto como `PageHeader variant="section"`. Se
+  // pidió una segunda vez porque no hay forma de evaluar la pieza real (una
+  // cabecera de sección DENTRO de un objeto con cuerpo) mirando una barra
+  // suelta. La pieza real es un Panel con esa
   // cabecera puesta, y Panel no la tenía: su `.head` siempre fue
   // `--sx-thead`, la banda, sin salida — ni siquiera vía `variant`, que ya
   // está tomado (ver la nota sobre `tone`/`variant` más abajo: reenvía a
@@ -93,6 +94,7 @@
   // `banda` (default, no se toca) sigue siendo `--sx-thead` — lo de siempre.
   import Card from './Card.svelte';
   import Glyph from './Glyph.svelte';
+  import { pickVariant } from '../variants.js';
 
   /** The heading. A Panel without one is a Card — use that instead. */
   export let title = '';
@@ -126,12 +128,13 @@
   const STEPS = new Set([1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20]);
   const step = (n) => (STEPS.has(Number(n)) ? `var(--sx-s-${n})` : '0px');
   const RADII = { 1: 'var(--sx-r-1)', 2: 'var(--sx-r-2)', 3: 'var(--sx-r-3)' };
-  const HEAD_VARIANTS = new Set(['banda', 'sarion']);
+  // El orden ES la numeración: 1 banda · 2 sarion.
+  const HEAD_VARIANTS = ['banda', 'sarion'];
 
   $: tag = `h${Math.min(6, Math.max(1, Number(level) || 2))}`;
-  // A typo in headVariant fails SAFE (banda, the law) not invisible — same
-  // rule Card and PageHeader already hold for their own `variant`.
-  $: hv = HEAD_VARIANTS.has(headVariant) ? headVariant : 'banda';
+  // Acepta nombre o número (1 banda · 2 sarion). Un typo cae SEGURO a `banda`
+  // (la ley) y no invisible — la misma regla que Card y PageHeader.
+  $: hv = pickVariant(headVariant, HEAD_VARIANTS, 'banda');
   // The footer band and the flush body both have to round exactly like the card
   // they sit in, and the card's radius is a prop — so it travels down as a
   // variable rather than as three near-miss guesses.

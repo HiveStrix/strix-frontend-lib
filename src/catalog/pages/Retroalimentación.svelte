@@ -816,6 +816,12 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
       <p class="one">La forma de lo que viene, sosteniéndole el lugar mientras viene.</p>
     </header>
 
+    <p class="tip">
+      <b>Las variantes tienen número</b>, para pedir «usá la variante N» — el número es un alias del
+      nombre (<span class="sx-id">variant="circle"</span> es lo mismo que
+      <span class="sx-id">variant="3"</span>): 1&nbsp;text&nbsp;· 2&nbsp;block&nbsp;· 3&nbsp;circle.
+    </p>
+
     <div class="when">
       <div class="use">
         <p class="sx-cap">Usalo</p>

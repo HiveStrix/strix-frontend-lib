@@ -242,6 +242,13 @@
           que ellas— está en la cabecera de <span class="sx-id">Card.svelte</span>.
         </p>
 
+        <p class="note">
+          <b>Las variantes tienen número</b>, para pedir «usá la variante N» — el número es un alias
+          del nombre (<span class="sx-id">variant="crest"</span> es lo mismo que
+          <span class="sx-id">variant="2"</span>):
+          &nbsp;<b>1</b>&nbsp;raised&nbsp;·&nbsp; <b>2</b>&nbsp;crest&nbsp;·&nbsp; <b>3</b>&nbsp;filled.
+        </p>
+
         <div class="demo">
           <div class="cards">
             <Card>
@@ -327,19 +334,27 @@
 
         <h3 class="sx-cap sub">headVariant — el estilo Sarion, comparado con el default</h3>
         <p class="why">
-          Se pidió ver la pieza trabajando, no la barra sola: <span class="sx-id">PageHeader
-          variant="sarion"</span> vive en <span class="sx-id">Estructura</span> como una cabecera
-          suelta, y una barra sola no alcanza para juzgar cómo se ve cerrando un Panel de verdad.
+          Se pidió ver la pieza trabajando, no la barra sola: el estilo compacto de sección vive
+          suelto como <span class="sx-id">PageHeader variant="section"</span> (en
+          <span class="sx-id">Estructura</span>), y una barra sola no alcanza para juzgar cómo se ve
+          cerrando un Panel de verdad.
           Panel no tenía esa cabecera — su <span class="sx-id">.head</span> siempre fue la banda de
           <span class="sx-id">--sx-thead</span>, sin salida —, así que ahora es un prop propio,
-          <span class="sx-id">headVariant</span>, con la misma tipografía que
-          <span class="sx-id">PageHeader</span> ya calibró para <span class="sx-id">sarion</span>
+          <span class="sx-id">headVariant</span>, con esa tipografía compacta —título apretado en
+          negativo, subtítulo monoespaciado— adaptada de <span class="sx-id">Sarion</span>
           (no <span class="sx-id">PageHeader</span> montado adentro: ver la nota en
           <span class="sx-id">Panel.svelte</span> sobre por qué — en corto, su <span class="sx-id">level</span>
           sólo entiende <span class="sx-id">h1</span>/<span class="sx-id">h2</span> y el de Panel
           tiene que llegar hasta <span class="sx-id">h6</span>). Mismo título, mismo subtítulo,
           mismas acciones, mismo cuerpo, mismo pie — sólo la cabecera cambia, para que se pueda
           comparar en vez de sólo mirar dos cosas lindas.
+        </p>
+
+        <p class="note">
+          <b><span class="sx-id">headVariant</span> tiene número</b>, para pedir «usá la variante N»
+          — es un alias del nombre (<span class="sx-id">headVariant="sarion"</span> es lo mismo que
+          <span class="sx-id">headVariant="2"</span>): &nbsp;<b>1</b>&nbsp;banda&nbsp;·&nbsp;
+          <b>2</b>&nbsp;sarion.
         </p>
 
         <div class="demo two-up">

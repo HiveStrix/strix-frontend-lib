@@ -1,142 +1,157 @@
 <script>
-  // PAGE HEADER — the first thing on a screen, and the last thing anybody
-  // remembers to design.
+  import { pickVariant } from '../variants.js';
+  // PAGE HEADER — lo primero de una pantalla, y lo último que alguien se
+  // acuerda de diseñar.
   //
-  // WHY IT IS A COMPONENT AND NOT JUST AN <h1>
+  // POR QUÉ ES UN COMPONENTE Y NO UN <h1>
   //
-  // Every Strix surface opens the same way: WHERE you are, WHAT is true right
-  // now, and WHAT you can do about it — in that order. A screen that invents
-  // its own opening costs half a second of re-orientation on every visit, and
-  // the people who use this software visit forty times a day. Multiply.
+  // Toda superficie de Strix abre igual: DÓNDE estás, QUÉ es cierto ahora
+  // mismo, y QUÉ podés hacer al respecto —en ese orden—. Una pantalla que se
+  // inventa su propia apertura cuesta medio segundo de reorientación en cada
+  // visita, y esta gente entra cuarenta veces al día. Multiplicá.
   //
-  // THE TITLE IS A SENTENCE, NOT A NOUN.
+  // EL TÍTULO ES UNA ORACIÓN, NO UN SUSTANTIVO.
   //
-  // «Flota» names a tab. «3 máquinas están vencidas» names a situation, and the
-  // situation is what somebody came to find out. So: the noun goes in `eyebrow`
-  // (that is what the eyebrow is FOR), and the title gets the sentence.
+  // «Flota» nombra una pestaña. «3 máquinas están vencidas» nombra una
+  // situación, y la situación es lo que alguien vino a averiguar. Así que el
+  // sustantivo va en `eyebrow` (para eso ES el eyebrow) y el título se queda
+  // con la oración.
   //
   //   <PageHeader
-  //     eyebrow="Flota"
-  //     title="3 máquinas están vencidas."
-  //     subtitle="BAT014 lleva 12 días vencida en «Cambio de aceite»."
+  //     variant="hero"
+  //     eyebrow="Atención requerida"
+  //     title="Mayo cierra con "
+  //     subtitle="La cartera vencida acumula ₡81.4M. Cuatro clientes concentran el 41%."
   //     tone="critical">
-  //     <Breadcrumb slot="crumbs" items={ruta} />
-  //     <Pill slot="meta" tone="critical">12 planes vencidos</Pill>
-  //     <button slot="actions" class="…">Registrar servicio</button>
+  //     <!-- el fragmento en acento entra por el slot default y se pinta solo -->
+  //     <em>caída del 88%</em> en ingresos cobrados.
+  //     <FigureBlock slot="figure" … />
+  //     <Button slot="actions" variant="solid">Abrir cobranza</Button>
   //   </PageHeader>
+  //
+  // ─────────────────────────────────────────────────────────────────────────
+  // `variant`: UNA ESCALERA DE INTENSIDAD, DE UN BANNER A UNA RAYA.
+  //
+  // El set viejo (halo · sarion · banda) se rehízo: halo y banda salieron; la
+  // tipografía compacta de sarion vuelve como `section`. En su lugar, seis
+  // formas ordenadas de más a menos ruido, replicando el encabezado de
+  // un ERP real (Sarion) en el extremo intenso y bajando de ahí a lo discreto.
+  // El CONTRATO no cambió: mismas props, mismos slots, mismos ~40 usos en
+  // producción siguen andando. Lo que se eliminó fue el DISEÑO, no la
+  // implementación.
+  //
+  // ÍNDICE (para pedir una por número al implementar — el número es un alias
+  // del nombre: `variant="line"` === `variant="1"`). El orden va de lo discreto
+  // (el default, la raya) a lo intenso: el banner `hero` es la ÚLTIMA opción, la
+  // que se saca de la galera sólo cuando la pantalla lo amerita.
+  //   1 line (default) · 2 section · 3 plain · 4 soft · 5 hero-card · 6 hero
+  //
+  //   hero      ▓▓▓  El banner. Isla oscura a sangre —gradiente de la escala
+  //                  neutra, tinta clara, un fragmento del título en acento— a
+  //                  dos zonas: la narrativa a la izquierda, la CIFRA a la
+  //                  derecha (slot `figure`). Adaptado de Sarion «Prism». Es el
+  //                  único bloque de la pantalla que se permite volverse oscuro
+  //                  y quedarse con toda la luz. Todo lo ranurado adentro
+  //                  (Button, Pill) cae en modo oscuro solo, porque la isla
+  //                  re-mapea los tokens de tinta/superficie —no toca las
+  //                  reglas de esas familias, cambia el AMBIENTE que leen.
+  //
+  //   hero-card ▓▓▓  El mismo esqueleto a dos zonas, pero como TARJETA nativa
+  //                  del tema: borde, divisor central, y se adapta a claro y
+  //                  oscuro sola (usa --sx-ink/--sx-line, no una isla). La
+  //                  derecha suele llevar un desglose. Adaptado de Sarion
+  //                  «Forge». Menos foco que `hero`, misma anatomía.
+  //
+  //   soft      ▓    El bloque tranquilo. Una sola columna sobre un relleno
+  //                  tenue (`--sx-accent-soft`, o la banda del `tone` cuando el
+  //                  estado urge). Para cerrar una sección con color sin
+  //                  encender un banner.
+  //
+  //   line      ·|·  EL DEFAULT. El título grande de la página, separado del
+  //                  contenido por una RAYA inferior en vez de una luz. Reemplaza
+  //                  al viejo `halo`: la separación ahora no depende de una
+  //                  sombra que un producto podía apagar. Universal y discreto.
+  //
+  //   section   ·|·  La cabecera de sección compacta: título apretado en
+  //                  negativo, subtítulo monoespaciado en positivo, una línea.
+  //                  Para un encabezado DENTRO del contenido (level 2/3) — la
+  //                  misma tipografía que Panel replica en su `headVariant`.
+  //
+  //   plain     ·    Sólo texto. Ni raya ni tarjeta ni sombra —el encabezado
+  //                  para cuando ya vive DENTRO de un marco (una Card) y otra
+  //                  línea sería doble marco.
   //
   // ABOUT `tone`
   //
-  // It colours the title, and it is the ONE place in this library where ink
-  // carries meaning by itself — so it is legal only when the title already says
-  // the word. «3 máquinas están vencidas» in critical ink is the rule holding.
-  // «Flota» in critical ink is the rule broken: somebody who cannot separate red
-  // from grey learns nothing, and everyone else learns that the colour is noise.
+  // Pinta el título, y es el ÚNICO lugar de esta librería donde la tinta lleva
+  // significado por sí sola —así que sólo es legal cuando el título ya dice la
+  // palabra—. «3 máquinas están vencidas» en tinta crítica es la regla
+  // aguantando; «Flota» en crítica es la regla rota. En `soft` el tono también
+  // tiñe el relleno (su banda medida); en `hero` los tonos usan sus inks
+  // claras para sobrevivir al fondo oscuro.
   //
-  // WHAT IT DELIBERATELY DOES NOT DO
-  //
-  // It does not own the figures (cumplimiento, MTTR, costo). Those are a data
-  // component's job and they go through `meta`, so a header never becomes the
-  // place where a fourth kind of layout gets invented.
-  //
-  // NOT `TopBar`. This is of the SCREEN — it changes on every route, a new
-  // title and a new eyebrow each time. `TopBar` (`../nav/TopBar.svelte`) is of
-  // the APPLICATION — the product's name, the tenant, the session — and does
-  // not change for as long as somebody stays signed in. A value that stays
-  // the same across every route was never this component's fact to hold.
-  //
-  // ─────────────────────────────────────────────────────────────────────────
-  // `variant`: LA MISMA LEY QUE `Card`, DICHA DESDE UN ENCABEZADO.
-  //
-  // Una superficie se separa de su fondo de tres maneras —luz, línea o
-  // tono— y el marco completo, con el argumento entero, vive en la cabecera
-  // de `Card` (`src/lib/shell/Card.svelte`). Acá la misma terna, el mismo
-  // default, la misma regla: `halo` no se toca.
-  //
-  //   halo   (default — NO SE TOCA) — la luz que ya cae con `--sx-halo`.
-  //
-  //   sarion — la línea. Adaptada de un ERP real, de donde salió el pedido
-  //   de dar esta salida: un encabezado de sección compacto, con
-  //   `border-bottom` en vez de halo. El problema que la origina: adentro
-  //   del contenido, donde no hay barra, el halo solo no alcanza y las
-  //   secciones se leen como una sola — «todo parece una sola sección», en
-  //   palabras de quien lo pidió. El gesto real de `sarion` no es la regla:
-  //   es la tipografía — el título en negativo (`-.015em`) contra el
-  //   subtítulo monoespaciado en positivo (`.04em`), el mismo contraste que
-  //   ya usa este sistema entre `.sx-id` (negativo, para un identificador
-  //   mono) y `.sx-cap`/`ChoiceCards` (positivo, para una etiqueta). `sarion`
-  //   NO agrega su propio padding horizontal — eso sigue siendo trabajo del
-  //   padre, como siempre en este componente — sólo cierra su propio ritmo
-  //   vertical antes de la línea.
-  //
-  //   banda  — el tono, ahora CON color de verdad. Antes pintaba con
-  //   `--sx-thead` (~6% del tinte sobre blanco) y se veía casi blanca; el
-  //   pedido fue una tarjeta de encabezado grande y realmente teñida. Default:
-  //   relleno de ACENTO pleno con tinta `--sx-accent-ink`. Con `tone`: la
-  //   banda semántica de ese tono (`--sx-*-band` claro) + su tinta oscura para
-  //   el título + su canto (`--sx-*-edge`) — pares ya medidos en el sistema
-  //   para Pill y Panel, así que «con color» no cuesta legibilidad. Todo el
-  //   color sale de cuatro custom properties (fill/ink/ink-soft/edge) que cada
-  //   tono reasigna; la anatomía las lee sin repetir un color por regla.
-  //   NO es `Hero`: Hero es el bloque de tablero a dos columnas con cifras al
-  //   lado; banda es un encabezado de ruta a una columna.
+  // NO ES `TopBar`. Esto es de la PANTALLA —cambia en cada ruta—. `TopBar` es
+  // de la APLICACIÓN (el nombre del producto, el tenant, la sesión) y no cambia
+  // mientras alguien siga adentro. Un valor que se repite en toda ruta nunca
+  // fue un dato de este componente.
   // ─────────────────────────────────────────────────────────────────────────
 
-  /** The situation, in a sentence. Required — a header with no title is a gap. */
+  /** La situación, en una oración. Requerido —un header sin título es un hueco. */
   export let title = '';
-  /** One line of evidence for the title. Optional, never a second title. */
+  /** Una línea de evidencia para el título. Opcional, nunca un segundo título. */
   export let subtitle = '';
-  /** The noun: which screen this is. Rendered in the caption register. */
+  /** El sustantivo: qué pantalla es esta. En `hero`/`hero-card` se rinde como tag. */
   export let eyebrow = '';
-  /** neutral | attention | critical — legal only if the title says the word. */
+  /** neutral | attention | critical | positive | info — legal sólo si el título dice la palabra. */
   export let tone = 'neutral';
-  /** 1 for the page's own header, 2 for a section header inside it. */
+  /** 1 para el header propio de la página, 2 para un header de sección adentro. */
   export let level = 1;
-  /** Rides the top of the scroll. Use on long ledgers where the actions matter. */
+  /** Se pega arriba del scroll. Útil en ledgers largos donde las acciones importan. */
   export let sticky = false;
-  /** Skeleton until the first payload lands. Keeps the layout from jumping. */
+  /** Esqueleto hasta que aterriza el primer payload. Evita que el layout salte. */
   export let loading = false;
   /**
-   * halo | sarion | banda — HOW this header leaves its background: light,
-   * line or tone. `halo` is the default and is the law, not just what
-   * happens when nobody writes anything. See «`variant`» above.
+   * hero | hero-card | soft | section | line | plain — la escalera de intensidad
+   * de arriba. `line` es el default y es la ley, no lo que pasa cuando nadie
+   * escribe nada. Un valor viejo o inválido (`halo`/`sarion`/`banda`) cae
+   * SEGURO a `line`: se eliminó el diseño, no se rompió el llamado.
    */
-  export let variant = 'halo';
+  export let variant = 'line';
   /**
-   * GUTTER GARANTIZADO — POR QUÉ ESTE ARCHIVO YA NO DICE «EL PADDING ES DEL
-   * PADRE». Durante mucho tiempo `halo` y `sarion` no ponían padding
-   * horizontal propio: el argumento era que el encabezado ya vive dentro de
-   * una columna con su padding, así que sumar el suyo sería padding doble.
-   * En la práctica eso dejaba el título/eyebrow/subtítulo ROZANDO el borde en
-   * cuanto alguien soltaba el componente sobre un contenedor sin padding —
-   * el defecto que este cambio vino a cerrar. Ahora el gutter (por los cuatro
-   * lados) es la GARANTÍA: nada de texto toca el borde. `bleed` es la salida
-   * para el caso que el argumento viejo describía bien —&nbsp;un encabezado
-   * dentro de una `Card` que YA rellena— donde el padding propio sería doble:
-   * lo apaga. `banda` no se ve afectada: su relleno es parte de su piel
-   * (la banda de color necesita aire propio), así que `bleed` la deja igual.
+   * GUTTER GARANTIZADO. Las variantes de texto (`line`/`plain`/`soft`) ponen
+   * padding propio por los cuatro lados para que nada roce el borde de un
+   * contenedor sin relleno. `bleed` lo apaga —la salida para un header que ya
+   * vive dentro de una Card que rellena, donde el padding propio sería doble—.
+   * No afecta a `hero`/`hero-card`: su relleno es parte de su piel.
    */
   export let bleed = false;
 
-  const VARIANTS = new Set(['halo', 'sarion', 'banda']);
+  // El orden ES la numeración (ver el ÍNDICE de arriba): 1 line (default) ·
+  // 2 section · 3 plain · 4 soft · 5 hero-card · 6 hero. De lo discreto a lo
+  // intenso, con el banner `hero` como ÚLTIMA opción. `pickVariant`
+  // (../variants.js) acepta el nombre o el número —son intercambiables—; los
+  // nombres siguen siendo los canónicos, el número es una comodidad.
+  const VARIANTS = ['line', 'section', 'plain', 'soft', 'hero-card', 'hero'];
 
-  // `$:` and not `const`: a legacy reactive statement tracks only the names
-  // written inside it, so a helper closing over `level` would be invisible to
-  // the markup that reads it and the tag would never change.
+  // `$:` y no `const`: un reactive statement legacy sólo rastrea los nombres
+  // escritos adentro, así que un helper que cerrara sobre `level` sería
+  // invisible para el markup que lo lee.
   $: tag = level === 2 ? 'h2' : 'h1';
   $: hasMeta = !!$$slots.meta;
   $: hasActions = !!$$slots.actions;
   $: hasCrumbs = !!$$slots.crumbs;
-  // A typo in `variant` fails SAFE (the law) not invisible.
-  $: v = VARIANTS.has(variant) ? variant : 'halo';
+  $: hasFigure = !!$$slots.figure;
+  // Resuelve el alias numérico al nombre; un typo o valor viejo (`halo`) falla
+  // SEGURO (la ley) al default `line`, no invisible.
+  $: v = pickVariant(variant, VARIANTS, 'line');
+  // Las dos variantes con esqueleto a dos zonas comparten markup.
+  $: isHero = v === 'hero' || v === 'hero-card';
 </script>
 
 <header
-  class="hd {tone}"
+  class="hd {v} {tone}"
   class:sticky
   class:loading
-  class:sarion={v === 'sarion'}
-  class:banda={v === 'banda'}
   class:bleed
   aria-busy={loading || undefined}
 >
@@ -144,47 +159,71 @@
     <div class="crumbs"><slot name="crumbs" /></div>
   {/if}
 
-  <div class="row">
-    <div class="say">
-      {#if loading}
-        <!-- The skeleton mirrors the real block's rhythm, so nothing moves when
-             the payload lands. The pulse is doing a job: it says «this is a
-             placeholder», which a static grey bar does not. -->
-        <span class="sr" role="status">Cargando…</span>
-        {#if eyebrow}<div class="sk sk-eyebrow" aria-hidden="true"></div>{/if}
-        <div class="sk sk-title" aria-hidden="true"></div>
-        {#if subtitle}<div class="sk sk-sub" aria-hidden="true"></div>{/if}
-      {:else}
-        {#if eyebrow}<p class="sx-cap eyebrow">{eyebrow}</p>{/if}
-        <!-- The default slot appends to the title, for the one case `title`
-             cannot cover: a code or a figure that has to be typeset — «BAT014
-             lleva <span class="sx-num">12</span> días vencida». -->
-        <svelte:element this={tag} class="ttl">{title}<slot /></svelte:element>
-        {#if subtitle}<p class="sub">{subtitle}</p>{/if}
-      {/if}
+  {#if isHero}
+    <!-- A DOS ZONAS: narrativa a la izquierda (con las acciones ancladas al
+         pie por `margin-top:auto`), la cifra a la derecha. Si nadie pasa
+         `figure`, la grilla colapsa a una columna sola sin dejar un hueco. -->
+    <div class="grid" class:one={!hasFigure}>
+      <div class="say">
+        {#if loading}
+          <span class="sr" role="status">Cargando…</span>
+          {#if eyebrow}<div class="sk sk-eyebrow" aria-hidden="true"></div>{/if}
+          <div class="sk sk-title" aria-hidden="true"></div>
+          {#if subtitle}<div class="sk sk-sub" aria-hidden="true"></div>{/if}
+        {:else}
+          {#if eyebrow}
+            <p class="tag"><span class="dot" aria-hidden="true"></span>{eyebrow}</p>
+          {/if}
+          <svelte:element this={tag} class="ttl">{title}<slot /></svelte:element>
+          {#if subtitle}<p class="sub">{subtitle}</p>{/if}
+          {#if hasMeta}<div class="meta"><slot name="meta" /></div>{/if}
+          {#if hasActions}<div class="acts"><slot name="actions" /></div>{/if}
+        {/if}
+      </div>
 
-      {#if hasMeta && !loading}
-        <div class="meta"><slot name="meta" /></div>
+      {#if hasFigure && !loading}
+        <div class="figure"><slot name="figure" /></div>
       {/if}
     </div>
+  {:else}
+    <div class="row">
+      <div class="say">
+        {#if loading}
+          <span class="sr" role="status">Cargando…</span>
+          {#if eyebrow}<div class="sk sk-eyebrow" aria-hidden="true"></div>{/if}
+          <div class="sk sk-title" aria-hidden="true"></div>
+          {#if subtitle}<div class="sk sk-sub" aria-hidden="true"></div>{/if}
+        {:else}
+          {#if eyebrow}<p class="sx-cap eyebrow">{eyebrow}</p>{/if}
+          <!-- El slot default se APPENDEA al título, para el caso que `title`
+               no cubre: un código o una cifra que hay que componer —«BAT014
+               lleva <span class="sx-num">12</span> días vencida»— o el
+               fragmento en acento del banner. -->
+          <svelte:element this={tag} class="ttl">{title}<slot /></svelte:element>
+          {#if subtitle}<p class="sub">{subtitle}</p>{/if}
+          {#if hasMeta}<div class="meta"><slot name="meta" /></div>{/if}
+        {/if}
+      </div>
 
-    {#if hasActions}
-      <!-- The actions keep their place while the title loads: a button that
-           appears late is a button somebody has already clicked past. -->
-      <div class="acts"><slot name="actions" /></div>
-    {/if}
-  </div>
+      {#if hasActions}
+        <!-- Las acciones guardan su lugar mientras el título carga: un botón
+             que aparece tarde es un botón que alguien ya pasó de largo. -->
+        <div class="acts"><slot name="actions" /></div>
+      {/if}
+    </div>
+  {/if}
 
   {#if $$slots.below}
-    <!-- Where a Tabs or a FilterChips row belongs: still inside the header's
-         rhythm, still above the fold, never a second bar floating on its own. -->
+    <!-- Donde va una fila de Tabs o FilterChips: todavía dentro del ritmo del
+         header, todavía sobre la línea de flotación, nunca una segunda barra
+         flotando sola. -->
     <div class="below"><slot name="below" /></div>
   {/if}
 </header>
 
 <style>
-  /* The registers a Core re-declares for itself; nothing here relies on a class
-     that lives outside this file except `.sx-cap`, which is one of the three. */
+  /* Los registros que un Core re-declara para sí; nada acá depende de una
+     clase de afuera salvo `.sx-cap`, que es uno de los tres. */
   .sr {
     position: absolute; width: 1px; height: 1px;
     padding: 0; margin: -1px; overflow: hidden;
@@ -195,54 +234,21 @@
     display: flex;
     flex-direction: column;
     gap: var(--sx-s-3);
-    /* EL GUTTER GARANTIZADO. Padding propio por los cuatro lados para que el
-       texto nunca roce el borde del contenedor — ver la nota de `bleed` en el
-       script. No afecta a la luz de la firma (una sombra cae por fuera de la
-       caja, no la empuja el padding). `banda` lo pisa con su propio relleno;
-       `sticky` con el suyo; `bleed` lo apaga. */
+    /* EL GUTTER GARANTIZADO, para las variantes de texto. Padding propio por
+       los cuatro lados para que el texto nunca roce el borde. `hero`/`hero-card`
+       lo pisan con su propia piel; `bleed` lo apaga. */
     padding: var(--sx-s-4) var(--sx-s-5);
-    /* LA FIRMA. La barra no se separa con una línea: se separa con la luz que
-       deja caer. La geometría está calibrada al límite de lo visible sobre
-       claro — bajarla más no la hace discreta, la hace invisible. La discreción
-       se gradúa por --sx-halo y sólo por ahí.
-       El z-index NO es opcional: sin él el fondo del hermano siguiente se pinta
-       después en el orden natural y se come la luz justo donde tiene que caer.
-       Pero es `1`, NO `--sx-z-sticky`: sólo tiene que ganarle al hermano de
-       abajo (auto/0), no al cromo pegajoso. Con el token de sticky (40) un
-       PageHeader normal, al hacer scroll por debajo de una TopBar fija del
-       mismo z, quedaba por ENCIMA de ella y le tapaba el texto —«3 máquinas
-       vencidas» montándose sobre la barra. La barra PEGADA (`.sticky`, abajo)
-       sí sube a `--sx-z-sticky`, porque ahí sí tiene que montar el contenido
-       que pasa por debajo. */
-    box-shadow: 0 12px 28px -18px var(--sx-halo);
     position: relative;
-    z-index: 1;
   }
 
-  /* La salida del gutter: un encabezado dentro de un padre que ya rellena no
-     quiere padding doble. No toca a `banda` — su relleno es parte de su piel. */
-  .hd.bleed:not(.banda) { padding: 0; }
+  /* Salida del gutter: un header dentro de un padre que ya rellena no quiere
+     padding HORIZONTAL doble. Sólo se apaga el gutter lateral —el vertical se
+     conserva SIEMPRE— para que el título alinee a sangre con el cuerpo sin que
+     la raya inferior quede pegada al subtítulo ni el bloque pierda su aire
+     arriba/abajo. No toca a `hero`/`hero-card` —su relleno es su piel. */
+  .hd.bleed:not(.hero):not(.hero-card) { padding-left: 0; padding-right: 0; }
 
-  .sticky {
-    position: sticky;
-    top: 0;
-    z-index: var(--sx-z-sticky);
-    background: var(--sx-ground);
-    /* No declara box-shadow propio a propósito: .hd ya deja caer el halo, y
-       pegada es cuando más tiene que notarse que hay contenido pasando por
-       debajo. Redeclararlo acá con --sx-e-1 lo pisaba en silencio — la firma
-       de la dirección desaparecía justo cuando la barra se quedaba pegada.
-       Pero un producto puede ligar --sx-halo a transparent (la perilla que el
-       README documenta) y entonces la barra pegada se queda sin raya, sin
-       sombra y sin halo. border-bottom es otra propiedad — convive con el
-       box-shadow de .hd sin pisarlo — y da un límite que no depende del halo. */
-    border-bottom: 1px solid var(--sx-line);
-    padding-block: var(--sx-s-3);
-    margin-inline: calc(var(--sx-s-4) * -1);
-    padding-inline: var(--sx-s-4);
-    border-radius: var(--sx-r-1);
-  }
-
+  /* ═══ LAYOUT COMÚN ═════════════════════════════════════════════════════════ */
   .row {
     display: flex;
     align-items: flex-start;
@@ -250,7 +256,6 @@
     gap: var(--sx-s-6);
     flex-wrap: wrap;
   }
-
   .say { min-width: 0; flex: 1 1 34ch; }
 
   .eyebrow { margin: 0 0 var(--sx-s-2); }
@@ -261,7 +266,7 @@
     font-weight: var(--sx-w-bold);
     letter-spacing: -.03em;
     line-height: 1.12;
-    /* A headline past this stops being read and starts being scanned. */
+    /* Un titular más largo que esto deja de leerse y empieza a escanearse. */
     max-width: 26ch;
     text-wrap: balance;
   }
@@ -274,41 +279,71 @@
     max-width: 58ch;
   }
 
+  /* El tono pinta el título —y sólo el título— en las variantes de texto. */
   .attention .ttl { color: var(--sx-attention); }
-  .critical .ttl { color: var(--sx-critical); }
+  .critical  .ttl { color: var(--sx-critical); }
+  .positive  .ttl { color: var(--sx-positive); }
+  .info      .ttl { color: var(--sx-info); }
 
-  /* ═══ VARIANT: sarion — la línea ══════════════════════════════════════════
-     `.hd.sarion`, no una redeclaración de `.hd`: la especificidad tiene que
-     ganarle al halo de arriba sin depender de en qué orden queda el bloque.
-     Ningún padding horizontal — eso lo sigue dando el padre, como en `halo` —
-     sólo el ritmo vertical antes de la línea. `--sx-line` y no `--sx-edge`
-     porque el README ya describe el trabajo exacto de `--sx-line`: «cierra
-     una cabecera, divide una fila» — es literalmente este caso, no un
-     préstamo forzado. */
-  .hd.sarion {
-    box-shadow: none;
+  .crumbs { min-width: 0; }
+  .meta { display: flex; flex-wrap: wrap; gap: var(--sx-s-2); margin-top: var(--sx-s-3); }
+  .below { min-width: 0; }
+
+  /* Sólo layout. Cómo se ve un botón es de quien manda en los botones; un
+     header que restyleara su slot estaría metiendo mano en otra familia. */
+  .acts { display: flex; align-items: center; gap: var(--sx-s-2); flex-wrap: wrap; flex: none; }
+
+  /* ═══ STICKY ═══════════════════════════════════════════════════════════════
+     Pensado para el default `line` en ledgers largos. Sube a --sx-z-sticky
+     porque ahí sí tiene que montar el contenido que pasa por debajo, y se
+     apoya en un borde que no depende del halo (un producto puede apagar la luz,
+     no la raya). */
+  .sticky {
+    position: sticky;
+    top: 0;
+    z-index: var(--sx-z-sticky);
+    background: var(--sx-ground);
+    border-bottom: 1px solid var(--sx-line);
+    padding-block: var(--sx-s-3);
+    margin-inline: calc(var(--sx-s-4) * -1);
+    padding-inline: var(--sx-s-4);
+    border-radius: var(--sx-r-1);
+  }
+
+  /* ═══ VARIANT: line — el default, una raya ════════════════════════════════
+     `.hd.line`, no una redeclaración de `.hd`: la especificidad tiene que
+     ganarle sin depender del orden del bloque. Reemplaza al viejo `halo`: el
+     título grande de la página, separado por `--sx-line` («cierra una
+     cabecera, divide una fila» —justo este caso). Ningún padding horizontal
+     extra: el gutter de `.hd` alcanza. */
+  .hd.line {
+    border-bottom: 1px solid var(--sx-line);
+  }
+
+  /* ═══ VARIANT: plain — sólo texto ═════════════════════════════════════════
+     Ni raya ni piel. Para un header que ya vive dentro de un marco. Nada que
+     declarar más allá de heredar la base: existe para NO poner una segunda
+     línea donde ya hay una tarjeta. */
+
+  /* ═══ VARIANT: section — la cabecera de sección compacta ══════════════════
+     La tipografía que Panel calibró para su `headVariant`, ahora también como
+     variante propia: título apretado en negativo (-.015em, el mismo tracking
+     que `.sx-id` para texto compacto y en negrita) contra un subtítulo
+     monoespaciado en positivo (+.04em) —ese contraste es su carácter— y una
+     línea en vez de banda. Para un encabezado DENTRO del contenido (level 2/3),
+     donde el título grande de `line` (33px) pesaría de más. */
+  .hd.section {
     border-bottom: 1px solid var(--sx-line);
     padding-bottom: var(--sx-s-4);
   }
-  /* 15px es --sx-t-md EXACTO; 700 es --sx-w-bold EXACTO. El tracking
-     (-.015em) no es un rgba: es una proporción, y coincide con la que ya usa
-     `.sx-id` en base.css para el mismo motivo — texto compacto y en negrita
-     se cierra un poco — así que no es un número sacado de contexto, es uno
-     que este sistema ya conocía. `max-width: none` porque el clamp de 26ch
-     de arriba está pensado para el título GRANDE (33px); a este tamaño la
-     referencia correcta es `Panel .t`, que tampoco clampea. */
-  .sarion .ttl {
+  .section .ttl {
     font-size: var(--sx-t-md);
     font-weight: var(--sx-w-bold);
     letter-spacing: -.015em;
     line-height: 1.3;
     max-width: none;
   }
-  /* El gesto real de la variante. Mono, chico, tracking POSITIVO — lo
-     opuesto del título — que es exactamente el contraste que le da carácter.
-     11px es --sx-t-2xs EXACTO. .04em ya es un valor del sistema (el badge de
-     `ChoiceCards`, `Divider label`), no uno inventado para esta variante. */
-  .sarion .sub {
+  .section .sub {
     margin-top: var(--sx-s-1);
     font-family: var(--sx-font-mono);
     font-size: var(--sx-t-2xs);
@@ -317,56 +352,178 @@
     color: var(--sx-ink-3);
   }
 
-  /* ═══ VARIANT: banda — el tono, ahora CON color de verdad ══════════════════
-     Antes `banda` pintaba con `--sx-thead` (~6% del tinte sobre blanco): tan
-     tenue que no se leía como «con color». Ahora es una tarjeta de encabezado
-     REALMENTE teñida, y todo el color sale de cuatro custom properties que
-     cada tono reasigna —fill, ink, ink-soft y edge— así que la anatomía
-     (título, eyebrow, subtítulo) las lee sin repetir un color por regla.
-
-     · Default (tono neutro): relleno de ACENTO pleno, tinta `--sx-accent-ink`.
-       El único bloque de la pantalla que puede permitirse el acento entero,
-       como `Hero` — con la diferencia de que Hero es el bloque de tablero a
-       dos columnas y esto es un encabezado de ruta a una (ver la cabecera).
-     · Tono semántico (positive/attention/critical/info): la BANDA de ese tono
-       (`--sx-*-band`, clara) con su tinta oscura para el título y su canto
-       (`--sx-*-edge`). Con color y legible: el par band/ink ya está medido en
-       el sistema para Pill y Panel. */
-  .hd.banda {
-    --banda-fill: var(--sx-accent);
-    --banda-ink: var(--sx-accent-ink);
-    --banda-ink-soft: color-mix(in srgb, var(--sx-accent-ink) 76%, transparent);
-    --banda-edge: transparent;
-    background: var(--banda-fill);
-    color: var(--banda-ink);
-    border: 1px solid var(--banda-edge);
-    box-shadow: var(--sx-e-1);
-    /* Grande: más aire que halo/sarion y el radio grande de la escala — es una
-       tarjeta cerrada, no una barra. */
-    padding: var(--sx-s-6);
-    border-radius: var(--sx-r-3);
+  /* ═══ VARIANT: soft — el bloque tranquilo ═════════════════════════════════
+     Una columna sobre un relleno tenue. Por defecto el acento al 10%; con
+     `tone`, la banda medida de ese estado (el mismo par banda/tinta que ya usan
+     Pill y Panel), así que «con color» no cuesta legibilidad. */
+  .hd.soft {
+    background: var(--sx-accent-soft);
+    border-radius: var(--sx-r-2);
+    padding: var(--sx-s-5) var(--sx-s-6);
   }
-  .hd.banda.positive  { --banda-fill: var(--sx-positive-band);  --banda-ink: var(--sx-positive);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-positive-edge); }
-  .hd.banda.attention { --banda-fill: var(--sx-attention-band); --banda-ink: var(--sx-attention); --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-attention-edge); }
-  .hd.banda.critical  { --banda-fill: var(--sx-critical-band);  --banda-ink: var(--sx-critical);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-critical-edge); }
-  .hd.banda.info      { --banda-fill: var(--sx-info-band);      --banda-ink: var(--sx-info);      --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-info-edge); }
+  .hd.soft.attention { background: var(--sx-attention-band); }
+  .hd.soft.critical  { background: var(--sx-critical-band); }
+  .hd.soft.positive  { background: var(--sx-positive-band); }
+  .hd.soft.info      { background: var(--sx-info-band); }
+  .hd.soft.bleed { margin-inline: calc(var(--sx-s-6) * -1); }
 
-  /* La anatomía lee las cuatro variables. `.hd.banda .ttl` (0,2,1) le gana a
-     `.critical .ttl` (0,2,0), así que el título de una banda toma SIEMPRE su
-     `--banda-ink` (el tono ya viajó al relleno y al canto, no sólo a la
-     tinta), sin romper el `tone` de un encabezado que no es banda. */
-  .hd.banda .ttl { color: var(--banda-ink); }
-  .hd.banda .eyebrow { color: var(--banda-ink-soft); }
-  .hd.banda .sub { color: var(--banda-ink-soft); }
+  /* ═══ ANATOMÍA A DOS ZONAS (hero · hero-card) ═════════════════════════════ */
+  .grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--sx-s-8);
+    align-items: stretch;
+  }
+  .grid.one { grid-template-columns: 1fr; }
+  /* La narrativa es una columna: eyebrow-tag, título, bajada, y las acciones
+     ancladas al PIE —como en el original— para que dos headers uno al lado del
+     otro alineen sus botones aunque los textos midan distinto. */
+  .grid .say { display: flex; flex-direction: column; gap: var(--sx-s-3); }
+  .grid .acts { margin-top: auto; padding-top: var(--sx-s-5); }
+  .grid .meta { margin-top: var(--sx-s-1); }
+  .figure {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--sx-s-3);
+  }
 
-  .crumbs { min-width: 0; }
-  .meta { display: flex; flex-wrap: wrap; gap: var(--sx-s-2); margin-top: var(--sx-s-3); }
-  .below { min-width: 0; }
+  /* El eyebrow como CHIP con punto vivo (el gesto de Sarion «Prism»): una
+     píldora tenue con punto que late. El relleno/borde se derivan de `--sx-ink`
+     con color-mix, así que adapta solo: sobre la isla oscura del `hero` la tinta
+     es casi blanca (chip claro translúcido), sobre la tarjeta clara del
+     `hero-card` la tinta es oscura (chip oscuro translúcido). Sin hex. */
+  .tag {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sx-s-2);
+    align-self: flex-start;
+    padding: var(--sx-s-1) var(--sx-s-3);
+    border-radius: var(--sx-r-pill);
+    background: color-mix(in srgb, var(--sx-ink) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--sx-ink) 14%, transparent);
+    font-family: var(--sx-font-mono);
+    font-size: var(--sx-t-2xs);
+    font-weight: var(--sx-w-semi);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--sx-ink-2);
+  }
+  .tag .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--sx-accent);
+    animation: livePulse 1.6s var(--sx-ease) infinite;
+  }
+  .attention .tag .dot { background: var(--sx-attention); }
+  .critical  .tag .dot { background: var(--sx-critical); }
+  .positive  .tag .dot { background: var(--sx-positive); }
+  .info      .tag .dot { background: var(--sx-info); }
 
-  /* Layout only. What a button looks like belongs to whoever owns buttons; a
-     header that restyled its slot would be reaching into another family. */
-  .acts { display: flex; align-items: center; gap: var(--sx-s-2); flex-wrap: wrap; flex: none; }
+  /* El título grande de las dos zonas, y el fragmento en acento que entra por
+     el slot default —un `<em>` sin cursiva, sólo color—. Ese contraste (una
+     palabra encendida dentro de una oración apagada) es la mitad del carácter
+     del banner. */
+  .grid .ttl { max-width: 20ch; }
+  /* El fragmento en acento, ahora como DEGRADADO (accent → accent aclarado
+     hacia --sx-n-0), el mismo gesto que enciende «caída del 88%» en Prism. Todo
+     por tokens: nada de un color crudo dentro del gradiente. */
+  .hd.hero .ttl :global(em),
+  .hd.hero-card .ttl :global(em) {
+    font-style: normal;
+    font-weight: inherit;
+    background: linear-gradient(
+      90deg,
+      var(--sx-accent) 0%,
+      color-mix(in srgb, var(--sx-accent) 45%, var(--sx-n-0)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 
+  /* ═══ VARIANT: hero — el banner, isla oscura a sangre ═════════════════════
+     Re-mapea los tokens de tinta/superficie a valores oscuros ESTABLES (la
+     escala --sx-n-* no cambia entre temas) para volverse una isla oscura sin
+     importar el tema de la app —y para que TODO lo ranurado adentro (Button,
+     Pill, Breadcrumb) caiga en modo oscuro solo, leyendo esos tokens—. El
+     header no toca las reglas de esas familias: cambia el AMBIENTE que leen.
+     El acento se queda vivo (no la versión lavada del tema oscuro) para que el
+     `<em>` y la primaria enciendan. */
+  .hd.hero {
+    --sx-surface: var(--sx-n-800);
+    --sx-sunk: var(--sx-n-900);
+    --sx-line: color-mix(in srgb, var(--sx-n-0) 12%, transparent);
+    --sx-edge: color-mix(in srgb, var(--sx-n-0) 24%, transparent);
+    --sx-ink: color-mix(in srgb, var(--sx-n-0) 96%, var(--sx-accent));
+    --sx-ink-2: color-mix(in srgb, var(--sx-n-0) 74%, transparent);
+    --sx-ink-3: color-mix(in srgb, var(--sx-n-0) 56%, transparent);
+    /* El tono, por defecto: tinta casi blanca para el título, acento vivo para
+       el punto. Los tonos semánticos los ACLARA el bloque de reglas de abajo
+       —nunca un hex: se mezcla el propio token hacia --sx-n-0, que es lo que lo
+       vuelve legible sobre el fondo oscuro sin clavar un color fuera del tema. */
+    --hero-tone-ink: var(--sx-ink);
+    --hero-tone-dot: var(--sx-accent);
+
+    color: var(--sx-ink);
+    background: linear-gradient(135deg, var(--sx-n-900) 0%, var(--sx-n-800) 100%);
+    border-radius: var(--sx-r-3);
+    box-shadow: var(--sx-e-2);
+    padding: var(--sx-s-8);
+  }
+  .hd.hero .ttl {
+    font-size: var(--sx-t-3xl);
+    font-weight: var(--sx-w-semi);
+    letter-spacing: -.035em;
+    line-height: 1.05;
+    color: var(--hero-tone-ink);
+  }
+  .hd.hero .sub { color: var(--sx-ink-3); max-width: 52ch; }
+  /* El tono sobre la isla oscura, SIN hardcodear: se aclara el token semántico
+     mezclándolo hacia --sx-n-0. El título y el punto leen la misma variable, así
+     que el color viaja a los dos lugares sin repetir un valor por regla. La
+     especificidad (`.hd.hero .ttl` = 0,2,1) le gana al `.critical .ttl` genérico
+     de arriba, así que el tono del banner no se pisa con el tono de campo claro. */
+  .hd.hero.attention { --hero-tone-ink: color-mix(in srgb, var(--sx-attention) 62%, var(--sx-n-0)); --hero-tone-dot: var(--hero-tone-ink); }
+  .hd.hero.critical  { --hero-tone-ink: color-mix(in srgb, var(--sx-critical) 62%, var(--sx-n-0));  --hero-tone-dot: var(--hero-tone-ink); }
+  .hd.hero.positive  { --hero-tone-ink: color-mix(in srgb, var(--sx-positive) 62%, var(--sx-n-0));  --hero-tone-dot: var(--hero-tone-ink); }
+  .hd.hero.info      { --hero-tone-ink: color-mix(in srgb, var(--sx-info) 62%, var(--sx-n-0));      --hero-tone-dot: var(--hero-tone-ink); }
+  .hd.hero .tag .dot { background: var(--hero-tone-dot); }
+  /* La cifra se centra vertical para pesar como contrapeso del título. */
+  .hd.hero .figure { justify-content: center; }
+
+  /* ═══ VARIANT: hero-card — la misma anatomía, tarjeta nativa del tema ══════
+     Nada de isla: usa --sx-ink/--sx-surface/--sx-line del tema, así que se
+     adapta a claro y oscuro sola. Borde, radio, y un divisor central entre la
+     narrativa y la cifra (como el `border-right` del original). El padding lo
+     ponen las columnas, no el header —por eso el header va a 0—. */
+  .hd.hero-card {
+    padding: 0;
+    background: var(--sx-surface);
+    border: 1px solid var(--sx-line);
+    border-radius: var(--sx-r-2);
+    box-shadow: var(--sx-e-1);
+    overflow: hidden;
+  }
+  .hd.hero-card .grid { gap: 0; }
+  .hd.hero-card .say { padding: var(--sx-s-6); }
+  .hd.hero-card .figure {
+    padding: var(--sx-s-6);
+    border-left: 1px solid var(--sx-line);
+  }
+  .hd.hero-card .grid.one .figure { border-left: 0; }
+  .hd.hero-card .ttl {
+    font-size: var(--sx-t-2xl);
+    font-weight: var(--sx-w-semi);
+    letter-spacing: -.03em;
+    line-height: 1.1;
+  }
+
+  /* ═══ ESQUELETO ═══════════════════════════════════════════════════════════
+     El esqueleto imita el ritmo del bloque real, así nada se mueve cuando llega
+     el payload. El pulso hace un trabajo: dice «esto es un placeholder», cosa
+     que una barra gris quieta no dice. */
   .sk {
     background: var(--sx-sunk);
     border-radius: var(--sx-r-1);
@@ -377,20 +534,28 @@
   .sk-sub { height: var(--sx-t-md); width: min(44ch, 100%); margin-top: var(--sx-s-3); }
 
   @keyframes sk-pulse { from { opacity: 1; } to { opacity: .5; } }
+  @keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 
-  /* base.css kills this globally, but a Core module in a shadow root never sees
-     base.css — so the rule is repeated where it has to be true. */
+  /* base.css mata esto global, pero un Core en un shadow root nunca ve base.css
+     —así que la regla se repite donde tiene que ser cierta. */
   @media (prefers-reduced-motion: reduce) {
     .sk { animation: none; opacity: .75; }
+    .tag .dot { animation: none; }
   }
 
-  /* The content column, not the window: a module usually renders beside the
-     Shell's 240px rail, so the header runs out of room well before the viewport
-     does. Below this the actions stop competing with the title and take a line
-     of their own. */
-  @media (max-width: 640px) {
-    .ttl { font-size: var(--sx-t-xl); }
+  /* La columna de contenido, no la ventana: un módulo suele renderizar al lado
+     del rail de 240px del Shell, así que el header se queda sin lugar bastante
+     antes que el viewport. Debajo de esto las dos zonas se apilan y las
+     acciones dejan de competir con el título. */
+  @media (max-width: 720px) {
+    .grid, .hd.hero-card .grid { grid-template-columns: 1fr; gap: 0; }
+    .hd.hero-card .figure { border-left: 0; border-top: 1px solid var(--sx-line); }
+    .hd.hero .figure { margin-top: var(--sx-s-5); }
+  }
+  @media (max-width: 560px) {
+    .ttl, .hd.hero .ttl { font-size: var(--sx-t-xl); }
     .sk-title { height: var(--sx-t-xl); }
     .acts { width: 100%; }
+    .hd.hero { padding: var(--sx-s-6); }
   }
 </style>

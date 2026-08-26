@@ -43,8 +43,9 @@
   // `href` renders a real <a>. A thing that navigates is a link — it belongs in
   // a new tab on middle click, and a button never will be.
   import { createEventDispatcher } from 'svelte';
+  import { pickVariant, BUTTON_VARIANTS } from '../variants.js';
 
-  /** solid | outline | ghost | danger */
+  /** solid(1) | outline(2) | ghost(3) | danger(4) — por nombre o por número. */
   export let variant = 'outline';
   /** sm | md | lg */
   export let size = 'md';
@@ -73,6 +74,10 @@
   export let node = null;
 
   const dispatch = createEventDispatcher();
+
+  // La variante, por nombre o por número (1 solid · 2 outline · 3 ghost ·
+  // 4 danger). Un valor inválido cae seguro al default, no a una clase muda.
+  $: v = pickVariant(variant, BUTTON_VARIANTS, 'outline');
 
   // Icon-only is inferred rather than declared: passing an icon and no words IS
   // the request. The explicit prop exists for the case where the label is
@@ -104,7 +109,7 @@
   <a
     {...$$restProps}
     bind:this={node}
-    class="sx-btn {variant} {size}"
+    class="sx-btn {v} {size}"
     class:only={onlyIcon}
     class:pill
     class:block
@@ -134,7 +139,7 @@
   <button
     {...$$restProps}
     bind:this={node}
-    class="sx-btn {variant} {size}"
+    class="sx-btn {v} {size}"
     class:only={onlyIcon}
     class:pill
     class:block

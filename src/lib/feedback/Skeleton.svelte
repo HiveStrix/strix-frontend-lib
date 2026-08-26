@@ -1,4 +1,5 @@
 <script>
+  import { pickVariant } from '../variants.js';
   // SKELETON — the shape of what is coming, held open while it comes.
   //
   // Its job is NOT to entertain: it is to reserve the exact space the real
@@ -24,7 +25,7 @@
   // killing the sweep with `animation-duration: .01ms` would leave a bright
   // stripe frozen mid-shape, which reads as a rendering error.
 
-  /** text | block | circle */
+  /** text(1) | block(2) | circle(3) — por nombre o por número. */
   export let variant = 'text';
   /** Only for `text`: how many lines. The last one is short, like real prose. */
   export let lines = 3;
@@ -39,7 +40,10 @@
    */
   export let label = '';
 
-  $: rows = variant === 'text' ? Math.max(1, lines) : 1;
+  // Acepta nombre o número: 1 text · 2 block · 3 circle.
+  const VARIANTS = ['text', 'block', 'circle'];
+  $: v = pickVariant(variant, VARIANTS, 'text');
+  $: rows = v === 'text' ? Math.max(1, lines) : 1;
   $: style = [
     width ? `width:${width}` : '',
     height ? `height:${height}` : '',
@@ -47,7 +51,7 @@
   ].filter(Boolean).join(';');
 </script>
 
-<div class="sk {variant}" role={label ? 'status' : undefined} aria-busy={label ? 'true' : undefined}>
+<div class="sk {v}" role={label ? 'status' : undefined} aria-busy={label ? 'true' : undefined}>
   {#if label}<span class="sx-sr">{label}</span>{/if}
   {#each Array(rows) as _, i (i)}
     <span class="bar" style={style} aria-hidden="true"></span>

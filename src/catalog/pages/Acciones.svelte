@@ -277,6 +277,14 @@
       dentro de una fila o de una barra sin pelearse con el contenido.
     </p>
 
+    <p class="note">
+      <b>Las variantes tienen número</b>, para pedir «usá la variante N» — el número es un alias del
+      nombre (<span class="sx-id">variant="solid"</span> es lo mismo que
+      <span class="sx-id">variant="1"</span>), igual en Button, IconButton, Menu y SplitButton:
+      &nbsp;<b>1</b>&nbsp;solid&nbsp;·&nbsp; <b>2</b>&nbsp;outline&nbsp;·&nbsp;
+      <b>3</b>&nbsp;ghost&nbsp;·&nbsp; <b>4</b>&nbsp;danger.
+    </p>
+
     <div class="card">
       <div class="stage">
         <div class="compare">

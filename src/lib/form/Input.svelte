@@ -38,6 +38,10 @@
   export let type = 'text';
   export let label = '';
   export let hint = '';
+  /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
+   *  bajo el campo — así los campos de una misma fila quedan a igual altura y
+   *  alinean. Se reenvía tal cual a `Field`. */
+  export let hintDot = false;
   export let error = '';
   export let fix = '';
   export let warning = '';
@@ -86,7 +90,7 @@
 </script>
 
 <Field
-  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {readonly}
+  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {readonly}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}

@@ -1,4 +1,5 @@
 <script>
+  import { pickVariant } from '../variants.js';
   // THE SURFACE. One object, lifted off the ground.
   //
   // Everything a Strix screen shows sits on something, and this is the something:
@@ -186,8 +187,9 @@
    */
   export let tone = '';
   /**
-   * raised | crest | filled — HOW this surface leaves its background: light,
-   * line or tone. `raised` is the default and is not the same as writing
+   * raised(1) | crest(2) | filled(3) — HOW this surface leaves its background:
+   * light, line or tone. Por nombre o por número (`variant="crest"` ===
+   * `variant="2"`). `raised` is the default and is not the same as writing
    * nothing wrong; it is the law. See «EL MARCO» above before reaching for
    * the other two.
    */
@@ -198,7 +200,8 @@
   const STEPS = new Set([1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20]);
   const step = (n) => (STEPS.has(Number(n)) ? `var(--sx-s-${n})` : '0px');
   const TONES = new Set(['positive', 'attention', 'critical', 'info', 'neutral']);
-  const VARIANTS = new Set(['raised', 'crest', 'filled']);
+  // El orden ES la numeración: 1 raised · 2 crest · 3 filled.
+  const VARIANTS = ['raised', 'crest', 'filled'];
 
   // A disabled link is not a thing: an <a> with no href is not focusable and an
   // <a> with one still navigates. So a card that is both a destination and
@@ -206,10 +209,10 @@
   $: kind = href && !disabled ? 'a' : interactive || href ? 'button' : 'div';
   $: live = kind !== 'div' && !disabled;
   $: t = TONES.has(tone) ? tone : '';
-  // An unrecognised value falls back to `raised` rather than to nothing: a
-  // typo in `variant` has to fail SAFE (the law) not fail INVISIBLE (a card
-  // with no shape at all).
-  $: v = VARIANTS.has(variant) ? variant : 'raised';
+  // Acepta el nombre o el número (1 raised · 2 crest · 3 filled). Un valor no
+  // reconocido cae a `raised` en vez de a nada: un typo en `variant` tiene que
+  // fallar SEGURO (la ley) y no INVISIBLE (una card sin forma).
+  $: v = pickVariant(variant, VARIANTS, 'raised');
   // `--card-tone` carries the tone colour as a variable rather than a class per
   // tone, because `--card-glow` (below) has to mix it in once for all five
   // tones plus "none". Undefined resolves through the `transparent` fallback in

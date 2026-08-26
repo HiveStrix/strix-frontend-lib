@@ -46,6 +46,9 @@
 
   export let label = '';
   export let hint = '';
+  /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
+   *  bajo el campo — así los campos de una fila alinean. Se reenvía a `Field`. */
+  export let hintDot = false;
   export let error = '';
   export let fix = '';
   export let warning = '';
@@ -82,7 +85,7 @@
 </script>
 
 <Field
-  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled}
+  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}

@@ -31,12 +31,13 @@
   // belong to the <a>, not to the half beside it.
   import Button from './Button.svelte';
   import Menu from './Menu.svelte';
+  import { pickVariant, BUTTON_VARIANTS } from '../variants.js';
 
   /** The primary action's words. Also the default slot's fallback. */
   export let label = '';
   /** The variations. Same shape as Menu's items. */
   export let items = [];
-  /** solid | outline | ghost | danger */
+  /** solid(1) | outline(2) | ghost(3) | danger(4) — por nombre o por número. */
   export let variant = 'solid';
   /** sm | md | lg */
   export let size = 'md';
@@ -55,25 +56,30 @@
 
   const CHEV = '<path d="M5 9.5 12 16.5 19 9.5"/>';
 
+  // La variante, por nombre o por número (misma familia que Button: 1 solid ·
+  // 2 outline · 3 ghost · 4 danger). Se resuelve acá y se pasa ya resuelta al
+  // wrapper y a las mitades, para que las tres piezas coincidan siempre.
+  $: v = pickVariant(variant, BUTTON_VARIANTS, 'solid');
+
   $: gname = groupLabel || label;
   // «Más opciones» alone is a name that tells a blind user nothing about which
   // of the four buttons on this toolbar they just landed on.
   $: mname = menuLabel || (label ? `Más opciones de ${label.toLocaleLowerCase('es')}` : 'Más opciones');
 </script>
 
-<div class="split {variant} {size}" role="group" aria-label={gname}>
+<div class="split {v} {size}" role="group" aria-label={gname}>
   <span class="lead">
     <!-- Forwarded conditionally rather than always: a slot that is declared but
          empty still counts as filled, and Button would then spend a gap on
          nothing before the label. The branch asks the question once, here, where
          the answer is actually known. -->
     {#if $$slots.icon}
-      <Button {variant} {size} {type} {disabled} {reason} {busy} on:click>
+      <Button variant={v} {size} {type} {disabled} {reason} {busy} on:click>
         <svelte:fragment slot="icon"><slot name="icon" /></svelte:fragment>
         <slot>{label}</slot>
       </Button>
     {:else}
-      <Button {variant} {size} {type} {disabled} {reason} {busy} on:click>
+      <Button variant={v} {size} {type} {disabled} {reason} {busy} on:click>
         <slot>{label}</slot>
       </Button>
     {/if}
@@ -81,7 +87,7 @@
   <span class="tail">
     <Menu
       {items}
-      {variant}
+      variant={v}
       {size}
       {align}
       compact
