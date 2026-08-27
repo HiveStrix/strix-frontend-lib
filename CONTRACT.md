@@ -7,7 +7,7 @@ tiene que sostener para que una pantalla se lea como Strix y no como cinco
 martes distintos. No reemplaza a las tres reglas; las lleva del cromo al
 comportamiento.
 
-Cinco cláusulas. Todas tienen la misma forma: una promesa, su porqué, y la
+Seis cláusulas. Todas tienen la misma forma: una promesa, su porqué, y la
 única excepción legal.
 
 ---
@@ -78,7 +78,11 @@ demás.
 - La explicación de un elemento va en un **`InfoDot`** (`ⓘ`/`?`) o un `Tooltip`,
   no en prosa al lado. En formularios, `Field` lo trae listo: `hintDot` colapsa
   la pista en un `ⓘ` pegado a la etiqueta y mantiene el `aria-describedby` del
-  control. El campo queda corto; la ayuda vive a un gesto.
+  control. El campo queda corto; la ayuda vive a un gesto. **`Input` y `Select`
+  reenvían `hintDot`** a `Field`, así que no hay que envolverlos a mano:
+  `<Input hint="…" hintDot />` ya colapsa la pista. Este es el gesto que mantiene
+  los **formularios compactos** — campos de una fila a igual alto, sin párrafos
+  que descuadren la línea (cláusula 3).
 - Lo que una persona **necesita** leer para hacer el trabajo va en la pantalla
   (`Well`, un `subtitle`), nunca escondido en un tooltip — un tooltip no existe
   en una tableta, llega tarde en una máquina lenta, y en un lector de pantalla
@@ -103,6 +107,35 @@ aire— y conserva un margen parejo contra el borde y contra su vecino.
   íconos (64px), `SideRail` con secciones (240px)— no por dibujarse leyes de
   separación distintas. Un carril de íconos angosto junto a uno ancho con
   etiquetas nunca se lee como el mismo control.
+- **La barra del módulo es del mismo sistema.** Un core embebido NO dibuja una
+  franja pegada de borde a borde: su topbar es `ModuleBar` —una tarjeta
+  redondeada desacoplada que flota sobre el lienzo, como el `Sidebar`—. El aire
+  de arriba y los lados lo da el marco del shell alrededor del outlet del módulo
+  (cláusula 1); el de abajo, su propio margen. Así el shell y el core se leen
+  como un objeto, no como una pegatina superpuesta.
+
+## 6 · Un solo lienzo — el shell adopta el tono del core embebido
+
+El fondo de cada core tiene su propio tinte (`--sx-chrome-tint`): montarlo sin
+más lo delata como un objeto ajeno pegado sobre otro —el blanco cálido de un
+módulo contra el frío del shell—. Como esos tonos son **tokens**, nunca hex
+clavados (regla 1 del README), y el core los define en su `:host`, el shell los
+**lee y los adopta** mientras dura la ruta del módulo.
+
+- El shell espeja la **rampa de cromo** del core —el tinte NEUTRO: los grises
+  `--sx-n-*`, `--sx-ground`, `--sx-thead`— en su documento con
+  `adoptPalette(coreEl)` (de `@strix/frontend-lib/tokens`) y la suelta con
+  `releasePalette()` al desmontar. Chrome y core pasan a compartir un mismo
+  lienzo.
+- El **acento NO se adopta**: cada módulo guarda el suyo (el shell su cobalto,
+  un core su ámbar). Se unifica el fondo, no la marca — la regla 2 sigue en pie:
+  el color con significado no se mezcla entre módulos.
+- Es **dinámico**: al montar otro core, el shell se adapta a su tono; fuera de la
+  ruta del módulo, vuelve a su propio tema.
+
+> **Excepción legal:** un core que deliberadamente pinta a sangre su propio
+> lienzo oscuro (una isla, un tablero de sala de control) no ofrece tono neutro
+> que adoptar; ahí la unicidad la da el marco, no el fondo.
 
 ---
 
@@ -111,6 +144,6 @@ aire— y conserva un margen parejo contra el borde y contra su vecino.
 No hay runner de tests unitarios: esto es obra visual. Antes de dar una pantalla
 por hecha, se mira en el **catálogo en vivo**, en los dos temas (claro/oscuro) y
 en anchos angosto y ancho, y se corre `pnpm contrast` para no bajar del piso de
-contraste del sistema. Una pantalla que rompe una de estas cinco cláusulas se ve
+contraste del sistema. Una pantalla que rompe una de estas seis cláusulas se ve
 —ese es el punto de que sean sobre márgenes, desborde y alineación y no sobre
 gustos.

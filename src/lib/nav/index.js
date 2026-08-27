@@ -43,6 +43,7 @@
 // on purpose, not one that quietly stopped existing.
 export { default as TopBar } from './TopBar.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
+export { default as ModuleBar } from './ModuleBar.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Breadcrumb } from './Breadcrumb.svelte';
 export { default as Tabs } from './Tabs.svelte';

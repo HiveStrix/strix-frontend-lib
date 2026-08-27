@@ -624,3 +624,44 @@ export const hostBase = () => `
 /** What `tokens.css` is generated from. Keeps the two shapes honest. */
 export const stylesheet = () =>
   `${hostTokens(':root')}\n${hostTokensDark(':root[data-sx-theme="dark"], .sx-dark')}`;
+
+// ── UNICIDAD: el shell ADOPTA el tono del core embebido (CONTRACT §6) ─────────
+// La rampa de cromo (el tinte NEUTRO: grises + fondo) es lo que un shell le
+// «adopta» a un core montado para que ambos compartan un solo lienzo y el
+// módulo no se lea como una pegatina. El acento NO está acá: cada módulo guarda
+// el suyo (regla de marca por módulo). Como el core define estos tokens en su
+// `:host`, un shell los puede LEER desde afuera y espejarlos en su documento.
+
+/** Los tokens de la rampa de cromo — lo único que se adopta para la unicidad. */
+export const RAMP_TOKENS = [
+  '--sx-chrome-tint', '--sx-ground', '--sx-thead',
+  '--sx-n-50', '--sx-n-100', '--sx-n-150', '--sx-n-200', '--sx-n-300',
+  '--sx-n-400', '--sx-n-500', '--sx-n-700', '--sx-n-800', '--sx-n-900'
+];
+
+/**
+ * Hace que `target` (por defecto, el documento) adopte la rampa de cromo de
+ * `sourceEl` — típicamente el `:host` de un core embebido. Así el chrome del
+ * shell (rieles) y el core comparten un mismo fondo y se leen como un objeto.
+ * Revertir con `releasePalette`. Ver CONTRACT §6.
+ * @param {Element} sourceEl  el elemento cuyo tono se copia (el `:host` del core)
+ * @param {HTMLElement} [target]  dónde aplicarlo (default: `document.documentElement`)
+ */
+export function adoptPalette(sourceEl, target = document.documentElement) {
+  if (!sourceEl || !target) return;
+  const cs = getComputedStyle(sourceEl);
+  for (const t of RAMP_TOKENS) {
+    const v = cs.getPropertyValue(t).trim();
+    if (v) target.style.setProperty(t, v);
+  }
+}
+
+/**
+ * Revierte `adoptPalette`: quita los overrides y deja que el tema del shell
+ * vuelva a mandar. Llamalo al desmontar el core / salir de la ruta del módulo.
+ * @param {HTMLElement} [target]  el mismo `target` que recibió `adoptPalette`
+ */
+export function releasePalette(target = document.documentElement) {
+  if (!target) return;
+  for (const t of RAMP_TOKENS) target.style.removeProperty(t);
+}
