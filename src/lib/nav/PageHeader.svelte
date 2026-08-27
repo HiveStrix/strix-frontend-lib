@@ -44,7 +44,7 @@
   // del nombre: `variant="line"` === `variant="1"`). El orden va de lo discreto
   // (el default, la raya) a lo intenso: el banner `hero` es la ÚLTIMA opción, la
   // que se saca de la galera sólo cuando la pantalla lo amerita.
-  //   1 line (default) · 2 section · 3 plain · 4 soft · 5 hero-card · 6 hero
+  //   1 line (default) · 2 section · 3 plain · 4 aire · 5 soft · 6 hero-card · 7 hero
   //
   //   hero      ▓▓▓  El banner. Isla oscura a sangre —gradiente de la escala
   //                  neutra, tinta clara, un fragmento del título en acento— a
@@ -81,6 +81,12 @@
   //                  para cuando ya vive DENTRO de un marco (una Card) y otra
   //                  línea sería doble marco.
   //
+  //   aire      ·    Como `plain` —ni raya ni piel— pero el eyebrow toma el
+  //                  acento de marca y el bloque respira un punto más. La marca
+  //                  la lleva el COLOR del eyebrow, no una línea ni una sombra:
+  //                  un header aireado y propio sin encender un banner. Nace en
+  //                  strix-maintenance (sus vistas de catálogo).
+  //
   // ABOUT `tone`
   //
   // Pinta el título, y es el ÚNICO lugar de esta librería donde la tinta lleva
@@ -111,10 +117,10 @@
   /** Esqueleto hasta que aterriza el primer payload. Evita que el layout salte. */
   export let loading = false;
   /**
-   * hero | hero-card | soft | section | line | plain — la escalera de intensidad
-   * de arriba. `line` es el default y es la ley, no lo que pasa cuando nadie
-   * escribe nada. Un valor viejo o inválido (`halo`/`sarion`/`banda`) cae
-   * SEGURO a `line`: se eliminó el diseño, no se rompió el llamado.
+   * hero | hero-card | soft | aire | section | line | plain — la escalera de
+   * intensidad de arriba. `line` es el default y es la ley, no lo que pasa
+   * cuando nadie escribe nada. Un valor viejo o inválido (`halo`/`sarion`/`banda`)
+   * cae SEGURO a `line`: se eliminó el diseño, no se rompió el llamado.
    */
   export let variant = 'line';
   /**
@@ -127,11 +133,11 @@
   export let bleed = false;
 
   // El orden ES la numeración (ver el ÍNDICE de arriba): 1 line (default) ·
-  // 2 section · 3 plain · 4 soft · 5 hero-card · 6 hero. De lo discreto a lo
-  // intenso, con el banner `hero` como ÚLTIMA opción. `pickVariant`
+  // 2 section · 3 plain · 4 aire · 5 soft · 6 hero-card · 7 hero. De lo discreto
+  // a lo intenso, con el banner `hero` como ÚLTIMA opción. `pickVariant`
   // (../variants.js) acepta el nombre o el número —son intercambiables—; los
   // nombres siguen siendo los canónicos, el número es una comodidad.
-  const VARIANTS = ['line', 'section', 'plain', 'soft', 'hero-card', 'hero'];
+  const VARIANTS = ['line', 'section', 'plain', 'aire', 'soft', 'hero-card', 'hero'];
 
   // `$:` y no `const`: un reactive statement legacy sólo rastrea los nombres
   // escritos adentro, así que un helper que cerrara sobre `level` sería
@@ -366,6 +372,16 @@
   .hd.soft.positive  { background: var(--sx-positive-band); }
   .hd.soft.info      { background: var(--sx-info-band); }
   .hd.soft.bleed { margin-inline: calc(var(--sx-s-6) * -1); }
+
+  /* ═══ VARIANT: aire — texto limpio con eyebrow de acento ═══════════════════
+     Como `plain` (ni raya ni piel) pero el eyebrow toma el acento de marca y el
+     bloque respira un peldaño más (gap y márgenes propios). La marca la lleva el
+     COLOR del eyebrow —no una línea ni una sombra—, para un header aireado y
+     propio sin encender un banner. El `tone` sigue pintando el título como en el
+     resto de las variantes de texto; el eyebrow se queda en acento a propósito. */
+  .hd.aire { gap: var(--sx-s-4); }
+  .aire .eyebrow { color: var(--sx-accent); margin-bottom: var(--sx-s-3); }
+  .aire .sub { margin-top: var(--sx-s-3); }
 
   /* ═══ ANATOMÍA A DOS ZONAS (hero · hero-card) ═════════════════════════════ */
   .grid {
