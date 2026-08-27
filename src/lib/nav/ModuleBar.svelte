@@ -40,12 +40,16 @@
     margin-bottom: var(--sx-s-4);
   }
 
-  /* Pegada, sube al z del cromo pegajoso para montar el contenido que pasa por
-     debajo. El radio se conserva: sigue siendo una tarjeta, ahora anclada. */
+  /* Pegada, sube un peldaño POR ENCIMA del cromo pegajoso: un `PageHeader` se
+     dibuja en `--sx-z-sticky` aunque no sea sticky (su propio comentario lo
+     explica), así que con el mismo valor ganaría por venir después en el DOM y
+     taparía la barra. Un `+ 1` deja el orden dicho, no heredado. Es la misma
+     mecánica que la barra probada de strix-maintenance, de donde sale esta
+     pieza. El radio se conserva: sigue siendo una tarjeta, ahora anclada. */
   .mbar.sticky {
     position: sticky;
     top: 0;
-    z-index: var(--sx-z-sticky);
+    z-index: calc(var(--sx-z-sticky) + 1);
   }
 
   @media (max-width: 560px) {
