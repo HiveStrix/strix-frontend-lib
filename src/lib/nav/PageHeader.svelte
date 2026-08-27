@@ -44,7 +44,7 @@
   // del nombre: `variant="line"` === `variant="1"`). El orden va de lo discreto
   // (el default, la raya) a lo intenso: el banner `hero` es la ÚLTIMA opción, la
   // que se saca de la galera sólo cuando la pantalla lo amerita.
-  //   1 line (default) · 2 section · 3 plain · 4 aire · 5 soft · 6 hero-card · 7 hero
+  //   1 line (default) · 2 section · 3 plain · 4 aire · 5 soft · 6 banda · 7 hero-card · 8 hero
   //
   //   hero      ▓▓▓  El banner. Isla oscura a sangre —gradiente de la escala
   //                  neutra, tinta clara, un fragmento del título en acento— a
@@ -66,6 +66,10 @@
   //                  tenue (`--sx-accent-soft`, o la banda del `tone` cuando el
   //                  estado urge). Para cerrar una sección con color sin
   //                  encender un banner.
+  //
+  //   banda     ▓▓   El principal de un MÓDULO, teñido de acento pleno. Una
+  //                  columna, sin cifra ni isla oscura —más bajo que `hero`,
+  //                  pero con todo el color. Recuperada de v0.8.2.
   //
   //   line      ·|·  EL DEFAULT. El título grande de la página, separado del
   //                  contenido por una RAYA inferior en vez de una luz. Reemplaza
@@ -117,8 +121,8 @@
   /** Esqueleto hasta que aterriza el primer payload. Evita que el layout salte. */
   export let loading = false;
   /**
-   * hero | hero-card | soft | aire | section | line | plain — la escalera de
-   * intensidad de arriba. `line` es el default y es la ley, no lo que pasa
+   * hero | hero-card | banda | soft | aire | section | line | plain — la escalera
+   * de intensidad de arriba. `line` es el default y es la ley, no lo que pasa
    * cuando nadie escribe nada. Un valor viejo o inválido (`halo`/`sarion`/`banda`)
    * cae SEGURO a `line`: se eliminó el diseño, no se rompió el llamado.
    */
@@ -133,11 +137,11 @@
   export let bleed = false;
 
   // El orden ES la numeración (ver el ÍNDICE de arriba): 1 line (default) ·
-  // 2 section · 3 plain · 4 aire · 5 soft · 6 hero-card · 7 hero. De lo discreto
-  // a lo intenso, con el banner `hero` como ÚLTIMA opción. `pickVariant`
+  // 2 section · 3 plain · 4 aire · 5 soft · 6 banda · 7 hero-card · 8 hero. De lo
+  // discreto a lo intenso, con el banner `hero` como ÚLTIMA opción. `pickVariant`
   // (../variants.js) acepta el nombre o el número —son intercambiables—; los
   // nombres siguen siendo los canónicos, el número es una comodidad.
-  const VARIANTS = ['line', 'section', 'plain', 'aire', 'soft', 'hero-card', 'hero'];
+  const VARIANTS = ['line', 'section', 'plain', 'aire', 'soft', 'banda', 'hero-card', 'hero'];
 
   // `$:` y no `const`: un reactive statement legacy sólo rastrea los nombres
   // escritos adentro, así que un helper que cerrara sobre `level` sería
@@ -252,7 +256,7 @@
      conserva SIEMPRE— para que el título alinee a sangre con el cuerpo sin que
      la raya inferior quede pegada al subtítulo ni el bloque pierda su aire
      arriba/abajo. No toca a `hero`/`hero-card` —su relleno es su piel. */
-  .hd.bleed:not(.hero):not(.hero-card) { padding-left: 0; padding-right: 0; }
+  .hd.bleed:not(.hero):not(.hero-card):not(.banda) { padding-left: 0; padding-right: 0; }
 
   /* ═══ LAYOUT COMÚN ═════════════════════════════════════════════════════════ */
   .row {
@@ -382,6 +386,37 @@
   .hd.aire { gap: var(--sx-s-4); }
   .aire .eyebrow { color: var(--sx-accent); margin-bottom: var(--sx-s-3); }
   .aire .sub { margin-top: var(--sx-s-3); }
+
+  /* ═══ VARIANT: banda — el principal con color de verdad ════════════════════
+     Un encabezado de RUTA teñido de acento pleno: el bloque que puede
+     permitirse todo el color —como `hero`— pero a UNA columna y más bajo. Es
+     para el principal de un MÓDULO (no un tablero a dos zonas): sin cifra, sin
+     isla oscura, sin punto que late. Todo el color sale de cuatro custom
+     properties que cada tono reasigna (fill · ink · ink-soft · edge), así que
+     la anatomía las lee sin repetir un color por regla. Default (neutro):
+     relleno de ACENTO, tinta `--sx-accent-ink`. Recuperada de v0.8.2 —era el
+     principal de strix-maintenance, y volvió a serlo. */
+  .hd.banda {
+    --banda-fill: var(--sx-accent);
+    --banda-ink: var(--sx-accent-ink);
+    --banda-ink-soft: color-mix(in srgb, var(--sx-accent-ink) 76%, transparent);
+    --banda-edge: transparent;
+    background: var(--banda-fill);
+    color: var(--banda-ink);
+    border: 1px solid var(--banda-edge);
+    box-shadow: var(--sx-e-1);
+    padding: var(--sx-s-6);
+    border-radius: var(--sx-r-3);
+  }
+  .hd.banda.positive  { --banda-fill: var(--sx-positive-band);  --banda-ink: var(--sx-positive);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-positive-edge); }
+  .hd.banda.attention { --banda-fill: var(--sx-attention-band); --banda-ink: var(--sx-attention); --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-attention-edge); }
+  .hd.banda.critical  { --banda-fill: var(--sx-critical-band);  --banda-ink: var(--sx-critical);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-critical-edge); }
+  .hd.banda.info      { --banda-fill: var(--sx-info-band);      --banda-ink: var(--sx-info);      --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-info-edge); }
+  /* `.hd.banda .ttl` (0,2,1) le gana a `.critical .ttl` (0,2,0): el título de
+     una banda toma SIEMPRE su `--banda-ink` (el tono ya viajó al relleno). */
+  .hd.banda .ttl { color: var(--banda-ink); }
+  .hd.banda .eyebrow { color: var(--banda-ink-soft); }
+  .hd.banda .sub { color: var(--banda-ink-soft); }
 
   /* ═══ ANATOMÍA A DOS ZONAS (hero · hero-card) ═════════════════════════════ */
   .grid {
