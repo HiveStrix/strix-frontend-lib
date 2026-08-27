@@ -42,7 +42,14 @@
 // el artefacto de capas no se manifestó.
 // ─────────────────────────────────────────────────────────────────────────
 
-const TINT = '#6541BE';
+// v0.8.8 — la perilla del cromo pasa a GRIS NEUTRO por defecto. El morado
+// (#6541BE) leía tintado, sobre todo en oscuro; el usuario lo quiere gris
+// parejo. `#8E8E93` es la traza gris que `scripts/contrast.mjs` ya validaba
+// como la SEGUNDA perilla ("cromo gris") — toda la matriz de contraste
+// (2 temas × 2 perillas) pasa con este valor, así que el cambio no arriesga
+// ningún piso. Un módulo que quiera recuperar una traza de marca re-hornea la
+// rampa con `chromeRamp()` desde su raíz; el default deja de imponer morado.
+const TINT = '#8E8E93';
 
 const rgbOf = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 /** La misma aritmética que color-mix(in srgb): lerp sobre los canales sRGB. */

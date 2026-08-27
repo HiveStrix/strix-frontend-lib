@@ -11,19 +11,19 @@
    ========================================================================= */
 
 :root {
-  --sx-chrome-tint: #6541BE;
+  --sx-chrome-tint: #8E8E93;
   --sx-n-0: #FFFFFF;
-  --sx-n-50: #F4F3F9;
-  --sx-n-100: #EDEBF3;
-  --sx-n-150: #E5E3ED;
-  --sx-n-200: #D3D1DF;
-  --sx-n-300: #B4B1C2;
-  --sx-n-400: #787584;
-  --sx-n-500: #5F5C6B;
-  --sx-n-700: #444150;
-  --sx-n-800: #2C2937;
-  --sx-n-900: #201E29;
-  --sx-ground: #F6F4FB;
+  --sx-n-50: #F6F6F7;
+  --sx-n-100: #EFEFF1;
+  --sx-n-150: #E7E7EA;
+  --sx-n-200: #D7D7DC;
+  --sx-n-300: #B7B7BE;
+  --sx-n-400: #7C7C81;
+  --sx-n-500: #626268;
+  --sx-n-700: #47474C;
+  --sx-n-800: #2F2F33;
+  --sx-n-900: #232326;
+  --sx-ground: #F8F8F9;
   --sx-surface: var(--sx-n-0);
   --sx-sunk: var(--sx-n-50);
   --sx-line: var(--sx-n-150);
@@ -32,7 +32,7 @@
   --sx-ink-2: var(--sx-n-700);
   --sx-ink-3: var(--sx-n-500);
   --sx-ink-on: var(--sx-n-0);
-  --sx-thead: #F6F4FB;
+  --sx-thead: #F8F8F9;
   --sx-glow: 0%;
   --sx-glow-color: var(--sx-accent);
   --sx-halo: color-mix(in srgb, var(--sx-accent) 70%, transparent);
@@ -104,20 +104,20 @@
 :root[data-sx-theme="dark"], .sx-dark {
   --sx-ground: var(--sx-n-900);
   --sx-surface: var(--sx-n-800);
-  --sx-sunk: #21222E;
-  --sx-line: #31323F;
+  --sx-sunk: #24282B;
+  --sx-line: #34383C;
   --sx-edge: #9C9AA1;
-  --sx-ink: #E8E8EE;
-  --sx-ink-2: #C8C9D3;
+  --sx-ink: #E9EBEC;
+  --sx-ink-2: #CACED0;
   --sx-ink-3: #BEBDC1;
   --sx-ink-on: var(--sx-n-900);
-  --sx-thead: #413E4B;
+  --sx-thead: #444447;
   --sx-halo: color-mix(in srgb, var(--sx-accent) 18%, transparent);
   --sx-accent: #D1C6EC;
   --sx-accent-ink: var(--sx-n-900);
   --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 8%, var(--sx-surface));
   --sx-accent-pick: color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface));
-  --sx-accent-edge: #3D3F4D;
+  --sx-accent-edge: #414549;
   --sx-positive: #8FCB9B;
   --sx-positive-band: #1D2C21;
   --sx-positive-edge: #2E4436;

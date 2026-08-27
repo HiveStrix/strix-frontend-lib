@@ -84,6 +84,16 @@
   /** false ⇒ no box. For a control that draws its own surface: cards, a dropzone. */
   export let frame = true;
   /**
+   * true ⇒ el PELDAÑO COMPACTO (~32px) de las dos alturas del sistema. La caja
+   * cómoda (~40px) es para formularios de pocos campos; `dense` es para los de
+   * alta frecuencia —una tabla de líneas, cargar comprobante tras comprobante—
+   * donde el aire de la cómoda desperdicia pantalla. Encoge la caja, la etiqueta
+   * y la fila del mensaje, pero NO el radio: sigue en `--sx-r-2` (12px), porque
+   * la densidad no se paga con esquinas duras. Los consumidores (Input, Select,
+   * NumberInput, Textarea, Combobox) reenvían este prop tal cual.
+   */
+  export let dense = false;
+  /**
    * true ⇒ the label stops being a `<label for>` and becomes a NAME: a plain
    * span with an id. A radiogroup and a checkbox group are labelled by
    * `aria-labelledby`, never by `for`, because there is no single control to
@@ -129,7 +139,7 @@
     [showInlineHint && hintId, message && msgId, origin && originId].filter(Boolean).join(' ') || undefined;
 </script>
 
-<div class="field" class:disabled class:no-frame={!frame}>
+<div class="field" class:disabled class:no-frame={!frame} class:dense>
   {#if label}
     <div class="head">
       <span class="lblwrap">
@@ -306,6 +316,17 @@
      reaches the document DOM, never a shadow root. */
   :global([data-sx-theme='dark']) .frame,
   :global(.sx-dark) .frame { color-scheme: dark; }
+
+  /* ── El peldaño COMPACTO ─────────────────────────────────────────────────
+     Encoge caja, etiqueta y fila del mensaje; conserva el radio r-2 y el mismo
+     anillo de foco. La caja baja de --sx-s-10 (40px) a --sx-s-8 (32px). */
+  .field.dense .head { margin-bottom: var(--sx-s-1); }
+  .field.dense .hint { margin-bottom: var(--sx-s-1); font-size: var(--sx-t-2xs); }
+  .field.dense .frame { min-height: var(--sx-s-8); padding: var(--sx-s-1) var(--sx-s-2); }
+  .field.dense .frame :global(input),
+  .field.dense .frame :global(select),
+  .field.dense .frame :global(textarea) { font-size: var(--sx-t-sm); line-height: 1.35; }
+  .field.dense .foot .msg { font-size: var(--sx-t-2xs); }
 
   /* ── What it says afterwards ────────────────────────────────────────────── */
   .foot { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sx-s-3); flex-wrap: wrap; }

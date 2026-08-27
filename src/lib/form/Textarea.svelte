@@ -61,6 +61,7 @@
   export let required = false;
   export let optional = false;
   export let disabled = false;
+  export let dense = false;
   export let readonly = false;
   export let placeholder = '';
   export let name = undefined;
@@ -97,7 +98,7 @@
 </script>
 
 <Field
-  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {readonly}
+  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}

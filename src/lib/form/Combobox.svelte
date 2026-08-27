@@ -96,6 +96,7 @@
   export let required = false;
   export let optional = false;
   export let disabled = false;
+  export let dense = false;
   export let name = undefined;
   export let id = '';
   export let origin = '';
@@ -303,7 +304,7 @@
 <svelte:window on:resize={() => open && place()} />
 
 <Field
-  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled}
+  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {dense}
   id={fid} {origin} {originValue} {changed}
   frame={false}
   on:revert

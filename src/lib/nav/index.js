@@ -43,6 +43,10 @@
 // on purpose, not one that quietly stopped existing.
 export { default as TopBar } from './TopBar.svelte';
 export { default as Sidebar } from './Sidebar.svelte';
+// AppShell — el layout que ATA TopBar + Sidebar + contenido con la regla dura:
+// la Sidebar es dueña de toda la altura y la TopBar vive en la columna de
+// contenido, nunca cruzándola. Ver su cabecera.
+export { default as AppShell } from './AppShell.svelte';
 export { default as ModuleBar } from './ModuleBar.svelte';
 export { default as PageHeader } from './PageHeader.svelte';
 export { default as Breadcrumb } from './Breadcrumb.svelte';

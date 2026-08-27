@@ -55,6 +55,7 @@
   export let required = false;
   export let optional = false;
   export let disabled = false;
+  export let dense = false;
   export let name = undefined;
   export let id = '';
   export let origin = '';
@@ -85,7 +86,7 @@
 </script>
 
 <Field
-  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled}
+  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}
