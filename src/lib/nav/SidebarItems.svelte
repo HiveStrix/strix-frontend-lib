@@ -109,7 +109,12 @@
   /* La lista toma el alto sobrante y hace su propio scroll si un tenant tiene
      más módulos de los que entran — el pie (`.foot`, `margin-top:auto`) sigue
      abajo y nada empuja la pantalla. */
-  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+  /* `overflow-x: hidden` explícito: un `overflow-y: auto` solo hace que el eje X
+     COMPUTE a `auto` también (regla CSS), así que al colapsar —cuando el ancho
+     anima de 240 a 64px— cualquier desborde horizontal momentáneo de un ítem
+     asomaba una barra de scroll horizontal en el riel. La lista de navegación
+     nunca scrollea en horizontal; el scroll vertical (muchos módulos) queda. */
+  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
 
   .sect { padding: var(--sx-s-3) var(--sx-s-3) var(--sx-s-1); }
   .tuck .sect { padding-inline: 0; text-align: center; overflow: hidden; }
