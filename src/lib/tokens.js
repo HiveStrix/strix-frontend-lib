@@ -619,6 +619,16 @@ export const hostBase = () => `
 }
 :focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; border-radius: var(--sx-r-1); }
 :host([data-sx-theme="dark"]) :focus-visible { outline-color: var(--sx-n-0); }
+/* Scrollbars al hover, no siempre — regla del sistema (misma que base.css). El
+   thumb es transparente en reposo y toma color cuando el cursor entra al
+   contenedor scrolleable; el gutter fino se reserva para no mover el layout. */
+* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+*:hover, *:focus-within { scrollbar-color: var(--sx-edge) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background-color: transparent; border: 3px solid transparent; border-radius: var(--sx-r-pill); background-clip: padding-box; }
+*:hover::-webkit-scrollbar-thumb, *:focus-within::-webkit-scrollbar-thumb { background-color: var(--sx-edge); }
+*::-webkit-scrollbar-corner { background: transparent; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

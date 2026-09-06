@@ -25,6 +25,30 @@ img, svg, video { display: block; max-width: 100%; }
    with one Arial select in it looks broken rather than plain. */
 button, input, select, textarea { font: inherit; color: inherit; }
 
+/* ── Scrollbars: al hover, no siempre (REGLA DEL SISTEMA) ───────────────────
+   Una barra de scroll permanente es ruido de cromo: compite con el dato en
+   cada panel, tabla o lista que desborda. Regla del sistema: el thumb es
+   transparente en reposo y toma color sólo cuando el cursor entra al
+   contenedor scrolleable (o algo dentro toma foco). El gutter fino se reserva
+   siempre, así que aparecer/desaparecer NO mueve el layout.
+   Excepciones legales (ganan por especificidad sobre `*`):
+     · ocultarla siempre  → `scrollbar-width: none` + `::-webkit-scrollbar{display:none}`
+       (un riel de tabs con scroll horizontal, p.ej.).
+     · dejarla fija       → el componente declara su propio `scrollbar-color`. */
+* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+*:hover, *:focus-within { scrollbar-color: var(--sx-edge) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border: 3px solid transparent;
+  border-radius: var(--sx-r-pill);
+  background-clip: padding-box;
+}
+*:hover::-webkit-scrollbar-thumb,
+*:focus-within::-webkit-scrollbar-thumb { background-color: var(--sx-edge); }
+*::-webkit-scrollbar-corner { background: transparent; }
+
 /* ── The three type registers ─────────────────────────────────────────────
    Everything in a Strix surface is one of these. Adding a fourth is a decision
    somebody has to argue for. */
