@@ -203,6 +203,19 @@
   .head, .foot { padding: var(--sx-s-2) var(--sx-s-3); min-width: 0; }
   .foot { margin-top: auto; }
 
+  /* Colapsado: el header y el footer (brand, menú de sesión) se contienen en
+     el ancho icon-only. Sin esto, el texto del botón de sesión desbordaba los
+     64px del carril y se salía del margen. El círculo/ícono del menú sigue
+     visible; el texto se oculta por overflow, igual que hacen los labels de
+     los ítems con clip-path. */
+  .tuck .head,
+  .tuck .foot {
+    padding-inline: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+  }
+
   .it:focus-visible {
     outline: 2px solid var(--sx-ink);
     outline-offset: -2px;
