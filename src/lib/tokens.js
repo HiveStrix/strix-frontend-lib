@@ -64,7 +64,7 @@ export const CHROME_RECIPES = {
     '--sx-n-50': [4, '#FAFAFB'], '--sx-n-100': [5, '#F4F4F6'], '--sx-n-150': [6, '#EDEDF0'],
     '--sx-n-200': [8, '#DDDDE2'], '--sx-n-300': [8, '#BBBBC2'], '--sx-n-400': [8, '#7A7A7F'],
     '--sx-n-500': [8, '#5E5E64'], '--sx-n-700': [8, '#414146'], '--sx-n-800': [8, '#27272B'],
-    '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [6, '#FFFFFF'], '--sx-thead': [6, '#FFFFFF']
+    '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [11, '#FFFFFF'], '--sx-thead': [9, '#FFFFFF']
   },
   dark: {
     '--sx-sunk': [8, '#1B1F22'], '--sx-line': [8, '#2C3134'], '--sx-ink': [4, '#EDEFF0'],
@@ -157,12 +157,18 @@ export const TOKENS = {
   // Un 3 % no es un color: es el escalón que hace que una superficie blanca se
   // lea como superficie. Prisma lo tenía al 5 % por esta misma razón; acá se
   // había quitado y hubo que devolverlo.
-  // Es 6 % y no 3 %, y el número salió del propio piso del sistema. A 3 % el
-  // escalón contra --sx-surface daba 1.046 con la perilla morada y 1.029 con la
-  // gris, o sea por DEBAJO del 1.05 que este repo exige para que dos superficies
-  // se consideren distinguibles. El arreglo cumplía a ojo y no cumplía su propia
-  // regla. Con la perilla en gris ni el 5 % llega (1.049): 6 % es el mínimo que
-  // pasa en las dos configuraciones.
+  // Fue 6 % y ahora es 11 %, y la corrección es la misma lección una vuelta más
+  // arriba. El 6 % se eligió como EL MÍNIMO que pasa el piso de 1.05 que este
+  // repo exige para que dos superficies se consideren distinguibles (a 3 % daba
+  // 1.046 morado / 1.029 gris, por debajo; ni el 5 % llegaba con la perilla
+  // gris). Pero pasar el piso por un pelo no es lo mismo que leerse: a 6 % el
+  // escalón contra --sx-surface mide 1.064, y en una pantalla real —un módulo
+  // lleno de tarjetas blancas sobre el campo— se seguía leyendo como blanco
+  // sobre blanco. El piso es un mínimo para no romper, no un objetivo de diseño.
+  // A 11 % el escalón mide ~1.11, el doble, y ahí una tarjeta se lee como
+  // tarjeta sin que el campo deje de ser un tinte. `--sx-thead` sube a 9 % por
+  // el mismo motivo: la cabecera de una tabla se apoya SOBRE la superficie
+  // blanca, así que compartir el 6 % del campo la dejaba invisible.
   '--sx-ground': CHROME['--sx-ground'],
   '--sx-surface': 'var(--sx-n-0)',
   '--sx-sunk': 'var(--sx-n-50)',
@@ -243,7 +249,12 @@ export const TOKENS = {
   // --sx-accent-pick, ver ahí):
   //     --sx-edge  sobre accent-soft:  3.84 morado / 3.59 gris
   //     --sx-ink-3 sobre accent-soft:  5.61 morado / 5.22 gris
-  '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF)',
+  // Sube de 10 % a 14 % junto con el campo. Al profundizar --sx-ground (6→11 %)
+  // el relleno suave quedó a 1.048 contra él —por debajo del piso de 1.05— y una
+  // `Card variant="filled"`, que no tiene sombra que la separe, se perdía sobre
+  // el campo. Más traza acá la devuelve a ser una superficie; de paso sube el
+  // contraste del texto que se apoya encima, no lo baja.
+  '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 14%, #FFFFFF)',
   // EL RELLENO DE SELECCIÓN. Existe separado de --sx-accent-soft porque son dos
   // estados distintos y compartir token los volvía indistinguibles: seleccionar
   // una fila y pasar el puntero por la de al lado las dejaba iguales.
@@ -629,6 +640,13 @@ export const hostBase = () => `
 *::-webkit-scrollbar-thumb { background-color: transparent; border: 3px solid transparent; border-radius: var(--sx-r-pill); background-clip: padding-box; }
 *:hover::-webkit-scrollbar-thumb, *:focus-within::-webkit-scrollbar-thumb { background-color: var(--sx-edge); }
 *::-webkit-scrollbar-corner { background: transparent; }
+/* Entrada escalonada opcional — misma regla que base.css. Sólo retrasa la
+   animación que el hijo ya trae (la entrada de Card); no anima por su cuenta. */
+.sx-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.sx-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.sx-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.sx-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.sx-stagger > *:nth-child(n+6) { animation-delay: 200ms; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: .01ms !important;

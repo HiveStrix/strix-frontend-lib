@@ -320,6 +320,27 @@
   .selected.e2 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
   .selected.e3 { box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
 
+  /* ── LA ENTRADA ────────────────────────────────────────────────────────────
+     Una superficie LLEGA, no parpadea en su sitio: seis píxeles de subida y un
+     fundido, lo mínimo para que el ojo registre que algo se montó. Es la única
+     animación que este componente se permite, y está motivada — dice «esto
+     acaba de aparecer», que es información cuando una pantalla cambia de
+     destino o una tabla termina de cargar.
+
+     `backwards` Y NO `both`/`forwards`, A PROPÓSITO. Con `forwards` el fotograma
+     final (`transform: none`) quedaría aplicado, y una animación le gana en
+     cascada a una declaración normal: el `translateY(-1px)` del hover de abajo
+     dejaría de verse. `backwards` sólo aplica el fotograma INICIAL durante el
+     retraso —lo que hace que `.sx-stagger` (base.css) pueda escalonar una
+     grilla sin que el primer cuadro parpadee— y suelta el control al terminar,
+     así el hover vuelve a mandar. El bloque de movimiento reducido de base.css
+     la desactiva sola. */
+  @keyframes sx-card-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .card { animation: sx-card-in var(--sx-beat) var(--sx-ease) backwards; }
+
   .live {
     cursor: pointer;
     transition:

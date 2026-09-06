@@ -23,7 +23,7 @@
   --sx-n-700: #47474C;
   --sx-n-800: #2F2F33;
   --sx-n-900: #232326;
-  --sx-ground: #F8F8F9;
+  --sx-ground: #F3F3F3;
   --sx-surface: var(--sx-n-0);
   --sx-sunk: var(--sx-n-50);
   --sx-line: var(--sx-n-150);
@@ -32,13 +32,13 @@
   --sx-ink-2: var(--sx-n-700);
   --sx-ink-3: var(--sx-n-500);
   --sx-ink-on: var(--sx-n-0);
-  --sx-thead: #F8F8F9;
+  --sx-thead: #F5F5F5;
   --sx-glow: 0%;
   --sx-glow-color: var(--sx-accent);
   --sx-halo: color-mix(in srgb, var(--sx-accent) 70%, transparent);
   --sx-accent: #6541BE;
   --sx-accent-ink: #FFFFFF;
-  --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF);
+  --sx-accent-soft: color-mix(in srgb, var(--sx-accent) 14%, #FFFFFF);
   --sx-accent-pick: color-mix(in srgb, var(--sx-accent) 18%, #FFFFFF);
   --sx-accent-edge: color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF);
   --sx-positive: #2E6B3E;
