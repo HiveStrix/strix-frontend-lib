@@ -23,6 +23,10 @@
 //               the component and cannot be switched off.
 //   Sparkline   the shape of a series at the size of a word. No axis, so no
 //               value can be read off it — that is deliberate.
+//   LineChart   the same shape at the size of a card, WITH axes: a printed
+//               y-scale and named x-ticks, so a value CAN be read off it. The
+//               line between the two is exactly whether a number gets read off
+//               the drawing — if it does, it is this; if not, it is a Sparkline.
 //
 // TWO RULES THIS FAMILY HOLDS UP FOR THE WHOLE SYSTEM:
 //
@@ -40,6 +44,7 @@ export { default as Bar } from './Bar.svelte';
 export { default as Threshold } from './Threshold.svelte';
 export { default as StackedBar } from './StackedBar.svelte';
 export { default as Sparkline } from './Sparkline.svelte';
+export { default as LineChart } from './LineChart.svelte';
 
 // The formatter travels with the family because every component in it prints
 // numbers and a strip where one figure says «4 820 000» and the next says

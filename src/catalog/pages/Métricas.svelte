@@ -4,14 +4,14 @@
   // La tercera que no existía, y la que peor consecuencia tenía: `src/lib/metric`
   // ni siquiera tenía un `index.js`, así que de las siete familias era la única
   // que un consumidor no podía importar. Nadie lo notó porque nada la renderizaba.
-  import { Stat, StatStrip, Bar, Threshold, StackedBar, Sparkline } from '../../lib/metric/index.js';
+  import { Stat, StatStrip, Bar, Threshold, StackedBar, Sparkline, LineChart } from '../../lib/metric/index.js';
   import { Card, Panel, Stack, Row, Well, Glyph } from '../../lib/shell/index.js';
   import Button from '../../lib/action/Button.svelte';
   import Pill from '../../lib/Pill.svelte';
 
   const TOC = [
     ['stat', 'Stat'], ['strip', 'StatStrip'], ['bar', 'Bar'], ['threshold', 'Threshold'],
-    ['stacked', 'StackedBar'], ['spark', 'Sparkline'], ['estados', 'Los estados']
+    ['stacked', 'StackedBar'], ['spark', 'Sparkline'], ['line', 'LineChart'], ['estados', 'Los estados']
   ];
 
   // Doce meses de costo de mantenimiento de un patio de batidoras, en miles de
@@ -21,6 +21,15 @@
 
   const horas = [38, 41, 39, 44, 42, 47];
   const plano = [96, 96, 96, 96, 96];
+
+  // Las mismas cifras de costo, ahora con sus meses, para la gráfica con ejes:
+  // acá SÍ se lee «¿cuánto en marzo?», que es lo que la separa de la sparkline.
+  const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  // Ingreso contra costo por trimestre — dos series en un mismo marco, con su
+  // leyenda: una línea sin nombre en un gráfico de dos es ilegible.
+  const trimestres = ['T1', 'T2', 'T3', 'T4'];
+  const ingreso = [4820, 5240, 5010, 6180];
+  const costoTrim = [3110, 3480, 3390, 3920];
 
   let cargando = false;
   function recargar() {
@@ -369,6 +378,60 @@
         </p>
       </section>
 
+      <!-- ═══ LINECHART ══════════════════════════════════════════════════ -->
+      <section id="line">
+        <h2>LineChart</h2>
+        <p class="why">
+          La misma forma que la sparkline, del tamaño de una tarjeta y <b>con ejes</b>: una escala
+          en <span class="sx-id">y</span> impresa y marcas nombradas en <span class="sx-id">x</span>,
+          así que acá <em>sí</em> se puede leer un valor del dibujo. Esa es la línea entera entre las
+          dos: si alguien lee un número de la gráfica, es esto; si sólo mira la pendiente, es una
+          Sparkline al lado de un Stat.
+        </p>
+
+        <div class="demo two">
+          <Panel title="Costo mensual" sub="12 meses · miles de ₡" level={3}>
+            <LineChart label="Costo mensual" unit="₡" labels={meses} values={costo} caption="12 meses" />
+          </Panel>
+
+          <Panel title="Ingreso vs. costo" sub="Por trimestre · miles de ₡" level={3}>
+            <LineChart
+              label="Ingreso vs. costo"
+              unit="₡"
+              labels={trimestres}
+              datasets={[
+                { label: 'Ingreso', values: ingreso },
+                { label: 'Costo', values: costoTrim }
+              ]}
+            />
+          </Panel>
+        </div>
+
+        <p class="note">
+          <b>Nada nunca es cero, tampoco acá.</b> Una serie vacía no dibuja una línea plana en el
+          piso —&nbsp;eso se leería como «estuvo en cero todo el año», una afirmación sobre el
+          negocio&nbsp;— dibuja nada y escribe la oración que dice qué la llenaría. Y una sola
+          lectura no es una línea: no hay pendiente que dibujar, así que la gráfica lo dice y espera
+          a la segunda en vez de inventar una tendencia de un punto.
+        </p>
+        <p class="note">
+          <b>Sin tooltip, a propósito.</b> Los ejes dejan leer un valor hasta la marca; una lectura
+          exacta punto por punto es trabajo de una tabla, al lado de la gráfica. La escala en
+          <span class="sx-id">y</span> se redondea a números humanos (1/2/2.5/5&nbsp;×10ⁿ) e incluye
+          el cero cuando los datos no lo cruzan, para que la altura de la línea sea honesta contra un
+          piso real y no uno recortado.
+        </p>
+
+        <h3>Los cuatro estados</h3>
+        <div class="cols">
+          <Card pad={5}><LineChart label="Costo mensual" unit="₡" labels={meses} values={costo} loading /></Card>
+          <Card pad={5}><LineChart label="Costo mensual" unit="₡" labels={[]} values={[]} empty="Sin lecturas todavía este año." /></Card>
+          <Card pad={5}><LineChart label="Costo mensual" unit="₡" labels={['ene']} values={[380]} /></Card>
+          <Card pad={5}><LineChart label="Costo mensual" unit="₡" labels={meses} values={[]}
+            error="No se pudo leer el histórico. Reintentá; si sigue igual avisá con la hora exacta." /></Card>
+        </div>
+      </section>
+
       <!-- ═══ LOS ESTADOS ════════════════════════════════════════════════ -->
       <section id="estados">
         <h2>Los cuatro estados, en los seis componentes</h2>
@@ -425,9 +488,15 @@
         <h2>Lo que esta familia todavía no tiene</h2>
         <ul>
           <li>
-            <b>Una gráfica con ejes.</b> Sparkline no puede contestar «¿cuánto en marzo?» por
-            diseño, y eso está bien: esa pregunta es de un gráfico con marcas, que vive en su
-            propia pantalla y no en esta librería.
+            <b>Una lectura punto por punto sobre la gráfica.</b> LineChart ya tiene ejes y contesta
+            «¿cuánto en marzo?» a la marca, pero todavía no trae un tooltip que dé el valor exacto
+            al pasar por encima —&nbsp;esa lectura fina hoy es trabajo de una tabla al lado. Cuando
+            aterrice el read-out en hover, va ahí.
+          </li>
+          <li>
+            <b>Barras y áreas.</b> La familia dibuja líneas (Sparkline, LineChart) y longitudes
+            sueltas (Bar, StackedBar), pero no una gráfica de barras por categoría ni un área
+            apilada en el tiempo. Comparten casi toda la maquinaria de ejes de LineChart.
           </li>
           <li>
             <span class="sx-id">format.js</span> es local a esta familia y su propia cabecera dice
