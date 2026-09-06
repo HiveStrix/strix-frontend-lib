@@ -132,14 +132,36 @@
     return { lo: start, hi: end, ticks };
   })();
 
+  // The y-tick label. Large magnitudes print compact («8,7 M», not «8 740 000»)
+  // so a money scale does not demand a 90px gutter; anything under 10 000 keeps
+  // its full figure. This is the ONE place the chart abbreviates — the axis is a
+  // scale to read against, not the figure itself (that is a Stat's job).
+  $: fmtTick = (v) => {
+    const n = Number(v);
+    if (Number.isFinite(n) && Math.abs(n) >= 10000) {
+      return new Intl.NumberFormat('es-CR', { notation: 'compact', maximumFractionDigits: 1 }).format(n);
+    }
+    return fmtNum(v, decimals);
+  };
+
+  // The left gutter is sized to the WIDEST y-tick label, not a fixed guess — a
+  // fixed pad clips the scale the moment a figure grows a digit (the bug: small
+  // numbers crammed against the card edge). Estimated from character count at
+  // the mono tick size, clamped so a huge label can never eat the plot.
+  $: padLeft = (() => {
+    if (!scale) return 44;
+    const chars = Math.max(3, ...scale.ticks.map((t) => (fmtTick(t) + (unit ? ` ${unit}` : '')).length));
+    return Math.min(84, Math.round(chars * 7 + 16));
+  })();
+
   // The whole drawing, computed once per box/series change: the two axis maps,
   // one path per series, each series' endpoint dot, and the thinned x-ticks.
   $: geo = (() => {
     if (!w || nothing || !scale) return null;
-    const iw = Math.max(1, w - PAD.left - PAD.right);
+    const iw = Math.max(1, w - padLeft - PAD.right);
     const ih = Math.max(1, h - PAD.top - PAD.bottom);
     const n = Math.max(longest, 1);
-    const X = (i) => PAD.left + (n === 1 ? iw / 2 : (i / (n - 1)) * iw);
+    const X = (i) => padLeft + (n === 1 ? iw / 2 : (i / (n - 1)) * iw);
     const Y = (v) => PAD.top + ih - ((v - scale.lo) / (scale.hi - scale.lo)) * ih;
     const zeroY = scale.lo <= 0 && scale.hi >= 0 ? Y(0) : null;
 
@@ -219,13 +241,13 @@
           <line
             class="grid"
             class:zero={geo.zeroY !== null && Math.abs(t.y - geo.zeroY) < 0.5}
-            x1={PAD.left}
+            x1={padLeft}
             y1={t.y.toFixed(2)}
             x2={w - PAD.right}
             y2={t.y.toFixed(2)}
           />
-          <text class="tk y" x={PAD.left - 8} y={t.y.toFixed(2)} dy="0.32em" text-anchor="end">
-            {#if unitBefore && unit}{unit} {/if}{show(t.v)}{#if !unitBefore && unit} {unit}{/if}
+          <text class="tk y" x={padLeft - 8} y={t.y.toFixed(2)} dy="0.32em" text-anchor="end">
+            {#if unitBefore && unit}{unit} {/if}{fmtTick(t.v)}{#if !unitBefore && unit} {unit}{/if}
           </text>
         {/each}
 
@@ -309,7 +331,7 @@
 
   .tk {
     font-family: var(--sx-font-mono);
-    font-size: var(--sx-t-2xs);
+    font-size: var(--sx-t-xs);
     fill: var(--sx-ink-3);
   }
 
