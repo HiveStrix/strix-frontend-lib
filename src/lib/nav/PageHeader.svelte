@@ -399,7 +399,13 @@
   .hd.banda {
     --banda-fill: var(--sx-accent);
     --banda-ink: var(--sx-accent-ink);
-    --banda-ink-soft: color-mix(in srgb, var(--sx-accent-ink) 76%, transparent);
+    /* 85%, NO 76%. La bajada y el eyebrow de la banda son texto corrido, así
+       que les toca el piso de 4.5:1 —y al 76% el tema oscuro medía 4.01 sobre
+       el acento (el claro apenas pasaba, 4.56). La asimetría es real: en
+       oscuro `--sx-accent-ink` es tinta OSCURA sobre un acento CLARO, y bajar
+       su alfa lo acerca al relleno en vez de alejarlo. Al 85% da 5.02 oscuro
+       y 5.18 claro, y sigue leyéndose como una voz más baja que el título. */
+    --banda-ink-soft: color-mix(in srgb, var(--sx-accent-ink) 85%, transparent);
     --banda-edge: transparent;
     background: var(--banda-fill);
     color: var(--banda-ink);
@@ -415,6 +421,19 @@
   /* `.hd.banda .ttl` (0,2,1) le gana a `.critical .ttl` (0,2,0): el título de
      una banda toma SIEMPRE su `--banda-ink` (el tono ya viajó al relleno). */
   .hd.banda .ttl { color: var(--banda-ink); }
+  /* EL BOTÓN DENTRO DE LA BANDA. `Button variant="solid"` se pinta con
+     `--sx-accent`, y la banda ES el acento: azul sobre azul, la acción
+     principal desaparecida. No hace falta una variante nueva de Button —
+     alcanza con reasignar, SÓLO para las acciones, los dos tokens que Button
+     ya lee. Es la misma mecánica con la que cada tono reasigna `--banda-*`
+     acá arriba, y funciona porque un custom property se sustituye al calcular
+     su valor: `.acts` hereda `--banda-fill/ink` YA resueltos a color, así que
+     no hay ciclo. El sólido queda en la tinta de la banda con el relleno de
+     la banda como texto —el negativo exacto del bloque que lo contiene. */
+  .hd.banda .acts {
+    --sx-accent: var(--banda-ink);
+    --sx-accent-ink: var(--banda-fill);
+  }
   .hd.banda .eyebrow { color: var(--banda-ink-soft); }
   .hd.banda .sub { color: var(--banda-ink-soft); }
 
