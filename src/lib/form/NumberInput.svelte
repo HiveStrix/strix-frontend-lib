@@ -105,6 +105,21 @@
   // invisible to the statement below — the box would keep formatting with
   // whatever the first render happened to see.
   $: places = decimals !== null ? decimals : currency ? 2 : null;
+  /* EL TECLADO TIENE QUE DECIR LA VERDAD SOBRE EL CAMPO.
+   *
+   * Esto decía `places ? 'decimal' : 'numeric'`, y con eso el caso POR DEFECTO
+   * —sin `decimals` y sin `currency`— le pedía al teléfono un teclado de
+   * enteros. Pero ese mismo caso formatea con `maximumFractionDigits: 20` (dos
+   * líneas más abajo): el componente aceptaba decimales y al mismo tiempo le
+   * decía al sistema que no los iba a haber. En un teclado numérico de iOS o
+   * Android no hay separador decimal, así que una cantidad de receta como
+   * 0,18 kg simplemente NO SE PUEDE ESCRIBIR desde una tablet.
+   *
+   * La regla correcta sale de la misma variable que ya manda en el formato:
+   * sólo `places === 0` es de verdad un campo de enteros. `null` (precisión
+   * libre) y cualquier número mayor que cero aceptan decimales, y el teclado
+   * tiene que traerlos. */
+  $: onlyIntegers = places === 0;
   $: grouped = (v) => {
     const s = canonical(v);
     if (s === '' || s === '-' || s === '.') return s;
@@ -186,7 +201,7 @@
   <input
     bind:this={el}
     type="text"
-    inputmode={places ? 'decimal' : 'numeric'}
+    inputmode={onlyIntegers ? 'numeric' : 'decimal'}
     id={fid}
     {name}
     {placeholder}
