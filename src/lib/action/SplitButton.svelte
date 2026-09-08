@@ -124,7 +124,8 @@
      is drawn — inset top and bottom so it reads as a seam in a single object
      rather than a gap between two. */
   .split.outline .tail,
-  .split.ghost .tail { margin-inline-start: -1px; }
+  .split.ghost .tail,
+  .split.frosted .tail { margin-inline-start: -1px; }
 
   .split.solid .tail,
   .split.danger .tail { position: relative; }

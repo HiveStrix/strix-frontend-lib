@@ -31,5 +31,7 @@ export function pickVariant(value, names, fallback = names[0]) {
 
 // Vocabulario COMPARTIDO por la familia de botones (Button, IconButton, Menu,
 // SplitButton). Vive acá, una sola vez, para que la numeración no se desincronice
-// entre ellos: 1 solid · 2 outline · 3 ghost · 4 danger.
-export const BUTTON_VARIANTS = ['solid', 'outline', 'ghost', 'danger'];
+// entre ellos: 1 solid · 2 outline · 3 ghost · 4 danger · 5 frosted.
+// `frosted` se agregó AL FINAL (regla del módulo: agregar, no intercalar), así
+// «la 1»…«la 4» siguen significando lo mismo en todo el ecosistema.
+export const BUTTON_VARIANTS = ['solid', 'outline', 'ghost', 'danger', 'frosted'];

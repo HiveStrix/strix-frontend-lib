@@ -45,7 +45,9 @@
   import { createEventDispatcher } from 'svelte';
   import { pickVariant, BUTTON_VARIANTS } from '../variants.js';
 
-  /** solid(1) | outline(2) | ghost(3) | danger(4) — por nombre o por número. */
+  /** solid(1) | outline(2) | ghost(3) | danger(4) | frosted(5) — por nombre o
+      por número. `solid` es glossy; `outline` es tinted (regulá su fuerza con
+      la custom property `--sx-btn-tint`); `frosted` es vidrio translúcido. */
   export let variant = 'outline';
   /** sm | md | lg */
   export let size = 'md';
@@ -226,16 +228,59 @@
   .pill { border-radius: var(--sx-r-pill); }
   .block { width: 100%; }
 
-  /* ── Variants ───────────────────────────────────────────────────────────── */
+  /* ── Variants ─────────────────────────────────────────────────────────────
+     `solid` wears a GLOSSY finish — a specular sheen over the accent — and is
+     the button that moves (see Hover). `outline` is now TINTED: a soft wash of
+     the surface's accent whose strength a module dials through `--sx-btn-tint`
+     (a custom property that inherits, so a module sets it once on its own root
+     and every tinted button follows). `frosted` (5) is new — translucent glass
+     that blurs whatever is behind it. ghost and danger are unchanged. The names
+     and their numbers do not move: every existing `variant="solid"` in the apps
+     simply looks glossy now, with no change on their side. */
   .solid {
-    background: var(--sx-accent);
     color: var(--sx-accent-ink);
+    overflow: hidden;
+    isolation: isolate;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sx-accent) 76%, #fff) 0%,
+      var(--sx-accent) 52%,
+      color-mix(in srgb, var(--sx-accent) 88%, #000) 100%);
     box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-1);
   }
+  /* The gloss: a bright specular band across the top, under the label. It grows
+     and brightens on hover so the key catches the light. Clipped by the host's
+     `overflow: hidden`, so it needs no radius of its own. */
+  .solid::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 48%;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0));
+    transition: height var(--sx-beat) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
+    pointer-events: none;
+  }
+  /* The sweep: one specular streak that crosses on hover, then is gone. */
+  .solid::after {
+    content: "";
+    position: absolute;
+    top: -60%;
+    height: 220%;
+    left: -45%;
+    width: 32%;
+    z-index: 2;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .6), transparent);
+    transform: skewX(-16deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+  /* TINTED. The accent, cleared with the surface; `--sx-btn-tint` is the knob.
+     The label is a strong accent-ink so it stays legible as the wash shifts. */
   .outline {
-    background: var(--sx-surface);
-    color: var(--sx-ink);
-    border-color: var(--sx-edge);
+    background: color-mix(in srgb, var(--sx-accent) var(--sx-btn-tint, 28%), var(--sx-surface));
+    color: color-mix(in srgb, var(--sx-accent) 68%, var(--sx-ink));
+    border-color: color-mix(in srgb, var(--sx-accent) 34%, transparent);
     box-shadow: var(--sx-e-1);
   }
   .ghost {
@@ -250,6 +295,21 @@
     color: var(--sx-ink-on);
     box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-1);
   }
+  /* FROSTED (5). Milky, translucent glass: a white veil over an accent tint,
+     with a live blur of whatever sits behind. On a flat surface it is quiet; it
+     earns its place on a bar or toolbar over content, where the blur reads. It
+     rides the same `--sx-btn-tint` knob as tinted (lighter default). */
+  .frosted {
+    color: var(--sx-ink);
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, .58), rgba(255, 255, 255, .30)),
+      color-mix(in srgb, var(--sx-accent) var(--sx-btn-tint, 22%), transparent);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+    backdrop-filter: blur(12px) saturate(160%);
+    border-color: rgba(255, 255, 255, .65);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), var(--sx-e-1);
+  }
 
   /* ── Hover ──────────────────────────────────────────────────────────────
      Behind `hover: hover` so a tap on a tablet does not leave a button stuck
@@ -262,16 +322,36 @@
       transform: translateY(-1px);
       box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-2);
     }
-    /* --sx-sunk aquí es el mismo bug que en Table/Tabs/Menu: bajo el cursor
-       un botón secundario se ilumina, no se hunde en gris. */
+    /* Glossy catches the light: the sheen grows and brightens, and a single
+       streak crosses once. This is the ONLY variant that animates. */
+    .solid:not(:disabled):not(.locked):hover::before {
+      height: 58%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, 0));
+    }
+    .solid:not(:disabled):not(.locked):hover::after {
+      animation: sx-btn-sweep 850ms var(--sx-ease) forwards;
+    }
+    /* Tinted deepens by one notch of the knob — it lifts in colour, never
+       sinks into grey (the --sx-sunk bug from Table/Tabs/Menu). */
     .outline:not(:disabled):not(.locked):hover {
-      background: var(--sx-accent-soft);
-      box-shadow: var(--sx-e-2);
+      background: color-mix(in srgb, var(--sx-accent) calc(var(--sx-btn-tint, 28%) + 8%), var(--sx-surface));
+      border-color: color-mix(in srgb, var(--sx-accent) 44%, transparent);
     }
     .ghost:not(:disabled):not(.locked):hover {
       background: var(--sx-accent-soft);
       color: var(--sx-ink);
     }
+    .frosted:not(:disabled):not(.locked):hover {
+      transform: translateY(-1px);
+      border-color: rgba(255, 255, 255, .85);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), var(--sx-e-2);
+    }
+  }
+  @keyframes sx-btn-sweep {
+    0% { left: -45%; opacity: 0; }
+    15% { opacity: 1; }
+    55% { opacity: 1; }
+    100% { left: 130%; opacity: 0; }
   }
 
   .sx-btn:not(:disabled):not(.locked):active { transform: none; }
@@ -301,6 +381,19 @@
     --btn-inset: inset 0 1px 0 rgba(255, 255, 255, .2);
   }
 
+  /* Frosted's veil is a translucent WHITE in both themes (that is what makes it
+     read as frost), so over the dark surface it thins right down — a heavier
+     dark veil would read as a solid chip, not glass. The accent tint underneath
+     still comes from the (pale) dark accent through the same knob. */
+  :global([data-sx-theme='dark']) .sx-btn.frosted,
+  :global(.sx-dark) .sx-btn.frosted {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .05)),
+      color-mix(in srgb, var(--sx-accent) var(--sx-btn-tint, 22%), transparent);
+    border-color: rgba(255, 255, 255, .20);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .20), var(--sx-e-1);
+  }
+
   /* ── Focus ──────────────────────────────────────────────────────────────
      Declared here and not inherited: base.css is a document stylesheet and a
      Core renders in a shadow root, where it does not reach. The halo is the
@@ -327,7 +420,8 @@
     transform: none;
   }
   .outline:disabled, .outline.off,
-  .ghost:disabled, .ghost.off {
+  .ghost:disabled, .ghost.off,
+  .frosted:disabled, .frosted.off {
     opacity: .48;
   }
   .solid:disabled, .solid.off,
@@ -336,6 +430,9 @@
     color: var(--sx-ink-3);
     border-color: var(--sx-line);
   }
+  /* A disabled key is furniture: no gloss, no sheen to catch. */
+  .solid:disabled::before, .solid.off::before,
+  .solid:disabled::after, .solid.off::after { display: none; }
   /* Working is not unavailable: it keeps its weight and only says it is thinking. */
   .sx-btn.busy { cursor: progress; }
   .busy .face { visibility: hidden; }
@@ -361,6 +458,9 @@
     .sx-btn { transition: none; }
     .sx-btn:hover { transform: none; }
     .sp { animation: none; }
+    /* No sweep, no growing gloss — the gloss stays at its resting size. */
+    .solid::after { display: none; }
+    .solid::before { transition: none; }
   }
 
   /* A tablet in landscape is 1024px and is still poked with a thumb, so this is
