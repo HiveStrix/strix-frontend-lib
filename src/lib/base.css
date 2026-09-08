@@ -25,29 +25,51 @@ img, svg, video { display: block; max-width: 100%; }
    with one Arial select in it looks broken rather than plain. */
 button, input, select, textarea { font: inherit; color: inherit; }
 
-/* ── Scrollbars: al hover, no siempre (REGLA DEL SISTEMA) ───────────────────
-   Una barra de scroll permanente es ruido de cromo: compite con el dato en
-   cada panel, tabla o lista que desborda. Regla del sistema: el thumb es
-   transparente en reposo y toma color sólo cuando el cursor entra al
-   contenedor scrolleable (o algo dentro toma foco). El gutter fino se reserva
-   siempre, así que aparecer/desaparecer NO mueve el layout.
-   Excepciones legales (ganan por especificidad sobre `*`):
-     · ocultarla siempre  → `scrollbar-width: none` + `::-webkit-scrollbar{display:none}`
-       (un riel de tabs con scroll horizontal, p.ej.).
-     · dejarla fija       → el componente declara su propio `scrollbar-color`. */
-* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
-*:hover, *:focus-within { scrollbar-color: var(--sx-edge) transparent; }
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb {
-  background-color: transparent;
-  border: 3px solid transparent;
-  border-radius: var(--sx-r-pill);
-  background-clip: padding-box;
+/* ── La barra de scroll: nuestra, flotante, y sin cobrarle ancho al contenido ─
+   La versión anterior de esta regla usaba `scrollbar-width: thin` con el thumb
+   transparente en reposo, y decía —en este mismo comentario— que «el gutter
+   fino se reserva siempre, así que aparecer/desaparecer NO mueve el layout».
+   Eso era cierto y era el problema: el gutter se reserva SIEMPRE, o sea que la
+   barra le cobra una franja al contenido aunque nadie la mire. Medido sobre el
+   Shell:
+
+       scrollbar-width: thin          →  11 px reservados, todo el tiempo
+       scrollbar-width: auto          →  15 px
+       ::-webkit-scrollbar{width:0}   →  15 px (el layout lo decide la propiedad
+                                         estándar; la de webkit sólo pinta)
+       scrollbar-width: none          →   0 px
+
+   `none` es el único valor que no cobra nada, así que la nativa se apaga en
+   todos lados y la afordancia la pone la acción `scrollbar` (shell/scrollbar.js),
+   que dibuja una flotante: aparece al entrar el cursor o al scrollear, se va
+   sola, se puede arrastrar, y no ocupa una sola columna de layout. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { width: 0; height: 0; }
+
+.sx-sbar {
+  position: fixed;
+  width: 10px;
+  z-index: var(--sx-z-sticky, 100);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--sx-beat) var(--sx-ease);
 }
-*:hover::-webkit-scrollbar-thumb,
-*:focus-within::-webkit-scrollbar-thumb { background-color: var(--sx-edge); }
-*::-webkit-scrollbar-corner { background: transparent; }
+.sx-sbar.on { opacity: 1; pointer-events: auto; }
+/* Delicada a propósito: 6px de ancho y la tinta al 20%. Se nota lo justo para
+   decir «esto sigue hacia abajo» y no compite con un solo dato de la pantalla. */
+.sx-sbar-thumb {
+  width: 6px;
+  margin-inline: 2px;
+  border-radius: var(--sx-r-pill);
+  background: color-mix(in srgb, var(--sx-ink) 20%, transparent);
+  transition: background var(--sx-beat) var(--sx-ease);
+}
+.sx-sbar:hover .sx-sbar-thumb { background: color-mix(in srgb, var(--sx-ink) 34%, transparent); }
+.sx-sbar-thumb:active { background: color-mix(in srgb, var(--sx-ink) 48%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sx-sbar, .sx-sbar-thumb { transition: none; }
+}
 
 /* ── The three type registers ─────────────────────────────────────────────
    Everything in a Strix surface is one of these. Adding a fourth is a decision

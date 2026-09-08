@@ -90,6 +90,24 @@
       'M1.2 11.5h1.7M5.9 11.5h4.1M13 11.5h1.2' +
       'M5.9 12.1a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0M13 12.1a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0',
     clock: 'M13.8 8a5.8 5.8 0 1 1-11.6 0 5.8 5.8 0 0 1 11.6 0M8 4.6V8.2l2.4 1.5',
+    // TRES GLIFOS PARA QUE LOS MODULOS NO SE LLAMEN TODOS IGUAL. El Shell
+    // dibujaba `layers` para los siete cores del riel, asi que la lista era
+    // siete veces el mismo dibujo y el icono no ayudaba a encontrar nada. El
+    // set no tenia con que representar personas ni dinero, que son dos de las
+    // identidades que hacian falta (Clientes, Gastos) — y `tag` cubre la
+    // tercera (Costeo: lo que algo vale).
+    users:
+      'M10.4 13.8v-1.1a2.6 2.6 0 0 0-2.6-2.6H4.5a2.6 2.6 0 0 0-2.6 2.6v1.1' +
+      'M8.4 5.2a2.2 2.2 0 1 1-4.5 0 2.2 2.2 0 0 1 4.5 0' +
+      'M14.1 13.8v-1.1a2.6 2.6 0 0 0-1.9-2.5M10.7 3.1a2.2 2.2 0 0 1 0 4.3',
+    coins:
+      'M13.4 4.3c0 1.15-2.42 2.1-5.4 2.1S2.6 5.45 2.6 4.3 5.02 2.2 8 2.2s5.4.95 5.4 2.1Z' +
+      'M2.6 4.3v3.4c0 1.15 2.42 2.1 5.4 2.1s5.4-.95 5.4-2.1V4.3' +
+      'M2.6 7.7v3.4c0 1.15 2.42 2.1 5.4 2.1s5.4-.95 5.4-2.1V7.7',
+    tag:
+      'M8.7 1.8H13a1.2 1.2 0 0 1 1.2 1.2v4.3a1.2 1.2 0 0 1-.35.85l-5.5 5.5a1.2 1.2 0 0 1-1.7 0' +
+      'L2.15 9.5a1.2 1.2 0 0 1 0-1.7l5.5-5.5a1.2 1.2 0 0 1 .85-.35Z' +
+      'M10.9 4.9h.01',
     gauge: 'M1.8 10.5a6.2 6.2 0 0 1 12.4 0M8.8 9.6 11.3 6.4M9.2 10.5a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0',
     wrench:
       'M9.5 4.1a.67.67 0 0 0 0 .93l1.07 1.07a.67.67 0 0 0 .93 0l2.51-2.51a4 4 0 0 1-5.29 5.29' +

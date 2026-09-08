@@ -630,16 +630,53 @@ export const hostBase = () => `
 }
 :focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; border-radius: var(--sx-r-1); }
 :host([data-sx-theme="dark"]) :focus-visible { outline-color: var(--sx-n-0); }
-/* Scrollbars al hover, no siempre — regla del sistema (misma que base.css). El
-   thumb es transparente en reposo y toma color cuando el cursor entra al
-   contenedor scrolleable; el gutter fino se reserva para no mover el layout. */
-* { scrollbar-width: thin; scrollbar-color: transparent transparent; }
-*:hover, *:focus-within { scrollbar-color: var(--sx-edge) transparent; }
-*::-webkit-scrollbar { width: 10px; height: 10px; }
-*::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background-color: transparent; border: 3px solid transparent; border-radius: var(--sx-r-pill); background-clip: padding-box; }
-*:hover::-webkit-scrollbar-thumb, *:focus-within::-webkit-scrollbar-thumb { background-color: var(--sx-edge); }
-*::-webkit-scrollbar-corner { background: transparent; }
+/* La barra de scroll: nuestra, flotante, y sin cobrarle ancho al contenido.
+   Misma regla que base.css.
+   La versión anterior de esta regla usaba «scrollbar-width: thin» con el thumb
+   transparente en reposo, y decía —en este mismo comentario— que »el gutter
+   fino se reserva siempre, así que aparecer/desaparecer NO mueve el layout».
+   Eso era cierto y era el problema: el gutter se reserva SIEMPRE, o sea que la
+   barra le cobra una franja al contenido aunque nadie la mire. Medido sobre el
+   Shell:
+
+       scrollbar-width: thin          →  11 px reservados, todo el tiempo
+       scrollbar-width: auto          →  15 px
+       ::-webkit-scrollbar{width:0}   →  15 px (el layout lo decide la propiedad
+                                         estándar; la de webkit sólo pinta)
+       scrollbar-width: none          →   0 px
+
+   «none» es el único valor que no cobra nada, así que la nativa se apaga en
+   todos lados y la afordancia la pone la acción «scrollbar» (shell/scrollbar.js),
+   que dibuja una flotante: aparece al entrar el cursor o al scrollear, se va
+   sola, se puede arrastrar, y no ocupa una sola columna de layout. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { width: 0; height: 0; }
+
+.sx-sbar {
+  position: fixed;
+  width: 10px;
+  z-index: var(--sx-z-sticky, 100);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--sx-beat) var(--sx-ease);
+}
+.sx-sbar.on { opacity: 1; pointer-events: auto; }
+/* Delicada a propósito: 6px de ancho y la tinta al 20%. Se nota lo justo para
+   decir «esto sigue hacia abajo» y no compite con un solo dato de la pantalla. */
+.sx-sbar-thumb {
+  width: 6px;
+  margin-inline: 2px;
+  border-radius: var(--sx-r-pill);
+  background: color-mix(in srgb, var(--sx-ink) 20%, transparent);
+  transition: background var(--sx-beat) var(--sx-ease);
+}
+.sx-sbar:hover .sx-sbar-thumb { background: color-mix(in srgb, var(--sx-ink) 34%, transparent); }
+.sx-sbar-thumb:active { background: color-mix(in srgb, var(--sx-ink) 48%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sx-sbar, .sx-sbar-thumb { transition: none; }
+}
+
 /* Entrada escalonada opcional — misma regla que base.css. Sólo retrasa la
    animación que el hijo ya trae (la entrada de Card); no anima por su cuenta. */
 .sx-stagger > *:nth-child(2) { animation-delay: 40ms; }

@@ -35,3 +35,4 @@ export { default as Sheet } from './Sheet.svelte';
 export { default as Tooltip } from './Tooltip.svelte';
 export { default as InfoDot } from './InfoDot.svelte';
 export { default as Glyph, GLYPHS, GLYPH_PATHS } from './Glyph.svelte';
+export { scrollbar } from './scrollbar.js';

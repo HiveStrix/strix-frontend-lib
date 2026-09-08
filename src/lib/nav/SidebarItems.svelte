@@ -1,4 +1,5 @@
 <script>
+  import { scrollbar } from '../shell/scrollbar.js';
   // PIEZA INTERNA DE SIDEBAR — no exportada, no en `nav/index.js`, no parte
   // de la API pública. Existe por una sola razón mecánica: Svelte 5 no deja
   // mezclar `<slot>` con `{#snippet}`/`{@render}` dentro del MISMO
@@ -56,7 +57,7 @@
     <div class="head"><slot name="header" /></div>
   {/if}
 
-  <ul>
+  <ul use:scrollbar>
     {#each items as it, i (it.key ?? `s-${i}`)}
       {#if it.kind === 'section'}
         <li class="sect"><span class="sx-cap">{it.label}</span></li>

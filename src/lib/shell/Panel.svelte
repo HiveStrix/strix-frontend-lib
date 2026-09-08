@@ -1,4 +1,5 @@
 <script>
+  import { scrollbar } from './scrollbar.js';
   // A CARD THAT SAYS WHAT IT IS.
   //
   // The commonest object in every Strix product is not a card, it is a card with
@@ -158,7 +159,7 @@
       </div>
     {/if}
 
-    <div class="body" class:flush class:scroll><slot /></div>
+    <div class="body" class:flush class:scroll use:scrollbar><slot /></div>
 
     {#if $$slots.footer}
       <div class="foot"><slot name="footer" /></div>

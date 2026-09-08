@@ -1,4 +1,5 @@
 <script>
+  import { scrollbar } from '../shell/scrollbar.js';
   // THE TABLE.
   //
   // A table is the only component in the system whose job is COMPARISON. Not
@@ -386,7 +387,7 @@
     <!-- The skeleton keeps the table's shape so nothing jumps when the rows
          land. It is aria-hidden as a whole; the sentence above already said it. -->
     <div class="box" aria-busy="true">
-      <div class="scroll" aria-hidden="true">
+      <div class="scroll" use:scrollbar aria-hidden="true">
         <table style="min-width:{minW}">
           <caption class="sx-sr">{caption}</caption>
           <thead>
@@ -599,6 +600,7 @@
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
       <div
         class="scroll"
+        use:scrollbar
         bind:this={scroller}
         style={maxHeight ? `max-height:${maxHeight}` : ''}
         role={overflows && caption ? 'region' : null}

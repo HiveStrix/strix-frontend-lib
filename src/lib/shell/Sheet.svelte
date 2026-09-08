@@ -5,6 +5,7 @@
 </script>
 
 <script>
+  import { scrollbar } from './scrollbar.js';
   // THE SIDE DRAWER. A second surface without leaving the first one.
   //
   // WHY A DRAWER AND NOT A MODAL BOX
@@ -225,7 +226,7 @@
         {/if}
       </div>
 
-      <div class="body"><slot /></div>
+      <div class="body" use:scrollbar><slot /></div>
 
       {#if $$slots.footer}
         <div class="foot"><slot name="footer" /></div>
