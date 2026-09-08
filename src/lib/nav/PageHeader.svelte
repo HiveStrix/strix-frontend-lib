@@ -434,6 +434,21 @@
     --sx-accent: var(--banda-ink);
     --sx-accent-ink: var(--banda-fill);
   }
+  /* `ghost` NO SE ARREGLA CON LOS TOKENS DE ACENTO, y por eso lleva regla
+     propia: es la única variante que no pinta su propio fondo —es transparente
+     y toma `--sx-ink-2`, que es la tinta del CAMPO, no la de la banda—, así
+     que sobre el relleno de acento desaparecía. Y la salida no puede ser
+     reasignar `--sx-ink` en `.acts`: `outline` sí pinta su fondo
+     (`--sx-surface`) y usa esa misma tinta, de modo que moverla dejaría a
+     `outline` con la tinta de la banda sobre superficie —el mismo bug,
+     mudado de botón. Se apunta a `ghost` y a nadie más.
+
+     `:global` porque el <button> lo dibuja Button, en su propio scope. */
+  .hd.banda .acts :global(.sx-btn.ghost) { color: var(--banda-ink); }
+  .hd.banda .acts :global(.sx-btn.ghost:not(:disabled):not(.locked):hover) {
+    background: color-mix(in srgb, var(--banda-ink) 16%, transparent);
+    color: var(--banda-ink);
+  }
   .hd.banda .eyebrow { color: var(--banda-ink-soft); }
   .hd.banda .sub { color: var(--banda-ink-soft); }
 
