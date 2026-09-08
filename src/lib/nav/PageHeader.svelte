@@ -96,9 +96,14 @@
   // Pinta el título, y es el ÚNICO lugar de esta librería donde la tinta lleva
   // significado por sí sola —así que sólo es legal cuando el título ya dice la
   // palabra—. «3 máquinas están vencidas» en tinta crítica es la regla
-  // aguantando; «Flota» en crítica es la regla rota. En `soft` el tono también
-  // tiñe el relleno (su banda medida); en `hero` los tonos usan sus inks
-  // claras para sobrevivir al fondo oscuro.
+  // aguantando; «Flota» en crítica es la regla rota. En `hero` los tonos usan
+  // sus inks claras para sobrevivir al fondo oscuro.
+  //
+  // EL TONO NO SE LLEVA PUESTO EL ACENTO. En las dos variantes que pintan una
+  // superficie —`banda` y `soft`— el relleno se queda SIEMPRE en el acento del
+  // producto y el tono sólo cambia su profundidad. El acento dice de qué
+  // módulo es esta pantalla en toda ruta; un estado es algo que pasa hoy, y lo
+  // pasajero no borra lo permanente. Para gritar está `Alert`.
   //
   // NO ES `TopBar`. Esto es de la PANTALLA —cambia en cada ruta—. `TopBar` es
   // de la APLICACIÓN (el nombre del producto, el tenant, la sesión) y no cambia
@@ -371,10 +376,12 @@
     border-radius: var(--sx-r-2);
     padding: var(--sx-s-5) var(--sx-s-6);
   }
-  .hd.soft.attention { background: var(--sx-attention-band); }
-  .hd.soft.critical  { background: var(--sx-critical-band); }
-  .hd.soft.positive  { background: var(--sx-positive-band); }
-  .hd.soft.info      { background: var(--sx-info-band); }
+  /* Misma ley que en `banda`: el lavado se queda en el acento y el tono sólo
+     lo carga un punto —acá hacia el propio acento, porque el punto de partida
+     ya es su versión diluida—. El estado sigue leyéndose en el título, que en
+     esta variante sí toma la tinta del tono. */
+  .hd.soft.attention { background: color-mix(in srgb, var(--sx-accent-soft) 82%, var(--sx-accent)); }
+  .hd.soft.critical  { background: color-mix(in srgb, var(--sx-accent-soft) 68%, var(--sx-accent)); }
   .hd.soft.bleed { margin-inline: calc(var(--sx-s-6) * -1); }
 
   /* ═══ VARIANT: aire — texto limpio con eyebrow de acento ═══════════════════
@@ -414,10 +421,30 @@
     padding: var(--sx-s-6);
     border-radius: var(--sx-r-3);
   }
-  .hd.banda.positive  { --banda-fill: var(--sx-positive-band);  --banda-ink: var(--sx-positive);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-positive-edge); }
-  .hd.banda.attention { --banda-fill: var(--sx-attention-band); --banda-ink: var(--sx-attention); --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-attention-edge); }
-  .hd.banda.critical  { --banda-fill: var(--sx-critical-band);  --banda-ink: var(--sx-critical);  --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-critical-edge); }
-  .hd.banda.info      { --banda-fill: var(--sx-info-band);      --banda-ink: var(--sx-info);      --banda-ink-soft: var(--sx-ink-2); --banda-edge: var(--sx-info-edge); }
+  /* EL TONO YA NO SE LLEVA PUESTO EL ACENTO — cambia su PROFUNDIDAD.
+   *
+   * Antes cada tono reasignaba `--banda-fill` a la banda de su estado, así que
+   * un inventario con una celda en negativo abría en ROJO y dejaba de leerse
+   * como inventario. Eso invierte la jerarquía: el acento es la identidad del
+   * módulo —te dice DÓNDE estás, en toda ruta— y un estado es algo que pasa
+   * hoy. Lo pasajero no puede borrar lo permanente. Para gritar ya está
+   * `Alert`, que es una pieza que se va cuando el problema se va; una banda no.
+   *
+   * Lo que sí varía es cuánto pesa: el relleno se mezcla hacia `--sx-ink`. Esa
+   * es la única mezcla que funciona en los dos temas sin una regla por tema,
+   * y no por casualidad: en claro `--sx-ink` es casi negro y hunde el acento,
+   * en oscuro es casi blanco y lo levanta —en ambos casos lo aleja de
+   * `--banda-ink`, así que el contraste del texto SUBE en vez de bajar.
+   *
+   * Sólo `attention` y `critical` mueven la aguja, porque sólo ellos piden
+   * algo. `positive`/`info`/`neutral` se quedan en el acento pleno: una banda
+   * que se tiñe cuando todo está bien enseña a ignorar el color.
+   *
+   * El estado no se queda mudo: el título ya dice la palabra («Una celda está
+   * en negativo»), que es lo que la regla de la casa pide —el color decora un
+   * reclamo que el contenido ya hace, nunca lo hace solo—. */
+  .hd.banda.attention { --banda-fill: color-mix(in srgb, var(--sx-accent) 92%, var(--sx-ink)); }
+  .hd.banda.critical  { --banda-fill: color-mix(in srgb, var(--sx-accent) 82%, var(--sx-ink)); }
   /* `.hd.banda .ttl` (0,2,1) le gana a `.critical .ttl` (0,2,0): el título de
      una banda toma SIEMPRE su `--banda-ink` (el tono ya viajó al relleno). */
   .hd.banda .ttl { color: var(--banda-ink); }
