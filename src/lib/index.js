@@ -48,7 +48,8 @@ export { Button, ButtonGroup, IconButton, Menu, SplitButton } from './action/ind
 export {
   Field, Input, NumberInput, Textarea, Select, Combobox,
   Checkbox, Radio, Switch, DateInput, FileDrop, ImportPreview, ChoiceCards, today,
-  Calendar, DateRange, DatePicker, parseLocalDate
+  Calendar, DateRange, DatePicker, parseLocalDate,
+  DivisionPicker, divisionOptions
 } from './form/index.js';
 
 // ── nav · where am I, what am I looking at, how do I get to the other thing ─

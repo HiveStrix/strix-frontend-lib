@@ -17,7 +17,7 @@
   import {
     Field, Input, NumberInput, Textarea, Select, Combobox,
     Checkbox, Radio, Switch, DateInput, FileDrop, ChoiceCards, today,
-    Calendar, DateRange, DatePicker
+    Calendar, DateRange, DatePicker, DivisionPicker
   } from '../../lib/form/index.js';
 
   // ── El índice ─────────────────────────────────────────────────────────────
@@ -31,6 +31,7 @@
     { id: 'textarea', label: 'Textarea' },
     { id: 'select', label: 'Select' },
     { id: 'combobox', label: 'Combobox' },
+    { id: 'divisionpicker', label: 'DivisionPicker' },
     { id: 'date', label: 'DateInput' },
     { id: 'calendar', label: 'Calendar' },
     { id: 'datepicker', label: 'DatePicker' },
@@ -141,6 +142,26 @@
   let costo = '1250000';
   let cantidad = '2';
   let nota = 'Se cambió el retén del cilindro y se purgó el sistema. La manguera de retorno está reseca';
+  // Tres árboles: el que no existe, el que alguien configuró, y el que ya no
+  // entra en un select.
+  const ARBOL_TRIVIAL = [{ id: 1, name: 'General', path: 'general', active: true }];
+  const ARBOL = [
+    { id: 1, name: 'General', path: 'general', active: true },
+    { id: 2, name: 'Centroamérica', path: 'general/centroamerica', active: true },
+    { id: 3, name: 'Costa Rica', path: 'general/centroamerica/cr', active: true },
+    { id: 4, name: 'Panamá', path: 'general/centroamerica/pa', active: true },
+    { id: 5, name: 'Guanacaste', path: 'general/centroamerica/cr/gte', active: false }
+  ];
+  const ARBOL_LARGO = Array.from({ length: 16 }, (_, i) => ({
+    id: i + 1,
+    name: `Sucursal ${String(i + 1).padStart(2, '0')}`,
+    path: `general/s${String(i + 1).padStart(2, '0')}`,
+    active: true
+  }));
+  let divFiltro = '';
+  let divForm = '';
+  let divLargo = '';
+
   let familia = '';
   let falla = 'FCM-03';
   let equipo = '';
@@ -287,6 +308,18 @@
     combobox: `<Combobox label="Equipo" bind:value={equipo} options={EQUIPOS}
           noun="equipo" nounPlural="equipos"
           placeholder="Código o nombre…" />`,
+
+    divisionpicker: `<DivisionPicker
+  divisions={arbol}
+  bind:value={divisionId}
+  allLabel="Todas"
+  includeInactive
+/>
+
+<!-- '' es «nada elegido». Qué significa lo traduce el core: -->
+<!--   filtro   → se omite del query -->
+<!--   bodega   → Number(v) || ROOT_DIVISION_ID -->
+<!--   compra   → Number(v) || undefined -->`,
 
     date: `<DateInput label="Fecha del servicio" bind:value={fecha} relative
            max={hoy} />`,
@@ -954,6 +987,55 @@
           campo: se mueve <span class="sx-id">aria-activedescendant</span>, que es el patrón que
           este control es.
         </p>
+      </section>
+
+      <!-- ═══ DIVISIONPICKER ═══════════════════════════════════════════════ -->
+      <section id="divisionpicker">
+        <h2>DivisionPicker</h2>
+        <p class="why">
+          El nodo del árbol organizacional del tenant. Tres módulos lo resolvían por su cuenta y de
+          tres formas distintas; esto es el acuerdo. <b>No busca el árbol</b>: se lo pasás en
+          <span class="sx-id">divisions</span>, porque esta librería no tiene capa de datos y el
+          catálogo no tiene servidor.
+        </p>
+        <p class="why">
+          <b>Una raíz sola no es una decisión.</b> Con menos de dos nodos no se dibuja nada: un
+          tenant que no configuró el árbol no tiene qué elegir, y un desplegable de una sola opción
+          es ruido en cada formulario. Sobre una docena de opciones cambia solo a Combobox.
+        </p>
+
+        <div class="two">
+          <div class="when yes">
+            <h3 class="sx-cap">Usalo</h3>
+            <ul>
+              <li>Como filtro de una lista: pasale <span class="sx-id">allLabel</span> y <span class="sx-id">includeInactive</span> — una sucursal cerrada sigue teniendo historia que mirar.</li>
+              <li>Como campo de un formulario: sin <span class="sx-id">allLabel</span>, y sin inactivas, que no aceptan registros nuevos.</li>
+            </ul>
+          </div>
+          <div class="when no">
+            <h3 class="sx-cap">No lo usés</h3>
+            <ul>
+              <li>Para administrar el árbol. Eso vive en el módulo Divisiones; acá sólo se elige un nodo.</li>
+              <li>Esperando que cargue solo. El árbol lo trae el core, y el <span class="sx-id">value</span> vacío lo traduce el core a lo que signifique en su backend.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="demo grid2">
+          <DivisionPicker divisions={ARBOL} bind:value={divFiltro} allLabel="Todas" includeInactive hint="De filtro: la opción que no filtra reemplaza al marcador, y las inactivas entran." />
+          <DivisionPicker divisions={ARBOL} bind:value={divForm} hint="De formulario: sin «todas» y sin inactivas." />
+          <DivisionPicker divisions={ARBOL_LARGO} bind:value={divLargo} allLabel="Todas" hint="Diecisiete opciones: cambia solo a Combobox." />
+          <DivisionPicker divisions={ARBOL_TRIVIAL} value="" hint="Una raíz sola: no se dibuja nada. Este hueco es el comportamiento." />
+          <DivisionPicker divisions={[]} value="7" hint="Sin árbol pero con un valor puesto: lo dice en vez de desaparecer." />
+          <DivisionPicker divisions={ARBOL} value="" disabled hint="Desactivado." />
+        </div>
+
+        <div class="code">
+          <pre><code>{C.divisionpicker}</code></pre>
+          <button class="copy" on:click={() => copy(C.divisionpicker, 'divisionpicker')}>
+            {copied === 'divisionpicker' ? 'Copiado' : failed === 'divisionpicker' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
+          </button>
+        </div>
       </section>
 
       <!-- ═══ DATEINPUT ═══════════════════════════════════════════════════ -->
