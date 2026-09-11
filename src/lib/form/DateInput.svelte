@@ -87,6 +87,10 @@
   export let optional = false;
   export let disabled = false;
   export let readonly = false;
+  /** El peldaño COMPACTO (~32px), reenviado a Field igual que Input/Select. Sin
+   *  esta prop, un `<DateInput dense>` se ignoraba y el campo quedaba en la
+   *  altura cómoda (~40px), desalineando su fila. */
+  export let dense = false;
   export let name = undefined;
   export let id = '';
   export let origin = '';
@@ -134,7 +138,7 @@
 </script>
 
 <Field
-  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {readonly}
+  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}
@@ -162,7 +166,7 @@
   {/if}
 
   <button
-    type="button" class="cal" on:click={openPicker} disabled={disabled || readonly}
+    type="button" class="cal" class:dense on:click={openPicker} disabled={disabled || readonly}
     aria-label={`Abrir el calendario de ${label || 'la fecha'}`}
   >
     <svg viewBox="0 0 16 16" aria-hidden="true">
@@ -200,6 +204,9 @@
      de campo: se ilumina bajo el cursor, no se hunde. */
   .cal:hover:not(:disabled) { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .cal:disabled { cursor: not-allowed; opacity: .5; }
+  /* En denso el botón baja de --sx-s-6 (24px) a --sx-s-5 (20px) para no empujar
+     el marco de 32px a 34 (el @media de puntero grueso lo devuelve a --sx-touch). */
+  .cal.dense { width: var(--sx-s-5); height: var(--sx-s-5); }
   .cal svg { width: 15px; height: 15px; }
 
   /* Nothing chosen ⇒ no echo and no space held for one: an empty line under
