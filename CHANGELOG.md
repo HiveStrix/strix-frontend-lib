@@ -4,6 +4,40 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## v0.10.0 — 2026-09-11
+
+> Construida **sobre `v0.9.1`**: incorpora su arreglo de `dense` en `Combobox` y
+> `DateInput`, y le suma lo de abajo.
+
+### Nuevo
+- **`DivisionPicker`** (`form`) — el nodo del árbol organizacional del tenant, en
+  un control. Tres módulos (inventory, expenses, clients) lo resolvían por su
+  cuenta y de tres formas distintas; esto es el acuerdo. Es **presentacional**:
+  recibe los nodos en `divisions` y no busca nada, porque esta librería no tiene
+  capa de datos y el catálogo no tiene servidor. **No se dibuja con menos de dos
+  nodos** — una raíz sola no es una decisión, y un desplegable de una sola opción
+  es ruido en cada formulario. Sobre una docena de opciones cambia solo a
+  `Combobox`. Si está oculto pero le queda un `value` que la lista no resuelve, lo
+  dice en vez de desaparecer callado.
+- **`divisionOptions(nodes, { includeInactive, allLabel, indent })`** (`form`) —
+  el etiquetado del árbol (orden por `path`, sangría por profundidad, `(inactiva)`,
+  la opción «todas»), exportado aparte para que una pantalla que arme su propia
+  lista obtenga exactamente las mismas etiquetas.
+
+### Ojo al migrar
+- **El `value` del `DivisionPicker` es un `string`, y `''` es «nada elegido».**
+  Qué significa ese vacío lo decide el backend de cada core —«todas» al filtrar,
+  «raíz» en una bodega, «sin clasificar» en una compra—, así que se traduce en el
+  borde del API, no en el componente. Un core que venía guardando números tiene
+  que pasar a `String(...)` al cargar el formulario y a `Number(...) || …` al
+  guardar.
+
+### Arreglado
+- **La sangría del árbol necesitaba espacio duro.** El HTML colapsa el espacio en
+  blanco inicial, así que un `<option>` sangrado con espacios normales se dibujaba
+  pegado al margen igual que su padre: la sangría quedaba en el DOM y no en la
+  pantalla. Medido en el navegador antes de tocarlo.
+
 ## v0.8.2 — 2026-08-20
 
 > Construida **sobre `v0.8.0`**.
