@@ -312,7 +312,7 @@
   let:invalid
 >
   <div class="wrap" bind:this={wrapEl} on:focusout={onFocusOut}>
-    <div class="frame" class:invalid class:disabled>
+    <div class="frame" class:invalid class:disabled class:dense>
       <span class="lead" aria-hidden="true">
         <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7" /><path d="M9.2 9.2 12.4 12.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg>
       </span>
@@ -446,6 +446,19 @@
      a 3:1 para el límite de un control. Ver Radio.svelte para los números
      completos. */
   .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; }
+
+  /* El peldaño COMPACTO. El Combobox dibuja su propio marco (frame={false} en
+     Field, porque el popup se ancla contra él), así que la regla dense de
+     Field.svelte no lo alcanza: hay que repetir aquí el mismo salto s-10 -> s-8.
+     Sin esto un Combobox denso medía ~40px y desalineaba cualquier fila que lo
+     pusiera junto a un Input/Select/NumberInput denso (~32px). */
+  .frame.dense { min-height: var(--sx-s-8); padding: var(--sx-s-1) var(--sx-s-2); }
+  .frame.dense input { font-size: var(--sx-t-sm); line-height: 1.35; }
+  /* El botón de acción (limpiar/desplegar) mide --sx-s-6 (24px): dentro de un
+     marco denso de 32px empujaría la altura a 34 y la fila volvería a
+     desalinearse. En denso baja a --sx-s-5 (20px) — en puntero grueso el @media
+     de abajo lo devuelve a --sx-touch, así que el objetivo táctil no se toca. */
+  .frame.dense .icon { width: var(--sx-s-5); height: var(--sx-s-5); }
 
   input {
     flex: 1 1 auto; min-width: 0; width: 100%;
