@@ -66,6 +66,11 @@ function depthOf(node) {
  *   coincidencia calcula el índice sobre la etiqueta plegada —que viene
  *   recortada— y lo aplica sobre la original, así que los espacios de sangría
  *   le corren el resaltado dos caracteres por nivel.
+ *
+ * OJO: la sangría va con ESPACIO DURO. El HTML colapsa el espacio en blanco
+ * inicial, así que un `<option>` sangrado con espacios normales se dibuja
+ * pegado al margen igual que su padre — se midió en el navegador. Definir
+ * `const PAD = '\u00A0\u00A0';` arriba.
  */
 export function divisionOptions(nodes, { includeInactive = false, allLabel = '', indent = true } = {}) {
   const opts = (nodes ?? [])
@@ -76,7 +81,7 @@ export function divisionOptions(nodes, { includeInactive = false, allLabel = '',
     .map((n) => ({
       value: String(n.id),
       label:
-        (indent ? '  '.repeat(depthOf(n)) : '') +
+        (indent ? PAD.repeat(depthOf(n)) : '') +
         String(n.name ?? n.path ?? '') +
         (n.active === false ? ' (inactiva)' : ''),
       // El path completo viaja como pista: el Combobox lo busca además del
@@ -105,7 +110,8 @@ const nodes = [
 ];
 const a = divisionOptions(nodes);
 console.assert(a.map((o) => o.value).join(',') === '1,2,3', 'orden por path + inactiva fuera: ' + JSON.stringify(a.map((o) => o.value)));
-console.assert(a[2].label === '    CR', 'sangría por profundidad: ' + JSON.stringify(a[2].label));
+console.assert(a[2].label === '\u00A0\u00A0\u00A0\u00A0CR', 'sangría con espacio duro: ' + JSON.stringify(a[2].label));
+console.assert(!a[2].label.includes(' '), 'la sangría NO usa espacio normal');
 console.assert(a[2].hint === 'general/centroamerica/cr', 'el path viaja como hint');
 const b = divisionOptions(nodes, { includeInactive: true });
 console.assert(b.length === 4 && b[3].label.endsWith('(inactiva)'), 'inactiva incluida y marcada: ' + JSON.stringify(b[3].label));
