@@ -31,6 +31,10 @@ export { default as Switch } from './Switch.svelte';
 // import it rather than re-solving the same timezone bug.
 export { default as DateInput, today, parseLocalDate } from './DateInput.svelte';
 export { default as FileDrop } from './FileDrop.svelte';
+// ImportPreview es la UI de `ingest.v1`: el contrato de importación de archivos
+// la pide UNA vez para todo el estate («una UI de importación, no cuatro»).
+// Vive al lado de FileDrop porque lo envuelve.
+export { default as ImportPreview } from './ImportPreview.svelte';
 export { default as ChoiceCards } from './ChoiceCards.svelte';
 // A month grid, keyboard-navigable on its own (see the file for the ARIA grid
 // pattern this follows), and the two-date span built on top of it plus DateInput.

@@ -47,7 +47,7 @@ export { Button, ButtonGroup, IconButton, Menu, SplitButton } from './action/ind
 // which is why they line up without anybody arranging them.
 export {
   Field, Input, NumberInput, Textarea, Select, Combobox,
-  Checkbox, Radio, Switch, DateInput, FileDrop, ChoiceCards, today,
+  Checkbox, Radio, Switch, DateInput, FileDrop, ImportPreview, ChoiceCards, today,
   Calendar, DateRange, DatePicker, parseLocalDate
 } from './form/index.js';
 
