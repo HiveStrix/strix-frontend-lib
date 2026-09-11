@@ -15,6 +15,16 @@ function depthOf(node) {
 }
 
 /**
+ * ESPACIO DURO, NO ESPACIO. El HTML colapsa el espacio en blanco inicial, así
+ * que un `<option>` sangrado con espacios normales se dibuja pegado al margen
+ * igual que su padre: la sangría queda en el DOM y no en la pantalla. Se midió
+ * —mismo ancho con y sin ella— antes de cambiarlo. Es el defecto que venía en
+ * el `options()` original de strix-expenses, donde el árbol nunca se vio como
+ * árbol.
+ */
+const PAD = '\u00A0\u00A0';
+
+/**
  * @param nodes  [{ id, name, path, active }]
  * @param includeInactive  Los inactivos quedan FUERA al escribir (no aceptan
  *   registros nuevos) y DENTRO al filtrar: una sucursal cerrada sigue teniendo
@@ -36,7 +46,7 @@ export function divisionOptions(nodes, { includeInactive = false, allLabel = '',
     .map((n) => ({
       value: String(n.id),
       label:
-        (indent ? '  '.repeat(depthOf(n)) : '') +
+        (indent ? PAD.repeat(depthOf(n)) : '') +
         String(n.name ?? n.path ?? '') +
         (n.active === false ? ' (inactiva)' : ''),
       // El path completo viaja como pista: el Combobox lo busca además del
