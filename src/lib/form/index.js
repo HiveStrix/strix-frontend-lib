@@ -44,3 +44,9 @@ export { default as DateRange } from './DateRange.svelte';
 // into a writable text field with the system's own calendar as its picker —
 // see the file for when this is the right call over DateInput.
 export { default as DatePicker } from './DatePicker.svelte';
+// El árbol organizacional del tenant, en un control. Presentacional: recibe
+// los nodos, no los busca — esta librería no tiene capa de datos. El helper va
+// al lado porque una pantalla que arme su propia lista tiene que poder obtener
+// las mismas etiquetas.
+export { default as DivisionPicker } from './DivisionPicker.svelte';
+export { divisionOptions } from './divisionOptions.js';
