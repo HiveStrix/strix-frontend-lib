@@ -85,6 +85,15 @@
     align-items: center;
     gap: var(--sx-s-1);
     padding: 3px;
+    /* LA MISMA ALTURA QUE UN CAMPO, PORQUE COMPARTE FILA CON ELLOS.
+       `Segmented` no es un `Field` y no tiene su `dense`, pero su `size` dice
+       lo mismo con otras palabras: `sm` para una fila apretada, `md` para una
+       barra propia. Sin altura propia resolvía la suya por el contenido —30px
+       en `sm` contra los 32 de un campo denso, 3 controles a 3 alturas en la
+       misma fila— y eso es exactamente lo que hace que un formulario se lea
+       desordenado. `min-height`, no `height`: una etiqueta que envuelve en un
+       idioma largo puede necesitar más. */
+    min-height: var(--sx-s-10);
     background: var(--sx-sunk);
     border-radius: var(--sx-r-pill);
     max-width: 100%;
@@ -134,6 +143,7 @@
     box-shadow: var(--sx-e-1);
   }
 
+  .seg.sm { min-height: var(--sx-s-8); }
   .sm .sg { padding: var(--sx-s-1) var(--sx-s-3); font-size: var(--sx-t-xs); }
 
   .off { opacity: .5; }
