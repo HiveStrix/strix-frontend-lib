@@ -90,6 +90,10 @@
 
   export let label = '';
   export let hint = '';
+  /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
+   *  bajo el campo — así los campos de una misma fila quedan a igual altura y
+   *  alinean. Se reenvía tal cual a `Field`. */
+  export let hintDot = false;
   export let error = '';
   export let fix = '';
   export let warning = '';
@@ -304,7 +308,7 @@
 <svelte:window on:resize={() => open && place()} />
 
 <Field
-  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {dense}
+  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
   id={fid} {origin} {originValue} {changed}
   frame={false}
   on:revert
