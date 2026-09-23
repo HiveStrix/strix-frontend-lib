@@ -404,20 +404,26 @@
      relleno de ACENTO, tinta `--sx-accent-ink`. Recuperada de v0.8.2 —era el
      principal de strix-maintenance, y volvió a serlo. */
   .hd.banda {
-    --banda-fill: var(--sx-accent);
-    --banda-ink: var(--sx-accent-ink);
+    /* Perillas de la variante (tokens.js): --sx-banda-tint es cuánto acento
+       lleva el relleno y --sx-banda-ink la tinta; sin ellas, el acento pleno
+       con su tinta, como en main. `--banda-accent` guarda el acento de ACÁ
+       para que `.acts` pueda volver a él sin un ciclo. */
+    --banda-accent: var(--sx-accent);
+    --banda-accent-ink: var(--sx-accent-ink);
+    --banda-fill: color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface));
+    --banda-ink: var(--sx-banda-ink, var(--sx-accent-ink));
     /* 85%, NO 76%. La bajada y el eyebrow de la banda son texto corrido, así
        que les toca el piso de 4.5:1 —y al 76% el tema oscuro medía 4.01 sobre
        el acento (el claro apenas pasaba, 4.56). La asimetría es real: en
        oscuro `--sx-accent-ink` es tinta OSCURA sobre un acento CLARO, y bajar
        su alfa lo acerca al relleno en vez de alejarlo. Al 85% da 5.02 oscuro
        y 5.18 claro, y sigue leyéndose como una voz más baja que el título. */
-    --banda-ink-soft: color-mix(in srgb, var(--sx-accent-ink) 85%, transparent);
+    --banda-ink-soft: color-mix(in srgb, var(--banda-ink) 85%, transparent);
     --banda-edge: transparent;
     background: var(--banda-fill);
     color: var(--banda-ink);
     border: 1px solid var(--banda-edge);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-card, var(--sx-e-1));
     padding: var(--sx-s-6);
     border-radius: var(--sx-r-3);
   }
@@ -443,8 +449,8 @@
    * El estado no se queda mudo: el título ya dice la palabra («Una celda está
    * en negativo»), que es lo que la regla de la casa pide —el color decora un
    * reclamo que el contenido ya hace, nunca lo hace solo—. */
-  .hd.banda.attention { --banda-fill: color-mix(in srgb, var(--sx-accent) 92%, var(--sx-ink)); }
-  .hd.banda.critical  { --banda-fill: color-mix(in srgb, var(--sx-accent) 82%, var(--sx-ink)); }
+  .hd.banda.attention { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) 92%, var(--sx-ink)); }
+  .hd.banda.critical  { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) 82%, var(--sx-ink)); }
   /* `.hd.banda .ttl` (0,2,1) le gana a `.critical .ttl` (0,2,0): el título de
      una banda toma SIEMPRE su `--banda-ink` (el tono ya viajó al relleno). */
   .hd.banda .ttl { color: var(--banda-ink); }
@@ -457,9 +463,12 @@
      su valor: `.acts` hereda `--banda-fill/ink` YA resueltos a color, así que
      no hay ciclo. El sólido queda en la tinta de la banda con el relleno de
      la banda como texto —el negativo exacto del bloque que lo contiene. */
+  /* Con `--sx-banda-remap` en 0 % (banda pastel, variante colorida) las
+     acciones conservan el acento del producto: un botón de acento sobre un
+     pastel se ve perfectamente. En 100 % (main) se invierten como siempre. */
   .hd.banda .acts {
-    --sx-accent: var(--banda-ink);
-    --sx-accent-ink: var(--banda-fill);
+    --sx-accent: color-mix(in srgb, var(--banda-ink) var(--sx-banda-remap, 100%), var(--banda-accent));
+    --sx-accent-ink: color-mix(in srgb, var(--banda-fill) var(--sx-banda-remap, 100%), var(--banda-accent-ink));
   }
   /* `ghost` NO SE ARREGLA CON LOS TOKENS DE ACENTO, y por eso lleva regla
      propia: es la única variante que no pinta su propio fondo —es transparente
@@ -480,14 +489,26 @@
      ilegible. Con un acento claro (el ámbar de Mantenimiento) no se veía porque
      la tinta de la banda es oscura. Dentro de la banda el teñido se hace con la
      tinta de la banda, que es lo que la banda ya lee, en los dos casos. */
+  /* Con la banda pastel (`--sx-banda-remap` en 0 %) el teñido de la banda no
+     hace falta: el outline vuelve a su lavado de acento normal, que sobre un
+     pastel se lee. Cada valor mezcla las dos recetas por la misma perilla. */
   .hd.banda .acts :global(.sx-btn.outline) {
-    background: color-mix(in srgb, var(--banda-ink) 16%, transparent);
-    color: var(--banda-ink);
-    border-color: color-mix(in srgb, var(--banda-ink) 38%, transparent);
+    background: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 16%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) var(--sx-btn-tint, 28%), var(--sx-surface)));
+    color: color-mix(in srgb, var(--banda-ink) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) 68%, var(--sx-ink)));
+    border-color: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 38%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) 34%, transparent));
   }
   .hd.banda .acts :global(.sx-btn.outline:not(:disabled):not(.locked):hover) {
-    background: color-mix(in srgb, var(--banda-ink) 24%, transparent);
-    border-color: color-mix(in srgb, var(--banda-ink) 52%, transparent);
+    background: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 24%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) calc(var(--sx-btn-tint, 28%) + 8%), var(--sx-surface)));
+    border-color: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 52%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) 44%, transparent));
   }
   .hd.banda .acts :global(.sx-btn.ghost:not(:disabled):not(.locked):hover) {
     background: color-mix(in srgb, var(--banda-ink) 16%, transparent);

@@ -190,7 +190,8 @@
     /* Transparent, never absent: a border only on some variants makes a row of
        mixed buttons two heights and the baseline stops being a line. */
     border: 1px solid transparent;
-    border-radius: var(--sx-r-2);
+    /* --sx-btn-radius: perilla de la variante (píldora); main, --sx-r-2. */
+    border-radius: var(--sx-btn-radius, var(--sx-r-2));
     transition:
       background-color var(--sx-fast) var(--sx-ease),
       border-color var(--sx-fast) var(--sx-ease),
@@ -214,7 +215,7 @@
   /* ── Sizes ──────────────────────────────────────────────────────────────
      Heights come off the spacing rhythm — 32 / 40 / 48 — so a button lines up
      with the fields and the rows beside it instead of being its own scale. */
-  .sm { min-height: var(--sx-s-8);  padding-inline: var(--sx-s-3); font-size: var(--sx-t-xs); gap: var(--sx-s-1); border-radius: var(--sx-r-1); }
+  .sm { min-height: var(--sx-s-8);  padding-inline: var(--sx-s-3); font-size: var(--sx-t-xs); gap: var(--sx-s-1); border-radius: var(--sx-btn-radius, var(--sx-r-1)); }
   .md { min-height: var(--sx-s-10); padding-inline: var(--sx-s-4); font-size: var(--sx-t-sm); }
   .lg { min-height: var(--sx-s-12); padding-inline: var(--sx-s-6); font-size: var(--sx-t-md); }
 
@@ -241,12 +242,14 @@
     color: var(--sx-accent-ink);
     overflow: hidden;
     isolation: isolate;
-    background: linear-gradient(
+    /* --sx-btn-solid y --sx-e-primary: perillas de la variante (el primario mate
+       de Stitch). Sin ellas, el degradé brillante y la sombra de main. */
+    background: var(--sx-btn-solid, linear-gradient(
       180deg,
       color-mix(in srgb, var(--sx-accent) 76%, #fff) 0%,
       var(--sx-accent) 52%,
-      color-mix(in srgb, var(--sx-accent) 88%, #000) 100%);
-    box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-1);
+      color-mix(in srgb, var(--sx-accent) 88%, #000) 100%));
+    box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-primary, var(--sx-e-1));
   }
   /* The gloss: a bright specular band across the top, under the label. It grows
      and brightens on hover so the key catches the light. Clipped by the host's
@@ -257,7 +260,7 @@
     inset: 0 0 auto 0;
     height: 48%;
     z-index: -1;
-    background: linear-gradient(180deg, rgba(255, 255, 255, .42), rgba(255, 255, 255, 0));
+    background: linear-gradient(180deg, rgba(255, 255, 255, var(--sx-btn-gloss, .42)), rgba(255, 255, 255, 0));
     transition: height var(--sx-beat) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
     pointer-events: none;
   }
@@ -322,11 +325,14 @@
       transform: translateY(-1px);
       box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-2);
     }
+    .solid:not(:disabled):not(.locked):hover {
+      box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-primary, var(--sx-e-2));
+    }
     /* Glossy catches the light: the sheen grows and brightens, and a single
        streak crosses once. This is the ONLY variant that animates. */
     .solid:not(:disabled):not(.locked):hover::before {
       height: 58%;
-      background: linear-gradient(180deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, 0));
+      background: linear-gradient(180deg, rgba(255, 255, 255, calc(var(--sx-btn-gloss, .42) + .2)), rgba(255, 255, 255, 0));
     }
     .solid:not(:disabled):not(.locked):hover::after {
       animation: sx-btn-sweep 850ms var(--sx-ease) forwards;

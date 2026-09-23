@@ -297,6 +297,12 @@ const CHECKS = [
   ['--sx-ink',    '--sx-field', 4.5, 'texto dentro de un control'],
   ['--sx-ink-3',  '--sx-field', 4.5, 'placeholder y ayuda dentro de un control'],
   ['--sx-edge',   '--sx-field', 3.0, 'borde de control sobre su propio relleno'],
+  // LA BANDA PASTEL (variante colorida): el título y la bajada de
+  // `PageHeader variant="banda"` se escriben con --sx-banda-ink sobre el acento
+  // al 20 % (--sx-banda-tint) contra la superficie. El 20 % está escrito acá a
+  // mano: si la perilla se mueve, esta fila se mueve con ella.
+  ['--sx-banda-ink', 'color-mix(in srgb, var(--sx-accent) 20%, var(--sx-surface))', 4.5, 'título de la banda pastel'],
+  ['color-mix(in srgb, var(--sx-banda-ink) 85%, transparent)', 'color-mix(in srgb, var(--sx-accent) 20%, var(--sx-surface))', 4.5, 'bajada de la banda pastel'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
@@ -346,7 +352,9 @@ INFO.push(['--sx-thead', '--sx-ground', 'PageHeader banda, si se usara sin tarje
 // un color y pedirselo es ruido, no una comprobacion.
 // `color-scheme` no es custom property ni color: es la señal para los widgets
 // nativos (ver tokens.js). Entra en la exención por lo mismo que una sombra.
-const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch)|color-scheme$)/;
+// Las perillas de la variante que NO son color (un radio, una opacidad, dos
+// porcentajes) entran a la exención por lo mismo que una sombra.
+const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch|btn-(radius|gloss)$|banda-(tint|remap)$)|color-scheme$)/;
 
 // EL TERCER HUECO. Este archivo ya se extendió dos veces por la misma razón —
 // primero medía `--sx-edge` contra dos fondos que resolvían al mismo blanco
