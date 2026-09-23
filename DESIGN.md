@@ -140,9 +140,11 @@ Un matiz no dice un estado y un tono no identifica una cosa. Para decir «vencid
 va una `Pill` de tono `critical` con su palabra, no un pozo coral.
 
 **La arcilla de cada módulo.** El lila es el del Tablero. Cada módulo lleva la
-misma arcilla girada al tono de su acento (`clayHost`): Mantenimiento un crema
-con sombra ocre, Clientes un rosado, Facturación una menta. Misma luz y misma
-saturación por rol, así que el volumen y el contraste son los mismos en todos.
+misma arcilla girada al tono de su acento y MUY diluida (`clayHost`): el fondo
+guarda el 30 % de la saturación del lila y la sombra el 50 %, así que es un
+soplo del tono —Mantenimiento apenas tibio, Clientes apenas rosado—, nunca una
+pantalla de color. Misma luz por rol, así que el volumen y el contraste son los
+mismos en todos.
 El Shell no tiene luz propia: adopta la del módulo montado, acento incluido.
 
 **Matiz por módulo** (el pozo del módulo en la barra lateral y en sus widgets):
@@ -204,7 +206,7 @@ la pieza que contiene el texto, no de tamaños gritados.
 
 Dos direcciones y cuatro alturas. Los valores están en `tokens.js`.
 
-**Levantado:** luz blanca al 70 % afuera arriba-izquierda (plena encandilaba), sombra violeta afuera
+**Levantado:** una luz clara teñida de la propia superficie, al 55 %, afuera arriba-izquierda (el blanco pleno encandilaba y sobresalía del fondo), sombra del tono afuera
 abajo-derecha, y, en super clay, un filo de luz y un volumen violeta adentro.
 
 | Token | Para qué |

@@ -109,12 +109,12 @@ const CHROME_DARK = chromeRampDark(TINT);
 // Mantenimiento amarillo dentro del Shell lila se leía como dos aplicaciones
 // apiladas.
 //
-// LA RECETA ES LA DEL LILA, GIRADA. Cada rol (lienzo, superficie, pozo, la
-// traza de los grises, la sombra de la arcilla) guarda la LUMINOSIDAD y la
-// SATURACIÓN (OKLCH L y C) que tiene hoy en el lila, y toma el TONO (h) del
-// acento del módulo. Así el violeta por defecto se reproduce idéntico y los
-// demás módulos tienen exactamente el mismo volumen, la misma profundidad y
-// el mismo contraste — sólo cambia hacia qué color tira la arcilla. Si el
+// LA RECETA ES LA DEL LILA, GIRADA Y DILUIDA. Cada rol (lienzo, superficie,
+// pozo, la traza de los grises, la sombra de la arcilla) guarda la LUMINOSIDAD
+// (OKLCH L) que tiene hoy en el lila, una fracción de su SATURACIÓN (C, ver
+// CLAY_BG / CLAY_SHADOW) y toma el TONO (h) del acento del módulo. Así todos
+// los módulos tienen exactamente el mismo volumen, la misma profundidad y el
+// mismo contraste — sólo cambia hacia qué color tira la arcilla, apenas. Si el
 // color no entra en sRGB a esa saturación, se baja la saturación, nunca la luz.
 //
 // PRECOMPUTADO, COMO EL CROMO (ver el banner de arriba): hex y rgba literales,
@@ -175,7 +175,16 @@ const clayHue = (accent) => {
 // no tira exactamente al mismo matiz que #6541BE): se gira el conjunto, no se
 // aplana. Con el acento violeta, el giro es cero y sale el lila tal cual.
 const TINT_H = oklchOf(TINT)[2];
-const rot = (role, h) => { const [L, C, h0] = CLAY_LC[role]; return hexOfOklch(L, C, (h0 - TINT_H + h + 360) % 360); };
+const rot = (role, h, k = 1) => { const [L, C, h0] = CLAY_LC[role]; return hexOfOklch(L, C * k, (h0 - TINT_H + h + 360) % 360); };
+
+// LA DILUCIÓN (pedido del usuario, 2026-09-23: «el color de fondo tiene que
+// ser muy muy ligero — ahora toda la página se ve rosa»). Con la saturación
+// entera del lila, el fondo de un módulo ERA su color: Clientes pintaba la
+// pantalla de rosa. Los fondos de un módulo guardan el 30 % de la saturación
+// del lila (un soplo del tono, casi neutro) y la sombra y la traza de los
+// grises el 50 %. La luz no se toca: el volumen y el contraste son los mismos.
+// El lila del Tablero (TOKENS) no se diluye: es la casa del Shell.
+const CLAY_BG = 0.3, CLAY_SHADOW = 0.5;
 const rgba = (hex, a) => `rgba(${rgbOf(hex).join(',')},${a})`;
 const lumOf = (hex) => { const [r, g, b] = rgbOf(hex).map((v) => toLin(v / 255)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 /** La razón WCAG entre dos hex — la misma que mide scripts/contrast.mjs. */
@@ -225,6 +234,30 @@ const washOf = (accent, base, from, ok) => {
   return [mixHex(accent, 60, base), 60];
 };
 
+// LA LUZ DE LA ARCILLA, una sola receta para el Tablero y para cada módulo.
+// Segunda vez que el usuario pide bajarla (2026-09-23: «una pizca más
+// discreto… adaptalo al fondo para que no sobresalga»): la luz ya no es blanco
+// puro sino una versión muy clara de la SUPERFICIE de quien la emite (la mitad
+// del camino entre su superficie y el blanco), y baja otra pizca — afuera .55
+// (era .7), el filo de adentro .5 (.6–.65), lo hundido .6 (.75). El volumen lo
+// sigue haciendo la sombra, que no se toca.
+const clayElevation = (S, F, surface) => {
+  const L = mixHex(surface, 50, '#FFFFFF');
+  return {
+    '--sx-e-1': `-3px -3px 8px ${rgba(L, .55)}, 3px 4px 10px ${rgba(S, .22)}, inset 1px 1px 1px ${rgba(L, .5)}, inset -1px -2px 4px ${rgba(S, .07)}`,
+    '--sx-e-2': `-5px -5px 12px ${rgba(L, .55)}, 5px 6px 14px ${rgba(S, .26)}, inset 1px 1px 1px ${rgba(L, .5)}, inset -1px -2px 5px ${rgba(S, .08)}`,
+    '--sx-e-card': `-7px -7px 16px ${rgba(L, .55)}, 7px 8px 20px ${rgba(S, .24)}, inset 1px 1px 1px ${rgba(L, .5)}, inset -2px -3px 7px ${rgba(S, .07)}`,
+    '--sx-e-chip': `-2px -2px 6px ${rgba(L, .55)}, 2px 3px 8px ${rgba(S, .16)}, inset 1px 1px 0 ${rgba(L, .5)}`,
+    '--sx-e-primary': `-3px -3px 8px ${rgba(L, .55)}, 3px 3px 12px color-mix(in srgb, var(--sx-accent) 35%, transparent)`,
+    '--sx-e-3': `0 2px 6px -2px ${rgba(F, .10)}, 0 26px 56px -18px ${rgba(F, .32)}`,
+    '--sx-e-sunk': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px ${rgba(L, .6)}`,
+    '--sx-e-well': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px ${rgba(L, .6)}`,
+    '--sx-e-pill': `inset 1.5px 1.5px 3px ${rgba(S, .14)}, inset -1.5px -1.5px 3px ${rgba(L, .6)}`
+  };
+};
+/** La del Tablero: el lila de TOKENS, sin girar ni diluir. */
+const LILAC_E = clayElevation(CLAY_REF.shadow, CLAY_REF.float, CLAY_REF['--sx-surface']);
+
 /**
  * Los tokens de la arcilla de un módulo, claro y oscuro, a partir de su acento.
  * Lo que devuelve es exactamente lo que la Shell adopta (ver PALETTE_TOKENS).
@@ -232,9 +265,9 @@ const washOf = (accent, base, from, ok) => {
  */
 export function clayTokens(accent) {
   const h = clayHue(accent);
-  const tint = h === TINT_H ? TINT : hexOfOklch(oklchOf(TINT)[0], oklchOf(TINT)[1], h);
-  const S = rot('shadow', h), F = rot('float', h);
-  const ground = rot('--sx-ground', h), surface = rot('--sx-surface', h), sunk = rot('--sx-sunk', h);
+  const tint = hexOfOklch(oklchOf(TINT)[0], oklchOf(TINT)[1] * CLAY_SHADOW, h);
+  const S = rot('shadow', h, CLAY_SHADOW), F = rot('float', h, CLAY_SHADOW);
+  const ground = rot('--sx-ground', h, CLAY_BG), surface = rot('--sx-surface', h, CLAY_BG), sunk = rot('--sx-sunk', h, CLAY_BG);
   const ramp = chromeRamp(tint);
   // EL BORDE, MEDIDO. --sx-edge aterriza en n-400; según el tono, la misma
   // traza da un gris un pelo más claro y un segmento de StackedBar sobre el
@@ -278,14 +311,7 @@ export function clayTokens(accent) {
     // de Mantenimiento) el ícono daba 2.57 (piso 3). Acá el acento se oscurece
     // de a 2 % hasta que su pozo se lee; con un acento oscuro queda igual.
     '--sx-accent-well': wellOf(accent, sunk),
-    '--sx-e-1': `-3px -3px 8px rgba(255,255,255,.7), 3px 4px 10px ${rgba(S, .22)}, inset 1px 1px 1px rgba(255,255,255,.6), inset -1px -2px 4px ${rgba(S, .07)}`,
-    '--sx-e-2': `-5px -5px 12px rgba(255,255,255,.7), 5px 6px 14px ${rgba(S, .26)}, inset 1px 1px 1px rgba(255,255,255,.65), inset -1px -2px 5px ${rgba(S, .08)}`,
-    '--sx-e-card': `-7px -7px 16px rgba(255,255,255,.7), 7px 8px 20px ${rgba(S, .24)}, inset 1px 1px 1px rgba(255,255,255,.65), inset -2px -3px 7px ${rgba(S, .07)}`,
-    '--sx-e-chip': `-2px -2px 6px rgba(255,255,255,.7), 2px 3px 8px ${rgba(S, .16)}, inset 1px 1px 0 rgba(255,255,255,.6)`,
-    '--sx-e-3': `0 2px 6px -2px ${rgba(F, .10)}, 0 26px 56px -18px ${rgba(F, .32)}`,
-    '--sx-e-sunk': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px rgba(255,255,255,.75)`,
-    '--sx-e-well': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px rgba(255,255,255,.75)`,
-    '--sx-e-pill': `inset 1.5px 1.5px 3px ${rgba(S, .14)}, inset -1.5px -1.5px 3px rgba(255,255,255,.75)`
+    ...clayElevation(S, F, surface)
   };
   // El oscuro: la misma traza en la rampa oscura (pozo, raya, tintas). Sus
   // sombras son negras y su luz casi nula en todos los módulos — ahí la arcilla
@@ -552,20 +578,21 @@ export const TOKENS = {
   // suma, ADENTRO, un filo de luz de 1 px arriba-izquierda y un volumen violeta
   // abajo-derecha. Afuera sigue mandando la luz blanca de Stitch; adentro la
   // pieza se abulta en vez de ser una lámina con sombra.
-  // LA LUZ, UN TERCIO MÁS BAJA (pedido del usuario, 2026-09-23: «el brillo
-  // blanco está muy fuerte»): la de afuera pasa de #FFF pleno a .7, el filo de
-  // adentro de .85–.9 a .6–.65 y la de los hundidos a .75. La sombra violeta no
-  // se toca: el volumen sigue, lo que baja es el resplandor.
-  '--sx-e-1': '-3px -3px 8px rgba(255,255,255,.7), 3px 4px 10px rgba(101,65,190,.22), inset 1px 1px 1px rgba(255,255,255,.6), inset -1px -2px 4px rgba(101,65,190,.07)',
-  '--sx-e-2': '-5px -5px 12px rgba(255,255,255,.7), 5px 6px 14px rgba(101,65,190,.26), inset 1px 1px 1px rgba(255,255,255,.65), inset -1px -2px 5px rgba(101,65,190,.08)',
-  '--sx-e-card': '-7px -7px 16px rgba(255,255,255,.7), 7px 8px 20px rgba(101,65,190,.24), inset 1px 1px 1px rgba(255,255,255,.65), inset -2px -3px 7px rgba(101,65,190,.07)',
-  '--sx-e-chip': '-2px -2px 6px rgba(255,255,255,.7), 2px 3px 8px rgba(101,65,190,.16), inset 1px 1px 0 rgba(255,255,255,.6)',
+  // LA LUZ, DOS VECES MÁS BAJA (pedidos del usuario, 2026-09-23: «el brillo
+  // blanco está muy fuerte», y después «una pizca más discreto, adaptado al
+  // fondo»): los valores salen de `clayElevation` (arriba, junto a la arcilla de
+  // cada módulo) — una luz teñida de la propia superficie a .55 / .5 / .6. La
+  // sombra violeta no se toca: el volumen sigue, lo que baja es el resplandor.
+  '--sx-e-1': LILAC_E['--sx-e-1'],
+  '--sx-e-2': LILAC_E['--sx-e-2'],
+  '--sx-e-card': LILAC_E['--sx-e-card'],
+  '--sx-e-chip': LILAC_E['--sx-e-chip'],
   // El primario de Stitch (tabla): la luz blanca afuera y una sombra del COLOR
   // del acento, fuerte. Se re-declara en oscuro (el acento cambia).
-  '--sx-e-primary': '-3px -3px 8px rgba(255,255,255,.7), 3px 3px 12px color-mix(in srgb, var(--sx-accent) 35%, transparent)',
+  '--sx-e-primary': LILAC_E['--sx-e-primary'],
   // El ítem activo de una navegación es un control levantado (Stitch, riel B).
   '--sx-e-nav': 'var(--sx-e-1)',
-  '--sx-e-3': '0 2px 6px -2px rgba(76,52,150,.10), 0 26px 56px -18px rgba(76,52,150,.32)',
+  '--sx-e-3': LILAC_E['--sx-e-3'],
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.9)',
   // EL TALLADO: lo inverso del relieve. La sombra entra por arriba-izquierda y
   // la luz sale por abajo-derecha, así que la pieza se lee HUNDIDA en su
@@ -573,9 +600,9 @@ export const TOKENS = {
   // HUNDIDO. --sx-e-sunk: campos, rieles, contadores (Stitch: 2.5/6 al .20).
   // --sx-e-well: el pozo de ícono, el mismo hueco. --sx-e-pill: lo chico que se
   // hunde — la pill de estado y el chip de filtro ELEGIDO (1.5/3 al .14).
-  '--sx-e-sunk': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px rgba(255,255,255,.75)',
-  '--sx-e-well': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px rgba(255,255,255,.75)',
-  '--sx-e-pill': 'inset 1.5px 1.5px 3px rgba(101,65,190,.14), inset -1.5px -1.5px 3px rgba(255,255,255,.75)',
+  '--sx-e-sunk': LILAC_E['--sx-e-sunk'],
+  '--sx-e-well': LILAC_E['--sx-e-well'],
+  '--sx-e-pill': LILAC_E['--sx-e-pill'],
   // LA CAJA DE UN CONTROL, como perilla. Desde la v0.8.14 el campo se levantaba
   // con --sx-e-1; acá se talla. Son dos tokens y no un valor escrito en cada
   // componente para que la decisión siga siendo UNA: un producto que quiera el
@@ -1153,7 +1180,7 @@ export const PALETTE_TOKENS = [
   ...RAMP_TOKENS,
   '--sx-line', '--sx-ink', '--sx-ink-2',
   '--sx-accent', '--sx-accent-ink', '--sx-accent-soft', '--sx-accent-pick', '--sx-accent-edge', '--sx-accent-well',
-  '--sx-e-1', '--sx-e-2', '--sx-e-card', '--sx-e-chip', '--sx-e-3',
+  '--sx-e-1', '--sx-e-2', '--sx-e-card', '--sx-e-chip', '--sx-e-3', '--sx-e-primary',
   '--sx-e-sunk', '--sx-e-well', '--sx-e-pill'
 ];
 
