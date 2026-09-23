@@ -72,6 +72,10 @@
     background: var(--sx-surface);
     padding: var(--sx-s-4);
     min-width: 0;
+    /* Cada celda es un contenedor: la cifra de Stat se mide contra ella
+       (`cqi`) y se achica en vez de recortarse. El ancho lo pone la grilla,
+       así que la contención no le quita nada. */
+    container-type: inline-size;
   }
 
   @media (pointer: coarse) {

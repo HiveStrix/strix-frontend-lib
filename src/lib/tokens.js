@@ -763,6 +763,13 @@ export const hostTokensDark = (selector = ':host([data-sx-theme="dark"])') =>
  * no body, and `*` inside one is the module's own business.
  */
 export const hostBase = () => `
+/* El mismo reset de controles que base.css. Un shadow root no hereda las
+   reglas del documento, así que sin esta línea todo botón de la lib que no
+   declara su fuente (Tabs, Segmented, FilterChips, Pagination, la ✕ de Dialog
+   y Alert, Toast, Calendar…) caía a la del agente de usuario —Arial— adentro
+   de un core, al lado de un host en Outfit. Selector de elemento a propósito:
+   pierde contra cualquier clase de componente, así que sólo llena el hueco. */
+button, input, select, textarea { font: inherit; color: inherit; }
 .sx-cap {
   font-size: var(--sx-t-2xs);
   font-weight: var(--sx-w-semi);

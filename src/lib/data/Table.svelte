@@ -337,12 +337,16 @@
   }
 
   // ── Which of the four states is true ─────────────────────────────────────
-  $: isFiltered = filtered ?? (!!query || (total != null && total > rows.length));
+  // `total` como NÚMERO. Un conteo del servidor suele ser int64, y grpc-gateway
+  // lo manda como string: «"17" !== 17» es true, así que la tabla decía
+  // «Mostrando 17 de 17» sin que faltara nada. Se normaliza una vez, acá.
+  $: count = total == null || total === '' || !Number.isFinite(Number(total)) ? null : Number(total);
+  $: isFiltered = filtered ?? (!!query || (count != null && count > rows.length));
   $: showState = !loading && !error && rows.length === 0;
   // Only over rows that exist. With none, the filtered state already says «hay
   // 340 en total» in a whole sentence, and «Mostrando 0 de 340» above it is the
   // same fact twice in worse words.
-  $: showing = !loading && !error && rows.length > 0 && total != null && total !== rows.length;
+  $: showing = !loading && !error && rows.length > 0 && count != null && count !== rows.length;
 
   // One sentence, once, for anyone who cannot see the arrow move. Polite: it
   // waits for a gap rather than interrupting.
@@ -379,7 +383,7 @@
 
   {#if showing}
     <p class="showing sx-num">
-      Mostrando {rows.length} de {total} {total === 1 ? noun : nounPlural}.
+      Mostrando {rows.length} de {count} {count === 1 ? noun : nounPlural}.
     </p>
   {/if}
 
@@ -441,7 +445,7 @@
         {nounPlural}
         {gender}
         {query}
-        {total}
+        total={count}
         filters={isFiltered && !query}
         on:clear
       >

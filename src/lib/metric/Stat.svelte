@@ -153,7 +153,9 @@
       </svg>
       <span>{error}</span>
     </p>
-  {:else if blank && !loading}
+  {:else if blank && !loading && !note}
+    <!-- Con `note`, la nota ya dice por qué no hay cifra: el «Sin datos todavía»
+         de fábrica encima contradecía el motivo real. -->
     <p class="line off">{empty}</p>
   {:else if dir}
     <p class="line delta d-{dTone}">
@@ -187,7 +189,11 @@
     align-items: baseline;
     flex-wrap: wrap;
     gap: var(--sx-s-2);
-    font-size: var(--sx-t-xl);
+    /* `min(token, Ncqi)`: en una celda chica de StatStrip (que hace de cada
+       celda un contenedor) la cifra se achica para caber entera, en vez de
+       recortarse — «₡1 800 000,0(» a 1024. Fuera de un contenedor, `cqi` cae al
+       viewport y el `min` devuelve el token: el tamaño de siempre. */
+    font-size: min(var(--sx-t-xl), 14cqi);
     font-weight: var(--sx-w-semi);
     /* Large figures need the tracking pulled in or they read as spaced-out
        digits rather than one quantity. */
@@ -195,8 +201,8 @@
     line-height: 1.1;
     color: var(--sx-ink);
   }
-  .sm .fig { font-size: var(--sx-t-lg); }
-  .lg .fig { font-size: var(--sx-t-2xl); }
+  .sm .fig { font-size: min(var(--sx-t-lg), 12cqi); }
+  .lg .fig { font-size: min(var(--sx-t-2xl), 15cqi); }
 
   .v { min-width: 0; }
 

@@ -185,6 +185,9 @@
           {#if eyebrow}<div class="sk sk-eyebrow" aria-hidden="true"></div>{/if}
           <div class="sk sk-title" aria-hidden="true"></div>
           {#if subtitle}<div class="sk sk-sub" aria-hidden="true"></div>{/if}
+          <!-- La fila `meta` también se reserva: sin ella, la banda crecía ~40px
+               al llegar los sellos y todo lo de abajo saltaba. -->
+          {#if hasMeta}<div class="meta" aria-hidden="true"><div class="sk sk-meta"></div><div class="sk sk-meta short"></div></div>{/if}
         {:else}
           {#if eyebrow}
             <p class="tag"><span class="dot" aria-hidden="true"></span>{eyebrow}</p>
@@ -208,6 +211,9 @@
           {#if eyebrow}<div class="sk sk-eyebrow" aria-hidden="true"></div>{/if}
           <div class="sk sk-title" aria-hidden="true"></div>
           {#if subtitle}<div class="sk sk-sub" aria-hidden="true"></div>{/if}
+          <!-- La fila `meta` también se reserva: sin ella, la banda crecía ~40px
+               al llegar los sellos y todo lo de abajo saltaba. -->
+          {#if hasMeta}<div class="meta" aria-hidden="true"><div class="sk sk-meta"></div><div class="sk sk-meta short"></div></div>{/if}
         {:else}
           {#if eyebrow}<p class="sx-cap eyebrow">{eyebrow}</p>{/if}
           <!-- El slot default se APPENDEA al título, para el caso que `title`
@@ -281,8 +287,11 @@
     font-weight: var(--sx-w-bold);
     letter-spacing: -.03em;
     line-height: 1.12;
-    /* Un titular más largo que esto deja de leerse y empieza a escanearse. */
-    max-width: 26ch;
+    /* Un titular más largo que esto deja de leerse y empieza a escanearse.
+       `--sx-ph-measure` lo abre para lo que no es un titular sino un NOMBRE
+       PROPIO (una razón social, un activo con su código): el core lo pone en
+       el contenedor del encabezado, y lo demás no cambia. */
+    max-width: var(--sx-ph-measure, 26ch);
     text-wrap: balance;
   }
 
@@ -682,6 +691,9 @@
   .sk-eyebrow { height: var(--sx-t-2xs); width: 9ch; margin-bottom: var(--sx-s-2); }
   .sk-title { height: var(--sx-t-2xl); width: min(22ch, 100%); }
   .sk-sub { height: var(--sx-t-md); width: min(44ch, 100%); margin-top: var(--sx-s-3); }
+  /* Del alto de una Pill chica: la fila reservada mide lo que va a medir. */
+  .sk-meta { height: 1.5rem; width: 7ch; border-radius: var(--sx-r-pill); }
+  .sk-meta.short { width: 5ch; }
 
   @keyframes sk-pulse { from { opacity: 1; } to { opacity: .5; } }
   @keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }

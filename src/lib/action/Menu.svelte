@@ -413,14 +413,17 @@
             role="menuitem"
             tabindex={i === active ? 0 : -1}
             aria-disabled={it.disabled ? 'true' : undefined}
-            title={it.reason || undefined}
             on:click={() => choose(it, i)}
           >
             <span class="mk" aria-hidden="true">
               {#if it.icon}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
                 stroke-linecap="round" stroke-linejoin="round">{@html it.icon}</svg>{/if}
             </span>
-            <span class="lb">{it.label}</span>
+            <!-- El motivo de un ítem apagado se DIBUJA debajo de su etiqueta. En
+                 `title` sólo lo veía un mouse que se quedara quieto: en un
+                 teléfono o con teclado nunca aparecía, y «stay put and let the
+                 reason be read» no tenía nada que leer. -->
+            <span class="lb">{it.label}{#if it.disabled && it.reason}<span class="why">{it.reason}</span>{/if}</span>
             {#if it.hint}<span class="hint">{it.hint}</span>{/if}
           </button>
         {/if}
@@ -538,6 +541,14 @@
   .mk { display: flex; flex: none; width: 1em; height: 1em; color: var(--sx-ink-3); }
   .mk :global(svg) { width: 100%; height: 100%; }
   .lb { flex: 1; min-width: 0; }
+  .why {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--sx-t-xs);
+    font-weight: var(--sx-w-normal);
+    color: var(--sx-ink-3);
+    max-width: 32ch;
+  }
   /* A hint is a count or a shortcut — a figure beside other figures. */
   .hint {
     flex: none;

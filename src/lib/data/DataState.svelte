@@ -82,6 +82,9 @@
   export let total = null;
   /** Present ⇒ other filters beyond the search box are on. Changes the wording. */
   export let filters = false;
+
+  // Un int64 del servidor llega como string (grpc-gateway): se compara como número.
+  $: count = total == null || total === '' || !Number.isFinite(Number(total)) ? null : Number(total);
   export let retryLabel = 'Reintentar';
   export let clearLabel = '';
   /**
@@ -118,8 +121,8 @@
     (kind === 'error'
       ? 'Puede ser la conexión o el servidor. Volvé a intentarlo; si sigue igual, avisá a soporte con la hora exacta.'
       : kind === 'filtered'
-        ? total != null && total > 0
-          ? `Hay ${total} ${total === 1 ? noun : nounPlural} en total.`
+        ? count != null && count > 0
+          ? `Hay ${count} ${count === 1 ? noun : nounPlural} en total.`
           : ''
         : '');
 
