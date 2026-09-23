@@ -164,7 +164,10 @@ la pieza que contiene el texto, no de tamaños gritados.
   esta regla (la vista Pendientes de Mantenimiento). La única excepción es el
   aire entre bloques.
 - **Una columna centrada.** El contenido de un módulo va en una columna de
-  1060–1200 px centrada en el área del core. El orden de arriba abajo es:
+  **1200 px de contenido** (`max-width: calc(1200px + 2 * var(--sx-s-6))` con el
+  relleno lateral de `--sx-s-6`), centrada en el área del core. Es la misma en
+  todos los módulos: con anchos distintos, el contenido salta de lugar al pasar
+  de uno a otro dentro del Shell. El orden de arriba abajo es:
   1. el encabezado (`PageHeader variant="banda"`);
   2. la barra de herramientas, levantada;
   3. los bloques.
