@@ -181,7 +181,11 @@
   }
 
   .head {
-    background: var(--sx-thead);
+    /* `--sx-panel-head`: la variante la deja sin banda —la cabecera del patrón
+       contenedor es pozo · título · contador sobre la misma superficie—; main,
+       la banda de siempre. Con la banda lila adentro de una tarjeta de
+       superficie, los cores terminaban escribiendo su propio «Contenedor». */
+    background: var(--sx-panel-head, var(--sx-thead));
     display: flex;
     align-items: flex-start;
     justify-content: space-between;

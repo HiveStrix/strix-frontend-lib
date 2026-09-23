@@ -109,6 +109,13 @@
   --sx-nest-e: var(--sx-e-sunk);
   --sx-nest-r: var(--sx-r-2);
   --sx-num-font: var(--sx-font-mono);
+  --sx-panel-head: transparent;
+  --sx-strip-bg: var(--sx-sunk);
+  --sx-strip-gap: var(--sx-s-2);
+  --sx-strip-pad: var(--sx-s-2);
+  --sx-strip-e: var(--sx-e-sunk);
+  --sx-strip-cell-e: var(--sx-e-1);
+  --sx-strip-cell-r: var(--sx-r-1);
   --sx-s-1: 4px;
   --sx-s-2: 8px;
   --sx-s-3: 12px;

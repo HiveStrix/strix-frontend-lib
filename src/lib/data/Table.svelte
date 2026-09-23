@@ -855,7 +855,10 @@
   }
 
   col.w-lead { width: var(--sx-s-10); }
-  col.w-act { width: var(--sx-s-16); }
+  /* La columna de acciones mide lo que su contenido: `1%` es el «encogé hasta
+     lo justo» de una tabla automática. Fija en 64px, dos botones (~150px) la
+     desbordaban y forzaban scroll lateral a 1024. */
+  col.w-act { width: 1%; }
 
   /* The head is pinned to the scroll box, not to the page: the person reading
      row 40 has forgotten what column four was. */
@@ -998,7 +1001,7 @@
   .disc svg.down, .cmore svg.down { transform: rotate(90deg); }
   .cdir svg.down { transform: rotate(180deg); }
 
-  td.acts { padding-inline: var(--sx-s-3); }
+  td.acts { padding-inline: var(--sx-s-3); white-space: nowrap; }
   .actbox { display: flex; align-items: center; justify-content: flex-end; gap: var(--sx-s-1); }
 
   .detrow td { padding: 0 0 var(--sx-s-4); height: auto; white-space: normal; }
@@ -1081,6 +1084,8 @@
     margin: 0;
     flex: 1;
     min-width: 0;
+    /* Un correo o un código sin espacios no puede pedir scroll lateral. */
+    overflow-wrap: anywhere;
     font-size: var(--sx-t-md);
     font-weight: var(--sx-w-semi);
     letter-spacing: -.01em;

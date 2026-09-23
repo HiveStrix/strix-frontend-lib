@@ -55,10 +55,15 @@
     --sx-cell: calc(var(--sx-s-20) * 2);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(var(--sx-cell), 1fr));
-    gap: 1px;
-    background: var(--sx-line);
+    /* Main: un mosaico de celdas separadas por la raya (el fondo `--sx-line`
+       asoma por el gap de 1px). La variante lo vuelve BANDEJA —pozo hundido del
+       que salen las cifras como fichas—, porque la raya fina como única
+       separación es lo que su DESIGN.md descarta. Perillas: --sx-strip-*. */
+    gap: var(--sx-strip-gap, 1px);
+    padding: var(--sx-strip-pad, 0);
+    background: var(--sx-strip-bg, var(--sx-line));
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-strip-e, var(--sx-e-1));
     /* Clips the cells to the strip's corners. Every cell's padding below is
        well clear of the focus ring's 4px reach, so nothing focusable is cut. */
     overflow: hidden;
@@ -70,6 +75,8 @@
      only: the strip owns the cell, the component inside owns everything in it. */
   .strip > :global(*) {
     background: var(--sx-surface);
+    border-radius: var(--sx-strip-cell-r, 0);
+    box-shadow: var(--sx-strip-cell-e, none);
     padding: var(--sx-s-4);
     min-width: 0;
     /* Cada celda es un contenedor: la cifra de Stat se mide contra ella
@@ -87,5 +94,8 @@
   @media (max-width: 420px) {
     .strip { --sx-cell: calc(var(--sx-s-20) + var(--sx-s-12)); }
     .strip > :global(*) { padding: var(--sx-s-3); }
+    /* Tres celdas en dos columnas dejaban un hueco del color de la raya: la
+       última impar ocupa la fila entera. */
+    .strip > :global(:last-child:nth-child(odd)) { grid-column: 1 / -1; }
   }
 </style>

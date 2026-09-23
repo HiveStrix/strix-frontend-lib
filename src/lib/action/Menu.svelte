@@ -436,11 +436,14 @@
   .sx-menu { position: relative; display: inline-flex; max-width: 100%; }
 
   .tl { overflow: hidden; text-overflow: ellipsis; }
-  .lead { flex: none; width: 1.15em; height: 1.15em; }
+  .lead { display: inline-block; vertical-align: middle; flex: none; width: 1.15em; height: 1.15em; }
   /* The chevron turns because the state it reports is a direction: closed points
      down at what is coming, open points up at where it came from. 120ms, and
      `aria-expanded` says the same thing to anyone who cannot see it turn. */
   .cv {
+    /* inline-block propio: en un anfitrión sin shadow DOM, `svg{display:block}`
+       de base.css mandaba el chevrón a un segundo renglón. */
+    display: inline-block; vertical-align: middle;
     flex: none; width: 1em; height: 1em; margin-inline-end: calc(var(--sx-s-1) * -1);
     transition: transform var(--sx-fast) var(--sx-ease);
   }

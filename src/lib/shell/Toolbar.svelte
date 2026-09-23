@@ -47,8 +47,11 @@
   $: css = `--bar-gap:${step(gap)}`;
 </script>
 
+<!-- Con `aria-label`, el grupo rotulado que promete el comentario de arriba:
+     sin el rol, el nombre se ignoraba (un <div> no expone aria-label). -->
 <svelte:element
   this={as}
+  role={$$restProps['aria-label'] || $$restProps['aria-labelledby'] ? 'group' : undefined}
   {...$$restProps}
   class="bar a-{align} on-{on}"
   class:sticky

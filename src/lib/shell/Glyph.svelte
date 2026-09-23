@@ -49,7 +49,7 @@
     'search', 'filter', 'refresh', 'settings', 'plus', 'close', 'check', 'alert',
     'chevronUp', 'chevronRight', 'chevronDown', 'chevronLeft',
     'box', 'truck', 'clock', 'gauge', 'wrench', 'clipboard', 'file', 'layers',
-    'edit', 'trash', 'download', 'menu'
+    'edit', 'trash', 'download', 'menu', 'inbox'
   ];
 
   // Drawn on a 16 × 16 grid with a ~1.4 margin, stroke centred, round caps and
@@ -125,7 +125,13 @@
       'M2.5 4h11M6.2 4V2.6a.8.8 0 0 1 .8-.8h2a.8.8 0 0 1 .8.8V4' +
       'M12.3 4l-.6 9.6a.9.9 0 0 1-.9.8H5.2a.9.9 0 0 1-.9-.8L3.7 4M6.6 6.9v4.6M9.4 6.9v4.6',
     download: 'M13.7 10.4v2.3a.9.9 0 0 1-.9.9H3.2a.9.9 0 0 1-.9-.9v-2.3M4.9 7.2 8 10.3l3.1-3.1M8 10.3V2.3',
-    menu: 'M2.5 4.5h11M2.5 8h11M2.5 11.5h11'
+    menu: 'M2.5 4.5h11M2.5 8h11M2.5 11.5h11',
+    // La bandeja de entrada (strix-inbox). El Shell la dibujaba con `download`:
+    // una flecha que dice «bajar un archivo», no «acá llegan las conversaciones».
+    inbox:
+      'M14.2 8.6v3.9a.9.9 0 0 1-.9.9H2.7a.9.9 0 0 1-.9-.9V8.6' +
+      'M1.8 8.6 3.9 3.2a.9.9 0 0 1 .8-.6h6.6a.9.9 0 0 1 .8.6l2.1 5.4' +
+      'M1.8 8.6h3.6l1.1 1.7h3l1.1-1.7h3.6'
   };
 
   export { PATHS as GLYPH_PATHS };

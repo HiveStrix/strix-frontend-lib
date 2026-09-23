@@ -470,6 +470,16 @@ export const TOKENS = {
   '--sx-nest-r': 'var(--sx-r-2)',
   // Table: las columnas `numeric` en la mono (main: la fuente de la interfaz).
   '--sx-num-font': 'var(--sx-font-mono)',
+  // Panel: cabecera sin banda (main: --sx-thead), como el patrón contenedor.
+  '--sx-panel-head': 'transparent',
+  // StatStrip como bandeja: pozo hundido, cifras en fichas levantadas (main:
+  // mosaico con raya de 1px, sin relleno, con --sx-e-1 afuera).
+  '--sx-strip-bg': 'var(--sx-sunk)',
+  '--sx-strip-gap': 'var(--sx-s-2)',
+  '--sx-strip-pad': 'var(--sx-s-2)',
+  '--sx-strip-e': 'var(--sx-e-sunk)',
+  '--sx-strip-cell-e': 'var(--sx-e-1)',
+  '--sx-strip-cell-r': 'var(--sx-r-1)',
 
   // Quarters of a 16 rhythm. Every gap in the system is one of these.
   '--sx-s-1': '4px', '--sx-s-2': '8px', '--sx-s-3': '12px', '--sx-s-4': '16px',
