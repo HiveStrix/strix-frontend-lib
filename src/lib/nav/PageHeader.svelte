@@ -324,7 +324,9 @@
      no la raya). */
   .sticky {
     position: sticky;
-    top: 0;
+    /* `--sx-sticky-top`: cuánto ocupa lo que ya está pegado arriba (la
+       ModuleBar de un core). Sin eso el encabezado se deslizaba debajo de ella. */
+    top: var(--sx-sticky-top, 0);
     z-index: var(--sx-z-sticky);
     background: var(--sx-ground);
     border-bottom: 1px solid var(--sx-line);
@@ -333,6 +335,14 @@
     padding-inline: var(--sx-s-4);
     border-radius: var(--sx-r-1);
   }
+  /* Una pieza con piel (`banda`, `soft`, `hero-card`) ya es su propio borde: el
+     sangrado negativo y la raya del sticky de `line` la hacían sobresalir 16px
+     por lado. Pegada, conserva su forma. */
+  .sticky.banda, .sticky.soft, .sticky.hero-card {
+    margin-inline: 0;
+    border-bottom: 0;
+  }
+
 
   /* ═══ VARIANT: line — el default, una raya ════════════════════════════════
      `.hd.line`, no una redeclaración de `.hd`: la especificidad tiene que

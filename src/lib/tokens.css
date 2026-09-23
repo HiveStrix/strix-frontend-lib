@@ -105,6 +105,10 @@
   --sx-tone-bar: 0px;
   --sx-toast-mark: 1;
   --sx-toast-mark-e: var(--sx-e-pill);
+  --sx-nest-bg: var(--sx-sunk);
+  --sx-nest-e: var(--sx-e-sunk);
+  --sx-nest-r: var(--sx-r-2);
+  --sx-num-font: var(--sx-font-mono);
   --sx-s-1: 4px;
   --sx-s-2: 8px;
   --sx-s-3: 12px;

@@ -102,6 +102,14 @@
   export let group = false;
   /** Force an id when something outside has to point at the control. */
   export let id = '';
+  /**
+   * true ⇒ la etiqueta sigue siendo el `<label for>` del control —su nombre
+   * accesible— pero no se dibuja. Para el campo cuyo rótulo ya está a la vista
+   * en otro lado: la columna «Contado» de un conteo, una celda de una tabla de
+   * líneas. Sin esto, esos campos quedaban sin nombre para un lector de
+   * pantalla. El ⓘ de `hintDot` no se muestra: no tiene a qué pegarse.
+   */
+  export let labelHidden = false;
 
   /**
    * Where the value came from, if the person did not type it: «la plantilla
@@ -131,7 +139,7 @@
   // la pone como descripción de su botón—, así que el párrafo no se dibuja y no
   // hay `hintId` al que apuntar: el input queda escueto y la ayuda vive a un
   // gesto, en el ⓘ de al lado, que es el objetivo de la prop.
-  $: showHintDot = !!(hint && hintDot && label);
+  $: showHintDot = !!(hint && hintDot && label && !labelHidden);
   $: showInlineHint = !!(hint && !showHintDot);
   // undefined, never '': an empty aria-describedby points at nothing and some
   // screen readers read the field name twice trying.
@@ -141,7 +149,7 @@
 
 <div class="field" class:disabled class:no-frame={!frame} class:dense>
   {#if label}
-    <div class="head">
+    <div class="head" class:sr={labelHidden}>
       <span class="lblwrap">
         <svelte:element
           this={group ? 'span' : 'label'}
@@ -253,6 +261,9 @@
      says «type here», and elevation alone cannot say that. Depth still does the
      rest of the work. */
   .frame {
+    /* Propio, no del anfitrión: un core cuyo reset `*` Svelte acota a sus
+       propios elementos no llega acá, y la caja medía 58px en vez de 40. */
+    box-sizing: border-box;
     position: relative;
     display: flex; align-items: stretch; gap: var(--sx-s-2);
     min-height: var(--sx-s-10);

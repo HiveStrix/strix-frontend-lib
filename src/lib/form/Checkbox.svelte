@@ -36,6 +36,8 @@
   /** Neither on nor off: some of the things underneath are ticked. */
   export let indeterminate = false;
   export let label = '';
+  /** true ⇒ la etiqueta nombra la casilla pero no se dibuja (una celda de tabla). */
+  export let labelHidden = false;
   /** What ticking it will actually cause. One line, under the label. */
   export let hint = '';
   export let value = undefined;
@@ -89,7 +91,7 @@
   </span>
 
   <span class="say">
-    <span class="lb">{label}<slot /></span>
+    <span class="lb" class:sr={labelHidden}>{label}<slot /></span>
     {#if hint}<span class="hint" id={hintId}>{hint}</span>{/if}
   </span>
 </label>
@@ -153,6 +155,10 @@
   .cb.disabled input:indeterminate + .box { background: var(--sx-ink-3); border-color: var(--sx-ink-3); }
 
   .say { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .sr {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+  }
   .lb { font-size: var(--sx-t-sm); color: var(--sx-ink); line-height: 1.45; }
   .cb.disabled .lb { color: var(--sx-ink-3); }
   .hint { font-size: var(--sx-t-xs); color: var(--sx-ink-3); line-height: 1.5; max-width: 60ch; }

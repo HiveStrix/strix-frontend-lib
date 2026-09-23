@@ -54,6 +54,10 @@
   export let maxRows = 14;
 
   export let label = '';
+
+  /** Nombre accesible sin rótulo a la vista (ver Field). */
+
+  export let labelHidden = false;
   export let hint = '';
   export let error = '';
   export let fix = '';
@@ -98,7 +102,7 @@
 </script>
 
 <Field
-  {label} {hint} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
+  {label} {labelHidden} {hint} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}

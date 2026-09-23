@@ -76,6 +76,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
    somebody has to argue for. */
 
 /* A label. Small, tracked, uppercase — the printed word on an instrument. */
+/* Un contenedor propio (del Shell o de un core) declara que lo de adentro está
+   anidado: un EmptyState o ErrorState ahí se hunde. Igual en hostBase(). */
+.sx-nest {
+  --sx-state-bg: var(--sx-nest-bg, var(--sx-surface));
+  --sx-state-e: var(--sx-nest-e, var(--sx-e-1));
+  --sx-state-r: var(--sx-nest-r, var(--sx-r-3));
+}
+
 .sx-cap {
   font-size: var(--sx-t-2xs);
   font-weight: var(--sx-w-semi);

@@ -89,6 +89,10 @@
   export let maxVisible = 50;
 
   export let label = '';
+
+  /** Nombre accesible sin rótulo a la vista (ver Field). */
+
+  export let labelHidden = false;
   export let hint = '';
   /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
    *  bajo el campo — así los campos de una misma fila quedan a igual altura y
@@ -308,7 +312,7 @@
 <svelte:window on:resize={() => open && place()} />
 
 <Field
-  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
+  {label} {labelHidden} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
   id={fid} {origin} {originValue} {changed}
   frame={false}
   on:revert

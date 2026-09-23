@@ -462,6 +462,14 @@ export const TOKENS = {
   '--sx-tone-bar': '0px',
   '--sx-toast-mark': '1',
   '--sx-toast-mark-e': 'var(--sx-e-pill)',
+  // Un estado (EmptyState, ErrorState) adentro de un contenedor se HUNDE en vez
+  // de levantarse como otra tarjeta (main: superficie, --sx-e-1, radio 28).
+  // Table, Card y Panel lo aplican solos; un contenedor del core, con `.sx-nest`.
+  '--sx-nest-bg': 'var(--sx-sunk)',
+  '--sx-nest-e': 'var(--sx-e-sunk)',
+  '--sx-nest-r': 'var(--sx-r-2)',
+  // Table: las columnas `numeric` en la mono (main: la fuente de la interfaz).
+  '--sx-num-font': 'var(--sx-font-mono)',
 
   // Quarters of a 16 rhythm. Every gap in the system is one of these.
   '--sx-s-1': '4px', '--sx-s-2': '8px', '--sx-s-3': '12px', '--sx-s-4': '16px',
@@ -770,6 +778,13 @@ export const hostBase = () => `
    de un core, al lado de un host en Outfit. Selector de elemento a propósito:
    pierde contra cualquier clase de componente, así que sólo llena el hueco. */
 button, input, select, textarea { font: inherit; color: inherit; }
+/* Un contenedor propio del core (su «Contenedor», su «cola») declara que lo de
+   adentro está anidado: un EmptyState o ErrorState ahí se hunde. */
+.sx-nest {
+  --sx-state-bg: var(--sx-nest-bg, var(--sx-surface));
+  --sx-state-e: var(--sx-nest-e, var(--sx-e-1));
+  --sx-state-r: var(--sx-nest-r, var(--sx-r-3));
+}
 .sx-cap {
   font-size: var(--sx-t-2xs);
   font-weight: var(--sx-w-semi);

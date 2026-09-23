@@ -535,17 +535,22 @@
                 <span class="sx-sr">Seleccionar {labelOf(row)}{typeof off === 'string' ? ` — ${off}` : ''}</span>
               </label>
             {/if}
+            <!-- El título de la ficha pasa por el slot `cell` como la celda
+                 primaria de la tabla: sin eso, lo que el core dibuja ahí (el
+                 nombre comercial, el tipo, una Pill) se perdía bajo 620px, y un
+                 «Sin asignar» salía en mono por ser columna `id`. Con slot, la
+                 forma es del core; sin slot, la de siempre. -->
             <h3 class="ctitle">
               {#if href}
                 <a href={href(row)} class="stretch" on:click={(e) => onOpen(row, e)}>
-                  <span class:sx-id={primary?.id}>{titleOf(row)}</span>
+                  {#if $$slots.cell}<slot name="cell" {row} col={primary} value={titleOf(row)} />{:else}<span class:sx-id={primary?.id}>{titleOf(row)}</span>{/if}
                 </a>
               {:else if open}
                 <button type="button" class="stretch" on:click={(e) => onOpen(row, e)}>
-                  <span class:sx-id={primary?.id}>{titleOf(row)}</span>
+                  {#if $$slots.cell}<slot name="cell" {row} col={primary} value={titleOf(row)} />{:else}<span class:sx-id={primary?.id}>{titleOf(row)}</span>{/if}
                 </button>
               {:else}
-                <span class:sx-id={primary?.id}>{titleOf(row)}</span>
+                {#if $$slots.cell}<slot name="cell" {row} col={primary} value={titleOf(row)} />{:else}<span class:sx-id={primary?.id}>{titleOf(row)}</span>{/if}
               {/if}
             </h3>
           </div>
@@ -797,6 +802,10 @@
      and uncover a shadow that stays put (`scroll`), so an edge darkens only
      while there is still a column past it. */
   .box {
+    /* Un estado (vacío, error) adentro de la tabla toma la forma anidada. */
+    --sx-state-bg: var(--sx-nest-bg, var(--sx-surface));
+    --sx-state-e: var(--sx-nest-e, var(--sx-e-1));
+    --sx-state-r: var(--sx-nest-r, var(--sx-r-3));
     border-radius: var(--sx-r-3);
     background: var(--sx-surface);
     box-shadow: var(--sx-e-card, var(--sx-e-1));
@@ -915,6 +924,9 @@
      register: a shadow root may not have base.css, and figures lining up under
      figures is not allowed to be the optional part. */
   td.num {
+    /* `--sx-num-font`: la variante pone las cifras de tabla en la mono del
+       sistema (DESIGN.md: todo dato que se compara); main, la de la interfaz. */
+    font-family: var(--sx-num-font, inherit);
     font-variant-numeric: tabular-nums lining-nums slashed-zero;
     font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1;
     font-weight: var(--sx-w-medium);
@@ -1093,6 +1105,7 @@
      its label above it — a note does not belong in a right-aligned column. */
   .cf.full dt { grid-column: 1 / -1; }
   .cf.full dd { grid-column: 1 / -1; text-align: left; }
+  .cf dd.sx-num { font-family: var(--sx-num-font, inherit); }
 
   .cmore {
     display: inline-flex;

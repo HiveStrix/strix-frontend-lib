@@ -141,7 +141,9 @@
        the retry AND whatever the surface passed, instead of one or the other. -->
   <ErrorState title={head} recovery={sub} retry="" {compact} {live} heading="p" on:retry>
     <svelte:fragment slot="actions">
-      <Button variant="solid" size={compact ? 'sm' : 'md'} on:click={() => dispatch('retry')}>
+      <!-- `outline`, no `solid`: el estado vive DENTRO de una vista que ya tiene
+           su primario (la banda), y dos sólidos en pantalla son dos primarios. -->
+      <Button variant="outline" size={compact ? 'sm' : 'md'} on:click={() => dispatch('retry')}>
         {retryLabel}
       </Button>
       <slot />
@@ -152,7 +154,7 @@
     {#if sub}{sub}{/if}
     <svelte:fragment slot="actions">
       {#if kind === 'filtered'}
-        <Button variant="solid" on:click={() => dispatch('clear')}>{clearWord}</Button>
+        <Button variant="outline" on:click={() => dispatch('clear')}>{clearWord}</Button>
       {/if}
       <slot />
     </svelte:fragment>

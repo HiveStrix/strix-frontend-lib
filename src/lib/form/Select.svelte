@@ -45,6 +45,10 @@
   export let placeholder = '';
 
   export let label = '';
+
+  /** Nombre accesible sin rótulo a la vista (ver Field). */
+
+  export let labelHidden = false;
   export let hint = '';
   /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
    *  bajo el campo — así los campos de una fila alinean. Se reenvía a `Field`. */
@@ -86,7 +90,7 @@
 </script>
 
 <Field
-  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
+  {label} {labelHidden} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}

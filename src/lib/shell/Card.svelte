@@ -246,6 +246,10 @@
 
 <style>
   .card {
+    /* Un estado (vacío, error) adentro de la tarjeta toma la forma anidada. */
+    --sx-state-bg: var(--sx-nest-bg, var(--sx-surface));
+    --sx-state-e: var(--sx-nest-e, var(--sx-e-1));
+    --sx-state-r: var(--sx-nest-r, var(--sx-r-3));
     display: flex;
     flex-direction: column;
     min-width: 0;

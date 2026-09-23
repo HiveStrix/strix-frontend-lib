@@ -125,9 +125,13 @@
 
 <style>
   .card {
-    background: var(--sx-surface);
-    border-radius: var(--sx-r-3);
-    box-shadow: var(--sx-e-1);
+    /* `--sx-state-*`: la forma la decide DÓNDE está. Suelto en la página es una
+       tarjeta levantada; adentro de un contenedor (Table, Panel, Card o un
+       contenedor del core con `.sx-nest`) la variante lo hunde, porque una
+       tarjeta sobre otra tarjeta es lo que la lib no hace. */
+    background: var(--sx-state-bg, var(--sx-surface));
+    border-radius: var(--sx-state-r, var(--sx-r-3));
+    box-shadow: var(--sx-state-e, var(--sx-e-1));
     padding: var(--sx-s-12) var(--sx-s-6);
     text-align: center;
   }

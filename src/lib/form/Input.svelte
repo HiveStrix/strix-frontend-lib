@@ -37,6 +37,8 @@
   /** text | search | email | tel | url | password */
   export let type = 'text';
   export let label = '';
+  /** Nombre accesible sin rótulo a la vista (ver Field). */
+  export let labelHidden = false;
   export let hint = '';
   /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
    *  bajo el campo — así los campos de una misma fila quedan a igual altura y
@@ -91,7 +93,7 @@
 </script>
 
 <Field
-  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
+  {label} {labelHidden} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}

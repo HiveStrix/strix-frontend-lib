@@ -153,9 +153,10 @@
   .err {
     display: flex;
     gap: var(--sx-s-4);
-    background: var(--sx-surface);
-    border-radius: var(--sx-r-3);
-    box-shadow: var(--sx-e-1);
+    /* La forma según dónde está: ver `--sx-state-*` en EmptyState. */
+    background: var(--sx-state-bg, var(--sx-surface));
+    border-radius: var(--sx-state-r, var(--sx-r-3));
+    box-shadow: var(--sx-state-e, var(--sx-e-1));
     padding: var(--sx-s-10) var(--sx-s-6);
     text-align: left;
   }
