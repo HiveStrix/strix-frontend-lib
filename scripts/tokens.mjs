@@ -1,6 +1,21 @@
 // Generates tokens.css from tokens.js, so the two shapes cannot drift.
 import { writeFileSync } from 'node:fs';
-import { stylesheet } from '../src/lib/tokens.js';
+import { stylesheet, TOKENS, TOKENS_DARK } from '../src/lib/tokens.js';
+
+// LA TRAMPA DEL ALIAS. Un `var()` dentro de una custom property se resuelve
+// donde se DECLARA: un alias en `:root` que apunta a un token que el oscuro
+// re-liga (`--sx-nest-bg: var(--sx-sunk)`) llega ya resuelto CLARO a todo
+// subárbol `.sx-dark`. Pasó con --sx-field, y volvió a pasar con siete alias de
+// la variante. Si un alias apunta a un token que TOKENS_DARK cambia, tiene que
+// estar re-declarado ahí; si no, no se genera nada.
+const trap = Object.entries(TOKENS)
+  .filter(([k, v]) => !(k in TOKENS_DARK))
+  .filter(([, v]) => [...String(v).matchAll(/var\((--sx-[\w-]+)/g)].some(([, ref]) => ref in TOKENS_DARK));
+if (trap.length) {
+  console.error('Alias sin re-declarar en TOKENS_DARK (en un .sx-dark quedarían claros):');
+  for (const [k, v] of trap) console.error(`  ${k}: ${v}`);
+  process.exit(1);
+}
 
 const header = `/* ============================================================================
    Strix — tokens

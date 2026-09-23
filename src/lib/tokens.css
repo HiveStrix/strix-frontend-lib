@@ -188,5 +188,12 @@
   --sx-e-pill: inset 1.5px 1.5px 3px rgba(0,0,0,.4), inset -1.5px -1.5px 3px rgba(255,255,255,.04);
   --sx-e-field: var(--sx-e-sunk);
   --sx-field: var(--sx-sunk);
+  --sx-glow-color: var(--sx-accent);
+  --sx-toast-mark-e: var(--sx-e-pill);
+  --sx-nest-bg: var(--sx-sunk);
+  --sx-nest-e: var(--sx-e-sunk);
+  --sx-strip-bg: var(--sx-sunk);
+  --sx-strip-e: var(--sx-e-sunk);
+  --sx-strip-cell-e: var(--sx-e-1);
   color-scheme: dark;
 }

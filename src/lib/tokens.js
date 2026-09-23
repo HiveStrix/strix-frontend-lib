@@ -749,6 +749,18 @@ export const TOKENS_DARK = {
   // catálogo móvil: el buscador del teléfono Android oscuro salía claro.
   '--sx-e-field': 'var(--sx-e-sunk)',
   '--sx-field': 'var(--sx-sunk)',
+  // Los alias de la variante, por la misma razón. Faltaban y un estado anidado,
+  // la tira de cifras o la marca del Toast dentro de un `.sx-dark` se pintaban
+  // con el pozo CLARO (lo encontró el pulido de strix-mobile-lib). Desde acá,
+  // scripts/tokens.mjs se niega a generar si un alias de un token que cambia con
+  // el tema no está re-declarado en este bloque.
+  '--sx-glow-color': 'var(--sx-accent)',
+  '--sx-toast-mark-e': 'var(--sx-e-pill)',
+  '--sx-nest-bg': 'var(--sx-sunk)',
+  '--sx-nest-e': 'var(--sx-e-sunk)',
+  '--sx-strip-bg': 'var(--sx-sunk)',
+  '--sx-strip-e': 'var(--sx-e-sunk)',
+  '--sx-strip-cell-e': 'var(--sx-e-1)',
 
   // La otra mitad de `color-scheme: light` en TOKENS — ver el comentario ahí.
   // Es lo que oscurece los widgets nativos (checkbox, date picker, scrollbar)
