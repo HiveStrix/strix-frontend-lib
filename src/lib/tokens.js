@@ -851,8 +851,14 @@ export const stylesheet = () =>
 // `:host`, un shell los puede LEER desde afuera y espejarlos en su documento.
 
 /** Los tokens de la rampa de cromo — lo único que se adopta para la unicidad. */
+// VARIANTE COLORIDA: se suman --sx-surface y --sx-sunk. En main salían de la
+// rampa (n-0, n-50), así que adoptar la rampa ya los traía; en la variante son
+// hex propios (#F6F3FC, #E6E1F1) y quedaban afuera. Con un core SIN migrar
+// (superficie blanca, pozo gris) el Shell adoptaba su fondo gris pero dejaba su
+// barra y sus tarjetas en lila encima: dos familias en una pantalla. Ahora el
+// Shell adopta el fondo, la superficie y el pozo del core, migrado o no.
 export const RAMP_TOKENS = [
-  '--sx-chrome-tint', '--sx-ground', '--sx-thead',
+  '--sx-chrome-tint', '--sx-ground', '--sx-thead', '--sx-surface', '--sx-sunk',
   '--sx-n-50', '--sx-n-100', '--sx-n-150', '--sx-n-200', '--sx-n-300',
   '--sx-n-400', '--sx-n-500', '--sx-n-700', '--sx-n-800', '--sx-n-900'
 ];
