@@ -9,7 +9,7 @@
   // Es más corta que Formularios o Tablas a propósito, y eso también es honesto:
   // documenta cada componente en su forma principal y en el estado que lo rompe,
   // no en las quince combinaciones. Lo que falta está anotado en el README.
-  import { Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, InfoDot, Glyph, GLYPHS } from '../../lib/shell/index.js';
+  import { Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, InfoDot, Glyph, GLYPHS, IconWell } from '../../lib/shell/index.js';
   import { Stat, StatStrip } from '../../lib/metric/index.js';
   import Pill from '../../lib/Pill.svelte';
   import Button from '../../lib/action/Button.svelte';
@@ -17,7 +17,7 @@
   const TOC = [
     ['hero', 'Hero'], ['card', 'Card'], ['panel', 'Panel'], ['well', 'Well'], ['aire', 'Stack · Row'],
     ['divider', 'Divider'], ['toolbar', 'Toolbar'], ['sheet', 'Sheet'],
-    ['tooltip', 'Tooltip'], ['infodot', 'InfoDot'], ['glyph', 'Glyph']
+    ['tooltip', 'Tooltip'], ['infodot', 'InfoDot'], ['glyph', 'Glyph'], ['iconwell', 'IconWell']
   ];
 
   let sheet = false;
@@ -765,6 +765,48 @@
           predeterminado es <span class="sx-id">aria-hidden</span>, porque el caso abrumadoramente
           común es un ícono al lado de un texto que ya lo dice. Pasá <span class="sx-id">label</span>
           sólo cuando el glifo de verdad sea lo único que está diciendo algo.
+        </p>
+      </section>
+
+      <!-- ═══ ICONWELL ═══════════════════════════════════════════════════ -->
+      <section id="iconwell">
+        <h2>IconWell</h2>
+        <p class="why">
+          La dosis chica de color de la variante colorida: un Glyph dentro de un cuadrado
+          redondeado, apenas tallado, teñido con un matiz de la paleta de categoría
+          (<span class="sx-id">--sx-hue-*</span>). Identifica una <em>cosa</em> —un módulo, una
+          familia, un tipo de registro—; no dice un estado.
+        </p>
+
+        <div class="demo">
+          <Stack gap={4}>
+            <Row gap={3} wrap>
+              <IconWell name="gauge" hue="violet" />
+              <IconWell name="box" hue="aqua" />
+              <IconWell name="truck" hue="coral" />
+              <IconWell name="wrench" hue="amber" />
+              <IconWell name="check" hue="sage" />
+              <IconWell name="layers" hue="indigo" />
+              <IconWell name="clipboard" hue="accent" />
+            </Row>
+            <Row gap={3} wrap align="center">
+              <IconWell name="wrench" hue="amber" size="sm" />
+              <IconWell name="wrench" hue="amber" size="md" />
+              <IconWell name="wrench" hue="amber" size="lg" />
+            </Row>
+            <Panel title="Existencias por bodega" sub="Hoy" icon="box" hue="aqua">
+              <p style="margin:0">Panel con <span class="sx-id">icon</span> y <span class="sx-id">hue</span>: el ícono del título va en su pozo.</p>
+            </Panel>
+          </Stack>
+        </div>
+
+        <p class="note">
+          <b>Por qué 16&nbsp;% y 66&nbsp;%.</b> El fondo es el matiz al 16&nbsp;% sobre la superficie
+          y el ícono el matiz al 66&nbsp;% contra la tinta. Un ícono puede cargar significado, así que
+          pide 3:1 contra su pozo; el ámbar, el más claro de la paleta, daba 3.19 al 72&nbsp;% y 3.59
+          al 66&nbsp;%. Los siete pares están en <span class="sx-id">scripts/contrast.mjs</span>, en los
+          dos temas. También lo encienden <span class="sx-id">Sidebar</span> (un
+          <span class="sx-id">hue</span> por ítem) y <span class="sx-id">Panel</span>.
         </p>
       </section>
 

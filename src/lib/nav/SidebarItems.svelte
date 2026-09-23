@@ -20,6 +20,7 @@
   // `:global()`. Más simple pasar los dos booleanos como props y aplicar las
   // clases acá mismo que andar marcando selectores como globales.
   import { GLYPH_VIEWBOX } from '../shell/Glyph.svelte';
+  import IconWell from '../shell/IconWell.svelte';
 
   export let items = [];
   export let value = '';
@@ -76,8 +77,12 @@
             title={it.label}
             use:activate={it}
           >
-            <span class="ic" aria-hidden="true">
-              {#if it.icon}
+            <!-- `hue` (variante colorida): el ícono en un pozo de color, como en la
+                 dirección de Stitch. Sin `hue`, el trazo suelto de siempre. -->
+            <span class="ic" class:hasw={it.hue && it.icon} aria-hidden="true">
+              {#if it.icon && it.hue}
+                <IconWell path={it.icon} hue={it.hue} size="sm" />
+              {:else if it.icon}
                 <svg viewBox={GLYPH_VIEWBOX}><path d={it.icon} fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
               {:else}
                 <span class="ini">{initial(it.label)}</span>
@@ -164,6 +169,8 @@
 
   .ic { display: flex; align-items: center; justify-content: center; flex: none; width: 20px; height: 20px; }
   .ic svg { width: 20px; height: 20px; }
+  /* Con pozo el hueco crece a 28: el pozo es la pieza, no un adorno del trazo. */
+  .ic.hasw { width: 28px; height: 28px; margin-inline: -4px; }
   /* La transición vive en el `path`, que es donde cambia el `stroke-width`. */
   .ic svg path { transition: stroke-width var(--sx-fast) var(--sx-ease); }
   .ini {

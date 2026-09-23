@@ -303,6 +303,17 @@ const CHECKS = [
   // mano: si la perilla se mueve, esta fila se mueve con ella.
   ['--sx-banda-ink', 'color-mix(in srgb, var(--sx-accent) 20%, var(--sx-surface))', 4.5, 'título de la banda pastel'],
   ['color-mix(in srgb, var(--sx-banda-ink) 85%, transparent)', 'color-mix(in srgb, var(--sx-accent) 20%, var(--sx-surface))', 4.5, 'bajada de la banda pastel'],
+  // EL POZO DE ÍCONO (IconWell, SidebarItems con `hue`, Panel con `hue`): el
+  // ícono es el matiz al 66 % contra --sx-ink, sobre el matiz al 16 % contra la
+  // superficie. Un ícono puede cargar significado ⇒ 3:1 (1.4.11). Los dos
+  // porcentajes están escritos en IconWell.svelte y en SidebarItems.svelte.
+  ['color-mix(in srgb, var(--sx-hue-violet) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-violet) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · violet'],
+  ['color-mix(in srgb, var(--sx-hue-aqua) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-aqua) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · aqua'],
+  ['color-mix(in srgb, var(--sx-hue-coral) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-coral) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · coral'],
+  ['color-mix(in srgb, var(--sx-hue-amber) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-amber) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · amber'],
+  ['color-mix(in srgb, var(--sx-hue-sage) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-sage) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · sage'],
+  ['color-mix(in srgb, var(--sx-hue-indigo) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-indigo) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · indigo'],
+  ['color-mix(in srgb, var(--sx-accent) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · acento'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],

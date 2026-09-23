@@ -95,6 +95,7 @@
   // `banda` (default, no se toca) sigue siendo `--sx-thead` — lo de siempre.
   import Card from './Card.svelte';
   import Glyph from './Glyph.svelte';
+  import IconWell from './IconWell.svelte';
   import { pickVariant } from '../variants.js';
 
   /** The heading. A Panel without one is a Card — use that instead. */
@@ -105,6 +106,9 @@
   export let level = 2;
   /** A name from Glyph, beside the title. Decoration only; the title carries the meaning. */
   export let icon = '';
+  /** Con `icon`: violet | aqua | coral | amber | sage | indigo | accent — el ícono va
+   *  en un pozo de color (IconWell). Vacío ⇒ el trazo suelto de siempre. */
+  export let hue = '';
   /** '' | positive | attention | critical | info | neutral. Forwarded to Card — see the note above. */
   export let tone = '';
   /** A step on the spacing scale, applied to head, body and footer alike. */
@@ -148,7 +152,7 @@
       <div class="head" class:sarion={hv === 'sarion'}>
         <div class="titles">
           <div class="tline">
-            {#if icon}<span class="ic"><Glyph name={icon} size={16} /></span>{/if}
+            {#if icon && hue}<IconWell name={icon} {hue} size="sm" />{:else if icon}<span class="ic"><Glyph name={icon} size={16} /></span>{/if}
             {#if title}<svelte:element this={tag} class="t">{title}</svelte:element>{/if}
           </div>
           {#if sub}<p class="s">{sub}</p>{/if}

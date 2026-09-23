@@ -352,6 +352,9 @@ export const TOKENS = {
   // EL TALLADO: lo inverso del relieve. La sombra entra por arriba-izquierda y
   // la luz sale por abajo-derecha, así que la pieza se lee HUNDIDA en su
   // superficie — un pozo, una ranura, un botón apretado.
+  // EL POZO DE ÍCONO (IconWell): el tallado más leve de Stitch — un cuadrado
+  // apenas hundido en su tarjeta, no un campo donde se escribe.
+  '--sx-e-well': 'inset 2px 2px 5px rgba(101,65,190,.12), inset -2px -2px 5px #FFFFFF',
   // El tallado de Stitch para campos (neu-sunk-deep).
   '--sx-e-sunk': 'inset 3px 3px 6px rgba(101,65,190,.16), inset -2px -2px 5px #FFFFFF',
   // LA CAJA DE UN CONTROL, como perilla. Desde la v0.8.14 el campo se levantaba
@@ -683,6 +686,7 @@ export const TOKENS_DARK = {
   '--sx-e-3': '0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45)',
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.05)',
   '--sx-e-sunk': 'inset 3px 3px 6px rgba(0,0,0,.45), inset -2px -2px 5px rgba(255,255,255,.04)',
+  '--sx-e-well': 'inset 2px 2px 5px rgba(0,0,0,.4), inset -2px -2px 5px rgba(255,255,255,.04)',
   // RE-DECLARADOS, AUNQUE EL TEXTO SEA EL MISMO QUE EN TOKENS. Un `var()` dentro
   // de una custom property se resuelve donde se DECLARA: en `:root` estos dos ya
   // valen el sunk CLARO, y un subárbol `.sx-dark` (el marco de un teléfono en el
