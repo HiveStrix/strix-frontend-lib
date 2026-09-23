@@ -299,10 +299,10 @@ const CHECKS = [
   ['--sx-edge',   '--sx-field', 3.0, 'borde de control sobre su propio relleno'],
   // LA BANDA PASTEL (variante colorida): el título y la bajada de
   // `PageHeader variant="banda"` se escriben con --sx-banda-ink sobre el acento
-  // al 0 % (--sx-banda-tint: la banda es una tarjeta clara) contra la superficie.
-  // El 0 % está escrito acá a mano: si la perilla se mueve, esta fila se mueve con ella.
-  ['--sx-banda-ink', 'color-mix(in srgb, var(--sx-accent) 0%, var(--sx-surface))', 4.5, 'título de la banda pastel'],
-  ['color-mix(in srgb, var(--sx-banda-ink) 85%, transparent)', 'color-mix(in srgb, var(--sx-accent) 0%, var(--sx-surface))', 4.5, 'bajada de la banda pastel'],
+  // al 22 % (--sx-banda-tint) contra la superficie.
+  // El 22 % está escrito acá a mano: si la perilla se mueve, esta fila se mueve con ella.
+  ['--sx-banda-ink', 'color-mix(in srgb, var(--sx-accent) 22%, var(--sx-surface))', 4.5, 'título de la banda pastel'],
+  ['color-mix(in srgb, var(--sx-banda-ink) 85%, transparent)', 'color-mix(in srgb, var(--sx-accent) 22%, var(--sx-surface))', 4.5, 'bajada de la banda pastel'],
   // EL POZO DE ÍCONO (IconWell, SidebarItems con `hue`, Panel con `hue`): el
   // ícono es el matiz al 66 % contra --sx-ink, sobre el matiz al 16 % contra el
   // pozo (--sx-sunk). Un ícono puede cargar significado ⇒ 3:1 (1.4.11). Los dos

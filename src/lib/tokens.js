@@ -341,10 +341,14 @@ export const TOKENS = {
   //     --sx-e-chip  lo más chico: chip de filtro, avatar, número de página
   //   hundido · lo inverso, adentro (ver --sx-e-sunk, --sx-e-well, --sx-e-pill)
   // Lo que FLOTA (--sx-e-3: menús, hojas, toasts, popups) no lleva la luz.
-  '--sx-e-1': '-3px -3px 8px #FFFFFF, 3px 3px 10px rgba(101,65,190,.20)',
-  '--sx-e-2': '-5px -5px 12px #FFFFFF, 5px 5px 14px rgba(101,65,190,.24)',
-  '--sx-e-card': '-6px -6px 14px #FFFFFF, 6px 6px 18px rgba(101,65,190,.22)',
-  '--sx-e-chip': '-2px -2px 6px #FFFFFF, 2px 2px 8px rgba(101,65,190,.14)',
+  // SUPER CLAY (pedido del usuario sobre la línea de Stitch): a cada nivel se le
+  // suma, ADENTRO, un filo de luz de 1 px arriba-izquierda y un volumen violeta
+  // abajo-derecha. Afuera sigue mandando la luz blanca de Stitch; adentro la
+  // pieza se abulta en vez de ser una lámina con sombra.
+  '--sx-e-1': '-3px -3px 8px #FFFFFF, 3px 4px 10px rgba(101,65,190,.22), inset 1px 1px 1px rgba(255,255,255,.85), inset -1px -2px 4px rgba(101,65,190,.07)',
+  '--sx-e-2': '-5px -5px 12px #FFFFFF, 5px 6px 14px rgba(101,65,190,.26), inset 1px 1px 1px rgba(255,255,255,.9), inset -1px -2px 5px rgba(101,65,190,.08)',
+  '--sx-e-card': '-7px -7px 16px #FFFFFF, 7px 8px 20px rgba(101,65,190,.24), inset 1px 1px 1px rgba(255,255,255,.9), inset -2px -3px 7px rgba(101,65,190,.07)',
+  '--sx-e-chip': '-2px -2px 6px #FFFFFF, 2px 3px 8px rgba(101,65,190,.16), inset 1px 1px 0 rgba(255,255,255,.85)',
   // El primario de Stitch (tabla): la luz blanca afuera y una sombra del COLOR
   // del acento, fuerte. Se re-declara en oscuro (el acento cambia).
   '--sx-e-primary': '-3px -3px 8px #FFFFFF, 3px 3px 12px color-mix(in srgb, var(--sx-accent) 35%, transparent)',
@@ -376,7 +380,8 @@ export const TOKENS = {
   // que seguir leyéndose cuadrado al lado del radio redondo.
   '--sx-r-1': '8px',
   '--sx-r-2': '16px',
-  '--sx-r-3': '24px',
+  // Super clay: el contenedor se redondea a 28 (Stitch va de 22 a 26).
+  '--sx-r-3': '28px',
   '--sx-r-pill': '999px',
 
   // Major third off 15 — the smallest size that survives a dirty screen at
@@ -429,7 +434,7 @@ export const TOKENS = {
   // Button: en Stitch los botones son de radio 12 (rounded-xl), no píldoras.
   // `--sx-btn-radius` lo fija; `--sx-btn-solid` es su relleno (en main, el degradé brillante);
   // `--sx-btn-gloss` es la opacidad del brillo especular de arriba (main: .42).
-  '--sx-btn-radius': '12px',
+  '--sx-btn-radius': '14px',
   '--sx-btn-solid': 'var(--sx-accent)',
   '--sx-btn-gloss': '0',
   // PageHeader variant="banda": en Stitch no hay bloques saturados — el color
@@ -438,9 +443,10 @@ export const TOKENS = {
   // tinta encima; `--sx-banda-remap` si las acciones de la banda se invierten
   // (main: 100 %, porque sobre un relleno de acento un botón de acento no se ve;
   // sobre un pastel sí, así que acá 0 %).
-  // 0 %: en Stitch el encabezado es una TARJETA clara levantada, no un bloque
-  // de color; el color del módulo viaja en sus pozos y en su botón.
-  '--sx-banda-tint': '0%',
+  // 22 %: el encabezado lleva el color del módulo en pastel. Se probó 0 %
+  // (tarjeta clara, como Stitch) y el usuario lo pidió de vuelta: el color del
+  // encabezado es cómo se sabe en qué módulo se está.
+  '--sx-banda-tint': '22%',
   '--sx-banda-ink': 'var(--sx-ink)',
   '--sx-banda-remap': '0%',
   // Pill: en Stitch las pills de estado son un hueco teñido, sin filo.
@@ -690,10 +696,10 @@ export const TOKENS_DARK = {
   // VARIANTE COLORIDA: el soft-UI de Stitch en oscuro. La luz de afuera baja a
   // un 4 % (más, y el borde se lee como un filo luminoso); la sombra se hace
   // negra y más densa.
-  '--sx-e-1': '-3px -3px 8px rgba(255,255,255,.04), 3px 3px 10px rgba(0,0,0,.5)',
-  '--sx-e-2': '-5px -5px 12px rgba(255,255,255,.05), 5px 5px 14px rgba(0,0,0,.55)',
-  '--sx-e-card': '-6px -6px 14px rgba(255,255,255,.04), 6px 6px 18px rgba(0,0,0,.55)',
-  '--sx-e-chip': '-2px -2px 6px rgba(255,255,255,.035), 2px 2px 8px rgba(0,0,0,.45)',
+  '--sx-e-1': '-3px -3px 8px rgba(255,255,255,.04), 3px 4px 10px rgba(0,0,0,.5), inset 1px 1px 1px rgba(255,255,255,.06), inset -1px -2px 4px rgba(0,0,0,.25)',
+  '--sx-e-2': '-5px -5px 12px rgba(255,255,255,.05), 5px 6px 14px rgba(0,0,0,.55), inset 1px 1px 1px rgba(255,255,255,.07), inset -1px -2px 5px rgba(0,0,0,.28)',
+  '--sx-e-card': '-7px -7px 16px rgba(255,255,255,.04), 7px 8px 20px rgba(0,0,0,.55), inset 1px 1px 1px rgba(255,255,255,.06), inset -2px -3px 7px rgba(0,0,0,.25)',
+  '--sx-e-chip': '-2px -2px 6px rgba(255,255,255,.035), 2px 3px 8px rgba(0,0,0,.45), inset 1px 1px 0 rgba(255,255,255,.05)',
   '--sx-e-primary': '-3px -3px 8px rgba(255,255,255,.04), 3px 3px 12px color-mix(in srgb, var(--sx-accent) 30%, transparent)',
   '--sx-e-nav': 'var(--sx-e-1)',
   '--sx-btn-solid': 'var(--sx-accent)',
