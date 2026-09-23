@@ -154,6 +154,15 @@
   .info .mk      { color: var(--sx-info); }
   .neutral .mk   { color: var(--sx-neutral); }
 
+  /* LA ACCIÓN DEL AVISO HABLA EN SU TONO. Un botón teñido toma el acento del
+     módulo; sobre la banda de un aviso crítico eso era un verde oliva sobre
+     rosa (Costeo) — dos colores discutiendo cuál manda. Adentro de `.acts` el
+     acento se vuelve el tono del aviso, así el botón es del aviso. */
+  .positive  .acts { --sx-accent: var(--sx-positive); }
+  .attention .acts { --sx-accent: var(--sx-attention); }
+  .critical  .acts { --sx-accent: var(--sx-critical); }
+  .info      .acts { --sx-accent: var(--sx-info); }
+
   @media (pointer: coarse) {
     .alert { padding: var(--sx-s-4); }
     /* The ✕ is the smallest thing on the band and the one most often pressed

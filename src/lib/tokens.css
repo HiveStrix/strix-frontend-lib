@@ -99,6 +99,7 @@
   --sx-banda-tint: 22%;
   --sx-banda-ink: var(--sx-ink);
   --sx-banda-remap: 0%;
+  --sx-banda-alarm: 0;
   --sx-pill-line: transparent;
   --sx-nav-pick: 0%;
   --sx-pg-raise: 100%;

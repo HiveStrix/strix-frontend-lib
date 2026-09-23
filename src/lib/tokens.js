@@ -449,6 +449,9 @@ export const TOKENS = {
   '--sx-banda-tint': '22%',
   '--sx-banda-ink': 'var(--sx-ink)',
   '--sx-banda-remap': '0%',
+  // Una banda con `tone` attention/critical se oscurece con tinta en main (1);
+  // sobre el pastel eso da barro, así que la variante no (0).
+  '--sx-banda-alarm': '0',
   // Pill: en Stitch las pills de estado son un hueco teñido, sin filo.
   '--sx-pill-line': 'transparent',
   // SidebarItems: el ítem activo es superficie levantada (--sx-e-nav), sin el

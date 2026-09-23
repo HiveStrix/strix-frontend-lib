@@ -468,8 +468,12 @@
    * El estado no se queda mudo: el título ya dice la palabra («Una celda está
    * en negativo»), que es lo que la regla de la casa pide —el color decora un
    * reclamo que el contenido ya hace, nunca lo hace solo—. */
-  .hd.banda.attention { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) 92%, var(--sx-ink)); }
-  .hd.banda.critical  { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) 82%, var(--sx-ink)); }
+  /* `--sx-banda-alarm` (0|1) es cuánto de eso aplica. Sobre el acento pleno de
+     main, oscurecer se lee como alarma; sobre el pastel de la variante (22 %),
+     la tinta lo vuelve barro (Costeo con alertas: un oliva gris). La variante
+     lo apaga: el reclamo ya lo hacen el título y el Alert de abajo. */
+  .hd.banda.attention { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) calc(100% - 8% * var(--sx-banda-alarm, 1)), var(--sx-ink)); }
+  .hd.banda.critical  { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) calc(100% - 18% * var(--sx-banda-alarm, 1)), var(--sx-ink)); }
   /* `.hd.banda .ttl` (0,2,1) le gana a `.critical .ttl` (0,2,0): el título de
      una banda toma SIEMPRE su `--banda-ink` (el tono ya viajó al relleno). */
   .hd.banda .ttl { color: var(--banda-ink); }
