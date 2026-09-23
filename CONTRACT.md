@@ -114,24 +114,31 @@ aire— y conserva un margen parejo contra el borde y contra su vecino.
   (cláusula 1); el de abajo, su propio margen. Así el shell y el core se leen
   como un objeto, no como una pegatina superpuesta.
 
-## 6 · Un solo lienzo — el shell adopta el tono del core embebido
+## 6 · Una sola aplicación — el shell adopta la atmósfera del core embebido
 
-El fondo de cada core tiene su propio tinte (`--sx-chrome-tint`): montarlo sin
-más lo delata como un objeto ajeno pegado sobre otro —el blanco cálido de un
-módulo contra el frío del shell—. Como esos tonos son **tokens**, nunca hex
-clavados (regla 1 del README), y el core los define en su `:host`, el shell los
-**lee y los adopta** mientras dura la ruta del módulo.
+El shell **no tiene luz propia** mientras hay un módulo montado. Cada core trae
+su atmósfera —su lienzo, su superficie, su pozo, sus grises, la luz y la sombra
+de su arcilla y su acento— y el shell la **lee y la adopta** mientras dura la
+ruta del módulo. La pantalla se lee como UNA aplicación, la del módulo: un
+Mantenimiento crema con sombra ocre no queda apilado dentro de un shell lila.
 
-- El shell espeja la **rampa de cromo** del core —el tinte NEUTRO: los grises
-  `--sx-n-*`, `--sx-ground`, `--sx-thead`— en su documento con
-  `adoptPalette(coreEl)` (de `@strix/frontend-lib/tokens`) y la suelta con
-  `releasePalette()` al desmontar. Chrome y core pasan a compartir un mismo
-  lienzo.
-- El **acento NO se adopta**: cada módulo guarda el suyo (el shell su cobalto,
-  un core su ámbar). Se unifica el fondo, no la marca — la regla 2 sigue en pie:
-  el color con significado no se mezcla entre módulos.
-- Es **dinámico**: al montar otro core, el shell se adapta a su tono; fuera de la
-  ruta del módulo, vuelve a su propio tema.
+- **El core emite su arcilla.** En su `:host`, después de `hostTokens()` y
+  `hostTokensDark()`, declara `clayHost(acento)`: la receta del lila girada al
+  tono de su acento (misma luz, misma saturación, mismo volumen — cambia hacia
+  qué color tira). Precomputada en JS, nunca `color-mix` en CSS. Declara su
+  acento (claro y oscuro) como siempre.
+- **El shell adopta todo** con `adoptPalette(coreEl)` (de
+  `@strix/frontend-lib/tokens`): la rampa (`RAMP_TOKENS`), el acento y la
+  elevación — la lista completa es `PALETTE_TOKENS`. La suelta con
+  `releasePalette()` al salir de la ruta del módulo, y vuelve a adoptar cuando
+  cambia el tema (la adopción vive en el `style` del documento y le gana al
+  oscuro de `tokens.css`).
+- **El acento SÍ se adopta.** Antes cada módulo guardaba el suyo y el shell el
+  propio; eso dejaba dos marcas en una pantalla. Se revierte a pedido del
+  usuario (2026-09-23): el ítem activo del riel, el foco y los botones del shell
+  toman el acento del módulo en el que se está.
+- Es **dinámico**: al montar otro core, el shell toma su atmósfera; fuera de la
+  ruta del módulo (el tablero, los ajustes), vuelve a la suya — el lila.
 
 > **Excepción legal:** un core que deliberadamente pinta a sangre su propio
 > lienzo oscuro (una isla, un tablero de sala de control) no ofrece tono neutro

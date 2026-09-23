@@ -56,7 +56,9 @@
 
 <style>
   .well {
-    --w-hue: var(--sx-accent);
+    /* `--sx-accent-well`: el acento oscurecido hasta que su pozo se lee (la
+       arcilla del módulo lo calcula; ver clayTokens). Sin arcilla, el acento. */
+    --w-hue: var(--sx-accent-well, var(--sx-accent));
     display: inline-grid;
     place-items: center;
     flex: none;

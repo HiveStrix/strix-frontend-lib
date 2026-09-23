@@ -21,7 +21,7 @@
 // ── The system itself ────────────────────────────────────────────────────
 // The tokens as data and as CSS-for-a-shadow-root; the five tone marks; the
 // three type registers. See README.md for which shape a given app needs.
-export { TOKENS, TOKENS_DARK, hostTokens, hostTokensDark, hostBase, stylesheet } from './tokens.js';
+export { TOKENS, TOKENS_DARK, hostTokens, hostTokensDark, hostBase, stylesheet, clayHost, clayTokens } from './tokens.js';
 export { MARKS, TONES, markOf } from './marks.js';
 
 // ── The signature ────────────────────────────────────────────────────────

@@ -100,6 +100,213 @@ export const chromeRampDark = (tint) => ({
 const CHROME = chromeRamp(TINT);
 const CHROME_DARK = chromeRampDark(TINT);
 
+// ─────────────────────────────────────────────────────────────────────────
+// LA ARCILLA DE CADA MÓDULO (variante colorida). Pedido del usuario: la Shell
+// no tiene luz propia — adopta el fondo, el brillo y el acento del core que
+// está montado, y cada core tiene la SUYA: Mantenimiento, un blanco amarillento
+// con sombras cálidas; Clientes, uno rosado. Antes todos los cores emitían el
+// mismo lila y la misma sombra violeta y sólo cambiaban el acento, así que un
+// Mantenimiento amarillo dentro del Shell lila se leía como dos aplicaciones
+// apiladas.
+//
+// LA RECETA ES LA DEL LILA, GIRADA. Cada rol (lienzo, superficie, pozo, la
+// traza de los grises, la sombra de la arcilla) guarda la LUMINOSIDAD y la
+// SATURACIÓN (OKLCH L y C) que tiene hoy en el lila, y toma el TONO (h) del
+// acento del módulo. Así el violeta por defecto se reproduce idéntico y los
+// demás módulos tienen exactamente el mismo volumen, la misma profundidad y
+// el mismo contraste — sólo cambia hacia qué color tira la arcilla. Si el
+// color no entra en sRGB a esa saturación, se baja la saturación, nunca la luz.
+//
+// PRECOMPUTADO, COMO EL CROMO (ver el banner de arriba): hex y rgba literales,
+// nunca color-mix en CSS.
+// ─────────────────────────────────────────────────────────────────────────
+const toLin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+const toGam = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+
+/** hex → [L, C, h°] en OKLCH (Björn Ottosson). */
+export const oklchOf = (h) => {
+  const [r, g, b] = rgbOf(h).map((v) => toLin(v / 255));
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return [L, Math.hypot(A, B), ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360];
+};
+
+const rgbFromOklch = (L, C, h) => {
+  const a = C * Math.cos((h * Math.PI) / 180), b = C * Math.sin((h * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  return [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s
+  ].map(toGam);
+};
+
+/** [L, C, h°] → hex. Fuera de sRGB baja la saturación (nunca la luz). */
+export const hexOfOklch = (L, C, h) => {
+  let c = C, rgb = rgbFromOklch(L, c, h);
+  while (c > 0 && rgb.some((v) => v < -1e-4 || v > 1 + 1e-4)) { c -= 0.002; rgb = rgbFromOklch(L, Math.max(c, 0), h); }
+  return '#' + rgb.map((v) => Math.round(Math.min(1, Math.max(0, v)) * 255).toString(16).padStart(2, '0').toUpperCase()).join('');
+};
+
+// Los roles de la arcilla y el color del lila del que sale cada receta. Los
+// hex son los de TOKENS: si el lila cambia allá, hay que cambiarlo acá.
+const CLAY_REF = {
+  '--sx-ground': '#EFEBF8',
+  '--sx-surface': '#F6F3FC',
+  '--sx-sunk': '#E6E1F1',
+  shadow: '#6541BE',   // rgba(101,65,190,·): la sombra de la arcilla
+  float: '#4C3496'     // rgba(76,52,150,·): la de lo que flota (--sx-e-3)
+};
+const CLAY_LC = Object.fromEntries(Object.entries(CLAY_REF).map(([k, v]) => [k, oklchOf(v)]));
+
+/** El tono de la arcilla para un acento. Un acento casi gris no tiene tono que
+ *  prestar: cae al del lila, que es el del sistema. */
+const clayHue = (accent) => {
+  const [, C, h] = oklchOf(accent);
+  return C < 0.03 ? oklchOf(TINT)[2] : h;
+};
+// Cada rol conserva su CORRIMIENTO de tono respecto de la traza (el lienzo lila
+// no tira exactamente al mismo matiz que #6541BE): se gira el conjunto, no se
+// aplana. Con el acento violeta, el giro es cero y sale el lila tal cual.
+const TINT_H = oklchOf(TINT)[2];
+const rot = (role, h) => { const [L, C, h0] = CLAY_LC[role]; return hexOfOklch(L, C, (h0 - TINT_H + h + 360) % 360); };
+const rgba = (hex, a) => `rgba(${rgbOf(hex).join(',')},${a})`;
+const lumOf = (hex) => { const [r, g, b] = rgbOf(hex).map((v) => toLin(v / 255)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+/** La razón WCAG entre dos hex — la misma que mide scripts/contrast.mjs. */
+const ratioOf = (a, b) => { const [x, y] = [lumOf(a), lumOf(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+// ΔE2000 (Sharma, Wu y Dalal 2005), para que la fila elegida de un módulo no
+// se confunda con la banda de un estado. Es la misma fórmula que mide
+// scripts/contrast.mjs, escrita otra vez a propósito: el arnés es la regla con
+// la que se controla esto, no se importa de acá.
+const labOf = (hex) => {
+  const [R, G, B] = rgbOf(hex).map((v) => toLin(v / 255));
+  const f = (t) => (t > (6 / 29) ** 3 ? Math.cbrt(t) : t / (3 * (6 / 29) ** 2) + 4 / 29);
+  const fx = f((0.4124564 * R + 0.3575761 * G + 0.1804375 * B) / 0.95047);
+  const fy = f(0.2126729 * R + 0.7151522 * G + 0.072175 * B);
+  const fz = f((0.0193339 * R + 0.119192 * G + 0.9503041 * B) / 1.08883);
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+};
+const dE = (x, y) => {
+  const [L1, a1, b1] = labOf(x), [L2, a2, b2] = labOf(y);
+  const rad = (d) => (d * Math.PI) / 180, deg = (r) => (r * 180) / Math.PI;
+  const C7 = ((Math.hypot(a1, b1) + Math.hypot(a2, b2)) / 2) ** 7;
+  const G = 0.5 * (1 - Math.sqrt(C7 / (C7 + 25 ** 7)));
+  const A1 = a1 * (1 + G), A2 = a2 * (1 + G);
+  const C1 = Math.hypot(A1, b1), C2 = Math.hypot(A2, b2);
+  const hp = (a, b) => (a === 0 && b === 0 ? 0 : (deg(Math.atan2(b, a)) + 360) % 360);
+  const h1 = hp(A1, b1), h2 = hp(A2, b2);
+  let dh = C1 * C2 === 0 ? 0 : Math.abs(h2 - h1) <= 180 ? h2 - h1 : h2 - h1 > 180 ? h2 - h1 - 360 : h2 - h1 + 360;
+  const dH = 2 * Math.sqrt(C1 * C2) * Math.sin(rad(dh / 2));
+  const Lb = (L1 + L2) / 2, Cb = (C1 + C2) / 2;
+  const hb = C1 * C2 === 0 ? h1 + h2 : Math.abs(h1 - h2) <= 180 ? (h1 + h2) / 2 : h1 + h2 < 360 ? (h1 + h2 + 360) / 2 : (h1 + h2 - 360) / 2;
+  const T = 1 - 0.17 * Math.cos(rad(hb - 30)) + 0.24 * Math.cos(rad(2 * hb)) + 0.32 * Math.cos(rad(3 * hb + 6)) - 0.2 * Math.cos(rad(4 * hb - 63));
+  const Cb7 = Cb ** 7, Rt = -Math.sin(rad(60 * Math.exp(-(((hb - 275) / 25) ** 2)))) * 2 * Math.sqrt(Cb7 / (Cb7 + 25 ** 7));
+  const tL = (L2 - L1) / (1 + (0.015 * (Lb - 50) ** 2) / Math.sqrt(20 + (Lb - 50) ** 2));
+  const tC = (C2 - C1) / (1 + 0.045 * Cb), tH = dH / (1 + 0.015 * Cb * T);
+  return Math.sqrt(tL * tL + tC * tC + tH * tH + Rt * tC * tH);
+};
+const TONE_BANDS = ['#DDF0E4', '#FCEBD0', '#FCDDE3', '#E2E8F7', '#EDEBF3']; // positive, attention, critical, info, neutral
+
+const INK = '#201E29';
+const wellOf = (accent, sunk) => {
+  let c = accent;
+  while (ratioOf(mixHex(c, 66, INK), mixHex(c, 16, sunk)) < 3.05) c = mixHex('#000000', 2, c);
+  return c;
+};
+/** El menor porcentaje de `accent` sobre `base`, desde `from`, que cumple `ok`. */
+const washOf = (accent, base, from, ok) => {
+  for (let p = from; p <= 60; p++) { const c = mixHex(accent, p, base); if (ok(c)) return [c, p]; }
+  return [mixHex(accent, 60, base), 60];
+};
+
+/**
+ * Los tokens de la arcilla de un módulo, claro y oscuro, a partir de su acento.
+ * Lo que devuelve es exactamente lo que la Shell adopta (ver PALETTE_TOKENS).
+ * @param {string} accent  el `--sx-accent` claro del módulo (hex #RRGGBB)
+ */
+export function clayTokens(accent) {
+  const h = clayHue(accent);
+  const tint = h === TINT_H ? TINT : hexOfOklch(oklchOf(TINT)[0], oklchOf(TINT)[1], h);
+  const S = rot('shadow', h), F = rot('float', h);
+  const ground = rot('--sx-ground', h), surface = rot('--sx-surface', h), sunk = rot('--sx-sunk', h);
+  const ramp = chromeRamp(tint);
+  // EL BORDE, MEDIDO. --sx-edge aterriza en n-400; según el tono, la misma
+  // traza da un gris un pelo más claro y un segmento de StackedBar sobre el
+  // pozo quedaba en 2.999 (Costeo). Se oscurece de a 1 % hasta que pasa.
+  while (ratioOf(mixHex(ramp['--sx-n-400'], 90, sunk), sunk) < 3.05 || ratioOf(ramp['--sx-n-400'], surface) < 3.05) {
+    ramp['--sx-n-400'] = mixHex('#000000', 1, ramp['--sx-n-400']);
+  }
+  // LOS LAVADOS DEL ACENTO, MEDIDOS CONTRA ESTA ARCILLA. La receta de la lib
+  // mezcla el acento contra blanco fijo (14 / 18 / 28 %). Sobre la superficie
+  // crema de Mantenimiento, un amarillo al 14 % queda IGUAL a ella (1.001) y el
+  // hover desaparece. Así que se busca el menor porcentaje, desde el de la
+  // receta, que se despegue: el hover de la superficie y del lienzo, la
+  // selección del hover. Precomputado en hex.
+  // La base es la de la receta —blanco fijo—, así el violeta sale igual que
+  // siempre (14 / 18 %) y sólo el acento que no se despega sube de porcentaje.
+  const [soft, ps] = washOf(accent, '#FFFFFF', 14, (c) => ratioOf(c, surface) >= 1.05 && ratioOf(c, ground) >= 1.05);
+  // La selección: se despega del hover y se LEE (tinta terciaria 4.5, borde
+  // 3.0 — obligatorio). Y, si se puede sin romper eso, lejos de las bandas de
+  // estado (ΔE ≥ 5.6, el piso del arnés con margen). Cuando las dos cosas
+  // chocan (un acento rosa contra la banda de «crítico»), manda que se lea: el
+  // choque de familia lo decide el acento del módulo, igual que en la clase 3
+  // del arnés, y queda informado ahí.
+  const reads = (c) => ratioOf(c, soft) >= 1.05 && ratioOf(ramp['--sx-n-500'], c) >= 4.55 && ratioOf(ramp['--sx-n-400'], c) >= 3.02;
+  const from = Math.max(18, ps + 4);
+  let [pick] = washOf(accent, '#FFFFFF', from, (c) => reads(c) && TONE_BANDS.every((b) => dE(c, b) >= 5.6));
+  if (!reads(pick)) [pick] = washOf(accent, '#FFFFFF', from, reads);
+  const light = {
+    ...ramp,
+    '--sx-ground': ground,
+    '--sx-thead': ground,
+    '--sx-surface': surface,
+    '--sx-sunk': sunk,
+    '--sx-accent-soft': soft,
+    '--sx-accent-pick': pick,
+    // El filo del acento, desde el 28 % de la receta hasta que se despegue de
+    // la superficie como el del violeta (1.4): un amarillo al 28 % es un filo
+    // que no se ve (Mantenimiento lo había subido a mano al 55 %).
+    '--sx-accent-edge': washOf(accent, '#FFFFFF', 28, (c) => ratioOf(c, surface) >= 1.4)[0],
+    // EL POZO DEL ACENTO. IconWell sin `hue` tiñe con el acento: el ícono al
+    // 66 % contra la tinta sobre un pozo al 16 %. Con un acento CLARO (el ámbar
+    // de Mantenimiento) el ícono daba 2.57 (piso 3). Acá el acento se oscurece
+    // de a 2 % hasta que su pozo se lee; con un acento oscuro queda igual.
+    '--sx-accent-well': wellOf(accent, sunk),
+    '--sx-e-1': `-3px -3px 8px rgba(255,255,255,.7), 3px 4px 10px ${rgba(S, .22)}, inset 1px 1px 1px rgba(255,255,255,.6), inset -1px -2px 4px ${rgba(S, .07)}`,
+    '--sx-e-2': `-5px -5px 12px rgba(255,255,255,.7), 5px 6px 14px ${rgba(S, .26)}, inset 1px 1px 1px rgba(255,255,255,.65), inset -1px -2px 5px ${rgba(S, .08)}`,
+    '--sx-e-card': `-7px -7px 16px rgba(255,255,255,.7), 7px 8px 20px ${rgba(S, .24)}, inset 1px 1px 1px rgba(255,255,255,.65), inset -2px -3px 7px ${rgba(S, .07)}`,
+    '--sx-e-chip': `-2px -2px 6px rgba(255,255,255,.7), 2px 3px 8px ${rgba(S, .16)}, inset 1px 1px 0 rgba(255,255,255,.6)`,
+    '--sx-e-3': `0 2px 6px -2px ${rgba(F, .10)}, 0 26px 56px -18px ${rgba(F, .32)}`,
+    '--sx-e-sunk': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px rgba(255,255,255,.75)`,
+    '--sx-e-well': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px rgba(255,255,255,.75)`,
+    '--sx-e-pill': `inset 1.5px 1.5px 3px ${rgba(S, .14)}, inset -1.5px -1.5px 3px rgba(255,255,255,.75)`
+  };
+  // El oscuro: la misma traza en la rampa oscura (pozo, raya, tintas). Sus
+  // sombras son negras y su luz casi nula en todos los módulos — ahí la arcilla
+  // no tira hacia ningún color, así que no se re-declaran.
+  // En oscuro el pozo del acento vuelve a ser el acento (oscuro) del módulo.
+  const dark = { ...chromeRampDark(tint), '--sx-accent-well': 'var(--sx-accent)' };
+  return { light, dark };
+}
+
+/**
+ * La arcilla del módulo como CSS para su `:host`, claro y oscuro. Va DESPUÉS de
+ * `hostTokens()` y `hostTokensDark()` en el mismo <style>:
+ *
+ *   const styles = hostTokens() + hostTokensDark() + clayHost('#F7B500') + hostBase();
+ */
+export const clayHost = (accent, selector = ':host', darkSelector = ':host([data-sx-theme="dark"])') => {
+  const { light, dark } = clayTokens(accent);
+  const d = (o) => Object.entries(o).map(([k, v]) => `  ${k}: ${v};`).join('\n');
+  return `${selector} {\n${d(light)}\n}\n${darkSelector} {\n${d(dark)}\n}\n`;
+};
+
 /** The light theme: role tokens, tones, and the scales. */
 export const TOKENS = {
   // LA PERILLA DEL CROMO, ahora INFORMATIVA: declara qué traza lleva la rampa,
@@ -921,17 +1128,39 @@ export const RAMP_TOKENS = [
 ];
 
 /**
- * Hace que `target` (por defecto, el documento) adopte la rampa de cromo de
- * `sourceEl` — típicamente el `:host` de un core embebido. Así el chrome del
- * shell (rieles) y el core comparten un mismo fondo y se leen como un objeto.
+ * Hace que `target` (por defecto, el documento) adopte la atmósfera de
+ * `sourceEl` — típicamente el `:host` de un core embebido: su rampa, su acento
+ * y su elevación (PALETTE_TOKENS). Así el chrome del shell (rieles, barra,
+ * tarjetas) y el core son una sola aplicación, no un módulo pegado encima.
  * Revertir con `releasePalette`. Ver CONTRACT §6.
  * @param {Element} sourceEl  el elemento cuyo tono se copia (el `:host` del core)
  * @param {HTMLElement} [target]  dónde aplicarlo (default: `document.documentElement`)
  */
+// LA SHELL NO TIENE LUZ PROPIA (pedido del usuario, 2026-09-23). Con la
+// arcilla por módulo (`clayHost`), adoptar sólo el lienzo no alcanza: la barra
+// lateral seguía con la sombra violeta y el acento del Shell al lado de un
+// Mantenimiento crema con sombra ocre — dos aplicaciones apiladas. Ahora la
+// Shell adopta TODO lo que hace a la atmósfera del módulo: la rampa, el
+// acento y la elevación (la luz y la sombra de la arcilla). Revierte la regla
+// vieja «el acento NO se adopta» de CONTRACT §6: mientras hay un módulo
+// montado, la pantalla es UNA sola aplicación, la del módulo.
+//
+// Los alias (`--sx-line: var(--sx-n-150)`, `--sx-halo`, `--sx-e-nav`,
+// `--sx-e-field`, `--sx-field`, `--sx-e-primary`…) no hace falta copiarlos: se
+// re-resuelven solos en `:root` en cuanto su token de base queda adoptado ahí.
+// `--sx-line`, `--sx-ink` y `--sx-ink-2` sí: en oscuro son literales teñidos.
+export const PALETTE_TOKENS = [
+  ...RAMP_TOKENS,
+  '--sx-line', '--sx-ink', '--sx-ink-2',
+  '--sx-accent', '--sx-accent-ink', '--sx-accent-soft', '--sx-accent-pick', '--sx-accent-edge', '--sx-accent-well',
+  '--sx-e-1', '--sx-e-2', '--sx-e-card', '--sx-e-chip', '--sx-e-3',
+  '--sx-e-sunk', '--sx-e-well', '--sx-e-pill'
+];
+
 export function adoptPalette(sourceEl, target = document.documentElement) {
   if (!sourceEl || !target) return;
   const cs = getComputedStyle(sourceEl);
-  for (const t of RAMP_TOKENS) {
+  for (const t of PALETTE_TOKENS) {
     const v = cs.getPropertyValue(t).trim();
     if (v) target.style.setProperty(t, v);
   }
@@ -944,5 +1173,5 @@ export function adoptPalette(sourceEl, target = document.documentElement) {
  */
 export function releasePalette(target = document.documentElement) {
   if (!target) return;
-  for (const t of RAMP_TOKENS) target.style.removeProperty(t);
+  for (const t of PALETTE_TOKENS) target.style.removeProperty(t);
 }

@@ -118,8 +118,9 @@ juguete. La escaneabilidad y el estado mandan sobre la expresión.
 
 ## Colors
 
-- **Lienzo** `#EFEBF8`: el fondo de toda pantalla. Es lila porque la luz blanca de
-  afuera sólo existe sobre un fondo que no es blanco.
+- **Lienzo** `#EFEBF8` (el del Tablero; cada módulo el suyo, ver abajo): el fondo
+  de toda pantalla. Tiene color porque la luz blanca de afuera sólo existe sobre
+  un fondo que no es blanco.
 - **Superficie** `#F6F3FC`: lo que se levanta (contenedores, controles, fichas).
 - **Pozo** `#E6E1F1`: lo que se hunde (campos, bandejas, rieles, contadores, pozos
   de ícono). Tiene que ser hondo: con un pozo claro, todo lo hundido se aplana.
@@ -137,6 +138,12 @@ juguete. La escaneabilidad y el estado mandan sobre la expresión.
 
 Un matiz no dice un estado y un tono no identifica una cosa. Para decir «vencido»
 va una `Pill` de tono `critical` con su palabra, no un pozo coral.
+
+**La arcilla de cada módulo.** El lila es el del Tablero. Cada módulo lleva la
+misma arcilla girada al tono de su acento (`clayHost`): Mantenimiento un crema
+con sombra ocre, Clientes un rosado, Facturación una menta. Misma luz y misma
+saturación por rol, así que el volumen y el contraste son los mismos en todos.
+El Shell no tiene luz propia: adopta la del módulo montado, acento incluido.
 
 **Matiz por módulo** (el pozo del módulo en la barra lateral y en sus widgets):
 Tablero `violet` · Mantenimiento `amber` · Inventario `indigo` · Clientes `coral` ·
@@ -288,9 +295,11 @@ y `--sx-sticky-top` (lo que ya está pegado arriba de un `PageHeader sticky`).
 1. `package.json`: `"@strix/frontend-lib": "github:HiveStrix/strix-frontend-lib#design/variante-colorida"`,
    y `npm install` fuera de iCloud. Verificar la versión en disco: el lock
    miente «up to date».
-2. Tema del módulo: quedarse con su **acento** y sacar la rampa propia
-   (`chromeRamp(...)`), porque el lienzo lila es de todos. Si no, al entrar al
-   módulo el Shell adopta otra rampa y se rompe la familia.
+2. Tema del módulo: su **acento** (claro y oscuro) y su **arcilla**,
+   `clayHost(acento)` después de `hostTokens() + hostTokensDark()`. Nada de
+   rampas a mano (`--sx-thead`, `--sx-ground`, `chromeRamp(...)` sueltos): la
+   arcilla del módulo es la receta del lila girada a su tono, y el Shell la
+   adopta entera junto con el acento (CONTRACT §6).
 3. Encabezado: `PageHeader variant="banda"`.
 4. Barrer la vista buscando contenido suelto sobre el lienzo y ponerle su pieza:
    contenedor, bandeja o ficha.

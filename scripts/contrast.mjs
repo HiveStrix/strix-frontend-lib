@@ -57,7 +57,7 @@
 // mide exactamente eso — dos tokens, resueltos, comparados ENTRE SÍ, nunca
 // contra un fondo— y es la razón por la que el archivo se llama «contraste» y
 // no «legibilidad»: hasta ahora medía sólo la mitad de lo que promete.
-import { TOKENS, TOKENS_DARK } from '../src/lib/tokens.js';
+import { TOKENS, TOKENS_DARK, clayTokens } from '../src/lib/tokens.js';
 
 const hex = (h) => {
   const s = h.length === 4 ? h.slice(1).split('').map((c) => c + c).join('') : h.slice(1);
@@ -313,7 +313,7 @@ const CHECKS = [
   ['color-mix(in srgb, var(--sx-hue-amber) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-amber) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · amber'],
   ['color-mix(in srgb, var(--sx-hue-sage) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-sage) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · sage'],
   ['color-mix(in srgb, var(--sx-hue-indigo) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-indigo) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · indigo'],
-  ['color-mix(in srgb, var(--sx-accent) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-accent) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · acento'],
+  ['color-mix(in srgb, var(--sx-accent-well, var(--sx-accent)) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-accent-well, var(--sx-accent)) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · acento'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
@@ -774,7 +774,60 @@ if (detalle.length) {
     }
   }
 }
-console.log(malas ? `\n${malas} comprobacion(es) fallando en la matriz` : '\nla matriz entera pasa: 4 combinaciones, 0 fallas (legibilidad y distinguibilidad)');
+// ── LA ARCILLA DE CADA MÓDULO — el mismo contrato, girado a cada acento ──────
+//
+// Cada core declara `clayHost(acento)`: la receta del lila girada al tono de su
+// acento (tokens.js, «LA ARCILLA DE CADA MÓDULO»). Guarda la luz y la
+// saturación de cada rol, así que en teoría mide lo mismo que el lila — pero
+// «en teoría» es la frase que este archivo existe para no creer. Corren las
+// DOS clases, en claro y en oscuro, con el acento REAL de cada módulo, y suman
+// a `malas`: un módulo cuya arcilla no se lee es un defecto de esta librería,
+// no del módulo, porque la receta es de acá.
+// [módulo, acento claro, tinta sobre el acento] — los que declara cada core.
+const MODULES = [
+  ['mantenimiento', '#F7B500', '#1B1B1E'], ['inventario', '#1D4ED8', '#FFFFFF'], ['clientes', '#BE185D', '#FFFFFF'],
+  ['facturación', '#0C6E68', '#FFFFFF'], ['costeo', '#4D7C0F', '#FFFFFF'], ['gastos y compras', '#B45309', '#FFFFFF'],
+  ['bandeja de entrada', '#6541BE', '#FFFFFF'], ['divisiones', '#4F46E5', '#FFFFFF']
+];
+const modResumen = [];
+const modInfo = [];
+for (const [mod, acc, accInk] of MODULES) {
+  const { light, dark } = clayTokens(acc);
+  for (const [tema, tokens] of [
+    ['claro', { ...TOKENS, ...light, '--sx-accent': acc, '--sx-accent-ink': accInk }],
+    ['oscuro', { ...TOKENS, ...light, ...TOKENS_DARK, ...dark }]
+  ]) {
+    const fails = [
+      ...evalContract(tokens).map((f) => ({ ...f, clase: 'legibilidad' })),
+      ...evalDistinct(tokens).map((f) => ({ ...f, clase: 'distinguibilidad' }))
+    ];
+    // LA SELECCIÓN CONTRA LAS BANDAS DE ESTADO (clase 3, la de ΔE2000), sólo
+    // en claro: el lavado de la selección lo calcula esta librería por módulo,
+    // así que un choque con «por vencer» sería un defecto de acá.
+    if (tema === 'claro') {
+      const pick = resolve(tokens['--sx-accent-pick'], tokens);
+      for (const tone of TONES) {
+        const band = resolve(tokens[`--sx-${tone}-band`], tokens);
+        const d = deltaE(pick, band);
+        // Informativo, como la clase 3 para cualquier acento que no es el de la
+        // librería: si un rosa choca con «crítico», lo decide el módulo.
+        if (d < ACCENT_MIN) modInfo.push(`${mod}: la fila elegida queda a ΔE ${d.toFixed(2)} de --sx-${tone}-band (piso ${ACCENT_MIN}) — choque de familia del acento`);
+      }
+    }
+    malas += fails.length;
+    modResumen.push({ label: `${mod} · ${tema}`, fails });
+  }
+}
+console.log('\n── LA ARCILLA DE CADA MÓDULO (clayHost) — mismo contrato, cada acento ──');
+for (const i of modInfo) console.log('  informativo · ' + i);
+for (const r of modResumen) {
+  console.log(`${r.label.padEnd(32)} ${r.fails.length ? r.fails.length + ' FALLAN' : 'pasa'}`);
+  for (const f of r.fails) {
+    console.log(`    ${String(f.fg).padEnd(22)} ${String(f.bg ?? '').padEnd(19)} ${f.r != null ? f.r.toFixed(3) : ''}  ${f.min ?? ''}  ${f.checkLabel}`);
+  }
+}
+
+console.log(malas ? `\n${malas} comprobacion(es) fallando en la matriz` : '\nla matriz entera pasa: 4 combinaciones, 0 fallas (legibilidad y distinguibilidad); y la arcilla de los 8 módulos, en claro y oscuro');
 
 // Las líneas de abajo son informativas (no suman a `malas`) y se miden una
 // sola vez, sobre el claro con la perilla por defecto: no cambian de rol
