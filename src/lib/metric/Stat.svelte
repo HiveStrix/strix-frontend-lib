@@ -71,8 +71,11 @@
   export let loading = false;
   /** What went wrong AND how to recover. Both, or it is half a message. */
   export let error = '';
+  // El texto de fábrica, para saber cuándo `empty` lo puso el componente y
+  // cuándo lo escribió quien lo usa.
+  const EMPTY = 'Sin datos todavía';
   /** The sentence that replaces the figure when there is no data. Invite the action. */
-  export let empty = 'Sin datos todavía';
+  export let empty = EMPTY;
   /** The figure IS the door: renders as a link. */
   export let href = undefined;
   /** The figure IS the door: renders as a button and forwards `click`. */
@@ -153,9 +156,10 @@
       </svg>
       <span>{error}</span>
     </p>
-  {:else if blank && !loading && !note}
+  {:else if blank && !loading && !(note && empty === EMPTY)}
     <!-- Con `note`, la nota ya dice por qué no hay cifra: el «Sin datos todavía»
-         de fábrica encima contradecía el motivo real. -->
+         DE FÁBRICA encima contradecía el motivo real. Un `empty` escrito por
+         quien usa el componente se dibuja igual: es una afirmación suya. -->
     <p class="line off">{empty}</p>
   {:else if dir}
     <p class="line delta d-{dTone}">
