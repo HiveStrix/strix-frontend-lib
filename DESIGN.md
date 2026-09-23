@@ -197,7 +197,7 @@ la pieza que contiene el texto, no de tamaños gritados.
 
 Dos direcciones y cuatro alturas. Los valores están en `tokens.js`.
 
-**Levantado:** luz `#FFF` afuera arriba-izquierda, sombra violeta afuera
+**Levantado:** luz blanca al 70 % afuera arriba-izquierda (plena encandilaba), sombra violeta afuera
 abajo-derecha, y, en super clay, un filo de luz y un volumen violeta adentro.
 
 | Token | Para qué |

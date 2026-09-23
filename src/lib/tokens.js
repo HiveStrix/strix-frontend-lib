@@ -345,13 +345,17 @@ export const TOKENS = {
   // suma, ADENTRO, un filo de luz de 1 px arriba-izquierda y un volumen violeta
   // abajo-derecha. Afuera sigue mandando la luz blanca de Stitch; adentro la
   // pieza se abulta en vez de ser una lámina con sombra.
-  '--sx-e-1': '-3px -3px 8px #FFFFFF, 3px 4px 10px rgba(101,65,190,.22), inset 1px 1px 1px rgba(255,255,255,.85), inset -1px -2px 4px rgba(101,65,190,.07)',
-  '--sx-e-2': '-5px -5px 12px #FFFFFF, 5px 6px 14px rgba(101,65,190,.26), inset 1px 1px 1px rgba(255,255,255,.9), inset -1px -2px 5px rgba(101,65,190,.08)',
-  '--sx-e-card': '-7px -7px 16px #FFFFFF, 7px 8px 20px rgba(101,65,190,.24), inset 1px 1px 1px rgba(255,255,255,.9), inset -2px -3px 7px rgba(101,65,190,.07)',
-  '--sx-e-chip': '-2px -2px 6px #FFFFFF, 2px 3px 8px rgba(101,65,190,.16), inset 1px 1px 0 rgba(255,255,255,.85)',
+  // LA LUZ, UN TERCIO MÁS BAJA (pedido del usuario, 2026-09-23: «el brillo
+  // blanco está muy fuerte»): la de afuera pasa de #FFF pleno a .7, el filo de
+  // adentro de .85–.9 a .6–.65 y la de los hundidos a .75. La sombra violeta no
+  // se toca: el volumen sigue, lo que baja es el resplandor.
+  '--sx-e-1': '-3px -3px 8px rgba(255,255,255,.7), 3px 4px 10px rgba(101,65,190,.22), inset 1px 1px 1px rgba(255,255,255,.6), inset -1px -2px 4px rgba(101,65,190,.07)',
+  '--sx-e-2': '-5px -5px 12px rgba(255,255,255,.7), 5px 6px 14px rgba(101,65,190,.26), inset 1px 1px 1px rgba(255,255,255,.65), inset -1px -2px 5px rgba(101,65,190,.08)',
+  '--sx-e-card': '-7px -7px 16px rgba(255,255,255,.7), 7px 8px 20px rgba(101,65,190,.24), inset 1px 1px 1px rgba(255,255,255,.65), inset -2px -3px 7px rgba(101,65,190,.07)',
+  '--sx-e-chip': '-2px -2px 6px rgba(255,255,255,.7), 2px 3px 8px rgba(101,65,190,.16), inset 1px 1px 0 rgba(255,255,255,.6)',
   // El primario de Stitch (tabla): la luz blanca afuera y una sombra del COLOR
   // del acento, fuerte. Se re-declara en oscuro (el acento cambia).
-  '--sx-e-primary': '-3px -3px 8px #FFFFFF, 3px 3px 12px color-mix(in srgb, var(--sx-accent) 35%, transparent)',
+  '--sx-e-primary': '-3px -3px 8px rgba(255,255,255,.7), 3px 3px 12px color-mix(in srgb, var(--sx-accent) 35%, transparent)',
   // El ítem activo de una navegación es un control levantado (Stitch, riel B).
   '--sx-e-nav': 'var(--sx-e-1)',
   '--sx-e-3': '0 2px 6px -2px rgba(76,52,150,.10), 0 26px 56px -18px rgba(76,52,150,.32)',
@@ -362,9 +366,9 @@ export const TOKENS = {
   // HUNDIDO. --sx-e-sunk: campos, rieles, contadores (Stitch: 2.5/6 al .20).
   // --sx-e-well: el pozo de ícono, el mismo hueco. --sx-e-pill: lo chico que se
   // hunde — la pill de estado y el chip de filtro ELEGIDO (1.5/3 al .14).
-  '--sx-e-sunk': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px #FFFFFF',
-  '--sx-e-well': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px #FFFFFF',
-  '--sx-e-pill': 'inset 1.5px 1.5px 3px rgba(101,65,190,.14), inset -1.5px -1.5px 3px #FFFFFF',
+  '--sx-e-sunk': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px rgba(255,255,255,.75)',
+  '--sx-e-well': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px rgba(255,255,255,.75)',
+  '--sx-e-pill': 'inset 1.5px 1.5px 3px rgba(101,65,190,.14), inset -1.5px -1.5px 3px rgba(255,255,255,.75)',
   // LA CAJA DE UN CONTROL, como perilla. Desde la v0.8.14 el campo se levantaba
   // con --sx-e-1; acá se talla. Son dos tokens y no un valor escrito en cada
   // componente para que la decisión siga siendo UNA: un producto que quiera el
