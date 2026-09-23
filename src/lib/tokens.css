@@ -102,6 +102,9 @@
   --sx-pill-line: transparent;
   --sx-nav-pick: 0%;
   --sx-pg-raise: 100%;
+  --sx-toast-bar: 0px;
+  --sx-toast-mark: 1;
+  --sx-toast-mark-e: var(--sx-e-pill);
   --sx-s-1: 4px;
   --sx-s-2: 8px;
   --sx-s-3: 12px;

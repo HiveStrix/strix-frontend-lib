@@ -195,22 +195,38 @@
        fixed edge — so the token stays. Removing it would cost dark theme a
        real highlight to tidy up a light-theme layer that was already free: an
        invisible white-on-white shadow costs nothing to draw, it just does
-       nothing. The tone is a bar in the fill, not a border. */
-    box-shadow: var(--sx-e-3), var(--sx-e-inset);
+       nothing. The tone is a bar in the fill, not a border.
+       Variante: `--sx-toast-bar` apaga la barra (main: 3px) y `--sx-toast-mark`
+       (0|1) mete la marca en un pozo hundido de la banda del tono — el mismo par
+       banda/tinta que Pill —, porque el DESIGN.md de la variante prohíbe el filo
+       de color en avisos: el estado lo dice la marca con su tono. */
+    --t-ink: var(--sx-ink-3);
+    --t-band: var(--sx-neutral-band);
+    --t-bar: transparent;
+    box-shadow: var(--sx-e-3), var(--sx-e-inset), inset var(--sx-toast-bar, 3px) 0 0 var(--t-bar);
     font-size: var(--sx-t-sm);
     line-height: 1.45;
     animation: toast-in var(--sx-beat) var(--sx-ease);
   }
-  .positive  { box-shadow: var(--sx-e-3), var(--sx-e-inset), inset 3px 0 0 var(--sx-positive); }
-  .attention { box-shadow: var(--sx-e-3), var(--sx-e-inset), inset 3px 0 0 var(--sx-attention); }
-  .critical  { box-shadow: var(--sx-e-3), var(--sx-e-inset), inset 3px 0 0 var(--sx-critical); }
-  .info      { box-shadow: var(--sx-e-3), var(--sx-e-inset), inset 3px 0 0 var(--sx-info); }
+  .positive  { --t-ink: var(--sx-positive);  --t-band: var(--sx-positive-band);  --t-bar: var(--sx-positive); }
+  .attention { --t-ink: var(--sx-attention); --t-band: var(--sx-attention-band); --t-bar: var(--sx-attention); }
+  .critical  { --t-ink: var(--sx-critical);  --t-band: var(--sx-critical-band);  --t-bar: var(--sx-critical); }
+  .info      { --t-ink: var(--sx-info);      --t-band: var(--sx-info-band);      --t-bar: var(--sx-info); }
 
-  .mk { flex: none; width: 1em; height: 1em; margin-top: .25em; color: var(--sx-ink-3); }
-  .positive .mk  { color: var(--sx-positive); }
-  .attention .mk { color: var(--sx-attention); }
-  .critical .mk  { color: var(--sx-critical); }
-  .info .mk      { color: var(--sx-info); }
+  .mk {
+    flex: none;
+    box-sizing: content-box;
+    width: 1em;
+    height: 1em;
+    /* Con el pozo encendido, el pozo crece hacia afuera y el margen negativo le
+       devuelve a la primera línea su altura: la marca sigue centrada en ella. */
+    padding: calc(var(--sx-toast-mark, 0) * .38em);
+    margin: calc(.25em - var(--sx-toast-mark, 0) * .38em) 0 calc(var(--sx-toast-mark, 0) * -.38em);
+    border-radius: var(--sx-r-pill);
+    background: color-mix(in srgb, var(--t-band) calc(var(--sx-toast-mark, 0) * 100%), transparent);
+    box-shadow: var(--sx-toast-mark-e, none);
+    color: var(--t-ink);
+  }
 
   .text { margin: 0; flex: 1; min-width: 0; }
 

@@ -456,6 +456,11 @@ export const TOKENS = {
   // lleva superficie (100 %) para que su relieve tenga dónde apoyarse.
   '--sx-nav-pick': '0%',
   '--sx-pg-raise': '100%',
+  // Toast: sin filo de color a la izquierda (main: 3px); la marca del tono va en
+  // un pozo hundido de su banda, como una Pill sin palabra.
+  '--sx-toast-bar': '0px',
+  '--sx-toast-mark': '1',
+  '--sx-toast-mark-e': 'var(--sx-e-pill)',
 
   // Quarters of a 16 rhythm. Every gap in the system is one of these.
   '--sx-s-1': '4px', '--sx-s-2': '8px', '--sx-s-3': '12px', '--sx-s-4': '16px',
