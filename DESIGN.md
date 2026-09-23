@@ -241,10 +241,24 @@ radio redondo: «cualquiera» contra «uno».
   `Radio`): tallados con `--sx-field` / `--sx-e-field`. El borde de 1 px se queda,
   porque es el límite que el contrato mide a 3:1.
 
+- **Estados** (`EmptyState`, `ErrorState`, y el `DataState` de `Table`): suelto
+  en la página, una tarjeta levantada. Adentro de un contenedor se **hunde**
+  (pozo, radio 16). `Table`, `Card` y `Panel` lo hacen solos; el contenedor
+  propio de un core lleva la clase `sx-nest`. Sus botones van `outline`: el
+  primario de la vista es el de la banda.
+- **`Toast`:** sin filo de color. La marca del tono va en un pozo de su banda.
+- **Campos sin rótulo a la vista** (una celda de una tabla de líneas): la prop
+  `labelHidden` conserva el `<label>` como nombre accesible y no lo dibuja.
+- **`Menu` de fila:** `variant="ghost" compact`, con el nombre accesible de la
+  fila. El motivo de un ítem apagado se dibuja debajo de su etiqueta.
+
 Cada perilla de la variante tiene en el componente un fallback que reproduce el
 look de `main`: `--sx-btn-*`, `--sx-banda-*`, `--sx-pill-line`, `--sx-nav-pick`,
 `--sx-pg-raise`, `--sx-e-card`, `--sx-e-chip`, `--sx-e-pill`, `--sx-e-primary`,
-`--sx-e-nav` y `--sx-e-well`.
+`--sx-e-nav`, `--sx-e-well`, `--sx-tone-bar`, `--sx-toast-mark*`, `--sx-nest-*` y
+`--sx-num-font`. Dos más son de layout y las pone el consumidor:
+`--sx-ph-measure` (el tope del título de `PageHeader` para un nombre propio largo)
+y `--sx-sticky-top` (lo que ya está pegado arriba de un `PageHeader sticky`).
 
 ## Do's and Don'ts
 
