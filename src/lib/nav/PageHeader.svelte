@@ -472,6 +472,23 @@
 
      `:global` porque el <button> lo dibuja Button, en su propio scope. */
   .hd.banda .acts :global(.sx-btn.ghost) { color: var(--banda-ink); }
+  /* EL OUTLINE TEÑIDO, TAMBIÉN. Desde v0.9.0 `outline` se tiñe con
+     --sx-accent (fondo Y tinta), y `.acts` re-liga --sx-accent a la tinta de la
+     banda. Con un acento OSCURO —el morado por defecto— eso daba un lavado
+     blanco con tinta blanca al 68 %: medido en el core de Mantenimiento, un
+     «+ Equipo» rgb(184,183,187) sobre una píldora casi blanca, habilitado e
+     ilegible. Con un acento claro (el ámbar de Mantenimiento) no se veía porque
+     la tinta de la banda es oscura. Dentro de la banda el teñido se hace con la
+     tinta de la banda, que es lo que la banda ya lee, en los dos casos. */
+  .hd.banda .acts :global(.sx-btn.outline) {
+    background: color-mix(in srgb, var(--banda-ink) 16%, transparent);
+    color: var(--banda-ink);
+    border-color: color-mix(in srgb, var(--banda-ink) 38%, transparent);
+  }
+  .hd.banda .acts :global(.sx-btn.outline:not(:disabled):not(.locked):hover) {
+    background: color-mix(in srgb, var(--banda-ink) 24%, transparent);
+    border-color: color-mix(in srgb, var(--banda-ink) 52%, transparent);
+  }
   .hd.banda .acts :global(.sx-btn.ghost:not(:disabled):not(.locked):hover) {
     background: color-mix(in srgb, var(--banda-ink) 16%, transparent);
     color: var(--banda-ink);
