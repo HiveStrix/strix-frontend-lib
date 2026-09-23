@@ -332,8 +332,15 @@
   .foot { display: flex; align-items: baseline; justify-content: space-between; gap: var(--sx-s-3); flex-wrap: wrap; }
   .msgs { flex: 1 1 16ch; min-width: 0; }
   /* No margin of its own: a slot that is forwarded but empty must cost nothing,
-     so whatever is dropped in here carries its own spacing. */
-  .meta { flex: none; }
+     so whatever is dropped in here carries its own spacing.
+
+     `flex: 0 1 auto` y NO `none`: con `none` la meta no podía encoger y se
+     salía por la derecha del campo. Visto en el formulario de compra —la
+     leyenda relativa del DateInput, «sábado, 12 de septiembre de 2026 · hoy»,
+     238px en una columna de 204— cortada contra el borde. No crece (toma su
+     ancho natural, que es lo que `none` quería) pero cede cuando no cabe, y
+     `min-width: 0` le permite partir en la palabra. */
+  .meta { flex: 0 1 auto; min-width: 0; }
 
   .msg {
     display: flex; align-items: flex-start; gap: var(--sx-s-2);
