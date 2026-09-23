@@ -192,6 +192,9 @@
     border: 0;
     border-radius: var(--sx-r-1);
     background: none;
+    /* Variante colorida: cada página es un control chico levantado (Stitch). */
+    background: color-mix(in srgb, var(--sx-surface) var(--sx-pg-raise, 0%), transparent);
+    box-shadow: var(--sx-e-chip, none);
     color: var(--sx-ink-2);
     font-size: var(--sx-t-sm);
     font-weight: var(--sx-w-medium);
@@ -215,6 +218,7 @@
     color: var(--sx-accent-ink);
     font-weight: var(--sx-w-semi);
     cursor: default;
+    box-shadow: var(--sx-e-primary, var(--sx-e-chip, none));
   }
 
   .nav:disabled { color: var(--sx-ink-3); opacity: .45; cursor: not-allowed; }

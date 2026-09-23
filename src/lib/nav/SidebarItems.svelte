@@ -159,7 +159,12 @@
      autor sobre el propio `path` sí pisa el atributo (los atributos de
      presentación son la prioridad más baja de la cascada SVG). */
   .it.on {
+    /* Variante colorida: el activo es un control LEVANTADO sobre la barra
+       (Stitch, riel B): superficie + --sx-e-nav. Sin la perilla, el relleno
+       de selección plano de main. */
     background: var(--sx-accent-pick);
+    background: color-mix(in srgb, var(--sx-accent-pick) var(--sx-nav-pick, 100%), var(--sx-surface));
+    box-shadow: var(--sx-e-nav, none);
     color: var(--sx-ink);
     font-weight: var(--sx-w-semi);
   }
@@ -193,6 +198,7 @@
     background: var(--sx-sunk);
     border-radius: var(--sx-r-pill);
     padding: 1px var(--sx-s-2);
+    box-shadow: var(--sx-e-pill, none);
   }
   .it.on .n { color: var(--sx-ink-2); background: var(--sx-surface); }
 

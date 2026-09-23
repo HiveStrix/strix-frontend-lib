@@ -180,13 +180,18 @@ export const TOKENS = {
   // tarjeta sin que el campo deje de ser un tinte. `--sx-thead` sube a 9 % por
   // el mismo motivo: la cabecera de una tabla se apoya SOBRE la superficie
   // blanca, así que compartir el 6 % del campo la dejaba invisible.
-  '--sx-ground': CHROME['--sx-ground'],
+  // VARIANTE COLORIDA: el lienzo de Stitch, literal (Lila Canvas #EFEBF8).
+  '--sx-ground': '#EFEBF8',
   // ARCILLA: la superficie deja de ser blanco puro (5 % de la traza) para que la
   // luz interna blanca de --sx-e-1 exista — blanco sobre blanco no infla nada.
   // El pozo baja al valor del campo (9 %) porque el escalón pozo/tarjeta tiene
   // que seguir pasando el piso de 1.05 contra una tarjeta que ya no es blanca.
-  '--sx-surface': mixHex(TINT, 5, '#FFFFFF'),
-  '--sx-sunk': mixHex(TINT, 9, '#FFFFFF'),
+  // La superficie levantada y el pozo de Stitch, literales (Surface Raised
+  // #F6F3FC, Surface Sunk #E6E1F1). El pozo hondo es la mitad de la
+  // profundidad: todo lo hundido —campos, rieles, pozos, contadores, pills de
+  // estado— se lee como un hueco porque está un escalón claro por debajo.
+  '--sx-surface': '#F6F3FC',
+  '--sx-sunk': '#E6E1F1',
   // --sx-line separa filas y cierra cabeceras: es AMBIENTE y puede ser tenue.
   '--sx-line': 'var(--sx-n-150)',
   // --sx-edge es el límite de un CONTROL: dice dónde se puede escribir. Eso es
@@ -206,7 +211,8 @@ export const TOKENS = {
   // (explore, [data-d='AD']); en blanco, tres piezas dejaron de existir: el pie
   // del panel quedaba blanco sobre una tarjeta blanca, la declaración de .head
   // era un no-op, y la cabecera de tabla no se separaba de sus filas.
-  '--sx-thead': CHROME['--sx-thead'],
+  // La cabecera baja al lienzo: a 9 % quedaba a 1.045 de la superficie nueva.
+  '--sx-thead': '#EFEBF8',
   // EL RESPLANDOR DE LAS SUPERFICIES, APAGADO POR DEFECTO. Es una perilla, no
   // un efecto: en 0 no dibuja nada y el sistema se comporta como siempre. Un
   // producto que quiera que sus tarjetas, paneles y pozos irradien sube este
@@ -324,39 +330,37 @@ export const TOKENS = {
   // bajo una familia lavanda parece suciedad — pero lleva un tercio del violeta
   // de Prisma pastel, no el violeta entero.
   //
-  // VARIANTE COLORIDA — SOFT-UI DE STITCH. Los valores salen literalmente del
-  // HTML que generó Stitch para la dirección que el usuario eligió (neu-btn,
-  // neu-card, neu-sunk, neu-primary): una luz blanca AFUERA arriba-izquierda y
-  // una sombra violeta suave AFUERA abajo-derecha, simétricas, sin sombras
-  // internas. Se probó antes una arcilla con volumen interno (sombra de color
-  // corrida + luz y sombra ADENTRO) y no se leía como los mockups: la firma de
-  // la dirección es la luz blanca de afuera, que sólo existe porque el campo es
-  // lila (#F1EEF9) y la tarjeta casi blanca (#F7F6FC).
-  //   --sx-e-1    lo que reposa y se toca: botones, pills, perillas (neu-btn).
-  //   --sx-e-2    lo mismo, levantado un escalón: hover, tooltips.
-  //   --sx-e-card la TARJETA: más grande y más suave (neu-card). Token propio
-  //               porque una tarjeta con la sombra de un botón se ve chata, y
-  //               un botón con la de una tarjeta se ve inflado.
+  // VARIANTE COLORIDA — SOFT-UI DE STITCH, CON SU PROFUNDIDAD. Valores medidos
+  // sobre los HTML que generó Stitch (getComputedStyle de cada pieza con sombra):
+  // la profundidad no está en una sombra grande, está en que CADA pieza tiene la
+  // suya, en dos direcciones.
+  //   levantado · luz #FFF afuera arriba-izquierda + violeta afuera abajo-derecha
+  //     --sx-e-card  contenedores: tarjeta, barra lateral, encabezado, tabla
+  //     --sx-e-1     controles: botón, ítem activo, fila de lista
+  //     --sx-e-2     el mismo control levantado un escalón (hover, tooltip)
+  //     --sx-e-chip  lo más chico: chip de filtro, avatar, número de página
+  //   hundido · lo inverso, adentro (ver --sx-e-sunk, --sx-e-well, --sx-e-pill)
   // Lo que FLOTA (--sx-e-3: menús, hojas, toasts, popups) no lleva la luz.
-  '--sx-e-1': '-4px -4px 10px #FFFFFF, 4px 4px 12px rgba(101,65,190,.16)',
-  '--sx-e-2': '-6px -6px 16px #FFFFFF, 6px 6px 18px rgba(101,65,190,.22)',
-  '--sx-e-card': '-8px -8px 20px #FFFFFF, 8px 8px 24px rgba(101,65,190,.14)',
-  // EL PRIMARIO DE STITCH (neu-primary): mate, con un resplandor del color del
-  // acento abajo y un hilo de luz arriba — no la luz blanca de afuera, que sobre
-  // un relleno saturado se lee como un halo sucio. El color sale del acento del
-  // producto; por eso se re-declara también en el bloque oscuro (ver
-  // --sx-field ahí: un var() se resuelve donde se declara).
-  '--sx-e-primary': '0 4px 14px color-mix(in srgb, var(--sx-accent) 35%, transparent), inset 0 1px 1px rgba(255,255,255,.3)',
+  '--sx-e-1': '-3px -3px 8px #FFFFFF, 3px 3px 10px rgba(101,65,190,.20)',
+  '--sx-e-2': '-5px -5px 12px #FFFFFF, 5px 5px 14px rgba(101,65,190,.24)',
+  '--sx-e-card': '-6px -6px 14px #FFFFFF, 6px 6px 18px rgba(101,65,190,.22)',
+  '--sx-e-chip': '-2px -2px 6px #FFFFFF, 2px 2px 8px rgba(101,65,190,.14)',
+  // El primario de Stitch (tabla): la luz blanca afuera y una sombra del COLOR
+  // del acento, fuerte. Se re-declara en oscuro (el acento cambia).
+  '--sx-e-primary': '-3px -3px 8px #FFFFFF, 3px 3px 12px color-mix(in srgb, var(--sx-accent) 35%, transparent)',
+  // El ítem activo de una navegación es un control levantado (Stitch, riel B).
+  '--sx-e-nav': 'var(--sx-e-1)',
   '--sx-e-3': '0 2px 6px -2px rgba(76,52,150,.10), 0 26px 56px -18px rgba(76,52,150,.32)',
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.9)',
   // EL TALLADO: lo inverso del relieve. La sombra entra por arriba-izquierda y
   // la luz sale por abajo-derecha, así que la pieza se lee HUNDIDA en su
   // superficie — un pozo, una ranura, un botón apretado.
-  // EL POZO DE ÍCONO (IconWell): el tallado más leve de Stitch — un cuadrado
-  // apenas hundido en su tarjeta, no un campo donde se escribe.
-  '--sx-e-well': 'inset 2px 2px 5px rgba(101,65,190,.12), inset -2px -2px 5px #FFFFFF',
-  // El tallado de Stitch para campos (neu-sunk-deep).
-  '--sx-e-sunk': 'inset 3px 3px 6px rgba(101,65,190,.16), inset -2px -2px 5px #FFFFFF',
+  // HUNDIDO. --sx-e-sunk: campos, rieles, contadores (Stitch: 2.5/6 al .20).
+  // --sx-e-well: el pozo de ícono, el mismo hueco. --sx-e-pill: lo chico que se
+  // hunde — la pill de estado y el chip de filtro ELEGIDO (1.5/3 al .14).
+  '--sx-e-sunk': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px #FFFFFF',
+  '--sx-e-well': 'inset 2.5px 2.5px 6px rgba(101,65,190,.20), inset -2.5px -2.5px 6px #FFFFFF',
+  '--sx-e-pill': 'inset 1.5px 1.5px 3px rgba(101,65,190,.14), inset -1.5px -1.5px 3px #FFFFFF',
   // LA CAJA DE UN CONTROL, como perilla. Desde la v0.8.14 el campo se levantaba
   // con --sx-e-1; acá se talla. Son dos tokens y no un valor escrito en cada
   // componente para que la decisión siga siendo UNA: un producto que quiera el
@@ -422,10 +426,10 @@ export const TOKENS = {
   // Cada una tiene en el componente un fallback que reproduce `main`; acá toman
   // el valor de la dirección de Stitch. Quitar una línea devuelve ese pedazo.
   //
-  // Button: el primario de Stitch es una PÍLDORA MATE. `--sx-btn-radius` lo
-  // redondea; `--sx-btn-solid` es su relleno (en main, el degradé brillante);
+  // Button: en Stitch los botones son de radio 12 (rounded-xl), no píldoras.
+  // `--sx-btn-radius` lo fija; `--sx-btn-solid` es su relleno (en main, el degradé brillante);
   // `--sx-btn-gloss` es la opacidad del brillo especular de arriba (main: .42).
-  '--sx-btn-radius': 'var(--sx-r-pill)',
+  '--sx-btn-radius': '12px',
   '--sx-btn-solid': 'var(--sx-accent)',
   '--sx-btn-gloss': '0',
   // PageHeader variant="banda": en Stitch no hay bloques saturados — el color
@@ -434,9 +438,18 @@ export const TOKENS = {
   // tinta encima; `--sx-banda-remap` si las acciones de la banda se invierten
   // (main: 100 %, porque sobre un relleno de acento un botón de acento no se ve;
   // sobre un pastel sí, así que acá 0 %).
-  '--sx-banda-tint': '20%',
+  // 0 %: en Stitch el encabezado es una TARJETA clara levantada, no un bloque
+  // de color; el color del módulo viaja en sus pozos y en su botón.
+  '--sx-banda-tint': '0%',
   '--sx-banda-ink': 'var(--sx-ink)',
   '--sx-banda-remap': '0%',
+  // Pill: en Stitch las pills de estado son un hueco teñido, sin filo.
+  '--sx-pill-line': 'transparent',
+  // SidebarItems: el ítem activo es superficie levantada (--sx-e-nav), sin el
+  // relleno de selección (0 % de --sx-accent-pick). Pagination: cada página
+  // lleva superficie (100 %) para que su relieve tenga dónde apoyarse.
+  '--sx-nav-pick': '0%',
+  '--sx-pg-raise': '100%',
 
   // Quarters of a 16 rhythm. Every gap in the system is one of these.
   '--sx-s-1': '4px', '--sx-s-2': '8px', '--sx-s-3': '12px', '--sx-s-4': '16px',
@@ -677,16 +690,19 @@ export const TOKENS_DARK = {
   // VARIANTE COLORIDA: el soft-UI de Stitch en oscuro. La luz de afuera baja a
   // un 4 % (más, y el borde se lee como un filo luminoso); la sombra se hace
   // negra y más densa.
-  '--sx-e-1': '-4px -4px 10px rgba(255,255,255,.04), 4px 4px 12px rgba(0,0,0,.5)',
-  '--sx-e-2': '-6px -6px 16px rgba(255,255,255,.05), 6px 6px 18px rgba(0,0,0,.55)',
-  '--sx-e-card': '-8px -8px 20px rgba(255,255,255,.035), 8px 8px 24px rgba(0,0,0,.5)',
-  '--sx-e-primary': '0 4px 14px color-mix(in srgb, var(--sx-accent) 28%, transparent), inset 0 1px 1px rgba(255,255,255,.25)',
+  '--sx-e-1': '-3px -3px 8px rgba(255,255,255,.04), 3px 3px 10px rgba(0,0,0,.5)',
+  '--sx-e-2': '-5px -5px 12px rgba(255,255,255,.05), 5px 5px 14px rgba(0,0,0,.55)',
+  '--sx-e-card': '-6px -6px 14px rgba(255,255,255,.04), 6px 6px 18px rgba(0,0,0,.55)',
+  '--sx-e-chip': '-2px -2px 6px rgba(255,255,255,.035), 2px 2px 8px rgba(0,0,0,.45)',
+  '--sx-e-primary': '-3px -3px 8px rgba(255,255,255,.04), 3px 3px 12px color-mix(in srgb, var(--sx-accent) 30%, transparent)',
+  '--sx-e-nav': 'var(--sx-e-1)',
   '--sx-btn-solid': 'var(--sx-accent)',
   '--sx-banda-ink': 'var(--sx-ink)',
   '--sx-e-3': '0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45)',
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.05)',
-  '--sx-e-sunk': 'inset 3px 3px 6px rgba(0,0,0,.45), inset -2px -2px 5px rgba(255,255,255,.04)',
-  '--sx-e-well': 'inset 2px 2px 5px rgba(0,0,0,.4), inset -2px -2px 5px rgba(255,255,255,.04)',
+  '--sx-e-sunk': 'inset 2.5px 2.5px 6px rgba(0,0,0,.5), inset -2.5px -2.5px 6px rgba(255,255,255,.04)',
+  '--sx-e-well': 'inset 2.5px 2.5px 6px rgba(0,0,0,.5), inset -2.5px -2.5px 6px rgba(255,255,255,.04)',
+  '--sx-e-pill': 'inset 1.5px 1.5px 3px rgba(0,0,0,.4), inset -1.5px -1.5px 3px rgba(255,255,255,.04)',
   // RE-DECLARADOS, AUNQUE EL TEXTO SEA EL MISMO QUE EN TOKENS. Un `var()` dentro
   // de una custom property se resuelve donde se DECLARA: en `:root` estos dos ya
   // valen el sunk CLARO, y un subárbol `.sx-dark` (el marco de un teléfono en el

@@ -795,7 +795,7 @@
   .box {
     border-radius: var(--sx-r-3);
     background: var(--sx-surface);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-card, var(--sx-e-1));
     overflow: hidden;
     min-width: 0;
   }

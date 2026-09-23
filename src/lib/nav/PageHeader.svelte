@@ -653,7 +653,7 @@
     background: var(--sx-surface);
     border: 1px solid var(--sx-line);
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-card, var(--sx-e-1));
     overflow: hidden;
   }
   .hd.hero-card .grid { gap: 0; }

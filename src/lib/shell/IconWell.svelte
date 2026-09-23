@@ -10,7 +10,8 @@
   //   <IconWell path={G.box} hue="aqua" size="sm" />    ← un `d` ya resuelto
   //   <IconWell name="alert" hue="coral" label="Pendiente de revisión" />
   //
-  // POR QUÉ 16 % Y 66 %. El fondo es el matiz al 16 % sobre la superficie; el
+  // POR QUÉ 16 % Y 66 %. El fondo es el matiz al 16 % sobre el POZO (Stitch: el
+  // pozo es un hueco, --sx-sunk, con el ícono en color); el
   // ícono, el matiz al 66 % contra --sx-ink. El 66 % está medido: un ícono puede
   // cargar significado, así que pide 3:1 contra su pozo (WCAG 1.4.11), y el más
   // claro de la paleta —ámbar— daba 3.19 al 72 % y 3.59 al 66 %. Los siete pares
@@ -59,7 +60,7 @@
     display: inline-grid;
     place-items: center;
     flex: none;
-    background: color-mix(in srgb, var(--w-hue) 16%, var(--sx-surface));
+    background: color-mix(in srgb, var(--w-hue) 16%, var(--sx-sunk));
     color: color-mix(in srgb, var(--w-hue) 66%, var(--sx-ink));
     box-shadow: var(--sx-e-well, none);
   }

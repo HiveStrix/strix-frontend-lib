@@ -299,21 +299,21 @@ const CHECKS = [
   ['--sx-edge',   '--sx-field', 3.0, 'borde de control sobre su propio relleno'],
   // LA BANDA PASTEL (variante colorida): el título y la bajada de
   // `PageHeader variant="banda"` se escriben con --sx-banda-ink sobre el acento
-  // al 20 % (--sx-banda-tint) contra la superficie. El 20 % está escrito acá a
-  // mano: si la perilla se mueve, esta fila se mueve con ella.
-  ['--sx-banda-ink', 'color-mix(in srgb, var(--sx-accent) 20%, var(--sx-surface))', 4.5, 'título de la banda pastel'],
-  ['color-mix(in srgb, var(--sx-banda-ink) 85%, transparent)', 'color-mix(in srgb, var(--sx-accent) 20%, var(--sx-surface))', 4.5, 'bajada de la banda pastel'],
+  // al 0 % (--sx-banda-tint: la banda es una tarjeta clara) contra la superficie.
+  // El 0 % está escrito acá a mano: si la perilla se mueve, esta fila se mueve con ella.
+  ['--sx-banda-ink', 'color-mix(in srgb, var(--sx-accent) 0%, var(--sx-surface))', 4.5, 'título de la banda pastel'],
+  ['color-mix(in srgb, var(--sx-banda-ink) 85%, transparent)', 'color-mix(in srgb, var(--sx-accent) 0%, var(--sx-surface))', 4.5, 'bajada de la banda pastel'],
   // EL POZO DE ÍCONO (IconWell, SidebarItems con `hue`, Panel con `hue`): el
-  // ícono es el matiz al 66 % contra --sx-ink, sobre el matiz al 16 % contra la
-  // superficie. Un ícono puede cargar significado ⇒ 3:1 (1.4.11). Los dos
+  // ícono es el matiz al 66 % contra --sx-ink, sobre el matiz al 16 % contra el
+  // pozo (--sx-sunk). Un ícono puede cargar significado ⇒ 3:1 (1.4.11). Los dos
   // porcentajes están escritos en IconWell.svelte y en SidebarItems.svelte.
-  ['color-mix(in srgb, var(--sx-hue-violet) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-violet) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · violet'],
-  ['color-mix(in srgb, var(--sx-hue-aqua) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-aqua) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · aqua'],
-  ['color-mix(in srgb, var(--sx-hue-coral) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-coral) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · coral'],
-  ['color-mix(in srgb, var(--sx-hue-amber) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-amber) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · amber'],
-  ['color-mix(in srgb, var(--sx-hue-sage) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-sage) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · sage'],
-  ['color-mix(in srgb, var(--sx-hue-indigo) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-indigo) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · indigo'],
-  ['color-mix(in srgb, var(--sx-accent) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-accent) 16%, var(--sx-surface))', 3.0, 'ícono en su pozo · acento'],
+  ['color-mix(in srgb, var(--sx-hue-violet) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-violet) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · violet'],
+  ['color-mix(in srgb, var(--sx-hue-aqua) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-aqua) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · aqua'],
+  ['color-mix(in srgb, var(--sx-hue-coral) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-coral) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · coral'],
+  ['color-mix(in srgb, var(--sx-hue-amber) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-amber) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · amber'],
+  ['color-mix(in srgb, var(--sx-hue-sage) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-sage) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · sage'],
+  ['color-mix(in srgb, var(--sx-hue-indigo) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-indigo) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · indigo'],
+  ['color-mix(in srgb, var(--sx-accent) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-accent) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · acento'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
@@ -365,7 +365,7 @@ INFO.push(['--sx-thead', '--sx-ground', 'PageHeader banda, si se usara sin tarje
 // nativos (ver tokens.js). Entra en la exención por lo mismo que una sombra.
 // Las perillas de la variante que NO son color (un radio, una opacidad, dos
 // porcentajes) entran a la exención por lo mismo que una sombra.
-const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch|btn-(radius|gloss)$|banda-(tint|remap)$)|color-scheme$)/;
+const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch|btn-(radius|gloss)$|banda-(tint|remap)$|pill-line$|nav-pick$|pg-raise$)|color-scheme$)/;
 
 // EL TERCER HUECO. Este archivo ya se extendió dos veces por la misma razón —
 // primero medía `--sx-edge` contra dos fondos que resolvían al mismo blanco

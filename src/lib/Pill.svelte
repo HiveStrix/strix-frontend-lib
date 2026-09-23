@@ -77,15 +77,19 @@
     /* Transparent, not absent: a border only on some tones makes the pills
        different heights and a row of them stops aligning. */
     border: 1px solid transparent;
+    /* Variante colorida: la pill de estado es un hueco teñido (Stitch). Sin la
+       perilla, plana como en main. */
+    box-shadow: var(--sx-e-pill, none);
   }
 
   .mk { flex: none; width: 9px; height: 9px; }
 
-  .positive  { background: var(--sx-positive-band);  color: var(--sx-positive);  border-color: var(--sx-positive-edge); }
-  .attention { background: var(--sx-attention-band); color: var(--sx-attention); border-color: var(--sx-attention-edge); }
-  .critical  { background: var(--sx-critical-band);  color: var(--sx-critical);  border-color: var(--sx-critical-edge); }
-  .info      { background: var(--sx-info-band);      color: var(--sx-info);      border-color: var(--sx-info-edge); }
-  .neutral   { background: var(--sx-neutral-band);   color: var(--sx-neutral);   border-color: var(--sx-neutral-edge); }
+  /* --sx-pill-line: perilla del filo (variante: transparent, como Stitch). */
+  .positive  { background: var(--sx-positive-band);  color: var(--sx-positive);  border-color: var(--sx-pill-line, var(--sx-positive-edge)); }
+  .attention { background: var(--sx-attention-band); color: var(--sx-attention); border-color: var(--sx-pill-line, var(--sx-attention-edge)); }
+  .critical  { background: var(--sx-critical-band);  color: var(--sx-critical);  border-color: var(--sx-pill-line, var(--sx-critical-edge)); }
+  .info      { background: var(--sx-info-band);      color: var(--sx-info);      border-color: var(--sx-pill-line, var(--sx-info-edge)); }
+  .neutral   { background: var(--sx-neutral-band);   color: var(--sx-neutral);   border-color: var(--sx-pill-line, var(--sx-neutral-edge)); }
 
   .solid { background: var(--sx-accent); color: var(--sx-accent-ink); border-color: transparent; }
 
@@ -98,12 +102,14 @@
     cursor: pointer;
     font-family: inherit;
     transition: transform var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
+    /* Un filtro en reposo es un control: se levanta (Stitch). */
+    box-shadow: var(--sx-e-chip, none);
   }
   button.pill:hover { transform: translateY(-1px); box-shadow: var(--sx-e-1); }
   button.pill:active { transform: none; }
   /* The pressed state is drawn with an inset ring in the tone's own ink, so a
      selected filter still reads as the state it names. */
-  button.pill[aria-pressed='true'] { box-shadow: 0 0 0 1.5px currentColor inset; }
+  button.pill[aria-pressed='true'] { box-shadow: var(--sx-e-pill, 0 0 transparent), 0 0 0 1.5px currentColor inset; }
 
   @media (pointer: coarse) {
     button.pill { min-height: var(--sx-touch); padding-inline: var(--sx-s-4); }
