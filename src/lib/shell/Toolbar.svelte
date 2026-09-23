@@ -112,7 +112,9 @@
      being two sides: side by side they each get 45 % of 390px and every control
      in them wraps to two lines. Stacked, each gets the whole width. */
   @media (max-width: 480px) {
-    .bar { flex-direction: column; align-items: stretch; }
+    /* En columna, `wrap` hacía que cada línea tomara el ancho de su contenido:
+       un Segmented de cuatro opciones empujaba el otro lado fuera de la barra. */
+    .bar { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
     .side { justify-content: flex-start; }
   }
 </style>

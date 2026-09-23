@@ -39,6 +39,9 @@
   export let recovery = '';
   /** Label of the retrying control. Empty ⇒ no retry (some failures do not). */
   export let retry = 'Reintentar';
+  /** solid | outline. `outline` cuando la vista ya tiene su primario (en la banda
+   *  o en la barra del módulo): dos sólidos en pantalla son dos primarios. */
+  export let retryVariant = 'solid';
   export let secondary = '';
   /** The retry is in flight. */
   export let busy = false;
@@ -117,7 +120,7 @@
                  it is disabled, so a keyboard user who pressed Enter on
                  «Reintentar» would be dropped on <body> and have to tab back
                  from the top of a page that just failed to load. -->
-            <Button variant="solid" size={band ? 'sm' : 'md'} busy={busy}
+            <Button variant={retryVariant} size={band ? 'sm' : 'md'} busy={busy}
               on:click={() => dispatch('retry')}>{retry}</Button>
           {/if}
           {#if secondary}
