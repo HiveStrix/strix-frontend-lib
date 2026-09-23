@@ -233,10 +233,12 @@
     align-items: center;
     gap: var(--sx-s-2);
     padding-inline: var(--sx-s-3);
-    background: var(--sx-surface);
+    /* Las perillas de la caja de un control (variante colorida), las mismas
+       que Field: tallado, como dice el comentario de arriba. */
+    background: var(--sx-field);
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-field);
     min-width: 0;
     transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
   }
