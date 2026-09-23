@@ -140,7 +140,9 @@ va una `Pill` de tono `critical` con su palabra, no un pozo coral.
 
 **Matiz por módulo** (el pozo del módulo en la barra lateral y en sus widgets):
 Tablero `violet` · Mantenimiento `amber` · Inventario `indigo` · Clientes `coral` ·
-Facturación `aqua` · Costeo `sage` · Gastos `amber` · Divisiones `indigo`.
+Facturación `aqua` · Costeo `sage` · Gastos y compras `amber` · Bandeja de entrada `aqua` ·
+Divisiones `indigo`. Hay más módulos que matices: se repiten, pero nunca dos vecinos
+en la barra lateral.
 
 ## Typography
 
