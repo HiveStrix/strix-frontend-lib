@@ -456,9 +456,10 @@ export const TOKENS = {
   // lleva superficie (100 %) para que su relieve tenga dónde apoyarse.
   '--sx-nav-pick': '0%',
   '--sx-pg-raise': '100%',
-  // Toast: sin filo de color a la izquierda (main: 3px); la marca del tono va en
+  // Sin filo de color a la izquierda en avisos y fichas (main: 3px): Toast y
+  // ReviewPanel dicen el tono con su marca o su Pill. En Toast, la marca va en
   // un pozo hundido de su banda, como una Pill sin palabra.
-  '--sx-toast-bar': '0px',
+  '--sx-tone-bar': '0px',
   '--sx-toast-mark': '1',
   '--sx-toast-mark-e': 'var(--sx-e-pill)',
 

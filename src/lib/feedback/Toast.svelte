@@ -196,14 +196,14 @@
        real highlight to tidy up a light-theme layer that was already free: an
        invisible white-on-white shadow costs nothing to draw, it just does
        nothing. The tone is a bar in the fill, not a border.
-       Variante: `--sx-toast-bar` apaga la barra (main: 3px) y `--sx-toast-mark`
+       Variante: `--sx-tone-bar` apaga la barra (main: 3px) y `--sx-toast-mark`
        (0|1) mete la marca en un pozo hundido de la banda del tono — el mismo par
        banda/tinta que Pill —, porque el DESIGN.md de la variante prohíbe el filo
        de color en avisos: el estado lo dice la marca con su tono. */
     --t-ink: var(--sx-ink-3);
     --t-band: var(--sx-neutral-band);
     --t-bar: transparent;
-    box-shadow: var(--sx-e-3), var(--sx-e-inset), inset var(--sx-toast-bar, 3px) 0 0 var(--t-bar);
+    box-shadow: var(--sx-e-3), var(--sx-e-inset), inset var(--sx-tone-bar, 3px) 0 0 var(--t-bar);
     font-size: var(--sx-t-sm);
     line-height: 1.45;
     animation: toast-in var(--sx-beat) var(--sx-ease);

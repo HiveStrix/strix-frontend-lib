@@ -403,9 +403,10 @@
     padding: var(--sx-s-4);
   }
   /* The tone bar is an inset fill, not a border: borders in this system are for
-     control outlines and focus. */
-  .item.flag.critical  { box-shadow: var(--sx-e-1), inset 3px 0 0 var(--sx-critical); }
-  .item.flag.attention { box-shadow: var(--sx-e-1), inset 3px 0 0 var(--sx-attention); }
+     control outlines and focus. `--sx-tone-bar` es su ancho (main 3px); la
+     variante lo apaga porque la ficha ya dice su tono con la Pill del sello. */
+  .item.flag.critical  { box-shadow: var(--sx-e-1), inset var(--sx-tone-bar, 3px) 0 0 var(--sx-critical); }
+  .item.flag.attention { box-shadow: var(--sx-e-1), inset var(--sx-tone-bar, 3px) 0 0 var(--sx-attention); }
   .item.out { opacity: .62; }
 
   .ihead { display: flex; align-items: flex-start; gap: var(--sx-s-3); }

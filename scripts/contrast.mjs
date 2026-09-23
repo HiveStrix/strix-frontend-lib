@@ -365,7 +365,7 @@ INFO.push(['--sx-thead', '--sx-ground', 'PageHeader banda, si se usara sin tarje
 // nativos (ver tokens.js). Entra en la exención por lo mismo que una sombra.
 // Las perillas de la variante que NO son color (un radio, una opacidad, dos
 // porcentajes) entran a la exención por lo mismo que una sombra.
-const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch|btn-(radius|gloss)$|banda-(tint|remap)$|pill-line$|nav-pick$|pg-raise$|toast-(bar|mark|mark-e)$)|color-scheme$)/;
+const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch|btn-(radius|gloss)$|banda-(tint|remap)$|pill-line$|nav-pick$|pg-raise$|tone-bar$|toast-(mark|mark-e)$)|color-scheme$)/;
 
 // EL TERCER HUECO. Este archivo ya se extendió dos veces por la misma razón —
 // primero medía `--sx-edge` contra dos fondos que resolvían al mismo blanco
