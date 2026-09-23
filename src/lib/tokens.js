@@ -637,6 +637,15 @@ export const TOKENS_DARK = {
   '--sx-e-3': '0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45)',
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.05)',
   '--sx-e-sunk': 'inset 2px 2px 5px rgba(0,0,0,.45), inset -2px -2px 5px rgba(255,255,255,.04)',
+  // RE-DECLARADOS, AUNQUE EL TEXTO SEA EL MISMO QUE EN TOKENS. Un `var()` dentro
+  // de una custom property se resuelve donde se DECLARA: en `:root` estos dos ya
+  // valen el sunk CLARO, y un subárbol `.sx-dark` (el marco de un teléfono en el
+  // catálogo móvil, una sección oscura dentro de una página clara) los hereda ya
+  // resueltos aunque re-ligue --sx-sunk. Es la misma razón por la que
+  // --sx-surface, --sx-ink y compañía se repiten en este bloque. Visto en el
+  // catálogo móvil: el buscador del teléfono Android oscuro salía claro.
+  '--sx-e-field': 'var(--sx-e-sunk)',
+  '--sx-field': 'var(--sx-sunk)',
 
   // La otra mitad de `color-scheme: light` en TOKENS — ver el comentario ahí.
   // Es lo que oscurece los widgets nativos (checkbox, date picker, scrollbar)
