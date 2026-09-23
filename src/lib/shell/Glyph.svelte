@@ -49,7 +49,7 @@
     'search', 'filter', 'refresh', 'settings', 'plus', 'close', 'check', 'alert',
     'chevronUp', 'chevronRight', 'chevronDown', 'chevronLeft',
     'box', 'truck', 'clock', 'gauge', 'wrench', 'clipboard', 'file', 'layers',
-    'edit', 'trash', 'download', 'menu', 'inbox'
+    'edit', 'trash', 'download', 'menu', 'inbox', 'star', 'mail', 'chat'
   ];
 
   // Drawn on a 16 × 16 grid with a ~1.4 margin, stroke centred, round caps and
@@ -131,7 +131,15 @@
     inbox:
       'M14.2 8.6v3.9a.9.9 0 0 1-.9.9H2.7a.9.9 0 0 1-.9-.9V8.6' +
       'M1.8 8.6 3.9 3.2a.9.9 0 0 1 .8-.6h6.6a.9.9 0 0 1 .8.6l2.1 5.4' +
-      'M1.8 8.6h3.6l1.1 1.7h3l1.1-1.7h3.6'
+      'M1.8 8.6h3.6l1.1 1.7h3l1.1-1.7h3.6',
+    // Los tres que la bandeja necesitaba para no caer a una inicial en su riel:
+    // «Destacados» (la estrella), el canal Correo (el sobre) y el canal de
+    // mensajería (el globo). Misma grilla de 16, mismo trazo.
+    star: 'M8 1.8 9.9 5.7l4.3.6-3.1 3 .7 4.3L8 11.6l-3.8 2 .7-4.3-3.1-3 4.3-.6Z',
+    mail:
+      'M2.3 3.6h11.4a.8.8 0 0 1 .8.8v7.2a.8.8 0 0 1-.8.8H2.3a.8.8 0 0 1-.8-.8V4.4a.8.8 0 0 1 .8-.8Z' +
+      'M1.8 4.3 8 9l6.2-4.7',
+    chat: 'M13.9 7.6a5.4 5.1 0 0 1-7.6 4.7L2.3 13.4l1.1-3.3A5.4 5.1 0 1 1 13.9 7.6Z'
   };
 
   export { PATHS as GLYPH_PATHS };
