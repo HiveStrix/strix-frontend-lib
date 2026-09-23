@@ -180,13 +180,13 @@ const rot = (role, h, k = 1) => { const [L, C, h0] = CLAY_LC[role]; return hexOf
 // LA DILUCIÓN (pedido del usuario, 2026-09-23: «el color de fondo tiene que
 // ser muy muy ligero — ahora toda la página se ve rosa»). Con la saturación
 // entera del lila, el fondo de un módulo ERA su color: Clientes pintaba la
-// pantalla de rosa. Los fondos de un módulo guardan el 36 % de la saturación
+// pantalla de rosa. Los fondos de un módulo guardan el 10 % de la saturación
 // del lila (un soplo del tono) y la sombra y la traza de los grises el 50 %. La luz no se toca: el volumen y el contraste son los mismos.
 // El lila del Tablero (TOKENS) no se diluye: es la casa del Shell.
-// 36 %: el usuario pidió subirlo 6 puntos sobre el 30 % («no se ve que se
-// adapta»): a 30 % los fondos de los módulos eran casi el mismo neutro y el
-// cambio de un módulo a otro no se percibía.
-const CLAY_BG = 0.36, CLAY_SHADOW = 0.5;
+// 10 %: el usuario lo fue ajustando (100 → 30 → 36 → 10, 2026-09-23). El fondo
+// de un módulo es casi neutro, apenas un soplo del tono; lo que dice en qué
+// módulo se está es la sombra, la luz y el acento, que la Shell adopta igual.
+const CLAY_BG = 0.1, CLAY_SHADOW = 0.5;
 const rgba = (hex, a) => `rgba(${rgbOf(hex).join(',')},${a})`;
 const lumOf = (hex) => { const [r, g, b] = rgbOf(hex).map((v) => toLin(v / 255)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 /** La razón WCAG entre dos hex — la misma que mide scripts/contrast.mjs. */

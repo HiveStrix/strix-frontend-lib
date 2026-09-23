@@ -141,7 +141,7 @@ va una `Pill` de tono `critical` con su palabra, no un pozo coral.
 
 **La arcilla de cada módulo.** El lila es el del Tablero. Cada módulo lleva la
 misma arcilla girada al tono de su acento y MUY diluida (`clayHost`): el fondo
-guarda el 36 % de la saturación del lila y la sombra el 50 %, así que es un
+guarda el 10 % de la saturación del lila y la sombra el 50 %, así que es un
 soplo del tono —Mantenimiento apenas tibio, Clientes apenas rosado—, nunca una
 pantalla de color. Misma luz por rol, así que el volumen y el contraste son los
 mismos en todos.
