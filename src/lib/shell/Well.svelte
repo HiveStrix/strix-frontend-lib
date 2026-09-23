@@ -51,6 +51,7 @@
     padding: var(--well-pad);
     min-width: 0;
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     color: var(--sx-ink-2);
     font-size: var(--sx-t-sm);
     line-height: 1.5;

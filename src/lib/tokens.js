@@ -49,7 +49,14 @@
 // (2 temas × 2 perillas) pasa con este valor, así que el cambio no arriesga
 // ningún piso. Un módulo que quiera recuperar una traza de marca re-hornea la
 // rampa con `chromeRamp()` desde su raíz; el default deja de imponer morado.
-const TINT = '#8E8E93';
+//
+// VARIANTE COLORIDA (rama design/variante-colorida) — la perilla VUELVE al
+// morado. No es un valor nuevo: `#6541BE` es la PRIMERA perilla que
+// `scripts/contrast.mjs` valida («cromo morado»), así que toda la rampa ya está
+// medida con él. Con esta traza el campo resuelve a #EEEAF8, que es el lienzo
+// lila de la dirección neumórfica (#EFEBF8) — la base colorida sale de una
+// perilla que el sistema ya tenía, no de una paleta paralela.
+const TINT = '#6541BE';
 
 const rgbOf = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 /** La misma aritmética que color-mix(in srgb): lerp sobre los canales sRGB. */
@@ -64,7 +71,11 @@ export const CHROME_RECIPES = {
     '--sx-n-50': [4, '#FAFAFB'], '--sx-n-100': [5, '#F4F4F6'], '--sx-n-150': [6, '#EDEDF0'],
     '--sx-n-200': [8, '#DDDDE2'], '--sx-n-300': [8, '#BBBBC2'], '--sx-n-400': [8, '#7A7A7F'],
     '--sx-n-500': [8, '#5E5E64'], '--sx-n-700': [8, '#414146'], '--sx-n-800': [8, '#27272B'],
-    '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [11, '#FFFFFF'], '--sx-thead': [9, '#FFFFFF']
+    // El campo baja de 11 % a 9 % con la variante colorida: con la traza morada
+    // (TINT) el 11 % quedaba a 1.048 de --sx-accent-soft — `Card
+    // variant="filled"` no se despegaba del campo, piso 1.05. A 9 % mide 1.08, y
+    // la tarjeta blanca sigue a ~1.15 del campo: más escalón que el 11 % gris.
+    '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [9, '#FFFFFF'], '--sx-thead': [9, '#FFFFFF']
   },
   dark: {
     '--sx-sunk': [8, '#1B1F22'], '--sx-line': [8, '#2C3134'], '--sx-ink': [4, '#EDEFF0'],
@@ -270,20 +281,31 @@ export const TOKENS = {
 
   // Semantic tones. Fixed across every product: "vencido" must look identical
   // in maintenance, billing and inventory or the vocabulary stops being one.
-  '--sx-positive': '#2E6B3E',
-  '--sx-positive-band': '#E4EFE2',
-  '--sx-positive-edge': '#C3D8C4',
+  //
+  // VARIANTE COLORIDA: las bandas ganan croma — salvia, ámbar, coral e índigo
+  // de la dirección neumórfica — pero la tinta de cada tono sigue siendo la
+  // que carga el significado y sigue medida a 4.5 contra su banda. El color
+  // sube en el relleno, no en la palabra.
+  '--sx-positive': '#276A47',
+  '--sx-positive-band': '#DDF0E4',
+  '--sx-positive-edge': '#B5DCC5',
   '--sx-attention': '#8A5A00',
-  '--sx-attention-band': '#FBEEDA',
-  '--sx-attention-edge': '#E8D4A6',
-  '--sx-critical': '#B3261E',
-  '--sx-critical-band': '#FBE0DC',
-  '--sx-critical-edge': '#EFC2BC',
+  '--sx-attention-band': '#FCEBD0',
+  '--sx-attention-edge': '#F0D29C',
+  // Coral en vez de rojo ladrillo: el mismo «crítico», con la temperatura de
+  // la paleta nueva.
+  '--sx-critical': '#B02840',
+  '--sx-critical-band': '#FCDDE3',
+  '--sx-critical-edge': '#F3BAC6',
   // Muted indigo, deliberately not blue: blue chrome is what every ERP already
-  // looks like, and this is the one convention the system declines.
-  '--sx-info': '#4A4E7A',
-  '--sx-info-band': '#E7E7F2',
-  '--sx-info-edge': '#C9CADD',
+  // looks like, and this is the one convention the system declines. La
+  // variante le sube el croma sin cruzar a azul.
+  '--sx-info': '#434A93',
+  // La banda se corre hacia el azul FRÍO y no hacia el violeta: a #E4E6F8 quedaba
+  // a ΔE 4.57 de la fila elegida con el acento morado (piso 5.3, `evalAccent`)
+  // — «informativo» y «seleccionado» se leían como el mismo lavanda.
+  '--sx-info-band': '#E2E8F7',
+  '--sx-info-edge': '#C4C8EC',
   // FIJADO A HEX, como los otros cuatro. Apuntaba a la rampa (n-500/n-100/n-200),
   // así que su color cambiaba con el cromo de cada dirección: «ninguno» se veía
   // distinto entre dos productos, que es exactamente lo que la ley prohíbe. Estos
@@ -297,10 +319,30 @@ export const TOKENS = {
   // asiento y una larga que da el aire. El tinte NO es gris — una sombra gris
   // bajo una familia lavanda parece suciedad — pero lleva un tercio del violeta
   // de Prisma pastel, no el violeta entero.
-  '--sx-e-1': '0 1px 2px rgba(30,28,44,.05), 0 8px 24px -10px rgba(30,28,44,.18)',
-  '--sx-e-2': '0 2px 6px -2px rgba(30,28,44,.07), 0 16px 40px -14px rgba(30,28,44,.22)',
-  '--sx-e-3': '0 2px 6px -2px rgba(30,28,44,.07), 0 24px 56px -18px rgba(30,28,44,.28)',
+  //
+  // VARIANTE COLORIDA — RELIEVE NEUMÓRFICO, INTENSIDAD MEDIA. Lo que REPOSA
+  // (tarjetas, botones, pills) se levanta con un PAR de sombras: una luz blanca
+  // arriba-izquierda y una sombra violeta abajo-derecha. La luz sólo se ve porque
+  // el campo ya no es blanco (#EEEAF8, ver TINT): sobre blanco puro un reflejo
+  // blanco no existe. Lo que FLOTA (--sx-e-3: menús, hojas, toasts, popups) NO
+  // lleva la luz: se apoya sobre contenido o sobre el velo, y un halo blanco
+  // encima de un scrim oscuro se lee como un brillo, no como relieve.
+  '--sx-e-1': '-4px -4px 10px rgba(255,255,255,.9), 5px 6px 14px -3px rgba(76,52,150,.20)',
+  '--sx-e-2': '-6px -6px 16px rgba(255,255,255,.85), 8px 12px 26px -8px rgba(76,52,150,.26)',
+  '--sx-e-3': '0 2px 6px -2px rgba(76,52,150,.10), 0 26px 56px -18px rgba(76,52,150,.32)',
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.9)',
+  // EL TALLADO: lo inverso del relieve. La sombra entra por arriba-izquierda y
+  // la luz sale por abajo-derecha, así que la pieza se lee HUNDIDA en su
+  // superficie — un pozo, una ranura, un botón apretado.
+  '--sx-e-sunk': 'inset 2px 2px 5px rgba(76,52,150,.16), inset -2px -2px 5px rgba(255,255,255,.9)',
+  // LA CAJA DE UN CONTROL, como perilla. Desde la v0.8.14 el campo se levantaba
+  // con --sx-e-1; acá se talla. Son dos tokens y no un valor escrito en cada
+  // componente para que la decisión siga siendo UNA: un producto que quiera el
+  // campo levantado re-liga `--sx-e-field: var(--sx-e-1)` y
+  // `--sx-field: var(--sx-surface)` en su raíz, sin tocar Field, Combobox,
+  // DatePicker, Checkbox ni Radio.
+  '--sx-e-field': 'var(--sx-e-sunk)',
+  '--sx-field': 'var(--sx-sunk)',
 
   // La forma de Prisma: 12 y 22. Nada cuadrado, y nada casi-cuadrado.
   '--sx-r-1': '8px',
@@ -327,10 +369,29 @@ export const TOKENS = {
   // Chrome and Safari, so an embedded face would silently not load in exactly
   // the surfaces this library exists to serve. Personality comes from
   // treatment — weight contrast, negative tracking, tabular figures.
+  //
+  // VARIANTE COLORIDA: la familia se NOMBRA primero y el stack de sistema queda
+  // detrás como red. La restricción de arriba sigue en pie y es por qué esto
+  // funciona igual: un @font-face declarado DENTRO de un shadow root se ignora,
+  // pero uno declarado en el DOCUMENTO sí alcanza a los shadow roots. La lib no
+  // carga ninguna fuente: la carga el anfitrión (el Shell, el catálogo) y si no
+  // la carga, el control cae al sistema y se ve como antes — nunca roto.
   '--sx-font':
-    'ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    '"Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   '--sx-font-mono':
-    'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace',
+    '"JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace',
+
+  // LA PALETA DE CATEGORÍA. No son tonos: un tono dice «vencido» y es igual en
+  // todos los productos; un matiz distingue COSAS (equipos, familias, series de
+  // un gráfico) y no significa nada por sí solo. Por eso no tienen banda ni
+  // piso de contraste propio: se usan como tinte (pozos de ícono, series), y
+  // cuando cargan texto lo hacen a través de un tono o de --sx-ink.
+  '--sx-hue-violet': '#6541BE',
+  '--sx-hue-aqua': '#1FA6B8',
+  '--sx-hue-coral': '#EE6079',
+  '--sx-hue-amber': '#E39A2E',
+  '--sx-hue-sage': '#4CA777',
+  '--sx-hue-indigo': '#5566D6',
 
   // Quarters of a 16 rhythm. Every gap in the system is one of these.
   '--sx-s-1': '4px', '--sx-s-2': '8px', '--sx-s-3': '12px', '--sx-s-4': '16px',
@@ -568,10 +629,14 @@ export const TOKENS_DARK = {
   // Heavier in dark, and pure black rather than the ramp: on a near-black ground
   // the only thing that still reads as «behind» is more absence of light.
   '--sx-scrim': 'rgba(0, 0, 0, .62)',
-  '--sx-e-1': '0 1px 2px rgba(0,0,0,.4)',
-  '--sx-e-2': '0 6px 16px -4px rgba(0,0,0,.5), 0 2px 6px -2px rgba(0,0,0,.4)',
+  // VARIANTE COLORIDA: el mismo par en oscuro. La luz baja casi a nada (un 4 %
+  // de blanco) porque sobre un campo oscuro cualquier reflejo más fuerte se lee
+  // como un borde luminoso; el relieve lo hace la sombra, que se profundiza.
+  '--sx-e-1': '-3px -3px 8px rgba(255,255,255,.035), 5px 6px 14px -3px rgba(0,0,0,.55)',
+  '--sx-e-2': '-4px -4px 12px rgba(255,255,255,.04), 8px 12px 26px -8px rgba(0,0,0,.6)',
   '--sx-e-3': '0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45)',
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.05)',
+  '--sx-e-sunk': 'inset 2px 2px 5px rgba(0,0,0,.45), inset -2px -2px 5px rgba(255,255,255,.04)',
 
   // La otra mitad de `color-scheme: light` en TOKENS — ver el comentario ahí.
   // Es lo que oscurece los widgets nativos (checkbox, date picker, scrollbar)

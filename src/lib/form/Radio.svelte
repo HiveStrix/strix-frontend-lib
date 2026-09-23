@@ -106,8 +106,8 @@
     width: 19px; height: 19px; margin-top: 1px;
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-pill);
-    background: var(--sx-surface);
-    box-shadow: var(--sx-e-1);
+    background: var(--sx-field);
+    box-shadow: var(--sx-e-field);
     transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
   }
   .dot::after {
@@ -125,7 +125,7 @@
   :global([data-sx-theme='dark']) input:focus-visible + .dot,
   :global(.sx-dark) input:focus-visible + .dot { outline-color: var(--sx-n-0); }
 
-  .rd.invalid .dot { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
+  .rd.invalid .dot { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
 
   /* `--sx-line` — ambient, meant for a divider, not a limit — measured
      against `--sx-sunk` on the real catalogue: 1.25:1 in light, and only

@@ -125,6 +125,7 @@
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-pill);
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     cursor: pointer;
     transition: background var(--sx-beat) var(--sx-ease), border-color var(--sx-beat) var(--sx-ease);
   }

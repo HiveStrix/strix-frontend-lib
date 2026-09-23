@@ -355,9 +355,12 @@
   }
 
   .sx-btn:not(:disabled):not(.locked):active { transform: none; }
+  /* Apretado se HUNDE (variante colorida): el relieve se invierte en el
+     tallado, que es lo que hace una tecla física al bajar. */
   .solid:not(:disabled):not(.locked):active,
-  .danger:not(:disabled):not(.locked):active { box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-1); }
-  .outline:not(:disabled):not(.locked):active { box-shadow: var(--sx-e-1); }
+  .danger:not(:disabled):not(.locked):active { box-shadow: var(--sx-e-sunk); }
+  .outline:not(:disabled):not(.locked):active,
+  .frosted:not(:disabled):not(.locked):active { box-shadow: var(--sx-e-sunk); }
 
   /* EN OSCURO, --sx-accent Y --sx-critical SON PÁLIDOS (texto casi negro
      encima) — no oscuros como en claro. --sx-e-inset ahí es 5 % de blanco

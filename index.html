@@ -4,6 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Strix · sistema de diseño</title>
+    <!-- La lib nombra Outfit y JetBrains Mono pero no las carga (un @font-face
+         dentro de un shadow root se ignora): las carga el anfitrión, y éste es
+         uno. Sin estas líneas todo cae al stack de sistema, sin romperse. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..800&family=JetBrains+Mono:wght@400..700&display=swap"
+    />
   </head>
   <body>
     <div id="app"></div>

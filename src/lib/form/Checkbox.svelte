@@ -116,8 +116,8 @@
     width: 19px; height: 19px; margin-top: 1px;
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-1);
-    background: var(--sx-surface);
-    box-shadow: var(--sx-e-1);
+    background: var(--sx-field);
+    box-shadow: var(--sx-e-field);
     color: transparent;
     transition: background var(--sx-fast) var(--sx-ease), border-color var(--sx-fast) var(--sx-ease),
                 color var(--sx-fast) var(--sx-ease);
@@ -138,7 +138,7 @@
   :global([data-sx-theme='dark']) input:focus-visible + .box,
   :global(.sx-dark) input:focus-visible + .box { outline-color: var(--sx-n-0); }
 
-  .cb.invalid .box { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
+  .cb.invalid .box { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
 
   /* Mismo arreglo que Radio.svelte, con el mismo número detrás: --sx-line
      contra --sx-sunk mide 1.25:1 en claro y 1.11:1 en oscuro —un anillo que

@@ -289,6 +289,14 @@ const CHECKS = [
     3.0,
     'segmento "resta" de StackedBar sobre el fondo del track'
   ],
+  // EL CAMPO TALLADO (variante colorida). La caja de un control dejó de ser
+  // --sx-surface y pasó a pintarse con --sx-field (hoy --sx-sunk): el valor que
+  // se escribe, el placeholder y el borde viven encima de ese relleno, no de la
+  // tarjeta. Un fondo nuevo para texto sin su par en el contrato es exactamente
+  // el hueco que este archivo existe para cerrar.
+  ['--sx-ink',    '--sx-field', 4.5, 'texto dentro de un control'],
+  ['--sx-ink-3',  '--sx-field', 4.5, 'placeholder y ayuda dentro de un control'],
+  ['--sx-edge',   '--sx-field', 3.0, 'borde de control sobre su propio relleno'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],

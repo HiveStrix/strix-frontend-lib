@@ -104,6 +104,7 @@
     position: relative;
     height: var(--sx-s-2);
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     border-radius: var(--sx-r-pill);
     overflow: hidden;
   }

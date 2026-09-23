@@ -218,6 +218,7 @@
     height: var(--sx-s-3);
     border-radius: var(--sx-r-1);
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     overflow: hidden;
   }
   .sm .track { height: var(--sx-s-2); }

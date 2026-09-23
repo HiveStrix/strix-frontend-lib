@@ -257,10 +257,14 @@
     display: flex; align-items: stretch; gap: var(--sx-s-2);
     min-height: var(--sx-s-10);
     padding: var(--sx-s-2) var(--sx-s-3);
-    background: var(--sx-surface);
+    /* TALLADO, no levantado (variante colorida): el relleno y la elevación de
+       la caja son perillas — --sx-field y --sx-e-field — para que la decisión
+       viva en tokens.js y no repetida en cada control. El borde se queda: es
+       el que dice «escribí acá» y el que el contrato mide a 3:1. */
+    background: var(--sx-field);
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-field);
     color: var(--sx-ink);
     transition: border-color var(--sx-fast) var(--sx-ease),
                 box-shadow var(--sx-fast) var(--sx-ease),
@@ -280,7 +284,7 @@
   :global(.sx-dark) .frame:focus-within { outline-color: var(--sx-n-0); border-color: var(--sx-n-0); }
 
   /* The ring is the second signal; the word underneath is the first. */
-  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
+  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
   /* --sx-line contra --sx-sunk mide 1.25:1 en claro y 1.11:1 en oscuro —
      visible acá sólo porque el marco es grande; el mismo par, en un radio o
      checkbox de 16px, medía igual de mal y se leía como una mancha, no como

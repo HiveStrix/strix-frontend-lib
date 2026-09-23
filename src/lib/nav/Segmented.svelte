@@ -95,6 +95,7 @@
        idioma largo puede necesitar más. */
     min-height: var(--sx-s-10);
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     border-radius: var(--sx-r-pill);
     max-width: 100%;
     /* Long labels on a narrow column scroll rather than wrap: a segmented
