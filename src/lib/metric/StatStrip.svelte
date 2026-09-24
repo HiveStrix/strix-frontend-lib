@@ -85,6 +85,17 @@
     container-type: inline-size;
   }
 
+  /* EL INSTRUMENTO SE ENCIENDE DE A UNA CELDA, de izquierda a derecha, como
+     las agujas de un tablero al dar contacto. La strip no anima nada: sólo
+     reparte `--sx-stat-delay`, que la cifra de cada Stat ya lee como el
+     retraso de su propia llegada (y una celda que no es un Stat lo ignora).
+     Se corta en la sexta, la misma regla que `.sx-stagger`. */
+  .strip > :global(:nth-child(2)) { --sx-stat-delay: 70ms; }
+  .strip > :global(:nth-child(3)) { --sx-stat-delay: 140ms; }
+  .strip > :global(:nth-child(4)) { --sx-stat-delay: 210ms; }
+  .strip > :global(:nth-child(5)) { --sx-stat-delay: 280ms; }
+  .strip > :global(:nth-child(n+6)) { --sx-stat-delay: 350ms; }
+
   @media (pointer: coarse) {
     .strip > :global(*) { padding: var(--sx-s-4) var(--sx-s-4) var(--sx-s-5); }
   }

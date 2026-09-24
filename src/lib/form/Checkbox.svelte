@@ -82,12 +82,15 @@
     on:blur
   />
 
+  <!-- Both marks are always drawn and CSS decides which one shows, off the
+       input's own `:checked` / `:indeterminate`. Swapping them with an {#if}
+       would create each mark fresh, and a fresh element has no «before» to
+       transition from — the tick could not draw itself. -->
   <span class="box" aria-hidden="true">
-    {#if indeterminate}
-      <svg viewBox="0 0 12 12"><rect x="2" y="5" width="8" height="2" rx="1" fill="currentColor" /></svg>
-    {:else}
-      <svg viewBox="0 0 12 12"><path d="M1.5 6.3 4.6 9.4 10.5 2.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-    {/if}
+    <svg viewBox="0 0 12 12">
+      <rect class="bar" x="2" y="5" width="8" height="2" rx="1" fill="currentColor" />
+      <path class="tk" pathLength="1" d="M1.5 6.3 4.6 9.4 10.5 2.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+    </svg>
   </span>
 
   <span class="say">
@@ -122,7 +125,8 @@
     box-shadow: var(--sx-e-field);
     color: transparent;
     transition: background var(--sx-fast) var(--sx-ease), border-color var(--sx-fast) var(--sx-ease),
-                color var(--sx-fast) var(--sx-ease);
+                color var(--sx-fast) var(--sx-ease),
+                scale 420ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
   .box svg { width: 12px; height: 12px; }
   .cb:hover .box { border-color: var(--sx-ink-3); }
@@ -132,6 +136,44 @@
     background: var(--sx-accent);
     border-color: var(--sx-accent);
     color: var(--sx-accent-ink);
+  }
+
+  /* The press. Held, the box gives a little; let go, it springs back past its
+     size and settles — that release IS the moment it ticks, so the pop lands
+     with the mark. The row is the target, so the whole row presses the box. */
+  .cb:not(.disabled):active .box,
+  .cb:not(.disabled) input:active + .box {
+    scale: .88;
+    transition: background var(--sx-fast) var(--sx-ease), border-color var(--sx-fast) var(--sx-ease),
+                color var(--sx-fast) var(--sx-ease),
+                scale 110ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
+
+  /* The tick DRAWS itself, stroke first to last, the way a hand makes one.
+     `pathLength="1"` makes the dash the whole mark whatever its real length;
+     the rest offset (1.1) sits inside the gap so no round cap leaks a dot.
+     Unticking retracts faster than ticking draws: leaving is quicker. */
+  .tk {
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 1.1;
+    transition: stroke-dashoffset 130ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0));
+  }
+  input:checked:not(:indeterminate) + .box .tk {
+    stroke-dashoffset: 0;
+    /* The house ease, not the expo glide: the expo would lay the short leg
+       down in a single frame, and the stroke has to be SEEN travelling. */
+    transition: stroke-dashoffset 340ms var(--sx-ease) 40ms;
+  }
+  /* The third state grows out from its middle — «some», spreading. */
+  .bar {
+    transform-box: fill-box;
+    transform-origin: center;
+    transform: scaleX(0);
+    transition: transform 140ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0));
+  }
+  input:indeterminate + .box .bar {
+    transform: scaleX(1);
+    transition: transform 280ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
 
   /* The system's one focus rule, moved onto the paint because the input itself
@@ -170,5 +212,14 @@
     .box { width: 22px; height: 22px; margin-top: 0; }
     .box svg { width: 14px; height: 14px; }
     .lb { font-size: var(--sx-t-md); }
+  }
+
+  /* The marks are simply there or not; the box does not give under a press. */
+  @media (prefers-reduced-motion: reduce) {
+    .box, .tk, .bar,
+    input:checked:not(:indeterminate) + .box .tk,
+    input:indeterminate + .box .bar { transition: none; }
+    .cb:not(.disabled):active .box,
+    .cb:not(.disabled) input:active + .box { scale: none; transition: none; }
   }
 </style>

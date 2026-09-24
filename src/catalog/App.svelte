@@ -25,6 +25,7 @@
   // can paste into a ticket.
   import { onMount, tick } from 'svelte';
   import Pill from '../lib/Pill.svelte';
+  import { choreograph, glide, spotlight, transition, reduced, EASE_OUT } from './motion.js';
   // «Lo último que entró» sale del propio historial de git, no de una lista
   // escrita a mano — ver scripts/novelties.mjs. Una lista a mano se
   // desactualiza en dos semanas y miente, que es peor que no tenerla.
@@ -101,6 +102,11 @@
     }
   ];
 
+  // El titular entra palabra por palabra, cada una saliendo de su propia
+  // máscara. El `aria-label` del <h1> lleva la frase entera para que un lector
+  // de pantalla no la deletree en cinco pedazos.
+  const HEADLINE = ['Un', 'sistema,', 'no', 'siete', 'carpetas.'];
+
   // ── The three rules ──────────────────────────────────────────────────────
   // Numbered the same way the Tablas page numbers them, because a system whose
   // rules are numbered differently on two pages does not have three rules.
@@ -134,6 +140,22 @@
     document.documentElement.dataset.sxTheme = next === 'dark' ? 'dark' : '';
     if (next !== 'dark') delete document.documentElement.dataset.sxTheme;
     try { localStorage.setItem('sx-theme', next); } catch { /* private mode */ }
+  }
+
+  // El clic en el interruptor abre el tema nuevo en círculo DESDE el botón:
+  // el centro es el botón y el radio la esquina más lejana, así el círculo
+  // termina justo cuando tapa la última esquina y no antes.
+  function pickTheme(next, e) {
+    if (next === theme) return;
+    const r = e.currentTarget.getBoundingClientRect();
+    const x = r.left + r.width / 2;
+    const y = r.top + r.height / 2;
+    const far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    transition('theme', () => setTheme(next), {
+      '--vt-x': `${x}px`,
+      '--vt-y': `${y}px`,
+      '--vt-r': `${Math.ceil(far)}px`
+    });
   }
 
   // ── El acento ────────────────────────────────────────────────────────────
@@ -183,8 +205,23 @@
     }
     root.setProperty('--sx-accent', b.hex);
     root.setProperty('--sx-accent-ink', b.ink);
-    root.setProperty('--sx-accent-soft', `color-mix(in srgb, ${b.hex} 10%, #FFFFFF)`);
-    root.setProperty('--sx-accent-edge', `color-mix(in srgb, ${b.hex} 28%, #FFFFFF)`);
+    // `var(--sx-accent)` y no `${b.hex}`: en reposo valen lo mismo, pero el
+    // acento está registrado y FLUYE (ver motion.css) — si los derivados
+    // nombraran el hex, saltarían al destino mientras el acento todavía viaja.
+    root.setProperty('--sx-accent-soft', 'color-mix(in srgb, var(--sx-accent) 10%, #FFFFFF)');
+    root.setProperty('--sx-accent-edge', 'color-mix(in srgb, var(--sx-accent) 28%, #FFFFFF)');
+  }
+
+  // Elegir una marca con la mano, además de ligarla, vuelve a correr la barra
+  // de la prueba: el acento no sólo cambia de color, llena algo de nuevo.
+  function pickBrand(id) {
+    if (id === brand) return;
+    setBrand(id);
+    if (reduced()) return;
+    document.querySelector('.ffill')?.animate(
+      [{ transform: 'scaleX(.08)' }, { transform: 'scaleX(1)' }],
+      { duration: 1100, easing: EASE_OUT }
+    );
   }
 
   // ── Novedades ────────────────────────────────────────────────────────────
@@ -248,9 +285,34 @@
     if (wanted === 'dark' || wanted === 'light') setTheme(wanted);
     if (wantedBrand && BRANDS.some((b) => b.id === wantedBrand)) setBrand(wantedBrand);
 
-    addEventListener('hashchange', read);
-    return () => removeEventListener('hashchange', read);
+    addEventListener('hashchange', onHash);
+    const onScroll = () => { scrolled = scrollY > 8; };
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => {
+      removeEventListener('hashchange', onHash);
+      removeEventListener('scroll', onScroll);
+    };
   });
+
+  // La barra se despega del lienzo en cuanto la página pasa por debajo: la
+  // sombra crece, porque ahora sí hay algo sobre lo que está parada.
+  let scrolled = false;
+
+  // Cambiar de familia es pasar de hoja; saltar a una sección de la misma
+  // familia no — ése es un scroll, y animarlo como página nueva mentiría sobre
+  // dónde estás. El sentido sale del orden de la barra (la portada es la -1).
+  const order = (id) => FAMILIES.findIndex((f) => f.id === id);
+  function onHash() {
+    const raw = (location.hash || '#/').replace(/^#\/?/, '');
+    const next = raw.split('/')[0];
+    if (next === route) return read();
+    document.documentElement.style.setProperty('--vt-dir', order(next) >= order(route) ? '1' : '-1');
+    transition('route', async () => {
+      read();
+      await tick();
+    });
+  }
 
   // Going to another family must not leave the reader half-way down the old
   // page, and going to a SECTION of the same family must not reset it to the
@@ -284,22 +346,24 @@
 
 <a class="skip" href="#contenido">Saltar al contenido</a>
 
-<header class="bar">
+<header class="bar" class:scrolled>
   <div class="barin">
     <a class="brand" href="#/" aria-current={current ? undefined : 'page'}>
       <!-- The mark is a Pill's own critical square, an attention triangle and a
            positive tick stacked: the system's alphabet, used as a signature. -->
       <svg class="logo" viewBox="0 0 20 20" aria-hidden="true">
-        <rect x="1.5" y="1.5" width="7" height="7" rx="2" fill="currentColor" />
-        <path d="M15 1.8 19.2 9H10.8z" fill="currentColor" opacity=".55" />
-        <path d="M2 14.6 5.4 18 11 11.4" fill="none" stroke="currentColor" stroke-width="2.4"
-          stroke-linecap="round" stroke-linejoin="round" />
+        <rect class="lg-sq" x="1.5" y="1.5" width="7" height="7" rx="2" fill="currentColor" />
+        <path class="lg-tri" d="M15 1.8 19.2 9H10.8z" fill="currentColor" opacity=".55" />
+        <path class="lg-tick" d="M2 14.6 5.4 18 11 11.4" fill="none" stroke="currentColor" stroke-width="2.4"
+          stroke-linecap="round" stroke-linejoin="round" pathLength="1" />
       </svg>
       <span class="wordmark">Strix</span>
       <span class="sx-cap tag">Sistema de diseño</span>
     </a>
 
-    <nav class="links" aria-label="Familias">
+    <nav class="links" aria-label="Familias"
+      use:glide={{ selector: '.link', hover: true }}
+      use:glide={{ selector: '.link.on' }}>
       {#each FAMILIES as f (f.id)}
         <a href="#/{f.id}" class="link" class:on={route === f.id}
           aria-current={route === f.id ? 'page' : undefined}>{f.name}</a>
@@ -310,7 +374,7 @@
       <!-- ROLE=GROUP AND ARIA-PRESSED, not role="tab": these do not swap a
            panel, they change how the same thing is drawn — which is exactly the
            line Segmented and Tabs are separated along. -->
-      <div class="seg" role="group" aria-label="Marca del producto">
+      <div class="seg" role="group" aria-label="Marca del producto" use:glide={{ selector: '.sw.on' }}>
         {#each BRANDS as b (b.id)}
           <button
             type="button"
@@ -318,7 +382,7 @@
             class:on={brand === b.id}
             aria-pressed={brand === b.id}
             title={b.hex ? `Acento de ${b.label} · ${b.hex}` : 'Sin marca: el acento resuelve a la tinta neutra'}
-            on:click={() => setBrand(b.id)}
+            on:click={() => pickBrand(b.id)}
           >
             <span class="dot" style={b.hex ? `background:${b.hex}` : ''} class:unbound={!b.hex} aria-hidden="true"></span>
             <span class="swl">{b.label}</span>
@@ -326,9 +390,9 @@
         {/each}
       </div>
 
-      <div class="seg" role="group" aria-label="Tema">
+      <div class="seg" role="group" aria-label="Tema" use:glide={{ selector: '.sw.on' }}>
         <button type="button" class="sw" class:on={theme === 'light'} aria-pressed={theme === 'light'}
-          on:click={() => setTheme('light')}>
+          on:click={(e) => pickTheme('light', e)}>
           <svg class="ti" viewBox="0 0 16 16" aria-hidden="true">
             <circle cx="8" cy="8" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6" />
             <path d="M8 1v1.8M8 13.2V15M1 8h1.8M13.2 8H15M3.1 3.1l1.3 1.3M11.6 11.6l1.3 1.3M12.9 3.1l-1.3 1.3M4.4 11.6l-1.3 1.3"
@@ -337,7 +401,7 @@
           <span class="swl">Claro</span>
         </button>
         <button type="button" class="sw" class:on={theme === 'dark'} aria-pressed={theme === 'dark'}
-          on:click={() => setTheme('dark')}>
+          on:click={(e) => pickTheme('dark', e)}>
           <svg class="ti" viewBox="0 0 16 16" aria-hidden="true">
             <path d="M13.4 9.6A5.9 5.9 0 0 1 6.4 2.6 5.9 5.9 0 1 0 13.4 9.6z"
               fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
@@ -349,7 +413,7 @@
   </div>
 </header>
 
-<main id="contenido">
+<main id="contenido" use:choreograph>
   {#if current}
     <svelte:component this={current.component} />
   {:else}
@@ -357,7 +421,9 @@
     <div class="home">
       <section class="hero">
         <p class="sx-cap">Strix · frontend-lib 0.1.0</p>
-        <h1>Un sistema, no siete carpetas.</h1>
+        <h1 aria-label="Un sistema, no siete carpetas.">
+          {#each HEADLINE as w, i}<span class="w" aria-hidden="true"><span style="--i:{i}">{w}</span></span>{' '}{/each}
+        </h1>
         <p class="lede">
           Cincuenta y siete componentes Svelte y un juego de tokens para todos los frontends
           del ecosistema Hivestrix: la Shell, los módulos Core que se dibujan dentro de un
@@ -408,7 +474,7 @@
           <p class="sx-cap" id="whatsnew-h">Lo último que entró a la librería</p>
           <ul class="newlist">
             {#each novelties as n (n.href)}
-              <li><a href={n.href}><span class="nn">{n.name}</span><span class="nt">{hace(n.ts)}</span></a></li>
+              <li data-rv="pop"><a href={n.href}><span class="nn">{n.name}</span><span class="nt">{hace(n.ts)}</span></a></li>
             {/each}
           </ul>
         </section>
@@ -416,15 +482,15 @@
 
       <!-- ── Las tres reglas ────────────────────────────────────────────── -->
       <section class="rules" aria-labelledby="reglas">
-        <h2 id="reglas">Las tres reglas sobre las que se apoya todo</h2>
-        <p class="sub">
+        <h2 id="reglas" data-rv="mask">Las tres reglas sobre las que se apoya todo</h2>
+        <p class="sub" data-rv="rise">
           No son principios: son restricciones que los componentes ya hacen cumplir.
           Cada una se puede verificar en esta página sin leer una línea de código.
         </p>
-        <ol>
+        <ol data-rv="approach">
           {#each RULES as r (r.n)}
             <li>
-              <span class="rn sx-num" aria-hidden="true">{r.n}</span>
+              <span class="rn sx-num" aria-hidden="true" data-rv="pop" data-rv-delay={260 + r.n * 110}>{r.n}</span>
               <div>
                 <h3>{r.title}</h3>
                 <p>{r.body}</p>
@@ -436,7 +502,7 @@
 
       <!-- ── La prueba del acento ───────────────────────────────────────── -->
       <section class="proof" aria-labelledby="acento">
-        <div class="proofsay">
+        <div class="proofsay" data-rv="left">
           <h2 id="acento">Un producto se marca; nadie forkea nada</h2>
           <p>
             El acento es un <b>hueco</b>, no un color. Ningún componente de esta librería nombra
@@ -457,11 +523,11 @@
 }`}</code></pre>
         </div>
 
-        <div class="proofshow" aria-hidden="true">
+        <div class="proofshow" aria-hidden="true" data-rv="right">
           <p class="sx-cap">Lo que sigue al acento</p>
           <div class="fake">
             <span class="fbtn">Registrar servicio</span>
-            <span class="ftrack"><span class="ffill"></span></span>
+            <span class="ftrack"><span class="ffill" data-rv="grow" data-rv-delay="420"></span></span>
             <span class="frow on">BAT014 · seleccionada</span>
             <span class="frow">CL445926</span>
             <span class="fsoft">Fondo suave · <span class="sx-id">--sx-accent-soft</span></span>
@@ -471,16 +537,16 @@
 
       <!-- ── Las familias ───────────────────────────────────────────────── -->
       <section class="fams" aria-labelledby="familias">
-        <h2 id="familias">Las siete familias</h2>
-        <p class="sub">
+        <h2 id="familias" data-rv="mask">Las siete familias</h2>
+        <p class="sub" data-rv="rise">
           Cada carpeta de <span class="sx-id">src/lib</span> tiene una página, y cada página
           muestra sus componentes en los estados que de verdad se rompen: vacío, cargando,
           bloqueado, fallado. Un catálogo que sólo enseña el camino feliz es exactamente lo que
           hace que un sistema de diseño se pudra.
         </p>
-        <ul class="grid">
+        <ul class="grid" use:spotlight={'.fam'}>
           {#each FAMILIES as f (f.id)}
-            <li>
+            <li data-rv="approach">
               <a class="fam" href="#/{f.id}">
                 <p class="famtop">
                   <span class="famname">{f.name}</span>
@@ -500,16 +566,16 @@
 
       <!-- ── Cómo se consume ────────────────────────────────────────────── -->
       <section class="how" aria-labelledby="consumo">
-        <h2 id="consumo">Cómo se consume</h2>
+        <h2 id="consumo" data-rv="mask">Cómo se consume</h2>
         <div class="two">
-          <div>
+          <div data-rv="left">
             <h3 class="sx-cap">Una app de SvelteKit</h3>
             <pre class="code"><code>{`import '@strix/frontend-lib/tokens.css';
 import '@strix/frontend-lib/base.css';
 import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
             <p>Una vez, en la raíz. Las custom properties heredan hacia abajo y ya está.</p>
           </div>
-          <div>
+          <div data-rv="right">
             <h3 class="sx-cap">Un módulo Core en un shadow root</h3>
             <pre class="code"><code>{CORE_SNIPPET}</code></pre>
             <p>
@@ -520,7 +586,7 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
         </div>
       </section>
 
-      <footer class="foot">
+      <footer class="foot" data-rv="rise">
         <p>
           Este catálogo está construido con la librería que documenta: la barra de arriba, las
           tarjetas de familia y esta nota usan los mismos tokens, la misma tipografía y la misma
@@ -560,6 +626,26 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     /* Profundidad, no una línea: la barra está POR ENCIMA de lo que pasa
        debajo, y arriba se dibuja con luz en todo el resto del sistema. */
     box-shadow: var(--sx-e-1);
+    transition: box-shadow var(--sx-slow) var(--mo-out);
+  }
+  .bar.scrolled { box-shadow: var(--sx-e-2); }
+  /* El hilo de lectura: una línea del acento que crece con el scroll. No es un
+     indicador que haya que leer, es pulso — la barra respira con la página.
+     Sólo donde el scroll puede manejar una animación; en el resto, no está. */
+  @supports (animation-timeline: scroll()) {
+    .bar::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 2px;
+      background: linear-gradient(90deg, color-mix(in srgb, var(--sx-accent) 40%, transparent), var(--sx-accent));
+      transform-origin: left center;
+      transform: scaleX(0);
+      animation: sx-read linear both;
+      animation-timeline: scroll(root block);
+      pointer-events: none;
+    }
+    @keyframes sx-read { to { transform: scaleX(1); } }
   }
   .barin {
     display: flex;
@@ -579,7 +665,20 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     text-decoration: none;
     flex: none;
   }
-  .logo { width: 20px; height: 20px; align-self: center; color: var(--sx-accent); flex: none; }
+  .logo { width: 20px; height: 20px; align-self: center; color: var(--sx-accent); flex: none; overflow: visible; }
+  /* La firma se arma sola al cargar: el cuadrado brota, el triángulo cae en su
+     lugar y el visto se dibuja — el alfabeto del sistema deletreándose. */
+  .lg-sq { transform-box: fill-box; transform-origin: center; animation: lg-pop 700ms var(--mo-spring) 120ms backwards; }
+  .lg-tri { transform-box: fill-box; transform-origin: center; animation: lg-drop 760ms var(--mo-out) 260ms backwards; }
+  .lg-tick { stroke-dasharray: 1; stroke-dashoffset: 0; animation: lg-draw 640ms var(--mo-out) 420ms backwards; }
+  @keyframes lg-pop { from { transform: scale(0) rotate(-45deg); } }
+  @keyframes lg-drop { from { transform: translateY(-7px) rotate(30deg); opacity: 0; } }
+  @keyframes lg-draw { from { stroke-dashoffset: 1; } }
+  .brand:hover .lg-sq { animation: lg-wiggle 620ms var(--mo-spring); }
+  @keyframes lg-wiggle { 40% { transform: rotate(-12deg) scale(.92); } }
+  .wordmark { display: inline-block; animation: word-in 900ms var(--mo-out) 180ms backwards; }
+  .tag { display: inline-block; animation: word-in 900ms var(--mo-out) 300ms backwards; }
+  @keyframes word-in { from { opacity: 0; transform: translateX(-10px); filter: blur(4px); } }
   .wordmark {
     font-size: var(--sx-t-lg);
     font-weight: var(--sx-w-bold);
@@ -615,6 +714,51 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
   /* La sección donde estás: tinta llena, relleno suave del acento y
      `aria-current`. Tres señales, ninguna de ellas sólo color. */
   .link.on { color: var(--sx-ink); background: var(--sx-accent-soft); }
+
+  /* ── Los deslizadores ────────────────────────────────────────────────────
+     Con motion.js corriendo, los fondos de arriba se apagan y los pinta UN
+     solo elemento que viaja hasta la opción: el hover se desliza de link en
+     link siguiendo al puntero, y la familia elegida cruza la barra hasta la
+     nueva. Sin JS, quedan los fondos de siempre. */
+  .links, .seg { position: relative; isolation: isolate; }
+  .links:global(.has-hover-glide) .link:hover { background: none; }
+  .links:global(.has-glide) .link.on { background: none; }
+  .seg:global(.has-glide) .sw.on { background: none; box-shadow: none; }
+  .links :global(.glider),
+  .seg :global(.glider) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    pointer-events: none;
+    transition:
+      transform 520ms var(--mo-out),
+      width 520ms var(--mo-out),
+      opacity var(--sx-beat) var(--mo-out);
+  }
+  .links :global(.glider) { border-radius: var(--sx-r-1); background: var(--sx-accent-soft); }
+  .links :global(.glider.hover) {
+    background: var(--sx-sunk);
+    transition:
+      transform 300ms var(--mo-out),
+      width 300ms var(--mo-out),
+      opacity var(--sx-beat) var(--mo-out);
+  }
+  .seg :global(.glider) {
+    border-radius: var(--sx-r-pill);
+    background: var(--sx-surface);
+    box-shadow: var(--sx-e-1);
+    transition:
+      transform 480ms var(--mo-spring),
+      width 480ms var(--mo-spring),
+      opacity var(--sx-beat) var(--mo-out);
+  }
+  /* El punto de la marca elegida brota cuando lo alcanza la pastilla. */
+  .sw .dot { transition: transform 420ms var(--mo-spring); }
+  .sw.on .dot { transform: scale(1.18); }
+  .sw:active .dot { transform: scale(.8); }
+  .sw .ti { transition: transform 600ms var(--mo-out); }
+  .sw.on .ti { transform: rotate(360deg); }
 
   .tools { display: flex; align-items: center; gap: var(--sx-s-2); flex: none; }
 
@@ -680,6 +824,49 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     max-width: 18ch;
     text-wrap: balance;
   }
+  /* ── La entrada de la portada: el único momento con autor ──────────────
+     El resto de la página se revela al scrollear; esto no espera a nada. En
+     orden: la etiqueta se cierra como un titular de imprenta, las palabras
+     suben de su máscara una por una, la bajada se enfoca, y la tarjeta de la
+     firma VIENE hacia vos — más chica, desenfocada y más abajo, hasta que se
+     asienta — y recién entonces le brotan las píldoras. */
+  .hero > .sx-cap { animation: cap-in 900ms var(--mo-out) 80ms backwards; }
+  @keyframes cap-in { from { opacity: 0; letter-spacing: .42em; filter: blur(3px); } }
+
+  .w {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    /* El aire de abajo es para las descendentes («p» de carpetas): sin él la
+       máscara les corta la cola. El margen negativo lo devuelve al renglón. */
+    padding-bottom: .14em;
+    margin-bottom: -.14em;
+  }
+  .w > span {
+    display: inline-block;
+    transform-origin: 0 100%;
+    animation: word-rise 1100ms var(--mo-out) calc(200ms + var(--i) * 80ms) backwards;
+  }
+  @keyframes word-rise { from { transform: translate3d(0, 110%, 0) rotate(6deg); } }
+
+  .lede { animation: lede-in 1000ms var(--mo-out) 620ms backwards; }
+  @keyframes lede-in { from { opacity: 0; transform: translate3d(0, 14px, 0); filter: blur(6px); } }
+
+  .sig { animation: come-to-me 1300ms var(--mo-out) 780ms backwards; transform-origin: 50% 0; }
+  @keyframes come-to-me {
+    from { opacity: 0; transform: translate3d(0, 64px, 0) scale(.88); filter: blur(14px); }
+    60% { filter: blur(0); }
+  }
+  .pills > :global(*) { animation: pill-pop 700ms var(--mo-spring) backwards; }
+  .sigrow:first-child .pills > :global(*) { animation-delay: calc(1180ms + var(--n, 0) * 70ms); }
+  .sigrow:nth-child(2) .pills > :global(*) { animation-delay: calc(1480ms + var(--n, 0) * 70ms); }
+  .pills > :global(:nth-child(2)) { --n: 1; }
+  .pills > :global(:nth-child(3)) { --n: 2; }
+  .pills > :global(:nth-child(4)) { --n: 3; }
+  .pills > :global(:nth-child(5)) { --n: 4; }
+  @keyframes pill-pop { from { opacity: 0; transform: scale(.5) translate3d(0, 8px, 0); } }
+  .signote { animation: lede-in 900ms var(--mo-out) 1700ms backwards; }
+
   .lede {
     margin: var(--sx-s-5) 0 0;
     max-width: 66ch;
@@ -900,10 +1087,47 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     box-shadow: var(--sx-e-1);
     color: var(--sx-ink);
     text-decoration: none;
-    transition: transform var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    transition: transform 420ms var(--mo-out), box-shadow 420ms var(--mo-out);
   }
-  .fam:hover { transform: translateY(-1px); box-shadow: var(--sx-e-2); }
-  .fam:active { transform: none; }
+  /* La luz de la arcilla, en tu mano: un foco blanco que sigue al puntero
+     sobre la tarjeta (motion.js escribe --mx/--my). Aparece suave y se va
+     suave; nunca es un borde que se enciende. */
+  .fam::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 0),
+      color-mix(in srgb, var(--sx-accent) 12%, transparent),
+      transparent 62%);
+    opacity: 0;
+    transition: opacity 500ms var(--mo-out);
+    pointer-events: none;
+  }
+  @media (hover: hover) {
+    .fam:hover { transform: translate3d(0, -4px, 0); box-shadow: var(--sx-e-2); }
+    .fam:hover::before { opacity: 1; }
+    .fam:hover .go { transform: translateX(6px); color: var(--sx-accent); }
+    .fam:hover .famname { transform: translateX(2px); }
+  }
+  .fam:active { transform: translate3d(0, -1px, 0) scale(.99); transition-duration: 120ms; }
+  .famname { display: inline-block; transition: transform 420ms var(--mo-out); }
+  .famfoot .go { transition: transform 420ms var(--mo-spring), color 300ms var(--mo-out); }
+
+  /* Las novedades se inclinan hacia el puntero un poco más que una tarjeta:
+     son chicas, y lo chico se mueve más. */
+  .newlist a { transition: box-shadow 360ms var(--mo-out), transform 360ms var(--mo-spring); }
+  @media (hover: hover) {
+    .newlist a:hover { transform: translate3d(0, -2px, 0) scale(1.03); }
+  }
+
+  /* La barra de la prueba se llena del acento de la marca que está puesta: al
+     cambiar de marca, además de teñirse, vuelve a correr. */
+  .ffill { transform-origin: left center; }
   .fam:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
 
   .famtop { margin: 0; display: flex; align-items: baseline; gap: var(--sx-s-3); flex-wrap: wrap; }
@@ -970,5 +1194,15 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
   @media (prefers-reduced-motion: reduce) {
     .fam, .link, .sw, .skip { transition: none; }
     .fam:hover { transform: none; }
+    /* Con moción reducida la portada está puesta desde el primer cuadro: sin
+       entradas, sin firma que se arma, sin deslizadores que viajan. El global
+       de base.css acorta la duración pero NO el retraso — sin este `none`, la
+       tarjeta de la firma esperaría casi un segundo invisible. */
+    .lg-sq, .lg-tri, .lg-tick, .wordmark, .tag, .hero > .sx-cap, .w > span,
+    .lede, .sig, .pills > :global(*), .signote, .brand:hover .lg-sq { animation: none; }
+    .bar::after { display: none; }
+    .links :global(.glider), .seg :global(.glider),
+    .sw .dot, .sw .ti, .famname, .famfoot .go, .newlist a, .bar { transition: none; }
+    .fam::before { display: none; }
   }
 </style>

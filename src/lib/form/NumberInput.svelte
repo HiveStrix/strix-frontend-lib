@@ -280,11 +280,30 @@
     width: var(--sx-s-6); height: var(--sx-s-4);
     padding: 0; border: 0; background: none; cursor: pointer;
     color: var(--sx-ink-3); border-radius: var(--sx-r-1);
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease),
+                opacity 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .steps button:hover:not(:disabled) { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .steps button:disabled { opacity: .35; cursor: not-allowed; }
-  .steps svg { width: 12px; height: 12px; }
+  .steps svg {
+    width: 12px; height: 12px;
+    transition: translate 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+  }
+  /* Each arrow leans the way it counts — up for «sumar», down for «restar» —
+     and a press nudges it one step further before it springs back, so a run of
+     clicks reads as the figure being pushed, not a button being hit. */
+  @media (hover: hover) {
+    .steps button:first-child:hover:not(:disabled) svg { translate: 0 -1px; }
+    .steps button:last-child:hover:not(:disabled) svg { translate: 0 1px; }
+  }
+  .steps button:active:not(:disabled) svg {
+    scale: .8;
+    transition: translate 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
+  .steps button:first-child:active:not(:disabled) svg { translate: 0 -2px; }
+  .steps button:last-child:active:not(:disabled) svg { translate: 0 2px; }
 
   .sr {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -297,5 +316,13 @@
        thumb that misses up still lands on down rather than on nothing. */
     .steps button { width: var(--sx-touch); height: calc(var(--sx-touch) / 2); }
     .steps { margin-right: calc(var(--sx-s-3) * -1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .steps button, .steps svg, .steps button:active:not(:disabled) svg { transition: none; }
+    .steps button:first-child:hover:not(:disabled) svg,
+    .steps button:last-child:hover:not(:disabled) svg,
+    .steps button:first-child:active:not(:disabled) svg,
+    .steps button:last-child:active:not(:disabled) svg { translate: none; scale: none; }
   }
 </style>

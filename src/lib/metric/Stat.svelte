@@ -39,6 +39,7 @@
   // a description. Those are text, and tabular figures on running prose read as
   // a stutter. And never for a state: «Vencido» is a Pill, not a Stat with one
   // word in it.
+  import { expoOut } from 'svelte/easing';
   import { fmtNum, isBlank, numOf } from './format.js';
 
   /** The printed word on the instrument. Always name the thing counted. */
@@ -119,13 +120,30 @@
   // fallback is built from what is on screen, so it is always true.
   $: aria = actionLabel || [label, show(value), unit].filter(Boolean).join(' ');
   $: interactive = !!href || clickable;
+
+  // UNA CIFRA NUEVA SE ASIENTA, no se reemplaza a secas. Nada de contar desde
+  // cero: `value` puede llegar ya formateado («₡4 820 000») y `fmtNum` es
+  // quien decide cómo se lee, así que un conteo pelearía con el formato y con
+  // lo que un lector de pantalla oye. Sólo la cifra que cambió sube 5px y se
+  // enciende. Es una transición LOCAL dentro de `{#key}`: Svelte no la corre
+  // en el primer montaje (de eso se ocupa el keyframe de `.fig`), sólo cuando
+  // el valor cambia de verdad.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function settle() {
+    return {
+      duration: still() ? 0 : 420,
+      easing: expoOut,
+      css: (t, u) => `opacity:${0.25 + 0.75 * t};transform:translateY(${u * 5}px)`
+    };
+  }
 </script>
 
 {#snippet figure()}
   <!-- The figure is a flex row, so the whitespace between these is collapsed
        away and the `gap` is the only spacing there is. -->
   {#if unitBefore && unit}<i class="unit pre">{unit}</i>{/if}
-  <span class="v">{show(value)}</span>
+  {#key value}<span class="v" in:settle>{show(value)}</span>{/key}
   {#if !unitBefore && unit}<i class="unit">{unit}</i>{/if}
   {#if !isBlank(outOf)}<i class="unit">de {show(outOf)}</i>{/if}
   {#if estimate}<i class="est">estimado</i>{/if}
@@ -210,6 +228,23 @@
 
   .v { min-width: 0; }
 
+  /* LA CIFRA SUBE A SU LUGAR y la línea de abajo la sigue; la flecha del
+     cambio brota con resorte — es lo único chico de la celda. El retraso
+     base es `--sx-stat-delay`, que pone quien la contiene (StatStrip reparte
+     uno por celda para que el instrumento se encienda de a una). Keyframes
+     con `backwards`: si no corren, la cifra está. */
+  .fig { animation: sx-fig-in 560ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) var(--sx-stat-delay, 0ms) backwards; }
+  .line {
+    animation: sx-fig-in 480ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+    animation-delay: calc(var(--sx-stat-delay, 0ms) + 90ms);
+  }
+  .delta .mk {
+    animation: sx-fig-pop 480ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)) backwards;
+    animation-delay: calc(var(--sx-stat-delay, 0ms) + 220ms);
+  }
+  @keyframes sx-fig-in { from { opacity: 0; transform: translateY(8px); } }
+  @keyframes sx-fig-pop { from { opacity: 0; transform: scale(.2); } }
+
   /* The unit is read once and then ignored; the figure is read every time. */
   .unit {
     font-style: normal;
@@ -262,6 +297,13 @@
     text-align: left;
     text-decoration: none;
     cursor: pointer;
+  }
+  /* El subrayado se ENCIENDE en vez de aparecer: está siempre, transparente,
+     y el hover sólo le da color. */
+  .jump .v {
+    text-decoration: underline transparent;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .jump:hover .v { text-decoration: underline; text-underline-offset: 4px; }
   /* Carried rather than inherited from base.css, for the shadow-root reason
@@ -327,6 +369,8 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .bone { animation: none; background: var(--sx-sunk); }
+    .fig, .line, .delta .mk { animation: none; }
+    .jump .v { transition: none; }
   }
 
   /* A figure poked with a thumb needs a thumb-sized door. The target grows

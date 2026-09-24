@@ -220,7 +220,16 @@
     align-items: flex-start;
     justify-content: center;
     padding: var(--sx-s-12) var(--sx-s-4) var(--sx-s-4);
-    animation: scrim-in var(--sx-fast) var(--sx-ease);
+    /* El velo cae más despacio que el panel llega: primero se apaga la sala,
+       después viene lo que hay que leer. */
+    animation: scrim-in 320ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
+  /* A light frost, ONLY where it exists and only as a ramp on top of the
+     `--sx-scrim` colour — the veil is still carried by the colour, as the note
+     above demands; the blur is a garnish Firefox-without-it simply skips. A
+     dialog is a wall, so blurring what is behind it costs nothing to read. */
+  @supports (backdrop-filter: blur(1px)) {
+    .scrim { backdrop-filter: blur(3px); animation-name: scrim-in, scrim-frost; }
   }
 
   .panel {
@@ -234,7 +243,12 @@
     color: var(--sx-ink);
     border-radius: var(--sx-r-3);
     box-shadow: var(--sx-e-3);
-    animation: panel-in var(--sx-beat) var(--sx-ease);
+    /* VIENE HACIA VOS, no aparece: un poco más chico, un poco más abajo y
+       desenfocado, y se asienta con una desaceleración larga. `backwards`
+       sólo sostiene el primer cuadro; al terminar no queda ni `transform` ni
+       `filter` colgado que atrape a un `fixed` de adentro. */
+    transform-origin: 50% 30%;
+    animation: panel-in 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
   /* Widths in `ch`: a dialog is prose plus controls, and the measure is what
      decides how wide it should be. */
@@ -301,7 +315,10 @@
   }
 
   @keyframes scrim-in { from { opacity: 0; } }
-  @keyframes panel-in { from { opacity: 0; transform: translateY(var(--sx-s-2)); } }
+  @keyframes scrim-frost { from { backdrop-filter: blur(0); } }
+  @keyframes panel-in {
+    from { opacity: 0; transform: translateY(12px) scale(.94); filter: blur(6px); }
+  }
 
   /* A tablet in landscape is 1024px wide and is still poked with a thumb, so
      this is keyed to the pointer as much as to the width. The sheet rises from
@@ -320,8 +337,13 @@
     .x svg { width: 1em; height: 1em; }
     footer { border-radius: 0; padding-bottom: max(var(--sx-s-4), env(safe-area-inset-bottom)); }
   }
-  @keyframes sheet-in { from { transform: translateY(var(--sx-s-6)); } }
+  /* La hoja sube entera desde el borde donde ya está la mano, y frena al
+     llegar: el mismo ease-out, más recorrido. */
+  @keyframes sheet-in { from { transform: translateY(100%); } }
 
+  /* No exit animation, on purpose: the focus return hangs off destroy (rule 4
+     above), and an outro would hold the node — and the focus — for its whole
+     duration. It leaves at once, like Sheet. */
   @media (prefers-reduced-motion: reduce) {
     .scrim, .panel { animation: none; }
   }

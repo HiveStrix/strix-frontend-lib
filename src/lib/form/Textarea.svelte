@@ -41,6 +41,7 @@
   // that says «se quemó» in nine spellings. Free text is where information goes
   // to stop being data.
   import Field from './Field.svelte';
+  import { cubicOut } from 'svelte/easing';
 
   export let value = '';
   /** The floor, in lines. The box never starts smaller than this. */
@@ -99,6 +100,16 @@
   function onInput(e) {
     value = e.currentTarget.value;
   }
+
+  // The counter wakes up in the last stretch, so it should arrive, not blink
+  // on: it rises the last few pixels into its place. Script transitions do not
+  // hear the stylesheet's reduced-motion block, so this one asks.
+  function wake() {
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return { duration: 0 };
+    }
+    return { duration: 240, easing: cubicOut, css: (t, u) => `opacity: ${t}; transform: translateY(${u * 3}px)` };
+  }
 </script>
 
 <Field
@@ -144,7 +155,7 @@
        props handed to it, and the ones on the component belong to the default. -->
   <span slot="meta" let:id={fid} class="count" class:show={showCount}>
     {#if showCount}
-      <span id={`${fid}-c`} class="fig sx-num" class:over aria-hidden="true">
+      <span id={`${fid}-c`} class="fig sx-num" class:over aria-hidden="true" in:wake>
         {over ? `${-remaining} de más` : `quedan ${remaining}`}
       </span>
     {/if}
@@ -198,6 +209,8 @@
   /* The tone never travels alone: «quedan 12» becomes «7 de más», so the number
      and the word change together and neither depends on seeing red. */
   .fig.over { color: var(--sx-critical); font-weight: var(--sx-w-semi); }
+  /* `transform` needs a box; and the tone crossing into critical eases over. */
+  .fig { display: inline-block; transition: color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
 
   .sr {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -206,5 +219,9 @@
 
   @media (pointer: coarse) {
     .grow { font-size: 16px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fig { transition: none; }
   }
 </style>

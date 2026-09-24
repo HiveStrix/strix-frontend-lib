@@ -97,6 +97,10 @@
     flex-wrap: nowrap;
     gap: 0;
     max-width: 100%;
+    /* Welded keys do not shrink when pressed: a half that scales opens a
+       sliver in the seam. The sink alone says «pressed» here. Button reads
+       this knob; it inherits, so one line covers every child. */
+    --sx-btn-press: 1;
   }
   .attached > :global(button),
   .attached > :global(a) {

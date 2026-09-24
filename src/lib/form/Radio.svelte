@@ -108,18 +108,32 @@
     border-radius: var(--sx-r-pill);
     background: var(--sx-field);
     box-shadow: var(--sx-e-field);
-    transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
+    transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease),
+                scale 420ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
+  /* The dot leaves quickly and arrives on a spring — a small overshoot and
+     settle, so the choice lands rather than appears. Each state names its own
+     clock because a transition runs on the rule it is going TO. */
   .dot::after {
     content: ''; position: absolute; inset: 4px;
     border-radius: var(--sx-r-pill);
     background: var(--sx-accent);
     transform: scale(0);
-    transition: transform var(--sx-fast) var(--sx-ease);
+    transition: transform 140ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0));
   }
   .rd:hover .dot { border-color: var(--sx-ink-3); }
   input:checked + .dot { border-color: var(--sx-accent); }
-  input:checked + .dot::after { transform: scale(1); }
+  input:checked + .dot::after {
+    transform: scale(1);
+    transition: transform 360ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+  }
+  /* Held, the ring gives a little; let go, it springs back as the dot lands. */
+  .rd:not(.disabled):active .dot,
+  .rd:not(.disabled) input:active + .dot {
+    scale: .88;
+    transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease),
+                scale 110ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
 
   input:focus-visible + .dot { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
   :global([data-sx-theme='dark']) input:focus-visible + .dot,
@@ -149,5 +163,11 @@
     .dot { width: 22px; height: 22px; margin-top: 0; }
     .dot::after { inset: 5px; }
     .lb { font-size: var(--sx-t-md); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot, .dot::after, input:checked + .dot::after { transition: none; }
+    .rd:not(.disabled):active .dot,
+    .rd:not(.disabled) input:active + .dot { scale: none; transition: none; }
   }
 </style>

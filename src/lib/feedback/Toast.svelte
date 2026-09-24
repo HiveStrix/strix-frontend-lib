@@ -35,6 +35,8 @@
   // the field, not in the corner. For anything that must be readable later: a
   // toast is not a log. And never for a message longer than one sentence.
   import { createEventDispatcher, onDestroy } from 'svelte';
+  import { flip } from 'svelte/animate';
+  import { cubicIn, expoOut } from 'svelte/easing';
   import { markOf } from '../marks.js';
 
   /** [{ id, text, tone?, action?, duration? }] — id must be stable and unique. */
@@ -113,6 +115,39 @@
   // start, empty, which is what makes the announcement work at all.
   $: loud = toasts.filter((t) => t.tone === 'critical');
   $: calm = toasts.filter((t) => t.tone !== 'critical');
+
+  // ── La moción que CSS no alcanza ──────────────────────────────────────────
+  // La LLEGADA es un keyframe de CSS (ver `toast-in`): no depende de que este
+  // script corra. Lo que sí necesita JS son las otras dos cosas: que la pila se
+  // REACOMODE deslizándose cuando uno se va (`flip`), y que el que se va SALGA
+  // hacia su borde en vez de desaparecer. Ninguna de las dos toca los relojes
+  // de arriba: el aviso ya fue despachado cuando esto empieza, sólo se está
+  // yendo. Durante esos ~200ms no recibe el puntero — un toast que se va no
+  // puede volver a pausar la pila al pasarle por encima.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // En un teléfono la pila ocupa la columna y los avisos suben desde abajo;
+  // en escritorio viven en la esquina y entran y salen por la derecha.
+  const narrow = () =>
+    typeof matchMedia === 'function' && matchMedia('(max-width: 560px), (pointer: coarse)').matches;
+
+  //
+  // `translate`/`scale` sueltos y no `transform`: `flip` saca al que se va del
+  // flujo con `position: absolute` y lo deja en su sitio con un `transform`
+  // en línea. Un keyframe de `transform` lo pisaría y el toast saltaría al
+  // tope de la pila antes de irse; las propiedades individuales se COMPONEN
+  // con ese `transform` en vez de reemplazarlo.
+  function leave(node) {
+    node.style.pointerEvents = 'none';
+    const down = narrow();
+    return {
+      duration: still() ? 0 : 200,
+      easing: cubicIn,
+      css: (t, u) =>
+        `opacity:${t};translate:${down ? `0 ${u * 14}px` : `${u * 32}px 0`};scale:${0.96 + 0.04 * t}`
+    };
+  }
+  const glide = (node, fromTo) => flip(node, fromTo, { duration: still() ? 0 : 360, easing: expoOut });
 </script>
 
 <div class="stack" role="region" aria-label={label}>
@@ -126,6 +161,8 @@
         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
         <li
           class="toast {t.tone ?? 'neutral'}"
+          animate:glide
+          out:leave
           on:pointerenter={() => (paused = true)}
           on:pointerleave={() => (paused = false)}
           on:focusin={() => (paused = true)}
@@ -206,7 +243,11 @@
     box-shadow: var(--sx-e-3), var(--sx-e-inset), inset var(--sx-tone-bar, 3px) 0 0 var(--t-bar);
     font-size: var(--sx-t-sm);
     line-height: 1.45;
-    animation: toast-in var(--sx-beat) var(--sx-ease);
+    /* Llega desde su borde, un poco más chico y desenfocado, y se asienta: no
+       aparece en la cara de nadie. Es un panel acotado y flotante, el único
+       lugar donde el sistema se permite un desenfoque. */
+    transform-origin: 100% 100%;
+    animation: toast-in 440ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
   .positive  { --t-ink: var(--sx-positive);  --t-band: var(--sx-positive-band);  --t-bar: var(--sx-positive); }
   .attention { --t-ink: var(--sx-attention); --t-band: var(--sx-attention-band); --t-bar: var(--sx-attention); }
@@ -264,12 +305,18 @@
   /* El botón de cerrar se ilumina bajo el cursor; --sx-sunk lo hundía. */
   .x:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
 
-  @keyframes toast-in { from { opacity: 0; transform: translateY(var(--sx-s-2)); } }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateX(28px) scale(.96); filter: blur(4px); }
+  }
+  @keyframes toast-rise {
+    from { opacity: 0; transform: translateY(20px) scale(.97); filter: blur(4px); }
+  }
 
   /* On a phone the stack spans the column, because a 46ch card floating in the
      corner of a 390px screen is a card with four words per line. */
   @media (max-width: 560px), (pointer: coarse) {
     .stack { left: var(--sx-s-3); right: var(--sx-s-3); width: auto; }
+    .toast { transform-origin: 50% 100%; animation-name: toast-rise; }
     .act, .x { min-height: var(--sx-touch); min-width: var(--sx-touch); }
     .act { padding-inline: var(--sx-s-4); font-size: var(--sx-t-sm); }
   }

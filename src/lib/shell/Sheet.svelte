@@ -280,7 +280,11 @@
        dark, so the drawer's «behind» was doing nothing at all on the dark theme
        and the list underneath stayed as bright as the drawer. */
     background: var(--sx-scrim);
-    animation: sx-fade var(--sx-beat) var(--sx-ease);
+    /* Sin desenfoque, a propósito — a diferencia de Dialog. El cajón existe
+       para que la lista de atrás SIGA LEGIBLE («cuál de las veintidós era»);
+       esmerilarla le quitaría justo eso. Sólo se apaga, un poco más lento que
+       lo que tarda el panel en llegar. */
+    animation: sx-fade 360ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
 
   .panel {
@@ -295,7 +299,11 @@
        and a drawer is not going to be the place that invents one. 320 / 400 / 560. */
     width: min(100%, calc(var(--sx-s-20) * 5));
     margin-left: auto;
-    animation: sx-in-right var(--sx-beat) var(--sx-ease);
+    /* EL CAJÓN SE DESLIZA DESDE SU BORDE, entero, y frena al llegar: la
+       desaceleración larga hace que el recorrido se lea como un solo gesto y
+       no como un salto. `backwards` y no `both`: al terminar no queda ningún
+       `transform` en el panel que atrape a un `fixed` de adentro. */
+    animation: sx-in-right 440ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
   .sm { width: min(100%, calc(var(--sx-s-20) * 4)); }
   .lg { width: min(100%, calc(var(--sx-s-20) * 7)); }
@@ -370,8 +378,8 @@
   }
 
   @keyframes sx-fade { from { opacity: 0; } }
-  @keyframes sx-in-right { from { transform: translateX(4%); opacity: 0; } }
-  @keyframes sx-in-left { from { transform: translateX(-4%); opacity: 0; } }
+  @keyframes sx-in-right { from { transform: translateX(100%); } }
+  @keyframes sx-in-left { from { transform: translateX(-100%); } }
 
   /* base.css turns motion off for a document; a Core has no base.css, so the
      component turns its own off. The sheet still arrives — it just arrives. */

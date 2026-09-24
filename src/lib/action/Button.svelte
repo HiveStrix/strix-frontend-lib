@@ -43,6 +43,7 @@
   // `href` renders a real <a>. A thing that navigates is a link — it belongs in
   // a new tab on middle click, and a button never will be.
   import { createEventDispatcher } from 'svelte';
+  import { fade } from 'svelte/transition';
   import { pickVariant, BUTTON_VARIANTS } from '../variants.js';
 
   /** solid(1) | outline(2) | ghost(3) | danger(4) | frosted(5) — por nombre o
@@ -97,6 +98,11 @@
   // arguing with the first. Only the wordless button gets one.
   $: name = onlyIcon ? label : undefined;
 
+  // A Svelte transition is script, so the stylesheet's reduced-motion block
+  // cannot reach it: it has to ask for itself.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   function onClick(e) {
     if (locked) {
       e.preventDefault();
@@ -135,7 +141,7 @@
       {#if $$slots.icon}<span class="ic"><slot name="icon" /></span>{/if}
       {#if !onlyIcon}<span class="lb"><slot /></span>{/if}
     </span>
-    {#if busy}<span class="sp" aria-hidden="true"></span>{/if}
+    {#if busy}<span class="sp" aria-hidden="true" out:fade={{ duration: still() ? 0 : 120 }}></span>{/if}
   </a>
 {:else}
   <button
@@ -164,7 +170,7 @@
       {#if $$slots.icon}<span class="ic"><slot name="icon" /></span>{/if}
       {#if !onlyIcon}<span class="lb"><slot /></span>{/if}
     </span>
-    {#if busy}<span class="sp" aria-hidden="true"></span>{/if}
+    {#if busy}<span class="sp" aria-hidden="true" out:fade={{ duration: still() ? 0 : 120 }}></span>{/if}
   </button>
 {/if}
 
@@ -192,17 +198,31 @@
     border: 1px solid transparent;
     /* --sx-btn-radius: perilla de la variante (píldora); main, --sx-r-2. */
     border-radius: var(--sx-btn-radius, var(--sx-r-2));
+    /* Two clocks, swapped by :active (see Pressed). The lift and the shadow
+       glide; the scale gives back on a spring, so releasing a key feels like
+       the key pushing back, not like a style being removed. `translate` and
+       `scale` are separate properties from `transform` so the hover lift and
+       the press can each keep their own timing. */
+    --btn-glide: 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    --btn-give: 440ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
     transition:
       background-color var(--sx-fast) var(--sx-ease),
       border-color var(--sx-fast) var(--sx-ease),
       color var(--sx-fast) var(--sx-ease),
-      box-shadow var(--sx-fast) var(--sx-ease),
-      transform var(--sx-fast) var(--sx-ease);
+      box-shadow var(--btn-glide),
+      transform var(--btn-glide),
+      translate var(--btn-glide),
+      scale var(--btn-give);
   }
 
-  .face { display: inline-flex; align-items: center; justify-content: center; gap: inherit; min-width: 0; }
+  .face {
+    display: inline-flex; align-items: center; justify-content: center; gap: inherit; min-width: 0;
+    transition:
+      opacity 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      scale 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
   .lb { overflow: hidden; text-overflow: ellipsis; }
-  .ic { display: inline-flex; flex: none; }
+  .ic { display: inline-flex; flex: none; transition: scale 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
   /* A safety net for anyone forwarding a slot: a declared-but-empty icon slot
      still counts as filled, and a phantom 8px before the label is exactly the
      drift that makes a toolbar look hand-assembled. SplitButton avoids the case
@@ -227,7 +247,9 @@
   .only.lg { width: var(--sx-s-12); }
 
   .pill { border-radius: var(--sx-r-pill); }
-  .block { width: 100%; }
+  /* A full-width key shrinking by 3 % is a 10px squeeze on a phone footer;
+     the press keeps the same feel at half the travel. */
+  .block { width: 100%; --sx-btn-press: .985; }
 
   /* ── Variants ─────────────────────────────────────────────────────────────
      `solid` wears a GLOSSY finish — a specular sheen over the accent — and is
@@ -322,7 +344,7 @@
   @media (hover: hover) {
     .solid:not(:disabled):not(.locked):hover,
     .danger:not(:disabled):not(.locked):hover {
-      transform: translateY(-1px);
+      translate: 0 -1px;
       box-shadow: var(--btn-inset, var(--sx-e-inset)), var(--sx-e-2);
     }
     .solid:not(:disabled):not(.locked):hover {
@@ -348,10 +370,13 @@
       color: var(--sx-ink);
     }
     .frosted:not(:disabled):not(.locked):hover {
-      transform: translateY(-1px);
+      translate: 0 -1px;
       border-color: rgba(255, 255, 255, .85);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), var(--sx-e-2);
     }
+    /* The glyph leans in a hair — every variant, flat ones included: it says
+       «this one» without moving the box inside a dense row. */
+    .sx-btn:not(:disabled):not(.locked):hover .ic { scale: 1.08; }
   }
   @keyframes sx-btn-sweep {
     0% { left: -45%; opacity: 0; }
@@ -361,6 +386,16 @@
   }
 
   .sx-btn:not(:disabled):not(.locked):active { transform: none; }
+  /* Pressed: the key goes down fast and small; on release the base clocks
+     take over again and the scale springs home. `--sx-btn-press` is a knob:
+     a welded group (ButtonGroup attached, SplitButton) sets it to 1, because
+     a half that shrinks opens a gap in the seam. */
+  .sx-btn:not(:disabled):not(.locked):active {
+    --btn-glide: 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    --btn-give: 110ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    translate: none;
+    scale: var(--sx-btn-press, .97);
+  }
   /* Apretado se HUNDE (variante colorida): el relieve se invierte en el
      tallado, que es lo que hace una tecla física al bajar. */
   .solid:not(:disabled):not(.locked):active,
@@ -427,6 +462,8 @@
     cursor: not-allowed;
     box-shadow: none;
     transform: none;
+    translate: none;
+    scale: none;
   }
   .outline:disabled, .outline.off,
   .ghost:disabled, .ghost.off,
@@ -445,6 +482,17 @@
   /* Working is not unavailable: it keeps its weight and only says it is thinking. */
   .sx-btn.busy { cursor: progress; }
   .busy .face { visibility: hidden; }
+  /* The label steps back and the spinner steps in, instead of one swapping for
+     the other in a frame. Leaving is quicker than arriving; visibility waits
+     for the fade, so the width promise above still holds throughout. */
+  .busy .face {
+    opacity: 0;
+    scale: .94;
+    transition:
+      opacity 120ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+      scale 120ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+      visibility 0s linear 120ms;
+  }
 
   .sp {
     position: absolute;
@@ -455,9 +503,14 @@
     border: 2px solid currentColor;
     border-right-color: transparent;
     border-radius: var(--sx-r-pill);
-    animation: sx-btn-spin 700ms linear infinite;
+    /* The arrival rides `scale` and the spin rides `transform`, so the two
+       animations never fight over the same property. */
+    animation:
+      sx-btn-sp-in 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) both,
+      sx-btn-spin 700ms linear infinite;
   }
   @keyframes sx-btn-spin { to { transform: rotate(360deg); } }
+  @keyframes sx-btn-sp-in { from { opacity: 0; scale: .5; } }
 
   /* Reduced motion stops the spin. What is left is a deliberate broken ring —
      the standing glyph for «waiting» — rather than an accident of a global
@@ -470,6 +523,12 @@
     /* No sweep, no growing gloss — the gloss stays at its resting size. */
     .solid::after { display: none; }
     .solid::before { transition: none; }
+    /* No lift, no squeeze, no leaning glyph: the sink still says «pressed». */
+    .sx-btn:not(:disabled):not(.locked):hover,
+    .sx-btn:not(:disabled):not(.locked):active { translate: none; scale: none; }
+    .sx-btn:not(:disabled):not(.locked):hover .ic { scale: none; }
+    .face, .ic, .busy .face { transition: none; }
+    .busy .face { scale: none; }
   }
 
   /* A tablet in landscape is 1024px and is still poked with a thumb, so this is

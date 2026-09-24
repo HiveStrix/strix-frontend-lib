@@ -167,6 +167,28 @@
   .mark { flex: none; color: var(--sx-critical); }
   .mark svg { width: var(--sx-s-8); height: var(--sx-s-8); }
 
+  /* LA LLEGADA: la marca flota a su sitio y las dos mitades del error la
+     siguen — el problema primero, la recuperación después, la acción al final:
+     el orden en que hay que leerlas. Con la curva de salida y SIN resorte: un
+     error que rebota se lee como una broma. La banda, que se apoya sobre datos
+     que siguen buenos, baja a su lugar como un Alert. Todo `backwards`: si no
+     corre, se ve. */
+  .err:not(.band) .mark { animation: sx-err-float 600ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  .err:not(.band) .title,
+  .err:not(.band) .say,
+  .err:not(.band) .acts,
+  .err:not(.band) .code {
+    animation: sx-err-rise 500ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  .err:not(.band) .title { animation-delay: 80ms; }
+  .err:not(.band) .say { animation-delay: 140ms; }
+  .err:not(.band) .acts { animation-delay: 200ms; }
+  .err:not(.band) .code { animation-delay: 240ms; }
+  .band { animation: sx-err-band 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  @keyframes sx-err-float { from { opacity: 0; transform: translateY(8px) scale(.9); } }
+  @keyframes sx-err-rise { from { opacity: 0; transform: translateY(6px); } }
+  @keyframes sx-err-band { from { opacity: 0; transform: translateY(-8px); } }
+
   .body { flex: 1; min-width: 0; }
 
   .title {
@@ -211,7 +233,7 @@
     border-radius: var(--sx-r-1);
   }
   .more:hover { color: var(--sx-ink-2); }
-  .chev { width: .85em; height: .85em; transition: transform var(--sx-fast) var(--sx-ease); }
+  .chev { width: .85em; height: .85em; transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
   .chev.open { transform: rotate(90deg); }
 
   .codeline {
@@ -224,7 +246,10 @@
     background: var(--sx-sunk);
     border-radius: var(--sx-r-1);
     font-size: var(--sx-t-xs);
+    /* Se despliega bajo el disclosure, desde el renglón que lo abrió. */
+    animation: sx-err-reveal 320ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
+  @keyframes sx-err-reveal { from { opacity: 0; transform: translateY(-4px); } }
   .codeline code { color: var(--sx-ink-2); user-select: all; }
   .copy {
     margin-left: auto;
@@ -277,5 +302,12 @@
 
   @media (prefers-reduced-motion: reduce) {
     .chev { transition: none; }
+    .err:not(.band) .mark,
+    .err:not(.band) .title,
+    .err:not(.band) .say,
+    .err:not(.band) .acts,
+    .err:not(.band) .code,
+    .band,
+    .codeline { animation: none; }
   }
 </style>

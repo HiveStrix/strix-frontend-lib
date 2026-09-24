@@ -63,7 +63,7 @@
   // Enter or Space to commit — otherwise arrowing across five tabs fires five
   // requests. A group tab never auto-activates: arrowing onto it only focuses
   // it, because there is no one child that «arriving» should pick.
-  import { createEventDispatcher, tick, onDestroy, flushSync } from 'svelte';
+  import { createEventDispatcher, tick, onDestroy, onMount, flushSync } from 'svelte';
   import { supportsPopover, syncPopover } from '../shell/toplayer.js';
 
   /** [{ key, label, count?, disabled?, items? }]. An item with `items` is a
@@ -294,10 +294,103 @@
     window.removeEventListener('resize', onResize);
     document.removeEventListener('scroll', onScroll, true);
   });
+
+  // ── The ink: one underline that travels ─────────────────────────────────
+  // Instead of the bar going out under one tab and coming on under another,
+  // a single bar slides along the rail to the new tab and takes its width, so
+  // the eye is carried from one side to the other. Measured with offsets —
+  // layout, unbent by any transform an ancestor is animating — against the
+  // tablist, which scrolls sideways and takes the bar along with it.
+  //
+  // Only a new selection travels. The first placement is drawn in place (the
+  // bar is created already there), and a resize, a web font landing or a
+  // count that changes a tab's width re-seat it without travel. If it cannot
+  // measure (hidden, zero width), each selected tab draws its own bar, as it
+  // always has.
+  let listEl;
+  let ink = null;
+  let inkTravel = false;
+  let ro = null;
+  const watched = new Set();
+
+  function placeInk(glide) {
+    const b = activeTopKey != null ? btns[activeTopKey] : null;
+    if (!listEl || !b || !b.isConnected || !b.offsetWidth) { ink = null; return; }
+    const next = { x: b.offsetLeft, w: b.offsetWidth };
+    if (ink && next.x === ink.x && next.w === ink.w) return;
+    inkTravel = glide && !!ink;
+    ink = next;
+    watchTabs();
+  }
+
+  // Every tab is watched: a count growing in one tab pushes the ones after it
+  // sideways without changing their size. Each node is observed once —
+  // observing again re-fires the observer, which would place, which would
+  // observe: a loop.
+  function watchTabs() {
+    if (!ro) return;
+    for (const el of watched) if (!el.isConnected) { ro.unobserve(el); watched.delete(el); }
+    for (const el of Object.values(btns)) {
+      if (el && el.isConnected && !watched.has(el)) { ro.observe(el); watched.add(el); }
+    }
+  }
+
+  $: if (listEl) followInk(activeTopKey, items);
+  async function followInk() {
+    await tick();
+    placeInk(true);
+  }
+
+  // ── The panel arrives from the side it was asked for ────────────────────
+  // Choosing a tab to the right slides the new body in a few pixels from the
+  // right (and from the left for one to the left), fading up as it settles —
+  // the content follows the ink. A Web Animation and not a class: it runs on
+  // the panel the slot already rendered (nothing is re-mounted, no state in
+  // the panel is lost) and, when it ends, it is gone — no `transform` left
+  // hanging on an ancestor to trap a `position: fixed` inside it.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let panelEl;
+  let lastTop = null;
+  let slide = null;
+  $: arrive(activeTopKey);
+  function arrive(k) {
+    const i = items.findIndex((t) => t.key === k);
+    const from = lastTop;
+    lastTop = i;
+    if (from === null || from < 0 || i < 0 || from === i || !panelEl?.animate || still()) return;
+    slide?.cancel();
+    slide = panelEl.animate(
+      [
+        { opacity: 0, transform: `translateX(${i > from ? 14 : -14}px)` },
+        { opacity: 1, transform: 'none' }
+      ],
+      { duration: 320, easing: 'cubic-bezier(.16, 1, .3, 1)' }
+    );
+  }
+
+  onMount(() => {
+    if (typeof ResizeObserver === 'function') {
+      ro = new ResizeObserver(() => placeInk(false));
+      ro.observe(listEl);
+      watchTabs();
+    }
+    document.fonts?.ready.then(() => placeInk(false));
+    return () => { ro?.disconnect(); slide?.cancel(); };
+  });
 </script>
 
 <div class="tabs">
-  <div class="list" role="tablist" aria-label={label || undefined}>
+  <div class="list" class:glide={!!ink} role="tablist" aria-label={label || undefined} bind:this={listEl}>
+    {#if ink}
+      <span
+        class="ink"
+        class:travel={inkTravel}
+        aria-hidden="true"
+        style:width="{ink.w}px"
+        style:transform="translateX({ink.x}px)"
+      ></span>
+    {/if}
     {#each items as t (t.key)}
       <!-- The arrow keys are bound on the TAB, not on the tablist: the listener
            belongs on the thing that has focus, and a keydown handler on a
@@ -372,7 +465,7 @@
          to tab to, and without a tab stop a keyboard user arrives at the tab,
          presses Tab, and lands past the very thing the tab just revealed. -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
-    <div class="panel" id="{uid}-p" role="tabpanel" tabindex="0"
+    <div class="panel" id="{uid}-p" role="tabpanel" tabindex="0" bind:this={panelEl}
       aria-labelledby={activeTopKey != null ? tabId(activeTopKey) : undefined}>
       <slot {value} />
     </div>
@@ -383,6 +476,8 @@
   .tabs { display: flex; flex-direction: column; min-width: 0; }
 
   .list {
+    /* The ink is placed against the tablist and scrolls with it. */
+    position: relative;
     display: flex;
     align-items: stretch;
     gap: var(--sx-s-1);
@@ -414,7 +509,10 @@
     line-height: 1.2;
     white-space: nowrap;
     cursor: pointer;
-    transition: color var(--sx-fast) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
+    /* The label inks in on the ink's clock, so the word lights as the bar
+       arrives under it; the hover wash glides in and out. */
+    transition: color 280ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
 
   /* Igual que una fila de tabla: la pestaña bajo el cursor se ilumina con el
@@ -435,6 +533,32 @@
     border-radius: var(--sx-r-pill);
     background: var(--sx-accent);
   }
+  /* The travelling ink draws the bar now — one bar, never two. The box is
+     the whole tab; the bar inside keeps the same inset as the one above. */
+  .glide .tab.on::after { content: none; }
+  .ink {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .ink::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline: var(--sx-s-2);
+    border-radius: var(--sx-r-pill);
+    background: var(--sx-accent);
+  }
+  /* A glide, not a spring: across a rail of six tabs a spring's overshoot is
+     tens of pixels, which reads as wobble, not as life. */
+  .ink.travel {
+    transition:
+      transform 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      width 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
 
   .tab:disabled {
     color: var(--sx-ink-3);
@@ -449,7 +573,7 @@
     height: 14px;
     margin-inline-start: calc(-1 * var(--sx-s-1));
     color: var(--sx-ink-3);
-    transition: transform var(--sx-fast) var(--sx-ease);
+    transition: transform 280ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .cv.open { transform: rotate(180deg); }
   .tab.on .cv { color: var(--sx-ink-2); }
@@ -498,8 +622,16 @@
     width: auto;
     height: auto;
     overflow-x: visible;
+    /* The dropdown unfolds from its tab — a touch smaller, a few pixels back
+       toward the rail, transparent — and settles. It is created fresh on every
+       open (it lives in an {#if}), so a keyframe plays each time. */
+    transform-origin: top left;
+    animation: sx-tabs-menu-in 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .menu.up { top: auto; bottom: calc(100% + var(--sx-s-1)); }
+  .menu.up { transform-origin: bottom left; animation-name: sx-tabs-menu-in-up; }
+  @keyframes sx-tabs-menu-in { from { opacity: 0; transform: translateY(-4px) scale(.96); } }
+  @keyframes sx-tabs-menu-in-up { from { opacity: 0; transform: translateY(4px) scale(.96); } }
   .menu.fx {
     position: fixed;
     right: auto;
@@ -558,5 +690,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .tab, .cv, .item { transition: none; }
+    /* The ink jumps to the new tab; the menu is simply there. */
+    .ink.travel { transition: none; }
+    .menu, .menu.up { animation: none; }
   }
 </style>

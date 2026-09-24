@@ -31,6 +31,7 @@
   // filtering a list — that is a Pill in pressed state, which lives beside the
   // list it filters.
   import { createEventDispatcher } from 'svelte';
+  import { backOut } from 'svelte/easing';
 
   export let checked = false;
   export let label = '';
@@ -49,6 +50,27 @@
   $: labelId = `${sid}-l`;
   $: hintId = `${sid}-h`;
   $: locked = disabled || busy;
+
+  // Script transitions do not hear the stylesheet's reduced-motion block.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // The glyph that arrives turns in from a quarter-turn back and settles with a
+  // small overshoot; the one leaving just fades. Both stack in the knob's one
+  // grid cell, so the swap is a crossfade and never a jump. Local, as every
+  // Svelte transition is: the first paint shows the glyph already there.
+  function turnIn(node) {
+    if (still()) return { duration: 0 };
+    return {
+      duration: 320,
+      easing: backOut,
+      css: (t, u) => `opacity: ${Math.min(1, t * 1.6)}; transform: rotate(${u * -90}deg) scale(${0.4 + 0.6 * t})`
+    };
+  }
+  function fadeOut() {
+    if (still()) return { duration: 0 };
+    return { duration: 110, css: (t) => `opacity: ${t}` };
+  }
 
   function toggle() {
     if (locked) return;
@@ -89,11 +111,11 @@
     >
       <span class="knob">
         {#if busy}
-          <svg class="spin" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="18" stroke-dashoffset="6" /></svg>
+          <svg class="spin" viewBox="0 0 12 12" aria-hidden="true" out:fadeOut><circle cx="6" cy="6" r="4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-dasharray="18" stroke-dashoffset="6" /></svg>
         {:else if checked}
-          <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6.2 4.8 9 10 3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <svg viewBox="0 0 12 12" aria-hidden="true" in:turnIn out:fadeOut><path d="M2 6.2 4.8 9 10 3.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
         {:else}
-          <svg viewBox="0 0 12 12" aria-hidden="true"><rect x="3" y="5.2" width="6" height="1.6" rx=".8" fill="currentColor" /></svg>
+          <svg viewBox="0 0 12 12" aria-hidden="true" in:turnIn out:fadeOut><rect x="3" y="5.2" width="6" height="1.6" rx=".8" fill="currentColor" /></svg>
         {/if}
       </span>
     </button>
@@ -118,6 +140,7 @@
     color: var(--sx-ink-3); min-width: 2ch; text-align: right;
   }
   .word.on { color: var(--sx-ink); }
+  .word { transition: color 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
 
   .track {
     position: relative; flex: none;
@@ -127,7 +150,11 @@
     background: var(--sx-sunk);
     box-shadow: var(--sx-e-sunk);
     cursor: pointer;
-    transition: background var(--sx-beat) var(--sx-ease), border-color var(--sx-beat) var(--sx-ease);
+    /* The fill floods in on the same clock as the knob's glide, so colour and
+       position arrive together instead of the colour snapping ahead. */
+    transition:
+      background-color 260ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      border-color 260ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .track:hover:not(:disabled) { border-color: var(--sx-ink-3); }
   .track.on { background: var(--sx-accent); border-color: var(--sx-accent); }
@@ -148,12 +175,36 @@
        the other place — which still reads, because the position and the glyph
        are both doing the work. */
     transform: translateX(0);
-    transition: transform var(--sx-beat) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    /* Travel and stretch ride a spring on the way home; while the track is
+       held they switch to a quick ease-out (see the press below). */
+    --sw-travel: 440ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+    --sw-stretch: 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+    transition:
+      transform var(--sw-travel),
+      width var(--sw-stretch),
+      background-color 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      color 160ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      box-shadow 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .track.on .knob { transform: translateX(17px); background: var(--sx-accent-ink); color: var(--sx-accent); }
-  .knob svg { width: 11px; height: 11px; }
+  /* The squish. Held down, the knob stretches toward where it is about to go —
+     rightwards when off, leftwards when on (it slides back by the same 4px it
+     grows, so it never leaves the track). Width on a 17px knob inside a
+     fixed-width track moves nothing else on the page. */
+  .track:active:not(:disabled) .knob {
+    --sw-travel: 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    --sw-stretch: 160ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    width: 21px;
+  }
+  .track.on:active:not(:disabled) .knob { transform: translateX(13px); }
+  /* The outgoing and the incoming glyph share one cell, so they crossfade. */
+  .knob svg { width: 11px; height: 11px; grid-area: 1 / 1; }
   .spin { animation: spin 800ms linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (hover: hover) {
+    .track:hover:not(:disabled) .knob { box-shadow: var(--sx-e-2); }
+  }
 
   @media (pointer: coarse) {
     .sw { min-height: var(--sx-touch); }
@@ -161,6 +212,22 @@
     .knob { width: 24px; height: 24px; }
     .knob svg { width: 14px; height: 14px; }
     .track.on .knob { transform: translateX(22px); }
+    .track:active:not(:disabled) .knob { width: 29px; }
+    .track.on:active:not(:disabled) .knob { transform: translateX(17px); }
     .lb { font-size: var(--sx-t-md); }
+  }
+
+  /* The travel stops and the knob simply IS in the other place; the glyph and
+     the position still carry the state. No squish either — a knob that jumps
+     wider under the finger is motion too. */
+  @media (prefers-reduced-motion: reduce) {
+    .track, .knob, .word { transition: none; }
+    .spin { animation: none; }
+    .track:active:not(:disabled) .knob { width: 17px; }
+    .track.on:active:not(:disabled) .knob { transform: translateX(17px); }
+  }
+  @media (prefers-reduced-motion: reduce) and (pointer: coarse) {
+    .track:active:not(:disabled) .knob { width: 24px; }
+    .track.on:active:not(:disabled) .knob { transform: translateX(22px); }
   }
 </style>

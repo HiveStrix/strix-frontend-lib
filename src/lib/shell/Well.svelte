@@ -59,6 +59,17 @@
        well and a plain one are one pixel different in height and a column of
        them stops aligning. */
     border: 1px solid transparent;
+    /* LA JUGADA OPUESTA, TAMBIÉN EN EL TIEMPO. Una Card llega hacia vos, desde
+       más chica; un Well se ASIENTA hacia adentro, desde un pelo más grande,
+       como algo que se hunde en la superficie en vez de levantarse de ella.
+       Sólo transform y opacidad, `backwards`: si no corre, está. */
+    animation: sx-well-in 480ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  @keyframes sx-well-in { from { opacity: 0; transform: scale(1.015); } }
+
+  /* A Core has no base.css to do this for it. */
+  @media (prefers-reduced-motion: reduce) {
+    .well { animation: none; }
   }
 
   .r1 { border-radius: var(--sx-r-1); }

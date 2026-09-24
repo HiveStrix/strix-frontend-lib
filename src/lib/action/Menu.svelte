@@ -445,7 +445,7 @@
        de base.css mandaba el chevrón a un segundo renglón. */
     display: inline-block; vertical-align: middle;
     flex: none; width: 1em; height: 1em; margin-inline-end: calc(var(--sx-s-1) * -1);
-    transition: transform var(--sx-fast) var(--sx-ease);
+    transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .cv.on { transform: rotate(180deg); }
 
@@ -483,10 +483,21 @@
     width: auto;
     height: auto;
     overflow-x: visible;
+    /* EL PANEL SALE DEL DISPARADOR. Crece desde la esquina que toca el botón
+       —la de su `align`, arriba o abajo según `up`— con un poco de deriva, y
+       se asienta: una lista que brota de donde se la pidió, no una caja que
+       aparece. Sólo transform y opacidad: `place()` mide `offsetWidth` /
+       `offsetHeight`, que un `transform` no toca. Cierra de golpe, y así debe
+       ser: el `flushSync()` del Tab de abajo necesita que el nodo YA no esté. */
+    transform-origin: 100% 0;
+    animation: sx-menu-in 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
-  .panel.start { inset-inline-start: 0; }
+  .panel.start { inset-inline-start: 0; transform-origin: 0 0; }
   .panel.end { inset-inline-end: 0; }
-  .panel.up { top: auto; bottom: calc(100% + var(--sx-s-1)); }
+  .panel.up { top: auto; bottom: calc(100% + var(--sx-s-1)); transform-origin: 100% 100%; animation-name: sx-menu-up; }
+  .panel.start.up { transform-origin: 0 100%; }
+  @keyframes sx-menu-in { from { opacity: 0; transform: translateY(-4px) scale(.95); } }
+  @keyframes sx-menu-up { from { opacity: 0; transform: translateY(4px) scale(.95); } }
 
   /* Con `popover`, `top: calc(100% + …)` deja de leer nada — no hay ancestro
      posicionado del que sea el 100%. `.fx` cambia a `position: fixed` con
@@ -524,7 +535,9 @@
     border: 0;
     border-radius: var(--sx-r-1);
     cursor: pointer;
-    transition: background-color var(--sx-fast) var(--sx-ease);
+    /* El resaltado se desliza de un ítem al otro en vez de saltar: al llegar
+       se enciende con la curva larga; al irse, se apaga igual. */
+    transition: background-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   /* `:focus` and not only `:focus-visible`: after a mouse opens the menu the
      roving focus is real and has to be visible, or the arrow keys move a
@@ -581,6 +594,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .cv, .item { transition: none; }
+    .panel { animation: none; }
   }
 
   @media (pointer: coarse) {

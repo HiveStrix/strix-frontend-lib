@@ -38,6 +38,7 @@
   // Do not give both and expect the event: a link that also preventDefaults is
   // how «abrir en pestaña nueva» quietly breaks.
   import { createEventDispatcher } from 'svelte';
+  import { cubicOut } from 'svelte/easing';
 
   /** [{ label, href?, id?, title? }] — the last entry is the current page. */
   export let items = [];
@@ -66,13 +67,24 @@
     e.preventDefault();
     dispatch('navigate', { item });
   }
+
+  // A crumb that joins the trail — one level deeper, or the middle levels
+  // unfolding — slides in the last few pixels from the left, the direction the
+  // trail reads from. Local, so the trail a page loads with is simply there.
+  // Script transitions do not hear the stylesheet's reduced-motion block.
+  function join() {
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return { duration: 0 };
+    }
+    return { duration: 280, easing: cubicOut, css: (t, u) => `opacity: ${t}; transform: translateX(${u * -8}px)` };
+  }
 </script>
 
 <nav class="bc" aria-label={label}>
   <ol>
     {#each shown as item, i (`${i}:${item.href ?? item.label}`)}
       {@const last = i === shown.length - 1}
-      <li>
+      <li in:join>
         {#if last}
           <span class="crumb here" class:sx-id={item.id} aria-current="page" title={item.title ?? item.label}>{item.label}</span>
         {:else if item.href}
@@ -85,7 +97,7 @@
       </li>
 
       {#if !last}
-        <li class="sep" aria-hidden="true">
+        <li class="sep" aria-hidden="true" in:join>
           <svg viewBox="0 0 12 12" focusable="false"><path d="M4.2 2.4 7.8 6l-3.6 3.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </li>
       {/if}
@@ -99,7 +111,7 @@
             <span class="sr">Mostrar {hidden} niveles intermedios</span>
           </button>
         </li>
-        <li class="sep" aria-hidden="true">
+        <li class="sep" aria-hidden="true" in:join>
           <svg viewBox="0 0 12 12" focusable="false"><path d="M4.2 2.4 7.8 6l-3.6 3.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>
         </li>
       {/if}
@@ -145,11 +157,20 @@
     margin-inline: calc(var(--sx-s-2) * -1);
     border-radius: var(--sx-r-1);
     cursor: pointer;
-    transition: color var(--sx-fast) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
+    transition: color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
 
   /* Un cruce bajo el cursor se ilumina; --sx-sunk lo apagaba a gris. */
   a.crumb:hover, button.crumb:hover { color: var(--sx-ink); background: var(--sx-accent-soft); }
+  /* A press gives and springs back, like every small control in the family. */
+  a.crumb:active, button.crumb:active, .more:active {
+    scale: .95;
+    transition: color 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
 
   /* Where you are: the only crumb in full ink, and not a control. */
   .here {
@@ -176,7 +197,9 @@
     font-size: var(--sx-t-sm);
     line-height: 1;
     cursor: pointer;
-    transition: color var(--sx-fast) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
+    transition: color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
   .more:hover { background: var(--sx-neutral-band); color: var(--sx-ink); }
 
@@ -199,5 +222,10 @@
   @media (max-width: 420px) {
     .crumb { max-width: 14ch; }
     .here { max-width: 18ch; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .crumb, .more, a.crumb:active, button.crumb:active, .more:active { transition: none; }
+    a.crumb:active, button.crumb:active, .more:active { scale: none; }
   }
 </style>

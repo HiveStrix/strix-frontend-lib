@@ -1,0 +1,121 @@
+/* ═════════════════════════════════════════════════════════════════════════
+   LA MOCIÓN DEL CATÁLOGO — lo que no cabe en un componente con scope.
+
+   Las View Transitions, el acento que fluye y el estado de espera de lo que se
+   revela viven en el documento, no en un componente: por eso este archivo es
+   global y lo importa main.js. Nada de esto es de la librería — un Core no
+   tiene ruta ni tema que cambiar; el catálogo sí.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  --mo-out: cubic-bezier(.16, 1, .3, 1);
+  --mo-in: cubic-bezier(.5, 0, .75, 0);
+  --mo-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --vt-dir: 1;
+}
+
+/* ── El acento FLUYE ─────────────────────────────────────────────────────
+   Registrado como <color>, el acento se puede interpolar: apretar Opra no
+   repinta la página de golpe, la tiñe — cada botón, cada fila elegida y cada
+   barra viajan del morado al terracota en el mismo medio segundo, porque todos
+   leen el mismo hueco. Es el argumento de la portada («el acento es un slot»)
+   hecho visible en el tiempo y no sólo en el resultado.
+   Los derivados (soft, pick, edge) no se registran: son mezclas de
+   `var(--sx-accent)` y se recalculan solos en cada cuadro. */
+@property --sx-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #6541BE;
+}
+@property --sx-accent-ink {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #FFFFFF;
+}
+html {
+  transition:
+    --sx-accent 640ms var(--mo-out),
+    --sx-accent-ink 640ms var(--mo-out);
+}
+
+/* ── Lo que espera su turno ──────────────────────────────────────────────
+   Sólo existe si motion.js lo puso: sin JS no hay nada oculto. */
+[data-rv-wait] { opacity: 0; }
+
+/* ── El índice que te sigue ───────────────────────────────────────────────
+   El deslizador del scrollspy (motion.js) vive adentro del <ul> de cada
+   página, que tiene estilos con scope; por eso se pinta desde acá. */
+.toc ul.has-glide { position: relative; isolation: isolate; }
+.toc ul.has-glide > .glider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  border-radius: var(--sx-r-1);
+  background: var(--sx-accent-soft);
+  box-shadow: inset 2px 0 0 var(--sx-accent);
+  pointer-events: none;
+  transition:
+    transform 560ms var(--mo-out),
+    height 560ms var(--mo-out),
+    width 560ms var(--mo-out),
+    opacity var(--sx-beat) var(--mo-out);
+}
+.toc a.spy-on { color: var(--sx-ink); }
+
+/* ── Cambio de familia: la página se va hacia un lado y la nueva llega del
+   otro. El lado lo decide el orden de la barra: ir a una familia de más a la
+   derecha empuja la página hacia la izquierda, como pasar una hoja. La barra
+   no participa — se queda quieta, que es lo que la hace sentir un lugar y no
+   una parte de la página. */
+html[data-vt='route'] .bar { view-transition-name: sx-bar; }
+/* Por id y no por `main`: las páginas de familia tienen su propio <main>
+   adentro, y dos elementos con el mismo nombre anulan la transición entera. */
+html[data-vt='route'] #contenido { view-transition-name: sx-page; }
+
+html[data-vt='route']::view-transition-old(root),
+html[data-vt='route']::view-transition-new(root),
+html[data-vt='route']::view-transition-old(sx-bar),
+html[data-vt='route']::view-transition-new(sx-bar),
+html[data-vt='route']::view-transition-group(sx-page) {
+  animation: none;
+}
+html[data-vt='route']::view-transition-old(sx-page) {
+  animation: vt-page-out 240ms var(--mo-in) both;
+}
+html[data-vt='route']::view-transition-new(sx-page) {
+  animation: vt-page-in 560ms var(--mo-out) both;
+}
+@keyframes vt-page-out {
+  to {
+    opacity: 0;
+    transform: translate3d(calc(var(--vt-dir) * -40px), 0, 0) scale(.985);
+    filter: blur(4px);
+  }
+}
+@keyframes vt-page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(calc(var(--vt-dir) * 80px), 0, 0) scale(.985);
+    filter: blur(8px);
+  }
+}
+
+/* ── Cambio de tema: la luz se abre (o se cierra) desde el botón que la
+   apretaste, en círculo, hasta la esquina más lejana. El tema no es un filtro
+   sobre la página: es otra hora del día, y llega desde tu mano. */
+html[data-vt='theme']::view-transition-old(root) { animation: none; }
+html[data-vt='theme']::view-transition-new(root) {
+  animation: vt-theme 820ms var(--mo-out) both;
+  mix-blend-mode: normal;
+}
+@keyframes vt-theme {
+  from { clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0)); }
+  to   { clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { transition: none; }
+  [data-rv-wait] { opacity: 1; }
+  .toc ul.has-glide > .glider { transition: none; }
+}

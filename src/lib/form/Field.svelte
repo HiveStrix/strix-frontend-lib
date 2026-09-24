@@ -59,6 +59,7 @@
   // achicar, así que la ayuda del campo pudiendo ser un punto es exactamente
   // lo que corresponde reusar acá, no reimplementar.
   import { createEventDispatcher } from 'svelte';
+  import { cubicOut } from 'svelte/easing';
   import InfoDot from '../shell/InfoDot.svelte';
 
   /** The name of the answer. Sentence case, no colon — the box is the colon. */
@@ -145,6 +146,21 @@
   // screen readers read the field name twice trying.
   $: describedBy =
     [showInlineHint && hintId, message && msgId, origin && originId].filter(Boolean).join(' ') || undefined;
+
+  // A message ARRIVES: it drops the last few pixels out from under the box it
+  // is about, instead of being stamped below it. Local, so a form that loads
+  // already holding an error shows it in place. Script transitions do not hear
+  // the stylesheet's reduced-motion block, so this one asks.
+  function arrive() {
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return { duration: 0 };
+    }
+    return {
+      duration: 240,
+      easing: cubicOut,
+      css: (t, u) => `opacity: ${t}; transform: translateY(${u * -4}px)`
+    };
+  }
 </script>
 
 <div class="field" class:disabled class:no-frame={!frame} class:dense>
@@ -188,12 +204,12 @@
          at the same moment as its text is a live region nobody hears. -->
     <div class="msgs" id={msgId} aria-live="polite">
       {#if error}
-        <p class="msg bad">
+        <p class="msg bad" in:arrive>
           <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor" /></svg>
           <span class="txt"><b class="prob">{error}</b>{#if fix}{' '}{fix}{/if}</span>
         </p>
       {:else if warning}
-        <p class="msg warn">
+        <p class="msg warn" in:arrive>
           <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8 11.6 10.8H.4z" fill="currentColor" /></svg>
           <span class="txt"><b class="prob">{warning}</b>{#if fix}{' '}{fix}{/if}</span>
         </p>
@@ -277,9 +293,18 @@
     border-radius: var(--sx-r-2);
     box-shadow: var(--sx-e-field);
     color: var(--sx-ink);
-    transition: border-color var(--sx-fast) var(--sx-ease),
-                box-shadow var(--sx-fast) var(--sx-ease),
-                background var(--sx-fast) var(--sx-ease);
+    /* The ring GROWS in: it rests at zero width hugging the border and opens
+       out to 2px at 2px off, instead of being stamped on in one frame. Zero
+       width and not a transparent colour, so forced-colours mode (which paints
+       transparent outlines) never shows a ring on a field nobody focused. */
+    outline: 0 solid transparent;
+    outline-offset: 0;
+    transition: border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background var(--sx-fast) var(--sx-ease),
+                outline-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                outline-width 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                outline-offset 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .frame:hover:not(.disabled):not(.readonly) { border-color: var(--sx-ink-3); }
 
@@ -405,5 +430,10 @@
     .frame :global(select),
     .frame :global(textarea) { font-size: 16px; }
     .revert::after { content: ''; position: absolute; inset: -12px -8px; }
+  }
+
+  /* The ring is simply there on focus. */
+  @media (prefers-reduced-motion: reduce) {
+    .frame { transition: none; }
   }
 </style>

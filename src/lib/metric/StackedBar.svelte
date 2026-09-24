@@ -149,10 +149,10 @@
         <span
           class="seg s-{p.step} {p.tone ? `t-${p.tone}` : ''}"
           class:est={p.estimate}
-          style="width: {p.pct}%"
+          style="width: {p.pct}%; --i: {i}"
         ></span>
       {/each}
-      {#if rest > 0}<span class="seg rest" style="width: {(rest / whole) * 100}%"></span>{/if}
+      {#if rest > 0}<span class="seg rest" style="width: {(rest / whole) * 100}%; --i: {parts.length}"></span>{/if}
     </div>
   {:else}
     <span class="track empty-track" aria-hidden="true"></span>
@@ -172,7 +172,7 @@
          same order as the bar above. Never optional. -->
     <ul class="legend" aria-label={label ? `Composición de ${label}` : 'Composición'}>
       {#each parts as p, i (p.label + i)}
-        <li>
+        <li style="--i: {i}">
           <span class="sw s-{p.step} {p.tone ? `t-${p.tone}` : ''}" class:est={p.estimate}
             aria-hidden="true"></span>
           <span class="name">{p.label}</span>
@@ -182,7 +182,7 @@
         </li>
       {/each}
       {#if rest > 0}
-        <li>
+        <li style="--i: {parts.length}">
           <span class="sw rest" aria-hidden="true"></span>
           <span class="name">{restLabel}</span>
           <span class="fig sx-num">{withUnit(rest)}</span>
@@ -231,7 +231,15 @@
        The last one has nothing to its right, so it keeps its full width. */
     box-shadow: -1px 0 0 var(--sx-surface) inset;
     min-width: 2px;
+    /* LA COMPOSICIÓN SE ARMA EN ORDEN: cada tramo crece desde cero cuando el
+       anterior ya salió, de izquierda a derecha — el mismo orden de lectura
+       que la leyenda. El retraso lo pone `--i`, el índice que escribe el
+       marcado. Después, un cambio de proporción se desliza. */
+    transition: width 600ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    animation: sx-seg-grow 620ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+    animation-delay: calc(100ms + var(--i, 0) * 110ms);
   }
+  @keyframes sx-seg-grow { from { width: 0; } }
   /* .rest, cuando existe, es siempre el último `.seg` del track — pero a
      diferencia de un `.s-d` genuinamente final, SIEMPRE tiene un vecino a su
      izquierda (usable exige sum > 0, así que `parts` nunca está vacío cuando
@@ -307,7 +315,12 @@
     line-height: 1.5;
     color: var(--sx-ink-2);
     min-width: 0;
+    /* Cada renglón de la leyenda se enciende junto con su tramo de arriba:
+       el ojo empareja el color con la palabra en el momento en que aparece. */
+    animation: sx-leg-in 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+    animation-delay: calc(140ms + var(--i, 0) * 110ms);
   }
+  @keyframes sx-leg-in { from { opacity: 0; transform: translateX(-6px); } }
   /* A slice of the bar, not a dot: the swatch echoes the track's own radius so
      the eye matches it to the segment above without being told to. */
   .sw {
@@ -362,5 +375,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .bone { animation: none; background: var(--sx-sunk); }
+    .seg { transition: none; animation: none; }
+    .legend li { animation: none; }
   }
 </style>

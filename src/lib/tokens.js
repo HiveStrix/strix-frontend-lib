@@ -734,6 +734,15 @@ export const TOKENS = {
   '--sx-fast': '120ms',
   '--sx-beat': '220ms',
   '--sx-slow': '380ms',
+  // Las cosas no aparecen: vienen. `out` es la llegada (desaceleración
+  // exponencial) para todo lo que viaja; `spring` es un sobrepaso suave que
+  // sólo lleva lo CHICO (la perilla de un Switch, el punto de un Radio, una
+  // marca que brota) — nunca un diálogo ni una tarjeta; `in` es la salida,
+  // siempre más corta que la entrada. Los componentes los piden con fallback,
+  // así que un anfitrión con tokens viejos no pierde la moción.
+  '--sx-ease-out': 'cubic-bezier(.16, 1, .3, 1)',
+  '--sx-ease-spring': 'cubic-bezier(.34, 1.56, .64, 1)',
+  '--sx-ease-in': 'cubic-bezier(.5, 0, .75, 0)',
 
   // The veil behind anything that took the screen. It is a ROLE and not a mix
   // of the neutral ramp, because the ramp does NOT re-bind in dark: mixing

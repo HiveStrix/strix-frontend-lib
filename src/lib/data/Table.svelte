@@ -582,8 +582,10 @@
               <span class="sx-sr">de {labelOf(row)}</span>
             </button>
             {#if isOpen}
-              <div class="cdetail" id="{uid}-d-{i}">
-                <slot name="expand" {row} />
+              <div class="unfold">
+                <div class="cdetail" id="{uid}-d-{i}">
+                  <slot name="expand" {row} />
+                </div>
               </div>
             {/if}
           {/if}
@@ -684,7 +686,7 @@
             </tr>
           </thead>
 
-          <tbody>
+          <tbody class="rows">
             {#each sorted as row, i (keyOf(row, i))}
               {@const key = keyOf(row, i)}
               {@const off = disabledOf(row)}
@@ -760,8 +762,10 @@
               {#if expandable && isOpen}
                 <tr class="detrow">
                   <td colspan={span}>
-                    <div class="detbox" id="{uid}-d-{i}">
-                      <slot name="expand" {row} />
+                    <div class="unfold">
+                      <div class="detbox" id="{uid}-d-{i}">
+                        <slot name="expand" {row} />
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -895,12 +899,16 @@
   /* The sort mark is a SHAPE that moves, never a colour that changes: the
      unsorted state is a faint arrow, the sorted one is solid ink and points the
      way the rows go. Someone who cannot see the tint still sees the direction. */
+  /* La flecha GIRA hasta la otra punta con la curva larga, en vez de
+     aparecer dada vuelta: el giro es la noticia de que el orden se invirtió. */
   .arw {
     width: 11px;
     height: 11px;
     flex: none;
     opacity: .28;
-    transition: transform var(--sx-fast) var(--sx-ease), opacity var(--sx-fast) var(--sx-ease);
+    transition:
+      transform var(--sx-slow) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      opacity var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .sortbtn:hover .arw { opacity: .6; }
   .arw.on { opacity: 1; color: var(--sx-ink); }
@@ -939,7 +947,18 @@
 
   /* `position: relative` on the row is what lets the primary cell's link stretch
      across it. The lead and action cells are raised out of its way. */
-  tbody tr.row { position: relative; transition: background var(--sx-fast) var(--sx-ease); }
+  /* El escalón del cursor se DESLIZA de fila en fila: se enciende y se apaga
+     con la curva larga, así pasar el mouse por la tabla se lee como una luz
+     que acompaña y no como un parpadeo por fila. La selección hace lo mismo. */
+  tbody tr.row { position: relative; transition: background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
+  tbody tr.row td { transition: background-color 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
+  /* Las filas LLEGAN juntas, como un cuerpo: cuando la tabla reemplaza al
+     esqueleto (o a un estado vacío), el cuerpo sube 6px y se enciende. En el
+     `tbody` y no en cada `tr`: una fila que se mueve al ordenar se re-inserta
+     en el DOM, y una animación por fila se volvería a disparar sólo en las que
+     se movieron. */
+  tbody.rows { animation: sx-rows-in 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  @keyframes sx-rows-in { from { opacity: 0; transform: translateY(6px); } }
   /* EL ESCALÓN DEL CURSOR. Iba a --sx-sunk, y ahí está la trampa de todo este
      rebind: en una dirección de vidrio --sx-sunk es blanco translúcido y ACLARA
      la fila; en una opaca es un gris y la misma regla la OSCURECE. Con Nácar
@@ -997,14 +1016,43 @@
   }
   .disc:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .disc:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
-  .disc svg, .cmore svg, .cdir svg { width: 12px; height: 12px; transition: transform var(--sx-fast) var(--sx-ease); }
+  .disc svg, .cmore svg, .cdir svg { width: 12px; height: 12px; transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
   .disc svg.down, .cmore svg.down { transform: rotate(90deg); }
   .cdir svg.down { transform: rotate(180deg); }
 
   td.acts { padding-inline: var(--sx-s-3); white-space: nowrap; }
   .actbox { display: flex; align-items: center; justify-content: flex-end; gap: var(--sx-s-1); }
 
-  .detrow td { padding: 0 0 var(--sx-s-4); height: auto; white-space: normal; }
+  .detrow td {
+    padding: 0 0 var(--sx-s-4); height: auto; white-space: normal;
+    animation: sx-unfold-td 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  @keyframes sx-unfold-td { from { padding-bottom: 0; } }
+
+  /* EL DETALLE SE DESPLIEGA, no aparece. Una grilla de una fila que va de
+     `0fr` a `1fr` es la única forma de animar «hasta el alto que tenga» sin
+     medir nada en JS; el `overflow: hidden` vive SÓLO en los keyframes, así
+     al terminar no recorta ni un menú ni una sombra del contenido. Adentro,
+     el contenido baja 6px y se enciende, un poco detrás del hueco que se
+     abre. Donde `grid-template-rows` no interpola, simplemente aparece. */
+  .unfold {
+    display: grid;
+    animation: sx-unfold 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  .unfold > * {
+    min-height: 0;
+    animation: sx-unfold-in 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 60ms backwards;
+  }
+  @keyframes sx-unfold {
+    from { grid-template-rows: 0fr; overflow: hidden; }
+    to   { grid-template-rows: 1fr; overflow: hidden; }
+  }
+  /* `padding-block: 0` en el primer cuadro: si no, el relleno del hijo es el
+     piso de la fila `0fr` y el hueco arrancaría de golpe en ~30px. */
+  @keyframes sx-unfold-in {
+    from { opacity: 0; transform: translateY(-6px); padding-block: 0; overflow: hidden; }
+    to   { overflow: hidden; }
+  }
   .detbox {
     padding: var(--sx-s-4);
     margin-inline: var(--sx-s-4);
@@ -1067,7 +1115,10 @@
   .cdir:disabled { opacity: .45; cursor: not-allowed; }
   .csort select:focus-visible, .cdir:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
 
-  .cards { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sx-s-3); }
+  .cards {
+    list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sx-s-3);
+    animation: sx-rows-in 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
   .card {
     position: relative;
     background: var(--sx-surface);
@@ -1157,6 +1208,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sortbtn, .arw, .disc, .disc svg, .cmore svg, .cdir svg, tbody tr.row { transition: none; }
+    .sortbtn, .arw, .disc, .disc svg, .cmore svg, .cdir svg, tbody tr.row, tbody tr.row td { transition: none; }
+    tbody.rows, .cards, .unfold, .unfold > *, .detrow td { animation: none; }
   }
 </style>

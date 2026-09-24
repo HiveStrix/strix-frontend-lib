@@ -40,6 +40,7 @@
   // because below that iOS zooms the whole page on focus and the operator has
   // to pinch back out one-handed while holding a machine part in the other.
   import { createEventDispatcher, onMount } from 'svelte';
+  import { backOut } from 'svelte/easing';
 
   /** The query. Bindable. */
   export let value = '';
@@ -126,6 +127,25 @@
     input?.select();
   }
 
+  // The ×, the «/» hint and «Buscando» trade places instead of blinking: what
+  // arrives swells in from small with a hint of overshoot, what leaves fades
+  // quicker than it came. Local, so the first paint shows them in place.
+  // Script transitions do not hear the stylesheet's reduced-motion block.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function popIn() {
+    if (still()) return { duration: 0 };
+    return { duration: 260, easing: backOut, css: (t) => `opacity: ${Math.min(1, t * 1.5)}; transform: scale(${0.5 + 0.5 * t})` };
+  }
+  function fadeIn() {
+    if (still()) return { duration: 0 };
+    return { duration: 200, css: (t) => `opacity: ${t}` };
+  }
+  function fadeOut() {
+    if (still()) return { duration: 0 };
+    return { duration: 110, css: (t) => `opacity: ${t}; transform: scale(${0.7 + 0.3 * t})` };
+  }
+
   onMount(() => {
     // Focus lands here, not on the window: a Core module must not be able to
     // steal a keystroke from the Shell around it after it unmounts.
@@ -166,7 +186,7 @@
     {#if busy}
       <!-- The word rides with the spinner. A spinner alone is a shape that
            could equally mean «loading», «saving» or «stuck». -->
-      <span class="busy" aria-hidden="true">
+      <span class="busy" aria-hidden="true" in:fadeIn>
         <svg class="sp" viewBox="0 0 16 16">
           <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" opacity=".25" />
           <path d="M8 2a6 6 0 0 1 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
@@ -178,7 +198,7 @@
     <!-- Clearable WHILE searching, on purpose: the moment you notice the query
          is wrong is usually the moment it is still in flight. -->
     {#if hasValue}
-      <button class="x" type="button" on:click={clear} title="Limpiar la búsqueda (Esc)">
+      <button class="x" type="button" in:popIn out:fadeOut on:click={clear} title="Limpiar la búsqueda (Esc)">
         <svg viewBox="0 0 16 16" aria-hidden="true">
           <path d="M4.5 4.5 11.5 11.5M11.5 4.5 4.5 11.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
         </svg>
@@ -187,7 +207,7 @@
     {:else if showHint}
       <!-- Aria-hidden because the input already carries `aria-keyshortcuts`,
            which is how a screen reader is told the same thing properly. -->
-      <kbd class="kb" aria-hidden="true">{hotkey}</kbd>
+      <kbd class="kb" aria-hidden="true" in:fadeIn out:fadeOut>{hotkey}</kbd>
     {/if}
   </div>
 
@@ -240,7 +260,10 @@
     border-radius: var(--sx-r-2);
     box-shadow: var(--sx-e-field);
     min-width: 0;
-    transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
+    /* The ring closes in over the carved well on a glide, rather than being
+       stamped on in one frame. */
+    transition: border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
 
   /* Drawn on the BOX, not the input, because the box is what looks like the
@@ -254,7 +277,14 @@
     box-shadow: 0 0 0 2px var(--sx-ink) inset;
   }
 
-  .ic { flex: none; width: 16px; height: 16px; color: var(--sx-ink-3); }
+  .ic {
+    flex: none; width: 16px; height: 16px; color: var(--sx-ink-3);
+    transition: color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+  }
+  /* With focus the lens inks in and leans forward a hair: the field is
+     listening. */
+  .box.focused .ic { color: var(--sx-ink-2); scale: 1.08; }
 
   .in {
     flex: 1 1 auto;
@@ -303,10 +333,16 @@
     background: none;
     color: var(--sx-ink-3);
     cursor: pointer;
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
   /* El botón de limpiar se ilumina bajo el cursor; --sx-sunk lo hundía. */
   .x:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
+  .x:active {
+    scale: .86;
+    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease),
+                scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
   .x svg { width: 14px; height: 14px; }
   .x:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
 
@@ -345,5 +381,7 @@
   @media (prefers-reduced-motion: reduce) {
     .sp { animation: none; }
     .box { transition: none; }
+    .ic, .x, .x:active { transition: none; }
+    .box.focused .ic, .x:active { scale: none; }
   }
 </style>

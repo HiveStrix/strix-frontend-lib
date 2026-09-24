@@ -115,8 +115,15 @@
     height: 100%;
     border-radius: var(--sx-r-pill);
     background: var(--sx-accent);
-    transition: width var(--sx-slow) var(--sx-ease);
+    /* DE CHICO A GRANDE. Al montarse, el relleno CRECE desde cero hasta lo que
+       ya lleva hecho — un keyframe de `width` sin `to`, así el destino es el
+       ancho en línea, sea cual sea, y si el valor cambia a mitad de camino el
+       crecimiento lo persigue. Después, cada avance se desliza con la misma
+       curva larga. `width` y no `scaleX`: la punta redondeada no se aplasta. */
+    transition: width 600ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    animation: sx-fill-grow 900ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 80ms backwards;
   }
+  @keyframes sx-fill-grow { from { width: 0; } }
   .positive  { background: var(--sx-positive); }
   .attention { background: var(--sx-attention); }
   .critical  { background: var(--sx-critical); }
@@ -151,7 +158,7 @@
   .hint { margin: 0; font-size: var(--sx-t-xs); color: var(--sx-ink-3); }
 
   @media (prefers-reduced-motion: reduce) {
-    .fill { transition: none; }
+    .fill { transition: none; animation: none; }
     .fill.unknown {
       animation: none;
       background-image: none;

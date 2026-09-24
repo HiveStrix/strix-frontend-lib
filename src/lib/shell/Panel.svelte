@@ -263,7 +263,14 @@
     min-height: 0;
     min-width: 0;
     flex: 1 1 auto;
+    /* La tarjeta llega con su cabecera; lo de adentro se asienta un instante
+       después. Dos tiempos, no uno: se lee como una superficie que se apoya y
+       después se llena. Sólo opacidad y 6px — el `transform` se va al
+       terminar (`backwards`), así no queda nada que atrape a un `fixed` de la
+       tabla o del menú de adentro. */
+    animation: sx-panel-fill 560ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 110ms backwards;
   }
+  @keyframes sx-panel-fill { from { opacity: 0; transform: translateY(6px); } }
   .body.flush { padding-inline: 0; }
   /* Flush and last ⇒ the content reaches the card's own bottom corners, so it
      gets clipped to them. Only then: clipping a body that is not at the edge
@@ -300,5 +307,9 @@
   @media (max-width: 520px) {
     .head { flex-direction: column; align-items: stretch; gap: var(--sx-s-3); }
     .acts { justify-content: flex-start; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .body { animation: none; }
   }
 </style>

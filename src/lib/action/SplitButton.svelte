@@ -103,7 +103,9 @@
 </div>
 
 <style>
-  .split { display: inline-flex; max-width: 100%; }
+  /* `--sx-btn-press: 1` — the two halves are one object, so neither shrinks on
+     press (a scaled half opens the seam); the sink carries the press. */
+  .split { display: inline-flex; max-width: 100%; --sx-btn-press: 1; }
   .lead { min-width: 0; }
   .lead, .tail { display: inline-flex; }
 
