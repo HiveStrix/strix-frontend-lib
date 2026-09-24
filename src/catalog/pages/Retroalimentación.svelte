@@ -1208,7 +1208,7 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
      con la ruta (ver App.svelte, «El índice que apuntaba a la portada»). */
   .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); margin-top: 0; align-items: start; }
 
-  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc { position: sticky; top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .toc a {
     display: block;
@@ -1258,7 +1258,7 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
   }
 
   /* ── Una sección de componente ───────────────────────────────────────── */
-  .c { display: flex; flex-direction: column; gap: var(--sx-s-5); scroll-margin-top: var(--sx-s-6); }
+  .c { display: flex; flex-direction: column; gap: var(--sx-s-5); scroll-margin-top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   .chead .one {
     margin: var(--sx-s-2) 0 0;
     font-size: var(--sx-t-md);

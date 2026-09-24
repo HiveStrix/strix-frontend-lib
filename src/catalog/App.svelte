@@ -289,11 +289,26 @@
     const onScroll = () => { scrolled = scrollY > 8; };
     addEventListener('scroll', onScroll, { passive: true });
     onScroll();
+
+    // LA ALTURA DE LA BARRA, PUBLICADA. La barra no mide lo mismo siempre:
+    // debajo de 1040px las familias bajan a un segundo renglón y pasa de ~60 a
+    // ~105px. Las páginas pegaban su índice a 72px fijos, y en ese ancho la
+    // barra les tapaba el primer renglón. Ahora la barra dice cuánto mide
+    // (`--cat-bar-h` en <html>) y todo lo que se pega debajo — el índice, el
+    // aterrizaje de un link a sección — lo lee de ahí.
+    const publish = () =>
+      document.documentElement.style.setProperty('--cat-bar-h', `${Math.ceil(bar.offsetHeight)}px`);
+    const ro = new ResizeObserver(publish);
+    ro.observe(bar);
+    publish();
+
     return () => {
       removeEventListener('hashchange', onHash);
       removeEventListener('scroll', onScroll);
+      ro.disconnect();
     };
   });
+  let bar;
 
   // La barra se despega del lienzo en cuanto la página pasa por debajo: la
   // sombra crece, porque ahora sí hay algo sobre lo que está parada.
@@ -346,7 +361,7 @@
 
 <a class="skip" href="#contenido">Saltar al contenido</a>
 
-<header class="bar" class:scrolled>
+<header class="bar" class:scrolled bind:this={bar}>
   <div class="barin">
     <a class="brand" href="#/" aria-current={current ? undefined : 'page'}>
       <!-- The mark is a Pill's own critical square, an attention triangle and a

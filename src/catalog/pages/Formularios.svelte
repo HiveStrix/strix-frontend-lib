@@ -1799,7 +1799,7 @@
 
   section {
     margin: 0 0 var(--sx-s-20);
-    scroll-margin-top: var(--sx-s-6);
+    scroll-margin-top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4));
   }
   section h2 {
     margin: 0 0 var(--sx-s-3); font-size: var(--sx-t-2xl);
@@ -1932,7 +1932,7 @@
   /* ── Ancho ─────────────────────────────────────────────────────────────── */
   @media (min-width: 68rem) {
     .body { display: grid; grid-template-columns: 11rem minmax(0, 1fr); gap: var(--sx-s-10); align-items: start; }
-    .toc { position: sticky; top: var(--sx-s-5); margin: 0; }
+    .toc { position: sticky; top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); margin: 0; }
     .toc ul { flex-direction: column; gap: var(--sx-s-1); overflow: visible; padding: 0; }
     .toc a { background: none; box-shadow: none; padding: var(--sx-s-1) var(--sx-s-2); color: var(--sx-ink-3); }
     .toc a:hover { background: var(--sx-sunk); box-shadow: none; color: var(--sx-ink); }

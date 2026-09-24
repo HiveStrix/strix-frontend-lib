@@ -874,7 +874,7 @@
 
   .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); margin-top: var(--sx-s-16); align-items: start; }
 
-  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc { position: sticky; top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .toc a {
     display: block;
@@ -888,7 +888,7 @@
   .toc a:hover { background: var(--sx-sunk); color: var(--sx-ink); }
 
   main { display: flex; flex-direction: column; gap: var(--sx-s-16); min-width: 0; }
-  section { min-width: 0; scroll-margin-top: var(--sx-s-16); }
+  section { min-width: 0; scroll-margin-top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   h2 { margin: 0; font-size: var(--sx-t-xl); font-weight: var(--sx-w-bold); letter-spacing: -.025em; }
   .why { margin: var(--sx-s-3) 0 0; max-width: 68ch; font-size: var(--sx-t-md); line-height: 1.6; color: var(--sx-ink-2); }
   /* Un sub-título dentro de una sección — «tone» adentro de Card, por ejemplo —

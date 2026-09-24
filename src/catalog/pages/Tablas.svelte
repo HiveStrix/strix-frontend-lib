@@ -970,7 +970,7 @@
   /* Mismo componente que Superficies, Estructura, Métricas y Retroalimentación. */
   .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); align-items: start; }
 
-  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc { position: sticky; top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .toc a {
     display: block;
@@ -994,7 +994,7 @@
     font-weight: var(--sx-w-bold);
     letter-spacing: -.03em;
     line-height: 1.1;
-    scroll-margin-top: var(--sx-s-16);
+    scroll-margin-top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4));
   }
   .what { margin: 0; font-size: var(--sx-t-md); color: var(--sx-ink-2); max-width: 68ch; line-height: 1.6; }
   .comp h3 { margin: 0; font-size: var(--sx-t-md); font-weight: var(--sx-w-semi); letter-spacing: -.01em; }
