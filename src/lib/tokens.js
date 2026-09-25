@@ -49,7 +49,14 @@
 // (2 temas × 2 perillas) pasa con este valor, así que el cambio no arriesga
 // ningún piso. Un módulo que quiera recuperar una traza de marca re-hornea la
 // rampa con `chromeRamp()` desde su raíz; el default deja de imponer morado.
-const TINT = '#8E8E93';
+//
+// VARIANTE COLORIDA (rama design/variante-colorida) — la perilla VUELVE al
+// morado. No es un valor nuevo: `#6541BE` es la PRIMERA perilla que
+// `scripts/contrast.mjs` valida («cromo morado»), así que toda la rampa ya está
+// medida con él. Con esta traza el campo resuelve a #EEEAF8, que es el lienzo
+// lila de la dirección neumórfica (#EFEBF8) — la base colorida sale de una
+// perilla que el sistema ya tenía, no de una paleta paralela.
+const TINT = '#6541BE';
 
 const rgbOf = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
 /** La misma aritmética que color-mix(in srgb): lerp sobre los canales sRGB. */
@@ -64,7 +71,11 @@ export const CHROME_RECIPES = {
     '--sx-n-50': [4, '#FAFAFB'], '--sx-n-100': [5, '#F4F4F6'], '--sx-n-150': [6, '#EDEDF0'],
     '--sx-n-200': [8, '#DDDDE2'], '--sx-n-300': [8, '#BBBBC2'], '--sx-n-400': [8, '#7A7A7F'],
     '--sx-n-500': [8, '#5E5E64'], '--sx-n-700': [8, '#414146'], '--sx-n-800': [8, '#27272B'],
-    '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [11, '#FFFFFF'], '--sx-thead': [9, '#FFFFFF']
+    // El campo baja de 11 % a 9 % con la variante colorida: con la traza morada
+    // (TINT) el 11 % quedaba a 1.048 de --sx-accent-soft — `Card
+    // variant="filled"` no se despegaba del campo, piso 1.05. A 9 % mide 1.08, y
+    // la tarjeta blanca sigue a ~1.15 del campo: más escalón que el 11 % gris.
+    '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [9, '#FFFFFF'], '--sx-thead': [9, '#FFFFFF']
   },
   dark: {
     '--sx-sunk': [8, '#1B1F22'], '--sx-line': [8, '#2C3134'], '--sx-ink': [4, '#EDEFF0'],
@@ -88,6 +99,241 @@ export const chromeRampDark = (tint) => ({
 
 const CHROME = chromeRamp(TINT);
 const CHROME_DARK = chromeRampDark(TINT);
+
+// ─────────────────────────────────────────────────────────────────────────
+// LA ARCILLA DE CADA MÓDULO (variante colorida). Pedido del usuario: la Shell
+// no tiene luz propia — adopta el fondo, el brillo y el acento del core que
+// está montado, y cada core tiene la SUYA: Mantenimiento, un blanco amarillento
+// con sombras cálidas; Clientes, uno rosado. Antes todos los cores emitían el
+// mismo lila y la misma sombra violeta y sólo cambiaban el acento, así que un
+// Mantenimiento amarillo dentro del Shell lila se leía como dos aplicaciones
+// apiladas.
+//
+// LA RECETA ES LA DEL LILA, GIRADA Y DILUIDA. Cada rol (lienzo, superficie,
+// pozo, la traza de los grises, la sombra de la arcilla) guarda la LUMINOSIDAD
+// (OKLCH L) que tiene hoy en el lila, una fracción de su SATURACIÓN (C, ver
+// CLAY_BG / CLAY_SHADOW) y toma el TONO (h) del acento del módulo. Así todos
+// los módulos tienen exactamente el mismo volumen, la misma profundidad y el
+// mismo contraste — sólo cambia hacia qué color tira la arcilla, apenas. Si el
+// color no entra en sRGB a esa saturación, se baja la saturación, nunca la luz.
+//
+// PRECOMPUTADO, COMO EL CROMO (ver el banner de arriba): hex y rgba literales,
+// nunca color-mix en CSS.
+// ─────────────────────────────────────────────────────────────────────────
+const toLin = (c) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+const toGam = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+
+/** hex → [L, C, h°] en OKLCH (Björn Ottosson). */
+export const oklchOf = (h) => {
+  const [r, g, b] = rgbOf(h).map((v) => toLin(v / 255));
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const L = 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
+  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return [L, Math.hypot(A, B), ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360];
+};
+
+const rgbFromOklch = (L, C, h) => {
+  const a = C * Math.cos((h * Math.PI) / 180), b = C * Math.sin((h * Math.PI) / 180);
+  const l = (L + 0.3963377774 * a + 0.2158037573 * b) ** 3;
+  const m = (L - 0.1055613458 * a - 0.0638541728 * b) ** 3;
+  const s = (L - 0.0894841775 * a - 1.291485548 * b) ** 3;
+  return [
+    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s
+  ].map(toGam);
+};
+
+/** [L, C, h°] → hex. Fuera de sRGB baja la saturación (nunca la luz). */
+export const hexOfOklch = (L, C, h) => {
+  let c = C, rgb = rgbFromOklch(L, c, h);
+  while (c > 0 && rgb.some((v) => v < -1e-4 || v > 1 + 1e-4)) { c -= 0.002; rgb = rgbFromOklch(L, Math.max(c, 0), h); }
+  return '#' + rgb.map((v) => Math.round(Math.min(1, Math.max(0, v)) * 255).toString(16).padStart(2, '0').toUpperCase()).join('');
+};
+
+// Los roles de la arcilla y el color del lila del que sale cada receta. Los
+// hex son los de TOKENS: si el lila cambia allá, hay que cambiarlo acá.
+const CLAY_REF = {
+  '--sx-ground': '#EFEBF8',
+  '--sx-surface': '#F6F3FC',
+  '--sx-sunk': '#E6E1F1',
+  shadow: '#6541BE',   // rgba(101,65,190,·): la sombra de la arcilla
+  float: '#4C3496'     // rgba(76,52,150,·): la de lo que flota (--sx-e-3)
+};
+const CLAY_LC = Object.fromEntries(Object.entries(CLAY_REF).map(([k, v]) => [k, oklchOf(v)]));
+
+/** El tono de la arcilla para un acento. Un acento casi gris no tiene tono que
+ *  prestar: cae al del lila, que es el del sistema. */
+const clayHue = (accent) => {
+  const [, C, h] = oklchOf(accent);
+  return C < 0.03 ? oklchOf(TINT)[2] : h;
+};
+// Cada rol conserva su CORRIMIENTO de tono respecto de la traza (el lienzo lila
+// no tira exactamente al mismo matiz que #6541BE): se gira el conjunto, no se
+// aplana. Con el acento violeta, el giro es cero y sale el lila tal cual.
+const TINT_H = oklchOf(TINT)[2];
+const rot = (role, h, k = 1) => { const [L, C, h0] = CLAY_LC[role]; return hexOfOklch(L, C * k, (h0 - TINT_H + h + 360) % 360); };
+
+// LA DILUCIÓN (pedido del usuario, 2026-09-23: «el color de fondo tiene que
+// ser muy muy ligero — ahora toda la página se ve rosa»). Con la saturación
+// entera del lila, el fondo de un módulo ERA su color: Clientes pintaba la
+// pantalla de rosa. Los fondos de un módulo guardan el 10 % de la saturación
+// del lila (un soplo del tono) y la sombra y la traza de los grises el 50 %. La luz no se toca: el volumen y el contraste son los mismos.
+// El lila del Tablero (TOKENS) no se diluye: es la casa del Shell.
+// 10 %: el usuario lo fue ajustando (100 → 30 → 36 → 10, 2026-09-23). El fondo
+// de un módulo es casi neutro, apenas un soplo del tono; lo que dice en qué
+// módulo se está es la sombra, la luz y el acento, que la Shell adopta igual.
+const CLAY_BG = 0.1, CLAY_SHADOW = 0.5;
+const rgba = (hex, a) => `rgba(${rgbOf(hex).join(',')},${a})`;
+const lumOf = (hex) => { const [r, g, b] = rgbOf(hex).map((v) => toLin(v / 255)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+/** La razón WCAG entre dos hex — la misma que mide scripts/contrast.mjs. */
+const ratioOf = (a, b) => { const [x, y] = [lumOf(a), lumOf(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+// ΔE2000 (Sharma, Wu y Dalal 2005), para que la fila elegida de un módulo no
+// se confunda con la banda de un estado. Es la misma fórmula que mide
+// scripts/contrast.mjs, escrita otra vez a propósito: el arnés es la regla con
+// la que se controla esto, no se importa de acá.
+const labOf = (hex) => {
+  const [R, G, B] = rgbOf(hex).map((v) => toLin(v / 255));
+  const f = (t) => (t > (6 / 29) ** 3 ? Math.cbrt(t) : t / (3 * (6 / 29) ** 2) + 4 / 29);
+  const fx = f((0.4124564 * R + 0.3575761 * G + 0.1804375 * B) / 0.95047);
+  const fy = f(0.2126729 * R + 0.7151522 * G + 0.072175 * B);
+  const fz = f((0.0193339 * R + 0.119192 * G + 0.9503041 * B) / 1.08883);
+  return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+};
+const dE = (x, y) => {
+  const [L1, a1, b1] = labOf(x), [L2, a2, b2] = labOf(y);
+  const rad = (d) => (d * Math.PI) / 180, deg = (r) => (r * 180) / Math.PI;
+  const C7 = ((Math.hypot(a1, b1) + Math.hypot(a2, b2)) / 2) ** 7;
+  const G = 0.5 * (1 - Math.sqrt(C7 / (C7 + 25 ** 7)));
+  const A1 = a1 * (1 + G), A2 = a2 * (1 + G);
+  const C1 = Math.hypot(A1, b1), C2 = Math.hypot(A2, b2);
+  const hp = (a, b) => (a === 0 && b === 0 ? 0 : (deg(Math.atan2(b, a)) + 360) % 360);
+  const h1 = hp(A1, b1), h2 = hp(A2, b2);
+  let dh = C1 * C2 === 0 ? 0 : Math.abs(h2 - h1) <= 180 ? h2 - h1 : h2 - h1 > 180 ? h2 - h1 - 360 : h2 - h1 + 360;
+  const dH = 2 * Math.sqrt(C1 * C2) * Math.sin(rad(dh / 2));
+  const Lb = (L1 + L2) / 2, Cb = (C1 + C2) / 2;
+  const hb = C1 * C2 === 0 ? h1 + h2 : Math.abs(h1 - h2) <= 180 ? (h1 + h2) / 2 : h1 + h2 < 360 ? (h1 + h2 + 360) / 2 : (h1 + h2 - 360) / 2;
+  const T = 1 - 0.17 * Math.cos(rad(hb - 30)) + 0.24 * Math.cos(rad(2 * hb)) + 0.32 * Math.cos(rad(3 * hb + 6)) - 0.2 * Math.cos(rad(4 * hb - 63));
+  const Cb7 = Cb ** 7, Rt = -Math.sin(rad(60 * Math.exp(-(((hb - 275) / 25) ** 2)))) * 2 * Math.sqrt(Cb7 / (Cb7 + 25 ** 7));
+  const tL = (L2 - L1) / (1 + (0.015 * (Lb - 50) ** 2) / Math.sqrt(20 + (Lb - 50) ** 2));
+  const tC = (C2 - C1) / (1 + 0.045 * Cb), tH = dH / (1 + 0.015 * Cb * T);
+  return Math.sqrt(tL * tL + tC * tC + tH * tH + Rt * tC * tH);
+};
+const TONE_BANDS = ['#DDF0E4', '#FCEBD0', '#FCDDE3', '#E2E8F7', '#EDEBF3']; // positive, attention, critical, info, neutral
+
+const INK = '#201E29';
+const wellOf = (accent, sunk) => {
+  let c = accent;
+  while (ratioOf(mixHex(c, 66, INK), mixHex(c, 16, sunk)) < 3.05) c = mixHex('#000000', 2, c);
+  return c;
+};
+/** El menor porcentaje de `accent` sobre `base`, desde `from`, que cumple `ok`. */
+const washOf = (accent, base, from, ok) => {
+  for (let p = from; p <= 60; p++) { const c = mixHex(accent, p, base); if (ok(c)) return [c, p]; }
+  return [mixHex(accent, 60, base), 60];
+};
+
+// LA LUZ DE LA ARCILLA, una sola receta para el Tablero y para cada módulo.
+// Segunda vez que el usuario pide bajarla (2026-09-23: «una pizca más
+// discreto… adaptalo al fondo para que no sobresalga»): la luz ya no es blanco
+// puro sino una versión muy clara de la SUPERFICIE de quien la emite (la mitad
+// del camino entre su superficie y el blanco), y baja otra pizca — afuera .55
+// (era .7), el filo de adentro .5 (.6–.65), lo hundido .6 (.75). El volumen lo
+// sigue haciendo la sombra, que no se toca.
+const clayElevation = (S, F, surface) => {
+  const L = mixHex(surface, 50, '#FFFFFF');
+  return {
+    '--sx-e-1': `-3px -3px 8px ${rgba(L, .55)}, 3px 4px 10px ${rgba(S, .22)}, inset 1px 1px 1px ${rgba(L, .5)}, inset -1px -2px 4px ${rgba(S, .07)}`,
+    '--sx-e-2': `-5px -5px 12px ${rgba(L, .55)}, 5px 6px 14px ${rgba(S, .26)}, inset 1px 1px 1px ${rgba(L, .5)}, inset -1px -2px 5px ${rgba(S, .08)}`,
+    '--sx-e-card': `-7px -7px 16px ${rgba(L, .55)}, 7px 8px 20px ${rgba(S, .24)}, inset 1px 1px 1px ${rgba(L, .5)}, inset -2px -3px 7px ${rgba(S, .07)}`,
+    '--sx-e-chip': `-2px -2px 6px ${rgba(L, .55)}, 2px 3px 8px ${rgba(S, .16)}, inset 1px 1px 0 ${rgba(L, .5)}`,
+    '--sx-e-primary': `-3px -3px 8px ${rgba(L, .55)}, 3px 3px 12px color-mix(in srgb, var(--sx-accent) 35%, transparent)`,
+    '--sx-e-3': `0 2px 6px -2px ${rgba(F, .10)}, 0 26px 56px -18px ${rgba(F, .32)}`,
+    '--sx-e-sunk': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px ${rgba(L, .6)}`,
+    '--sx-e-well': `inset 2.5px 2.5px 6px ${rgba(S, .20)}, inset -2.5px -2.5px 6px ${rgba(L, .6)}`,
+    '--sx-e-pill': `inset 1.5px 1.5px 3px ${rgba(S, .14)}, inset -1.5px -1.5px 3px ${rgba(L, .6)}`
+  };
+};
+/** La del Tablero: el lila de TOKENS, sin girar ni diluir. */
+const LILAC_E = clayElevation(CLAY_REF.shadow, CLAY_REF.float, CLAY_REF['--sx-surface']);
+
+/**
+ * Los tokens de la arcilla de un módulo, claro y oscuro, a partir de su acento.
+ * Lo que devuelve es exactamente lo que la Shell adopta (ver PALETTE_TOKENS).
+ * @param {string} accent  el `--sx-accent` claro del módulo (hex #RRGGBB)
+ */
+export function clayTokens(accent) {
+  const h = clayHue(accent);
+  const tint = hexOfOklch(oklchOf(TINT)[0], oklchOf(TINT)[1] * CLAY_SHADOW, h);
+  const S = rot('shadow', h, CLAY_SHADOW), F = rot('float', h, CLAY_SHADOW);
+  const ground = rot('--sx-ground', h, CLAY_BG), surface = rot('--sx-surface', h, CLAY_BG), sunk = rot('--sx-sunk', h, CLAY_BG);
+  const ramp = chromeRamp(tint);
+  // EL BORDE, MEDIDO. --sx-edge aterriza en n-400; según el tono, la misma
+  // traza da un gris un pelo más claro y un segmento de StackedBar sobre el
+  // pozo quedaba en 2.999 (Costeo). Se oscurece de a 1 % hasta que pasa.
+  while (ratioOf(mixHex(ramp['--sx-n-400'], 90, sunk), sunk) < 3.05 || ratioOf(ramp['--sx-n-400'], surface) < 3.05) {
+    ramp['--sx-n-400'] = mixHex('#000000', 1, ramp['--sx-n-400']);
+  }
+  // LOS LAVADOS DEL ACENTO, MEDIDOS CONTRA ESTA ARCILLA. La receta de la lib
+  // mezcla el acento contra blanco fijo (14 / 18 / 28 %). Sobre la superficie
+  // crema de Mantenimiento, un amarillo al 14 % queda IGUAL a ella (1.001) y el
+  // hover desaparece. Así que se busca el menor porcentaje, desde el de la
+  // receta, que se despegue: el hover de la superficie y del lienzo, la
+  // selección del hover. Precomputado en hex.
+  // La base es la de la receta —blanco fijo—, así el violeta sale igual que
+  // siempre (14 / 18 %) y sólo el acento que no se despega sube de porcentaje.
+  const [soft, ps] = washOf(accent, '#FFFFFF', 14, (c) => ratioOf(c, surface) >= 1.05 && ratioOf(c, ground) >= 1.05);
+  // La selección: se despega del hover y se LEE (tinta terciaria 4.5, borde
+  // 3.0 — obligatorio). Y, si se puede sin romper eso, lejos de las bandas de
+  // estado (ΔE ≥ 5.6, el piso del arnés con margen). Cuando las dos cosas
+  // chocan (un acento rosa contra la banda de «crítico»), manda que se lea: el
+  // choque de familia lo decide el acento del módulo, igual que en la clase 3
+  // del arnés, y queda informado ahí.
+  const reads = (c) => ratioOf(c, soft) >= 1.05 && ratioOf(ramp['--sx-n-500'], c) >= 4.55 && ratioOf(ramp['--sx-n-400'], c) >= 3.02;
+  const from = Math.max(18, ps + 4);
+  let [pick] = washOf(accent, '#FFFFFF', from, (c) => reads(c) && TONE_BANDS.every((b) => dE(c, b) >= 5.6));
+  if (!reads(pick)) [pick] = washOf(accent, '#FFFFFF', from, reads);
+  const light = {
+    ...ramp,
+    '--sx-ground': ground,
+    '--sx-thead': ground,
+    '--sx-surface': surface,
+    '--sx-sunk': sunk,
+    '--sx-accent-soft': soft,
+    '--sx-accent-pick': pick,
+    // El filo del acento, desde el 28 % de la receta hasta que se despegue de
+    // la superficie como el del violeta (1.4): un amarillo al 28 % es un filo
+    // que no se ve (Mantenimiento lo había subido a mano al 55 %).
+    '--sx-accent-edge': washOf(accent, '#FFFFFF', 28, (c) => ratioOf(c, surface) >= 1.4)[0],
+    // EL POZO DEL ACENTO. IconWell sin `hue` tiñe con el acento: el ícono al
+    // 66 % contra la tinta sobre un pozo al 16 %. Con un acento CLARO (el ámbar
+    // de Mantenimiento) el ícono daba 2.57 (piso 3). Acá el acento se oscurece
+    // de a 2 % hasta que su pozo se lee; con un acento oscuro queda igual.
+    '--sx-accent-well': wellOf(accent, sunk),
+    ...clayElevation(S, F, surface)
+  };
+  // El oscuro: la misma traza en la rampa oscura (pozo, raya, tintas). Sus
+  // sombras son negras y su luz casi nula en todos los módulos — ahí la arcilla
+  // no tira hacia ningún color, así que no se re-declaran.
+  // En oscuro el pozo del acento vuelve a ser el acento (oscuro) del módulo.
+  const dark = { ...chromeRampDark(tint), '--sx-accent-well': 'var(--sx-accent)' };
+  return { light, dark };
+}
+
+/**
+ * La arcilla del módulo como CSS para su `:host`, claro y oscuro. Va DESPUÉS de
+ * `hostTokens()` y `hostTokensDark()` en el mismo <style>:
+ *
+ *   const styles = hostTokens() + hostTokensDark() + clayHost('#F7B500') + hostBase();
+ */
+export const clayHost = (accent, selector = ':host', darkSelector = ':host([data-sx-theme="dark"])') => {
+  const { light, dark } = clayTokens(accent);
+  const d = (o) => Object.entries(o).map(([k, v]) => `  ${k}: ${v};`).join('\n');
+  return `${selector} {\n${d(light)}\n}\n${darkSelector} {\n${d(dark)}\n}\n`;
+};
 
 /** The light theme: role tokens, tones, and the scales. */
 export const TOKENS = {
@@ -169,9 +415,18 @@ export const TOKENS = {
   // tarjeta sin que el campo deje de ser un tinte. `--sx-thead` sube a 9 % por
   // el mismo motivo: la cabecera de una tabla se apoya SOBRE la superficie
   // blanca, así que compartir el 6 % del campo la dejaba invisible.
-  '--sx-ground': CHROME['--sx-ground'],
-  '--sx-surface': 'var(--sx-n-0)',
-  '--sx-sunk': 'var(--sx-n-50)',
+  // VARIANTE COLORIDA: el lienzo de Stitch, literal (Lila Canvas #EFEBF8).
+  '--sx-ground': '#EFEBF8',
+  // ARCILLA: la superficie deja de ser blanco puro (5 % de la traza) para que la
+  // luz interna blanca de --sx-e-1 exista — blanco sobre blanco no infla nada.
+  // El pozo baja al valor del campo (9 %) porque el escalón pozo/tarjeta tiene
+  // que seguir pasando el piso de 1.05 contra una tarjeta que ya no es blanca.
+  // La superficie levantada y el pozo de Stitch, literales (Surface Raised
+  // #F6F3FC, Surface Sunk #E6E1F1). El pozo hondo es la mitad de la
+  // profundidad: todo lo hundido —campos, rieles, pozos, contadores, pills de
+  // estado— se lee como un hueco porque está un escalón claro por debajo.
+  '--sx-surface': '#F6F3FC',
+  '--sx-sunk': '#E6E1F1',
   // --sx-line separa filas y cierra cabeceras: es AMBIENTE y puede ser tenue.
   '--sx-line': 'var(--sx-n-150)',
   // --sx-edge es el límite de un CONTROL: dice dónde se puede escribir. Eso es
@@ -191,7 +446,8 @@ export const TOKENS = {
   // (explore, [data-d='AD']); en blanco, tres piezas dejaron de existir: el pie
   // del panel quedaba blanco sobre una tarjeta blanca, la declaración de .head
   // era un no-op, y la cabecera de tabla no se separaba de sus filas.
-  '--sx-thead': CHROME['--sx-thead'],
+  // La cabecera baja al lienzo: a 9 % quedaba a 1.045 de la superficie nueva.
+  '--sx-thead': '#EFEBF8',
   // EL RESPLANDOR DE LAS SUPERFICIES, APAGADO POR DEFECTO. Es una perilla, no
   // un efecto: en 0 no dibuja nada y el sistema se comporta como siempre. Un
   // producto que quiera que sus tarjetas, paneles y pozos irradien sube este
@@ -270,20 +526,31 @@ export const TOKENS = {
 
   // Semantic tones. Fixed across every product: "vencido" must look identical
   // in maintenance, billing and inventory or the vocabulary stops being one.
-  '--sx-positive': '#2E6B3E',
-  '--sx-positive-band': '#E4EFE2',
-  '--sx-positive-edge': '#C3D8C4',
+  //
+  // VARIANTE COLORIDA: las bandas ganan croma — salvia, ámbar, coral e índigo
+  // de la dirección neumórfica — pero la tinta de cada tono sigue siendo la
+  // que carga el significado y sigue medida a 4.5 contra su banda. El color
+  // sube en el relleno, no en la palabra.
+  '--sx-positive': '#276A47',
+  '--sx-positive-band': '#DDF0E4',
+  '--sx-positive-edge': '#B5DCC5',
   '--sx-attention': '#8A5A00',
-  '--sx-attention-band': '#FBEEDA',
-  '--sx-attention-edge': '#E8D4A6',
-  '--sx-critical': '#B3261E',
-  '--sx-critical-band': '#FBE0DC',
-  '--sx-critical-edge': '#EFC2BC',
+  '--sx-attention-band': '#FCEBD0',
+  '--sx-attention-edge': '#F0D29C',
+  // Coral en vez de rojo ladrillo: el mismo «crítico», con la temperatura de
+  // la paleta nueva.
+  '--sx-critical': '#B02840',
+  '--sx-critical-band': '#FCDDE3',
+  '--sx-critical-edge': '#F3BAC6',
   // Muted indigo, deliberately not blue: blue chrome is what every ERP already
-  // looks like, and this is the one convention the system declines.
-  '--sx-info': '#4A4E7A',
-  '--sx-info-band': '#E7E7F2',
-  '--sx-info-edge': '#C9CADD',
+  // looks like, and this is the one convention the system declines. La
+  // variante le sube el croma sin cruzar a azul.
+  '--sx-info': '#434A93',
+  // La banda se corre hacia el azul FRÍO y no hacia el violeta: a #E4E6F8 quedaba
+  // a ΔE 4.57 de la fila elegida con el acento morado (piso 5.3, `evalAccent`)
+  // — «informativo» y «seleccionado» se leían como el mismo lavanda.
+  '--sx-info-band': '#E2E8F7',
+  '--sx-info-edge': '#C4C8EC',
   // FIJADO A HEX, como los otros cuatro. Apuntaba a la rampa (n-500/n-100/n-200),
   // así que su color cambiaba con el cromo de cada dirección: «ninguno» se veía
   // distinto entre dos productos, que es exactamente lo que la ley prohíbe. Estos
@@ -297,15 +564,64 @@ export const TOKENS = {
   // asiento y una larga que da el aire. El tinte NO es gris — una sombra gris
   // bajo una familia lavanda parece suciedad — pero lleva un tercio del violeta
   // de Prisma pastel, no el violeta entero.
-  '--sx-e-1': '0 1px 2px rgba(30,28,44,.05), 0 8px 24px -10px rgba(30,28,44,.18)',
-  '--sx-e-2': '0 2px 6px -2px rgba(30,28,44,.07), 0 16px 40px -14px rgba(30,28,44,.22)',
-  '--sx-e-3': '0 2px 6px -2px rgba(30,28,44,.07), 0 24px 56px -18px rgba(30,28,44,.28)',
+  //
+  // VARIANTE COLORIDA — SOFT-UI DE STITCH, CON SU PROFUNDIDAD. Valores medidos
+  // sobre los HTML que generó Stitch (getComputedStyle de cada pieza con sombra):
+  // la profundidad no está en una sombra grande, está en que CADA pieza tiene la
+  // suya, en dos direcciones.
+  //   levantado · luz #FFF afuera arriba-izquierda + violeta afuera abajo-derecha
+  //     --sx-e-card  contenedores: tarjeta, barra lateral, encabezado, tabla
+  //     --sx-e-1     controles: botón, ítem activo, fila de lista
+  //     --sx-e-2     el mismo control levantado un escalón (hover, tooltip)
+  //     --sx-e-chip  lo más chico: chip de filtro, avatar, número de página
+  //   hundido · lo inverso, adentro (ver --sx-e-sunk, --sx-e-well, --sx-e-pill)
+  // Lo que FLOTA (--sx-e-3: menús, hojas, toasts, popups) no lleva la luz.
+  // SUPER CLAY (pedido del usuario sobre la línea de Stitch): a cada nivel se le
+  // suma, ADENTRO, un filo de luz de 1 px arriba-izquierda y un volumen violeta
+  // abajo-derecha. Afuera sigue mandando la luz blanca de Stitch; adentro la
+  // pieza se abulta en vez de ser una lámina con sombra.
+  // LA LUZ, DOS VECES MÁS BAJA (pedidos del usuario, 2026-09-23: «el brillo
+  // blanco está muy fuerte», y después «una pizca más discreto, adaptado al
+  // fondo»): los valores salen de `clayElevation` (arriba, junto a la arcilla de
+  // cada módulo) — una luz teñida de la propia superficie a .55 / .5 / .6. La
+  // sombra violeta no se toca: el volumen sigue, lo que baja es el resplandor.
+  '--sx-e-1': LILAC_E['--sx-e-1'],
+  '--sx-e-2': LILAC_E['--sx-e-2'],
+  '--sx-e-card': LILAC_E['--sx-e-card'],
+  '--sx-e-chip': LILAC_E['--sx-e-chip'],
+  // El primario de Stitch (tabla): la luz blanca afuera y una sombra del COLOR
+  // del acento, fuerte. Se re-declara en oscuro (el acento cambia).
+  '--sx-e-primary': LILAC_E['--sx-e-primary'],
+  // El ítem activo de una navegación es un control levantado (Stitch, riel B).
+  '--sx-e-nav': 'var(--sx-e-1)',
+  '--sx-e-3': LILAC_E['--sx-e-3'],
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.9)',
+  // EL TALLADO: lo inverso del relieve. La sombra entra por arriba-izquierda y
+  // la luz sale por abajo-derecha, así que la pieza se lee HUNDIDA en su
+  // superficie — un pozo, una ranura, un botón apretado.
+  // HUNDIDO. --sx-e-sunk: campos, rieles, contadores (Stitch: 2.5/6 al .20).
+  // --sx-e-well: el pozo de ícono, el mismo hueco. --sx-e-pill: lo chico que se
+  // hunde — la pill de estado y el chip de filtro ELEGIDO (1.5/3 al .14).
+  '--sx-e-sunk': LILAC_E['--sx-e-sunk'],
+  '--sx-e-well': LILAC_E['--sx-e-well'],
+  '--sx-e-pill': LILAC_E['--sx-e-pill'],
+  // LA CAJA DE UN CONTROL, como perilla. Desde la v0.8.14 el campo se levantaba
+  // con --sx-e-1; acá se talla. Son dos tokens y no un valor escrito en cada
+  // componente para que la decisión siga siendo UNA: un producto que quiera el
+  // campo levantado re-liga `--sx-e-field: var(--sx-e-1)` y
+  // `--sx-field: var(--sx-surface)` en su raíz, sin tocar Field, Combobox,
+  // DatePicker, Checkbox ni Radio.
+  '--sx-e-field': 'var(--sx-e-sunk)',
+  '--sx-field': 'var(--sx-sunk)',
 
   // La forma de Prisma: 12 y 22. Nada cuadrado, y nada casi-cuadrado.
+  // VARIANTE COLORIDA: 16 y 24 — los de Stitch (campos rounded-2xl, tarjetas
+  // 22–24). --sx-r-1 NO se mueve: es el radio del checkbox, y el checkbox tiene
+  // que seguir leyéndose cuadrado al lado del radio redondo.
   '--sx-r-1': '8px',
-  '--sx-r-2': '12px',
-  '--sx-r-3': '22px',
+  '--sx-r-2': '16px',
+  // Super clay: el contenedor se redondea a 28 (Stitch va de 22 a 26).
+  '--sx-r-3': '28px',
   '--sx-r-pill': '999px',
 
   // Major third off 15 — the smallest size that survives a dirty screen at
@@ -327,10 +643,86 @@ export const TOKENS = {
   // Chrome and Safari, so an embedded face would silently not load in exactly
   // the surfaces this library exists to serve. Personality comes from
   // treatment — weight contrast, negative tracking, tabular figures.
+  //
+  // VARIANTE COLORIDA: la familia se NOMBRA primero y el stack de sistema queda
+  // detrás como red. La restricción de arriba sigue en pie y es por qué esto
+  // funciona igual: un @font-face declarado DENTRO de un shadow root se ignora,
+  // pero uno declarado en el DOCUMENTO sí alcanza a los shadow roots. La lib no
+  // carga ninguna fuente: la carga el anfitrión (el Shell, el catálogo) y si no
+  // la carga, el control cae al sistema y se ve como antes — nunca roto.
   '--sx-font':
-    'ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    '"Outfit", ui-sans-serif, system-ui, -apple-system, "Segoe UI Variable Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   '--sx-font-mono':
-    'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace',
+    '"JetBrains Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Roboto Mono", monospace',
+
+  // LA PALETA DE CATEGORÍA. No son tonos: un tono dice «vencido» y es igual en
+  // todos los productos; un matiz distingue COSAS (equipos, familias, series de
+  // un gráfico) y no significa nada por sí solo. Por eso no tienen banda ni
+  // piso de contraste propio: se usan como tinte (pozos de ícono, series), y
+  // cuando cargan texto lo hacen a través de un tono o de --sx-ink.
+  '--sx-hue-violet': '#6541BE',
+  '--sx-hue-aqua': '#1FA6B8',
+  '--sx-hue-coral': '#EE6079',
+  '--sx-hue-amber': '#E39A2E',
+  '--sx-hue-sage': '#4CA777',
+  '--sx-hue-indigo': '#5566D6',
+
+  // ── PERILLAS DE LA VARIANTE ─────────────────────────────────────────────
+  // Cada una tiene en el componente un fallback que reproduce `main`; acá toman
+  // el valor de la dirección de Stitch. Quitar una línea devuelve ese pedazo.
+  //
+  // Button: en Stitch los botones son de radio 12 (rounded-xl), no píldoras.
+  // `--sx-btn-radius` lo fija; `--sx-btn-solid` es su relleno (en main, el degradé brillante);
+  // `--sx-btn-gloss` es la opacidad del brillo especular de arriba (main: .42).
+  '--sx-btn-radius': '14px',
+  '--sx-btn-solid': 'var(--sx-accent)',
+  '--sx-btn-gloss': '0',
+  // PageHeader variant="banda": en Stitch no hay bloques saturados — el color
+  // viaja en dosis chicas sobre tarjetas claras. `--sx-banda-tint` es cuánto
+  // acento lleva el relleno (main: 100 %, el acento pleno); `--sx-banda-ink` la
+  // tinta encima; `--sx-banda-remap` si las acciones de la banda se invierten
+  // (main: 100 %, porque sobre un relleno de acento un botón de acento no se ve;
+  // sobre un pastel sí, así que acá 0 %).
+  // 22 %: el encabezado lleva el color del módulo en pastel. Se probó 0 %
+  // (tarjeta clara, como Stitch) y el usuario lo pidió de vuelta: el color del
+  // encabezado es cómo se sabe en qué módulo se está.
+  '--sx-banda-tint': '22%',
+  '--sx-banda-ink': 'var(--sx-ink)',
+  '--sx-banda-remap': '0%',
+  // Una banda con `tone` attention/critical se oscurece con tinta en main (1);
+  // sobre el pastel eso da barro, así que la variante no (0).
+  '--sx-banda-alarm': '0',
+  // Pill: en Stitch las pills de estado son un hueco teñido, sin filo.
+  '--sx-pill-line': 'transparent',
+  // SidebarItems: el ítem activo es superficie levantada (--sx-e-nav), sin el
+  // relleno de selección (0 % de --sx-accent-pick). Pagination: cada página
+  // lleva superficie (100 %) para que su relieve tenga dónde apoyarse.
+  '--sx-nav-pick': '0%',
+  '--sx-pg-raise': '100%',
+  // Sin filo de color a la izquierda en avisos y fichas (main: 3px): Toast y
+  // ReviewPanel dicen el tono con su marca o su Pill. En Toast, la marca va en
+  // un pozo hundido de su banda, como una Pill sin palabra.
+  '--sx-tone-bar': '0px',
+  '--sx-toast-mark': '1',
+  '--sx-toast-mark-e': 'var(--sx-e-pill)',
+  // Un estado (EmptyState, ErrorState) adentro de un contenedor se HUNDE en vez
+  // de levantarse como otra tarjeta (main: superficie, --sx-e-1, radio 28).
+  // Table, Card y Panel lo aplican solos; un contenedor del core, con `.sx-nest`.
+  '--sx-nest-bg': 'var(--sx-sunk)',
+  '--sx-nest-e': 'var(--sx-e-sunk)',
+  '--sx-nest-r': 'var(--sx-r-2)',
+  // Table: las columnas `numeric` en la mono (main: la fuente de la interfaz).
+  '--sx-num-font': 'var(--sx-font-mono)',
+  // Panel: cabecera sin banda (main: --sx-thead), como el patrón contenedor.
+  '--sx-panel-head': 'transparent',
+  // StatStrip como bandeja: pozo hundido, cifras en fichas levantadas (main:
+  // mosaico con raya de 1px, sin relleno, con --sx-e-1 afuera).
+  '--sx-strip-bg': 'var(--sx-sunk)',
+  '--sx-strip-gap': 'var(--sx-s-2)',
+  '--sx-strip-pad': 'var(--sx-s-2)',
+  '--sx-strip-e': 'var(--sx-e-sunk)',
+  '--sx-strip-cell-e': 'var(--sx-e-1)',
+  '--sx-strip-cell-r': 'var(--sx-r-1)',
 
   // Quarters of a 16 rhythm. Every gap in the system is one of these.
   '--sx-s-1': '4px', '--sx-s-2': '8px', '--sx-s-3': '12px', '--sx-s-4': '16px',
@@ -342,6 +734,15 @@ export const TOKENS = {
   '--sx-fast': '120ms',
   '--sx-beat': '220ms',
   '--sx-slow': '380ms',
+  // Las cosas no aparecen: vienen. `out` es la llegada (desaceleración
+  // exponencial) para todo lo que viaja; `spring` es un sobrepaso suave que
+  // sólo lleva lo CHICO (la perilla de un Switch, el punto de un Radio, una
+  // marca que brota) — nunca un diálogo ni una tarjeta; `in` es la salida,
+  // siempre más corta que la entrada. Los componentes los piden con fallback,
+  // así que un anfitrión con tokens viejos no pierde la moción.
+  '--sx-ease-out': 'cubic-bezier(.16, 1, .3, 1)',
+  '--sx-ease-spring': 'cubic-bezier(.34, 1.56, .64, 1)',
+  '--sx-ease-in': 'cubic-bezier(.5, 0, .75, 0)',
 
   // The veil behind anything that took the screen. It is a ROLE and not a mix
   // of the neutral ramp, because the ramp does NOT re-bind in dark: mixing
@@ -568,10 +969,43 @@ export const TOKENS_DARK = {
   // Heavier in dark, and pure black rather than the ramp: on a near-black ground
   // the only thing that still reads as «behind» is more absence of light.
   '--sx-scrim': 'rgba(0, 0, 0, .62)',
-  '--sx-e-1': '0 1px 2px rgba(0,0,0,.4)',
-  '--sx-e-2': '0 6px 16px -4px rgba(0,0,0,.5), 0 2px 6px -2px rgba(0,0,0,.4)',
+  // VARIANTE COLORIDA: el soft-UI de Stitch en oscuro. La luz de afuera baja a
+  // un 4 % (más, y el borde se lee como un filo luminoso); la sombra se hace
+  // negra y más densa.
+  '--sx-e-1': '-3px -3px 8px rgba(255,255,255,.04), 3px 4px 10px rgba(0,0,0,.5), inset 1px 1px 1px rgba(255,255,255,.06), inset -1px -2px 4px rgba(0,0,0,.25)',
+  '--sx-e-2': '-5px -5px 12px rgba(255,255,255,.05), 5px 6px 14px rgba(0,0,0,.55), inset 1px 1px 1px rgba(255,255,255,.07), inset -1px -2px 5px rgba(0,0,0,.28)',
+  '--sx-e-card': '-7px -7px 16px rgba(255,255,255,.04), 7px 8px 20px rgba(0,0,0,.55), inset 1px 1px 1px rgba(255,255,255,.06), inset -2px -3px 7px rgba(0,0,0,.25)',
+  '--sx-e-chip': '-2px -2px 6px rgba(255,255,255,.035), 2px 3px 8px rgba(0,0,0,.45), inset 1px 1px 0 rgba(255,255,255,.05)',
+  '--sx-e-primary': '-3px -3px 8px rgba(255,255,255,.04), 3px 3px 12px color-mix(in srgb, var(--sx-accent) 30%, transparent)',
+  '--sx-e-nav': 'var(--sx-e-1)',
+  '--sx-btn-solid': 'var(--sx-accent)',
+  '--sx-banda-ink': 'var(--sx-ink)',
   '--sx-e-3': '0 24px 48px -16px rgba(0,0,0,.6), 0 6px 14px -6px rgba(0,0,0,.45)',
   '--sx-e-inset': 'inset 0 1px 0 rgba(255,255,255,.05)',
+  '--sx-e-sunk': 'inset 2.5px 2.5px 6px rgba(0,0,0,.5), inset -2.5px -2.5px 6px rgba(255,255,255,.04)',
+  '--sx-e-well': 'inset 2.5px 2.5px 6px rgba(0,0,0,.5), inset -2.5px -2.5px 6px rgba(255,255,255,.04)',
+  '--sx-e-pill': 'inset 1.5px 1.5px 3px rgba(0,0,0,.4), inset -1.5px -1.5px 3px rgba(255,255,255,.04)',
+  // RE-DECLARADOS, AUNQUE EL TEXTO SEA EL MISMO QUE EN TOKENS. Un `var()` dentro
+  // de una custom property se resuelve donde se DECLARA: en `:root` estos dos ya
+  // valen el sunk CLARO, y un subárbol `.sx-dark` (el marco de un teléfono en el
+  // catálogo móvil, una sección oscura dentro de una página clara) los hereda ya
+  // resueltos aunque re-ligue --sx-sunk. Es la misma razón por la que
+  // --sx-surface, --sx-ink y compañía se repiten en este bloque. Visto en el
+  // catálogo móvil: el buscador del teléfono Android oscuro salía claro.
+  '--sx-e-field': 'var(--sx-e-sunk)',
+  '--sx-field': 'var(--sx-sunk)',
+  // Los alias de la variante, por la misma razón. Faltaban y un estado anidado,
+  // la tira de cifras o la marca del Toast dentro de un `.sx-dark` se pintaban
+  // con el pozo CLARO (lo encontró el pulido de strix-mobile-lib). Desde acá,
+  // scripts/tokens.mjs se niega a generar si un alias de un token que cambia con
+  // el tema no está re-declarado en este bloque.
+  '--sx-glow-color': 'var(--sx-accent)',
+  '--sx-toast-mark-e': 'var(--sx-e-pill)',
+  '--sx-nest-bg': 'var(--sx-sunk)',
+  '--sx-nest-e': 'var(--sx-e-sunk)',
+  '--sx-strip-bg': 'var(--sx-sunk)',
+  '--sx-strip-e': 'var(--sx-e-sunk)',
+  '--sx-strip-cell-e': 'var(--sx-e-1)',
 
   // La otra mitad de `color-scheme: light` en TOKENS — ver el comentario ahí.
   // Es lo que oscurece los widgets nativos (checkbox, date picker, scrollbar)
@@ -611,6 +1045,20 @@ export const hostTokensDark = (selector = ':host([data-sx-theme="dark"])') =>
  * no body, and `*` inside one is the module's own business.
  */
 export const hostBase = () => `
+/* El mismo reset de controles que base.css. Un shadow root no hereda las
+   reglas del documento, así que sin esta línea todo botón de la lib que no
+   declara su fuente (Tabs, Segmented, FilterChips, Pagination, la ✕ de Dialog
+   y Alert, Toast, Calendar…) caía a la del agente de usuario —Arial— adentro
+   de un core, al lado de un host en Outfit. Selector de elemento a propósito:
+   pierde contra cualquier clase de componente, así que sólo llena el hueco. */
+button, input, select, textarea { font: inherit; color: inherit; }
+/* Un contenedor propio del core (su «Contenedor», su «cola») declara que lo de
+   adentro está anidado: un EmptyState o ErrorState ahí se hunde. */
+.sx-nest {
+  --sx-state-bg: var(--sx-nest-bg, var(--sx-surface));
+  --sx-state-e: var(--sx-nest-e, var(--sx-e-1));
+  --sx-state-r: var(--sx-nest-r, var(--sx-r-3));
+}
 .sx-cap {
   font-size: var(--sx-t-2xs);
   font-weight: var(--sx-w-semi);
@@ -705,24 +1153,52 @@ export const stylesheet = () =>
 // `:host`, un shell los puede LEER desde afuera y espejarlos en su documento.
 
 /** Los tokens de la rampa de cromo — lo único que se adopta para la unicidad. */
+// VARIANTE COLORIDA: se suman --sx-surface y --sx-sunk. En main salían de la
+// rampa (n-0, n-50), así que adoptar la rampa ya los traía; en la variante son
+// hex propios (#F6F3FC, #E6E1F1) y quedaban afuera. Con un core SIN migrar
+// (superficie blanca, pozo gris) el Shell adoptaba su fondo gris pero dejaba su
+// barra y sus tarjetas en lila encima: dos familias en una pantalla. Ahora el
+// Shell adopta el fondo, la superficie y el pozo del core, migrado o no.
 export const RAMP_TOKENS = [
-  '--sx-chrome-tint', '--sx-ground', '--sx-thead',
+  '--sx-chrome-tint', '--sx-ground', '--sx-thead', '--sx-surface', '--sx-sunk',
   '--sx-n-50', '--sx-n-100', '--sx-n-150', '--sx-n-200', '--sx-n-300',
   '--sx-n-400', '--sx-n-500', '--sx-n-700', '--sx-n-800', '--sx-n-900'
 ];
 
 /**
- * Hace que `target` (por defecto, el documento) adopte la rampa de cromo de
- * `sourceEl` — típicamente el `:host` de un core embebido. Así el chrome del
- * shell (rieles) y el core comparten un mismo fondo y se leen como un objeto.
+ * Hace que `target` (por defecto, el documento) adopte la atmósfera de
+ * `sourceEl` — típicamente el `:host` de un core embebido: su rampa, su acento
+ * y su elevación (PALETTE_TOKENS). Así el chrome del shell (rieles, barra,
+ * tarjetas) y el core son una sola aplicación, no un módulo pegado encima.
  * Revertir con `releasePalette`. Ver CONTRACT §6.
  * @param {Element} sourceEl  el elemento cuyo tono se copia (el `:host` del core)
  * @param {HTMLElement} [target]  dónde aplicarlo (default: `document.documentElement`)
  */
+// LA SHELL NO TIENE LUZ PROPIA (pedido del usuario, 2026-09-23). Con la
+// arcilla por módulo (`clayHost`), adoptar sólo el lienzo no alcanza: la barra
+// lateral seguía con la sombra violeta y el acento del Shell al lado de un
+// Mantenimiento crema con sombra ocre — dos aplicaciones apiladas. Ahora la
+// Shell adopta TODO lo que hace a la atmósfera del módulo: la rampa, el
+// acento y la elevación (la luz y la sombra de la arcilla). Revierte la regla
+// vieja «el acento NO se adopta» de CONTRACT §6: mientras hay un módulo
+// montado, la pantalla es UNA sola aplicación, la del módulo.
+//
+// Los alias (`--sx-line: var(--sx-n-150)`, `--sx-halo`, `--sx-e-nav`,
+// `--sx-e-field`, `--sx-field`, `--sx-e-primary`…) no hace falta copiarlos: se
+// re-resuelven solos en `:root` en cuanto su token de base queda adoptado ahí.
+// `--sx-line`, `--sx-ink` y `--sx-ink-2` sí: en oscuro son literales teñidos.
+export const PALETTE_TOKENS = [
+  ...RAMP_TOKENS,
+  '--sx-line', '--sx-ink', '--sx-ink-2',
+  '--sx-accent', '--sx-accent-ink', '--sx-accent-soft', '--sx-accent-pick', '--sx-accent-edge', '--sx-accent-well',
+  '--sx-e-1', '--sx-e-2', '--sx-e-card', '--sx-e-chip', '--sx-e-3', '--sx-e-primary',
+  '--sx-e-sunk', '--sx-e-well', '--sx-e-pill'
+];
+
 export function adoptPalette(sourceEl, target = document.documentElement) {
   if (!sourceEl || !target) return;
   const cs = getComputedStyle(sourceEl);
-  for (const t of RAMP_TOKENS) {
+  for (const t of PALETTE_TOKENS) {
     const v = cs.getPropertyValue(t).trim();
     if (v) target.style.setProperty(t, v);
   }
@@ -735,5 +1211,5 @@ export function adoptPalette(sourceEl, target = document.documentElement) {
  */
 export function releasePalette(target = document.documentElement) {
   if (!target) return;
-  for (const t of RAMP_TOKENS) target.style.removeProperty(t);
+  for (const t of PALETTE_TOKENS) target.style.removeProperty(t);
 }

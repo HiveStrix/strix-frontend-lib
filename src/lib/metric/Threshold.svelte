@@ -282,6 +282,7 @@
     height: var(--sx-s-3);
     border-radius: var(--sx-r-1);
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     overflow: hidden;
   }
   .sm .track { height: var(--sx-s-2); border-radius: var(--sx-r-1); }
@@ -291,8 +292,15 @@
     height: 100%;
     border-radius: var(--sx-r-1);
     background: var(--sx-ink);
-    transition: width var(--sx-beat) var(--sx-ease), background-color var(--sx-fast) var(--sx-ease);
+    /* Crece desde cero hasta la lectura al montarse — el mismo keyframe de
+       `width` que Bar —, y cruzar la línea después se desliza: el relleno
+       llega a la marca y el color cambia cuando ya pasó, no antes. */
+    transition:
+      width 600ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      background-color var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    animation: sx-thr-grow 900ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 120ms backwards;
   }
+  @keyframes sx-thr-grow { from { width: 0; } }
   .fill.t-critical { background: var(--sx-critical); }
 
   /* THE ESTIMATE MARK — Bar's own stripe, the same broken register as Stat's
@@ -322,7 +330,12 @@
     background: var(--sx-ink);
     box-shadow: 0 0 0 1px var(--sx-surface);
     transform: translateX(-50%);
+    /* La línea se CLAVA en su sitio antes de que el relleno la alcance: crece
+       de arriba abajo con resorte — es chica, y es el único dato fijo acá. */
+    transform-origin: 50% 0;
+    animation: sx-thr-mark 520ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)) 60ms backwards;
   }
+  @keyframes sx-thr-mark { from { opacity: 0; transform: translateX(-50%) scaleY(0); } }
 
   .over {
     position: absolute;
@@ -332,7 +345,9 @@
     width: 6px;
     height: 9px;
     color: var(--sx-surface);
+    animation: sx-thr-notch 360ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 760ms backwards;
   }
+  @keyframes sx-thr-notch { from { opacity: 0; transform: translate(-4px, -50%); } }
 
   .empty-track { background: var(--sx-sunk); opacity: .6; }
 
@@ -369,6 +384,10 @@
     font-variant-numeric: normal;
   }
   .flag .mk { flex: none; width: 8px; height: 8px; }
+  /* Cruzar la línea es EL estado de este componente: la bandera brota con
+     resorte cuando el relleno ya pasó la marca. */
+  .flag { animation: sx-thr-flag 480ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)) 620ms backwards; }
+  @keyframes sx-thr-flag { from { opacity: 0; transform: scale(.7); } }
 
   .bad {
     display: inline-flex;
@@ -398,6 +417,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .bone { animation: none; background: var(--sx-sunk); }
-    .fill { transition: none; }
+    .fill { transition: none; animation: none; }
+    .mark, .over, .flag { animation: none; }
   }
 </style>

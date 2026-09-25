@@ -337,12 +337,16 @@
   }
 
   // ── Which of the four states is true ─────────────────────────────────────
-  $: isFiltered = filtered ?? (!!query || (total != null && total > rows.length));
+  // `total` como NÚMERO. Un conteo del servidor suele ser int64, y grpc-gateway
+  // lo manda como string: «"17" !== 17» es true, así que la tabla decía
+  // «Mostrando 17 de 17» sin que faltara nada. Se normaliza una vez, acá.
+  $: count = total == null || total === '' || !Number.isFinite(Number(total)) ? null : Number(total);
+  $: isFiltered = filtered ?? (!!query || (count != null && count > rows.length));
   $: showState = !loading && !error && rows.length === 0;
   // Only over rows that exist. With none, the filtered state already says «hay
   // 340 en total» in a whole sentence, and «Mostrando 0 de 340» above it is the
   // same fact twice in worse words.
-  $: showing = !loading && !error && rows.length > 0 && total != null && total !== rows.length;
+  $: showing = !loading && !error && rows.length > 0 && count != null && count !== rows.length;
 
   // One sentence, once, for anyone who cannot see the arrow move. Polite: it
   // waits for a gap rather than interrupting.
@@ -379,7 +383,7 @@
 
   {#if showing}
     <p class="showing sx-num">
-      Mostrando {rows.length} de {total} {total === 1 ? noun : nounPlural}.
+      Mostrando {rows.length} de {count} {count === 1 ? noun : nounPlural}.
     </p>
   {/if}
 
@@ -441,7 +445,7 @@
         {nounPlural}
         {gender}
         {query}
-        {total}
+        total={count}
         filters={isFiltered && !query}
         on:clear
       >
@@ -531,17 +535,22 @@
                 <span class="sx-sr">Seleccionar {labelOf(row)}{typeof off === 'string' ? ` — ${off}` : ''}</span>
               </label>
             {/if}
+            <!-- El título de la ficha pasa por el slot `cell` como la celda
+                 primaria de la tabla: sin eso, lo que el core dibuja ahí (el
+                 nombre comercial, el tipo, una Pill) se perdía bajo 620px, y un
+                 «Sin asignar» salía en mono por ser columna `id`. Con slot, la
+                 forma es del core; sin slot, la de siempre. -->
             <h3 class="ctitle">
               {#if href}
                 <a href={href(row)} class="stretch" on:click={(e) => onOpen(row, e)}>
-                  <span class:sx-id={primary?.id}>{titleOf(row)}</span>
+                  {#if $$slots.cell}<slot name="cell" {row} col={primary} value={titleOf(row)} />{:else}<span class:sx-id={primary?.id}>{titleOf(row)}</span>{/if}
                 </a>
               {:else if open}
                 <button type="button" class="stretch" on:click={(e) => onOpen(row, e)}>
-                  <span class:sx-id={primary?.id}>{titleOf(row)}</span>
+                  {#if $$slots.cell}<slot name="cell" {row} col={primary} value={titleOf(row)} />{:else}<span class:sx-id={primary?.id}>{titleOf(row)}</span>{/if}
                 </button>
               {:else}
-                <span class:sx-id={primary?.id}>{titleOf(row)}</span>
+                {#if $$slots.cell}<slot name="cell" {row} col={primary} value={titleOf(row)} />{:else}<span class:sx-id={primary?.id}>{titleOf(row)}</span>{/if}
               {/if}
             </h3>
           </div>
@@ -573,8 +582,10 @@
               <span class="sx-sr">de {labelOf(row)}</span>
             </button>
             {#if isOpen}
-              <div class="cdetail" id="{uid}-d-{i}">
-                <slot name="expand" {row} />
+              <div class="unfold">
+                <div class="cdetail" id="{uid}-d-{i}">
+                  <slot name="expand" {row} />
+                </div>
               </div>
             {/if}
           {/if}
@@ -675,7 +686,7 @@
             </tr>
           </thead>
 
-          <tbody>
+          <tbody class="rows">
             {#each sorted as row, i (keyOf(row, i))}
               {@const key = keyOf(row, i)}
               {@const off = disabledOf(row)}
@@ -751,8 +762,10 @@
               {#if expandable && isOpen}
                 <tr class="detrow">
                   <td colspan={span}>
-                    <div class="detbox" id="{uid}-d-{i}">
-                      <slot name="expand" {row} />
+                    <div class="unfold">
+                      <div class="detbox" id="{uid}-d-{i}">
+                        <slot name="expand" {row} />
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -793,9 +806,13 @@
      and uncover a shadow that stays put (`scroll`), so an edge darkens only
      while there is still a column past it. */
   .box {
+    /* Un estado (vacío, error) adentro de la tabla toma la forma anidada. */
+    --sx-state-bg: var(--sx-nest-bg, var(--sx-surface));
+    --sx-state-e: var(--sx-nest-e, var(--sx-e-1));
+    --sx-state-r: var(--sx-nest-r, var(--sx-r-3));
     border-radius: var(--sx-r-3);
     background: var(--sx-surface);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-card, var(--sx-e-1));
     overflow: hidden;
     min-width: 0;
   }
@@ -842,7 +859,10 @@
   }
 
   col.w-lead { width: var(--sx-s-10); }
-  col.w-act { width: var(--sx-s-16); }
+  /* La columna de acciones mide lo que su contenido: `1%` es el «encogé hasta
+     lo justo» de una tabla automática. Fija en 64px, dos botones (~150px) la
+     desbordaban y forzaban scroll lateral a 1024. */
+  col.w-act { width: 1%; }
 
   /* The head is pinned to the scroll box, not to the page: the person reading
      row 40 has forgotten what column four was. */
@@ -879,12 +899,16 @@
   /* The sort mark is a SHAPE that moves, never a colour that changes: the
      unsorted state is a faint arrow, the sorted one is solid ink and points the
      way the rows go. Someone who cannot see the tint still sees the direction. */
+  /* La flecha GIRA hasta la otra punta con la curva larga, en vez de
+     aparecer dada vuelta: el giro es la noticia de que el orden se invirtió. */
   .arw {
     width: 11px;
     height: 11px;
     flex: none;
     opacity: .28;
-    transition: transform var(--sx-fast) var(--sx-ease), opacity var(--sx-fast) var(--sx-ease);
+    transition:
+      transform var(--sx-slow) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      opacity var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .sortbtn:hover .arw { opacity: .6; }
   .arw.on { opacity: 1; color: var(--sx-ink); }
@@ -911,6 +935,9 @@
      register: a shadow root may not have base.css, and figures lining up under
      figures is not allowed to be the optional part. */
   td.num {
+    /* `--sx-num-font`: la variante pone las cifras de tabla en la mono del
+       sistema (DESIGN.md: todo dato que se compara); main, la de la interfaz. */
+    font-family: var(--sx-num-font, inherit);
     font-variant-numeric: tabular-nums lining-nums slashed-zero;
     font-feature-settings: "tnum" 1, "lnum" 1, "zero" 1;
     font-weight: var(--sx-w-medium);
@@ -920,7 +947,18 @@
 
   /* `position: relative` on the row is what lets the primary cell's link stretch
      across it. The lead and action cells are raised out of its way. */
-  tbody tr.row { position: relative; transition: background var(--sx-fast) var(--sx-ease); }
+  /* El escalón del cursor se DESLIZA de fila en fila: se enciende y se apaga
+     con la curva larga, así pasar el mouse por la tabla se lee como una luz
+     que acompaña y no como un parpadeo por fila. La selección hace lo mismo. */
+  tbody tr.row { position: relative; transition: background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
+  tbody tr.row td { transition: background-color 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
+  /* Las filas LLEGAN juntas, como un cuerpo: cuando la tabla reemplaza al
+     esqueleto (o a un estado vacío), el cuerpo sube 6px y se enciende. En el
+     `tbody` y no en cada `tr`: una fila que se mueve al ordenar se re-inserta
+     en el DOM, y una animación por fila se volvería a disparar sólo en las que
+     se movieron. */
+  tbody.rows { animation: sx-rows-in 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  @keyframes sx-rows-in { from { opacity: 0; transform: translateY(6px); } }
   /* EL ESCALÓN DEL CURSOR. Iba a --sx-sunk, y ahí está la trampa de todo este
      rebind: en una dirección de vidrio --sx-sunk es blanco translúcido y ACLARA
      la fila; en una opaca es un gris y la misma regla la OSCURECE. Con Nácar
@@ -978,14 +1016,43 @@
   }
   .disc:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
   .disc:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
-  .disc svg, .cmore svg, .cdir svg { width: 12px; height: 12px; transition: transform var(--sx-fast) var(--sx-ease); }
+  .disc svg, .cmore svg, .cdir svg { width: 12px; height: 12px; transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
   .disc svg.down, .cmore svg.down { transform: rotate(90deg); }
   .cdir svg.down { transform: rotate(180deg); }
 
-  td.acts { padding-inline: var(--sx-s-3); }
+  td.acts { padding-inline: var(--sx-s-3); white-space: nowrap; }
   .actbox { display: flex; align-items: center; justify-content: flex-end; gap: var(--sx-s-1); }
 
-  .detrow td { padding: 0 0 var(--sx-s-4); height: auto; white-space: normal; }
+  .detrow td {
+    padding: 0 0 var(--sx-s-4); height: auto; white-space: normal;
+    animation: sx-unfold-td 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  @keyframes sx-unfold-td { from { padding-bottom: 0; } }
+
+  /* EL DETALLE SE DESPLIEGA, no aparece. Una grilla de una fila que va de
+     `0fr` a `1fr` es la única forma de animar «hasta el alto que tenga» sin
+     medir nada en JS; el `overflow: hidden` vive SÓLO en los keyframes, así
+     al terminar no recorta ni un menú ni una sombra del contenido. Adentro,
+     el contenido baja 6px y se enciende, un poco detrás del hueco que se
+     abre. Donde `grid-template-rows` no interpola, simplemente aparece. */
+  .unfold {
+    display: grid;
+    animation: sx-unfold 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  .unfold > * {
+    min-height: 0;
+    animation: sx-unfold-in 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 60ms backwards;
+  }
+  @keyframes sx-unfold {
+    from { grid-template-rows: 0fr; overflow: hidden; }
+    to   { grid-template-rows: 1fr; overflow: hidden; }
+  }
+  /* `padding-block: 0` en el primer cuadro: si no, el relleno del hijo es el
+     piso de la fila `0fr` y el hueco arrancaría de golpe en ~30px. */
+  @keyframes sx-unfold-in {
+    from { opacity: 0; transform: translateY(-6px); padding-block: 0; overflow: hidden; }
+    to   { overflow: hidden; }
+  }
   .detbox {
     padding: var(--sx-s-4);
     margin-inline: var(--sx-s-4);
@@ -1048,7 +1115,10 @@
   .cdir:disabled { opacity: .45; cursor: not-allowed; }
   .csort select:focus-visible, .cdir:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
 
-  .cards { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sx-s-3); }
+  .cards {
+    list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sx-s-3);
+    animation: sx-rows-in 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
   .card {
     position: relative;
     background: var(--sx-surface);
@@ -1065,6 +1135,8 @@
     margin: 0;
     flex: 1;
     min-width: 0;
+    /* Un correo o un código sin espacios no puede pedir scroll lateral. */
+    overflow-wrap: anywhere;
     font-size: var(--sx-t-md);
     font-weight: var(--sx-w-semi);
     letter-spacing: -.01em;
@@ -1089,6 +1161,7 @@
      its label above it — a note does not belong in a right-aligned column. */
   .cf.full dt { grid-column: 1 / -1; }
   .cf.full dd { grid-column: 1 / -1; text-align: left; }
+  .cf dd.sx-num { font-family: var(--sx-num-font, inherit); }
 
   .cmore {
     display: inline-flex;
@@ -1135,6 +1208,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sortbtn, .arw, .disc, .disc svg, .cmore svg, .cdir svg, tbody tr.row { transition: none; }
+    .sortbtn, .arw, .disc, .disc svg, .cmore svg, .cdir svg, tbody tr.row, tbody tr.row td { transition: none; }
+    tbody.rows, .cards, .unfold, .unfold > *, .detrow td { animation: none; }
   }
 </style>

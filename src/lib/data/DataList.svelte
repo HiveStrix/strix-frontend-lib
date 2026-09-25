@@ -163,7 +163,7 @@
         {@const isOpen = expanded.includes(key)}
         {@const facts = metaOf(item)}
         {@const val = valueOf(item)}
-        <li class="row">
+        <li class="row" class:live={!!href || open}>
           <div class="line">
             <div class="main">
               <p class="head">
@@ -218,8 +218,10 @@
               <span class="sx-sr">de {titleOf(item)}</span>
             </button>
             {#if isOpen}
-              <div class="detail" id="{uid}-d-{i}">
-                <slot name="detail" {item} />
+              <div class="unfold">
+                <div class="detail" id="{uid}-d-{i}">
+                  <slot name="detail" {item} />
+                </div>
               </div>
             {/if}
           {/if}
@@ -262,12 +264,23 @@
     background: var(--sx-surface);
     border-radius: var(--sx-r-2);
     box-shadow: var(--sx-e-1);
-    transition: box-shadow var(--sx-fast) var(--sx-ease), transform var(--sx-fast) var(--sx-ease);
+    transition:
+      box-shadow var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .dense .row { padding: var(--sx-s-3) var(--sx-s-4); }
   .row:hover { box-shadow: var(--sx-e-2); }
   .row:focus-within { box-shadow: var(--sx-e-2); }
   .row.sk:hover { box-shadow: var(--sx-e-1); }
+  /* Sólo la ficha que ES una puerta (href u open) se levanta: dos píxeles,
+     deslizados. Una que no lleva a ninguna parte no promete moverse. */
+  .row.live:hover { transform: translateY(-2px); }
+
+  /* La lista llega como un cuerpo cuando reemplaza al esqueleto o a un estado:
+     en el `ul` y no en cada `li`, por la misma razón que el `tbody` de Table —
+     una ficha que se re-ordena se re-inserta y volvería a dispararse sola. */
+  .list:not([aria-hidden]) { animation: sx-list-in 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  @keyframes sx-list-in { from { opacity: 0; transform: translateY(6px); } }
 
   .line { display: flex; align-items: flex-start; gap: var(--sx-s-4); }
 
@@ -363,7 +376,7 @@
      aclara, oscurece. El botón «más» se ilumina con el acento, no se hunde. */
   .more:hover { color: var(--sx-ink); background: var(--sx-accent-soft); }
   .more:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
-  .more svg { width: 12px; height: 12px; transition: transform var(--sx-fast) var(--sx-ease); }
+  .more svg { width: 12px; height: 12px; transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
   .more svg.down { transform: rotate(90deg); }
 
   .detail {
@@ -372,6 +385,27 @@
     background: var(--sx-sunk);
     font-size: var(--sx-t-sm);
     color: var(--sx-ink-2);
+  }
+
+  /* El detalle se despliega — ver `.unfold` en Table.svelte, es la misma
+     grilla `0fr → 1fr` con el `overflow` sólo en los keyframes. */
+  .unfold {
+    display: grid;
+    animation: sx-unfold 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  .unfold > * {
+    min-height: 0;
+    animation: sx-unfold-in 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 60ms backwards;
+  }
+  @keyframes sx-unfold {
+    from { grid-template-rows: 0fr; overflow: hidden; }
+    to   { grid-template-rows: 1fr; overflow: hidden; }
+  }
+  /* `padding-block: 0` en el primer cuadro: si no, el relleno del hijo es el
+     piso de la fila `0fr` y el hueco arrancaría de golpe en ~30px. */
+  @keyframes sx-unfold-in {
+    from { opacity: 0; transform: translateY(-6px); padding-block: 0; overflow: hidden; }
+    to   { overflow: hidden; }
   }
 
   /* Narrow: the figure stops sitting beside the name and takes its own line,
@@ -388,5 +422,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .row, .more svg { transition: none; }
+    .row.live:hover { transform: none; }
+    .list:not([aria-hidden]), .unfold, .unfold > * { animation: none; }
   }
 </style>

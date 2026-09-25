@@ -45,6 +45,10 @@
   export let placeholder = '';
 
   export let label = '';
+
+  /** Nombre accesible sin rótulo a la vista (ver Field). */
+
+  export let labelHidden = false;
   export let hint = '';
   /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
    *  bajo el campo — así los campos de una fila alinean. Se reenvía a `Field`. */
@@ -86,7 +90,7 @@
 </script>
 
 <Field
-  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
+  {label} {labelHidden} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}
@@ -145,6 +149,20 @@
   .chev {
     display: inline-flex; align-items: center; flex: none; align-self: center;
     color: var(--sx-ink-3); pointer-events: none;
+    transition: color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                translate 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .chev svg { width: 13px; height: 13px; }
+  /* The native list opens where the platform says (see the note above), and a
+     <select> reports no «open», so the chevron cannot turn truthfully. It can
+     lean toward the gesture: under the pointer it dips a hair and inks in, and
+     with focus it inks in, so the box answers before it is opened. */
+  select:focus + .chev { color: var(--sx-ink-2); }
+  @media (hover: hover) {
+    select:hover:not(:disabled) + .chev { color: var(--sx-ink-2); translate: 0 1.5px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chev { transition: none; }
+    select:hover:not(:disabled) + .chev { translate: none; }
+  }
 </style>

@@ -142,8 +142,10 @@ export function scrollbar(node, options = {}) {
   window.addEventListener('scroll', schedule, { passive: true, capture: true });
   window.addEventListener('resize', schedule, { passive: true });
 
-  const ro = new ResizeObserver(schedule);
-  ro.observe(node);
+  // Sin ResizeObserver (jsdom, un navegador viejo) la barra igual sigue al
+  // scroll y al resize de la ventana; lo que no hay es observar la caja.
+  const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(schedule) : null;
+  ro?.observe(node);
   // El contenido puede crecer sin que el contenedor cambie de tamaño.
   const mo = new MutationObserver(schedule);
   mo.observe(node, { childList: true, subtree: true, characterData: true });
@@ -157,7 +159,7 @@ export function scrollbar(node, options = {}) {
     destroy() {
       cancelAnimationFrame(raf);
       clearTimeout(hideTimer);
-      ro.disconnect();
+      ro?.disconnect();
       mo.disconnect();
       node.removeEventListener('scroll', onScroll);
       node.removeEventListener('pointerenter', onEnter);

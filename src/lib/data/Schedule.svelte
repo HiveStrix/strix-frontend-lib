@@ -237,6 +237,22 @@
   }
   const goToday = () => { viewDate = today(); };
 
+  // HACIA QUÉ LADO SE MOVIÓ LA VISTA. Los días de un mes nuevo son nodos
+  // nuevos (van keyed por fecha), así que llegan con su animación; esto sólo
+  // le dice de qué lado venir: al avanzar entran desde la derecha, al volver
+  // desde la izquierda — como pasar una hoja. Se deriva del ANCLA y no de
+  // `pan()`, así un DatePicker que salta desde afuera también lo cuenta bien.
+  // Cambiar de vista no es moverse en el tiempo: ahí vale 0 y sólo suben.
+  let panDir = 0;
+  let lastStamp = null;
+  let lastView = view;
+  $: trackPan(view === 'week' ? weekStart.getTime() : vy * 12 + vm, view);
+  function trackPan(stamp, v) {
+    panDir = lastStamp === null || v !== lastView ? 0 : Math.sign(stamp - lastStamp);
+    lastStamp = stamp;
+    lastView = v;
+  }
+
   // Un evento es un enlace si trae `href`, un botón si trae `key` (y avisa por
   // `on:select`), o texto plano si no es navegable — el mismo criterio que
   // SideRail/Calendar usan para no fabricar interactividad que no existe.
@@ -293,7 +309,7 @@
   </header>
 
   {#if view === 'month'}
-    <table class="grid" aria-label={label ? `${label}, ${monthYearLabel}` : monthYearLabel}>
+    <table class="grid" style="--pan:{panDir}" aria-label={label ? `${label}, ${monthYearLabel}` : monthYearLabel}>
       <thead>
         <tr>
           {#each weekdayHeaders as w (w.long)}
@@ -338,7 +354,7 @@
          enteros, sin «+N más». Bajo cierto ancho la fila no entra y hace su
          propio scroll horizontal DENTRO de la tarjeta (nunca el body). -->
     <div class="weekwrap">
-      <div class="week">
+      <div class="week" style="--pan:{panDir}">
         {#each weekDays as d (d.iso)}
           <div class="wday" class:today={d.isToday} class:out={!d.inMonth}>
             <p class="wdh">
@@ -432,8 +448,41 @@
     border: 0; background: var(--sx-sunk); color: var(--sx-ink-2);
     font: inherit; font-size: var(--sx-t-xs); font-weight: var(--sx-w-semi);
     padding: var(--sx-s-1) var(--sx-s-3); border-radius: var(--sx-r-pill); cursor: pointer;
-    transition: color var(--sx-fast) var(--sx-ease), background var(--sx-fast) var(--sx-ease);
+    transition:
+      color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      background 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
+
+  /* ── LA LLEGADA DE LOS DÍAS ───────────────────────────────────────────────
+     Cada vista, al montarse, llega; cada día nuevo, al cambiar de mes o de
+     semana, entra desde el lado hacia el que se avanzó (`--pan`: -1, 0, 1) y
+     en ola —fila por fila, columna por columna—, así la grilla se lee como
+     una hoja que se da vuelta y no como 42 casillas que parpadean. Keyframes
+     con `backwards`: si no corren, la grilla está. */
+  .grid tbody tr:nth-child(2) { --r: 1; }
+  .grid tbody tr:nth-child(3) { --r: 2; }
+  .grid tbody tr:nth-child(4) { --r: 3; }
+  .grid tbody tr:nth-child(5) { --r: 4; }
+  .grid tbody tr:nth-child(6) { --r: 5; }
+  .grid .cell:nth-child(2), .week .wday:nth-child(2) { --c: 1; }
+  .grid .cell:nth-child(3), .week .wday:nth-child(3) { --c: 2; }
+  .grid .cell:nth-child(4), .week .wday:nth-child(4) { --c: 3; }
+  .grid .cell:nth-child(5), .week .wday:nth-child(5) { --c: 4; }
+  .grid .cell:nth-child(6), .week .wday:nth-child(6) { --c: 5; }
+  .grid .cell:nth-child(7), .week .wday:nth-child(7) { --c: 6; }
+  .grid .cell, .week .wday {
+    animation: sx-day-in 440ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+    animation-delay: calc(var(--r, 0) * 26ms + var(--c, 0) * 14ms);
+  }
+  @keyframes sx-day-in {
+    from { opacity: 0; transform: translate(calc(var(--pan, 0) * 14px), calc((1 - var(--pan, 0) * var(--pan, 0)) * 6px)); }
+  }
+  .agenda .grp { animation: sx-agenda-in 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  .agenda .grp:nth-child(2) { animation-delay: 50ms; }
+  .agenda .grp:nth-child(3) { animation-delay: 100ms; }
+  .agenda .grp:nth-child(4) { animation-delay: 150ms; }
+  .agenda .grp:nth-child(n+5) { animation-delay: 200ms; }
+  @keyframes sx-agenda-in { from { opacity: 0; transform: translateY(8px); } }
   .hoy:hover { color: var(--sx-ink); background: var(--sx-neutral-band); }
   .hoy:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 2px; }
 
@@ -499,7 +548,10 @@
      el mismo arreglo que la fila de agenda ya usa. Sin esto, el nombre se
      cortaba a media palabra (viola la cláusula 2 del CONTRACT). */
   .evlbl { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .ev.act { cursor: pointer; }
+  .ev.act {
+    cursor: pointer;
+    transition: filter 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
   .ev.act:hover { filter: saturate(1.15) brightness(.98); }
   .ev.act:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: 1px; }
 
@@ -572,7 +624,10 @@
     background: none; color: var(--sx-ink); font: inherit;
     text-align: start; text-decoration: none;
   }
-  .row.act { cursor: pointer; }
+  .row.act {
+    cursor: pointer;
+    transition: background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
   .row.act:hover { background: var(--sx-sunk); }
   .row.act:focus-visible { outline: 2px solid var(--sx-ink); outline-offset: -2px; }
   .when { flex: none; width: 5ch; font-size: var(--sx-t-xs); color: var(--sx-ink-3); }
@@ -591,7 +646,8 @@
     .row.act { padding-block: var(--sx-s-3); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .hoy, .ev.act { transition: none; }
+    .hoy, .ev.act, .row.act { transition: none; }
+    .grid .cell, .week .wday, .agenda .grp { animation: none; }
   }
 
   /* Angosto: la grilla del mes deja de tener sentido bajo cierto ancho —las

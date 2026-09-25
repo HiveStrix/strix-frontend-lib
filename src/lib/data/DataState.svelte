@@ -82,6 +82,9 @@
   export let total = null;
   /** Present ⇒ other filters beyond the search box are on. Changes the wording. */
   export let filters = false;
+
+  // Un int64 del servidor llega como string (grpc-gateway): se compara como número.
+  $: count = total == null || total === '' || !Number.isFinite(Number(total)) ? null : Number(total);
   export let retryLabel = 'Reintentar';
   export let clearLabel = '';
   /**
@@ -118,8 +121,8 @@
     (kind === 'error'
       ? 'Puede ser la conexión o el servidor. Volvé a intentarlo; si sigue igual, avisá a soporte con la hora exacta.'
       : kind === 'filtered'
-        ? total != null && total > 0
-          ? `Hay ${total} ${total === 1 ? noun : nounPlural} en total.`
+        ? count != null && count > 0
+          ? `Hay ${count} ${count === 1 ? noun : nounPlural} en total.`
           : ''
         : '');
 
@@ -138,7 +141,9 @@
        the retry AND whatever the surface passed, instead of one or the other. -->
   <ErrorState title={head} recovery={sub} retry="" {compact} {live} heading="p" on:retry>
     <svelte:fragment slot="actions">
-      <Button variant="solid" size={compact ? 'sm' : 'md'} on:click={() => dispatch('retry')}>
+      <!-- `outline`, no `solid`: el estado vive DENTRO de una vista que ya tiene
+           su primario (la banda), y dos sólidos en pantalla son dos primarios. -->
+      <Button variant="outline" size={compact ? 'sm' : 'md'} on:click={() => dispatch('retry')}>
         {retryLabel}
       </Button>
       <slot />
@@ -149,7 +154,7 @@
     {#if sub}{sub}{/if}
     <svelte:fragment slot="actions">
       {#if kind === 'filtered'}
-        <Button variant="solid" on:click={() => dispatch('clear')}>{clearWord}</Button>
+        <Button variant="outline" on:click={() => dispatch('clear')}>{clearWord}</Button>
       {/if}
       <slot />
     </svelte:fragment>

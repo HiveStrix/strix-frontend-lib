@@ -59,6 +59,7 @@
   // achicar, así que la ayuda del campo pudiendo ser un punto es exactamente
   // lo que corresponde reusar acá, no reimplementar.
   import { createEventDispatcher } from 'svelte';
+  import { cubicOut } from 'svelte/easing';
   import InfoDot from '../shell/InfoDot.svelte';
 
   /** The name of the answer. Sentence case, no colon — the box is the colon. */
@@ -102,6 +103,14 @@
   export let group = false;
   /** Force an id when something outside has to point at the control. */
   export let id = '';
+  /**
+   * true ⇒ la etiqueta sigue siendo el `<label for>` del control —su nombre
+   * accesible— pero no se dibuja. Para el campo cuyo rótulo ya está a la vista
+   * en otro lado: la columna «Contado» de un conteo, una celda de una tabla de
+   * líneas. Sin esto, esos campos quedaban sin nombre para un lector de
+   * pantalla. El ⓘ de `hintDot` no se muestra: no tiene a qué pegarse.
+   */
+  export let labelHidden = false;
 
   /**
    * Where the value came from, if the person did not type it: «la plantilla
@@ -131,17 +140,32 @@
   // la pone como descripción de su botón—, así que el párrafo no se dibuja y no
   // hay `hintId` al que apuntar: el input queda escueto y la ayuda vive a un
   // gesto, en el ⓘ de al lado, que es el objetivo de la prop.
-  $: showHintDot = !!(hint && hintDot && label);
+  $: showHintDot = !!(hint && hintDot && label && !labelHidden);
   $: showInlineHint = !!(hint && !showHintDot);
   // undefined, never '': an empty aria-describedby points at nothing and some
   // screen readers read the field name twice trying.
   $: describedBy =
     [showInlineHint && hintId, message && msgId, origin && originId].filter(Boolean).join(' ') || undefined;
+
+  // A message ARRIVES: it drops the last few pixels out from under the box it
+  // is about, instead of being stamped below it. Local, so a form that loads
+  // already holding an error shows it in place. Script transitions do not hear
+  // the stylesheet's reduced-motion block, so this one asks.
+  function arrive() {
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return { duration: 0 };
+    }
+    return {
+      duration: 240,
+      easing: cubicOut,
+      css: (t, u) => `opacity: ${t}; transform: translateY(${u * -4}px)`
+    };
+  }
 </script>
 
 <div class="field" class:disabled class:no-frame={!frame} class:dense>
   {#if label}
-    <div class="head">
+    <div class="head" class:sr={labelHidden}>
       <span class="lblwrap">
         <svelte:element
           this={group ? 'span' : 'label'}
@@ -180,12 +204,12 @@
          at the same moment as its text is a live region nobody hears. -->
     <div class="msgs" id={msgId} aria-live="polite">
       {#if error}
-        <p class="msg bad">
+        <p class="msg bad" in:arrive>
           <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor" /></svg>
           <span class="txt"><b class="prob">{error}</b>{#if fix}{' '}{fix}{/if}</span>
         </p>
       {:else if warning}
-        <p class="msg warn">
+        <p class="msg warn" in:arrive>
           <svg class="mk" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 .8 11.6 10.8H.4z" fill="currentColor" /></svg>
           <span class="txt"><b class="prob">{warning}</b>{#if fix}{' '}{fix}{/if}</span>
         </p>
@@ -253,18 +277,34 @@
      says «type here», and elevation alone cannot say that. Depth still does the
      rest of the work. */
   .frame {
+    /* Propio, no del anfitrión: un core cuyo reset `*` Svelte acota a sus
+       propios elementos no llega acá, y la caja medía 58px en vez de 40. */
+    box-sizing: border-box;
     position: relative;
     display: flex; align-items: stretch; gap: var(--sx-s-2);
     min-height: var(--sx-s-10);
     padding: var(--sx-s-2) var(--sx-s-3);
-    background: var(--sx-surface);
+    /* TALLADO, no levantado (variante colorida): el relleno y la elevación de
+       la caja son perillas — --sx-field y --sx-e-field — para que la decisión
+       viva en tokens.js y no repetida en cada control. El borde se queda: es
+       el que dice «escribí acá» y el que el contrato mide a 3:1. */
+    background: var(--sx-field);
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-field);
     color: var(--sx-ink);
-    transition: border-color var(--sx-fast) var(--sx-ease),
-                box-shadow var(--sx-fast) var(--sx-ease),
-                background var(--sx-fast) var(--sx-ease);
+    /* The ring GROWS in: it rests at zero width hugging the border and opens
+       out to 2px at 2px off, instead of being stamped on in one frame. Zero
+       width and not a transparent colour, so forced-colours mode (which paints
+       transparent outlines) never shows a ring on a field nobody focused. */
+    outline: 0 solid transparent;
+    outline-offset: 0;
+    transition: border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background var(--sx-fast) var(--sx-ease),
+                outline-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                outline-width 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                outline-offset 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .frame:hover:not(.disabled):not(.readonly) { border-color: var(--sx-ink-3); }
 
@@ -280,7 +320,7 @@
   :global(.sx-dark) .frame:focus-within { outline-color: var(--sx-n-0); border-color: var(--sx-n-0); }
 
   /* The ring is the second signal; the word underneath is the first. */
-  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
+  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
   /* --sx-line contra --sx-sunk mide 1.25:1 en claro y 1.11:1 en oscuro —
      visible acá sólo porque el marco es grande; el mismo par, en un radio o
      checkbox de 16px, medía igual de mal y se leía como una mancha, no como
@@ -390,5 +430,10 @@
     .frame :global(select),
     .frame :global(textarea) { font-size: 16px; }
     .revert::after { content: ''; position: absolute; inset: -12px -8px; }
+  }
+
+  /* The ring is simply there on focus. */
+  @media (prefers-reduced-motion: reduce) {
+    .frame { transition: none; }
   }
 </style>

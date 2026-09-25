@@ -200,7 +200,8 @@
     padding: var(--sx-s-3);
     background: var(--sx-surface);
     border-radius: var(--sx-r-3);
-    box-shadow: var(--sx-e-1);
+    /* Es un contenedor, no un control: la elevación de tarjeta. */
+    box-shadow: var(--sx-e-card, var(--sx-e-1));
     transition: width var(--sx-beat) var(--sx-ease);
   }
 

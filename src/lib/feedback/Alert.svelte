@@ -98,9 +98,19 @@
     font-size: var(--sx-t-sm);
     line-height: 1.5;
     color: var(--sx-ink);
+    /* Baja a su lugar en el flujo, sobre lo que describe — como una nota que
+       se apoya, no como un cartel que se enciende. */
+    animation: sx-alert-in 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
 
-  .mk { flex: none; width: 1.05em; height: 1.05em; margin-top: .28em; }
+  /* La marca del tono BROTA, con resorte, cuando la banda ya está puesta: es
+     lo único chico del aviso y lo primero que el ojo tiene que encontrar. */
+  .mk {
+    flex: none; width: 1.05em; height: 1.05em; margin-top: .28em;
+    animation: sx-alert-mark 520ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)) 140ms backwards;
+  }
+  @keyframes sx-alert-in { from { opacity: 0; transform: translateY(-8px); } }
+  @keyframes sx-alert-mark { from { opacity: 0; transform: scale(.3) rotate(-12deg); } }
 
   .body { flex: 1; min-width: 0; }
   .title {
@@ -137,7 +147,9 @@
     border-radius: var(--sx-r-1);
     color: var(--sx-ink-3);
     cursor: pointer;
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    transition:
+      background 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .x svg { width: .85em; height: .85em; }
   .x:hover { color: var(--sx-ink); background: color-mix(in srgb, currentColor 12%, transparent); }
@@ -153,6 +165,21 @@
   .critical .mk  { color: var(--sx-critical); }
   .info .mk      { color: var(--sx-info); }
   .neutral .mk   { color: var(--sx-neutral); }
+
+  /* LA ACCIÓN DEL AVISO HABLA EN SU TONO. Un botón teñido toma el acento del
+     módulo; sobre la banda de un aviso crítico eso era un verde oliva sobre
+     rosa (Costeo) — dos colores discutiendo cuál manda. Adentro de `.acts` el
+     acento se vuelve el tono del aviso, así el botón es del aviso. */
+  .positive  .acts { --sx-accent: var(--sx-positive); }
+  .attention .acts { --sx-accent: var(--sx-attention); }
+  .critical  .acts { --sx-accent: var(--sx-critical); }
+  .info      .acts { --sx-accent: var(--sx-info); }
+
+  /* A Core has no base.css to switch this off for it. */
+  @media (prefers-reduced-motion: reduce) {
+    .alert, .mk { animation: none; }
+    .x { transition: none; }
+  }
 
   @media (pointer: coarse) {
     .alert { padding: var(--sx-s-4); }

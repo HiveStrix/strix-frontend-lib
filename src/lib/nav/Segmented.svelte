@@ -33,7 +33,7 @@
   // THE OPTIONS MUST BE MUTUALLY EXCLUSIVE AND EXHAUSTIVE. There is no «none»
   // state: pressing the pressed segment does nothing, because a view has to be
   // drawn some way. If «ninguno» is a real answer you want, that is FilterChips.
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount, tick } from 'svelte';
 
   /** [{ key, label, hint? }] — key may be any primitive; it is compared with ===. */
   export let items = [];
@@ -59,9 +59,85 @@
     value = k;
     dispatch('change', { key: k });
   }
+
+  // ── The thumb ────────────────────────────────────────────────────────────
+  // ONE raised pill that TRAVELS to the new option, instead of one segment
+  // going dark while another lights up: the eye follows it from one side to
+  // the other and reads «this replaces that». It is measured off the pressed
+  // button with offsets, not getBoundingClientRect — offsets are where the
+  // button IS in the layout, unbent by any transform an ancestor is animating.
+  //
+  // Only a new choice travels. The first placement is drawn in place (the
+  // thumb is created already there — a fresh element has nothing to glide
+  // from), and a resize, a web font landing or a changed label re-seat it
+  // without travel, so dragging a window never leaves it trailing behind.
+  // Until it has measured once — or if it cannot (hidden, zero width) — the
+  // pressed segment paints its own fill, exactly as before.
+  let track;
+  let thumb = null;
+  let travel = false;
+  let ro = null;
+  const watched = new Set();
+
+  function place(glide) {
+    const on = track?.querySelector('[aria-pressed="true"]');
+    if (!on || !on.offsetWidth) { thumb = null; return; }
+    const next = { x: on.offsetLeft, w: on.offsetWidth, h: on.offsetHeight };
+    if (thumb && next.x === thumb.x && next.w === thumb.w && next.h === thumb.h) return;
+    travel = glide && !!thumb;
+    thumb = next;
+    watch();
+  }
+
+  // Every segment is watched, not just the pressed one: a neighbour whose label
+  // grows pushes the pressed one sideways without changing its size. A node is
+  // observed once — observing it again re-fires the observer, which would
+  // place, which would observe: a loop.
+  function watch() {
+    if (!ro || !track) return;
+    for (const el of watched) if (!el.isConnected) { ro.unobserve(el); watched.delete(el); }
+    for (const el of track.querySelectorAll('.sg')) {
+      if (!watched.has(el)) { ro.observe(el); watched.add(el); }
+    }
+  }
+
+  // The choice (or the list) changed: glide, once the DOM has the new pressed.
+  $: if (track) follow(value, items);
+  async function follow() {
+    await tick();
+    place(true);
+  }
+
+  onMount(() => {
+    if (typeof ResizeObserver === 'function') {
+      ro = new ResizeObserver(() => place(false));
+      ro.observe(track);
+      watch();
+    }
+    document.fonts?.ready.then(() => place(false));
+    return () => ro?.disconnect();
+  });
 </script>
 
-<div class="seg {size}" class:full class:off={disabled} role="group" aria-label={label || undefined}>
+<div
+  class="seg {size}"
+  class:full
+  class:off={disabled}
+  class:glide={!!thumb}
+  role="group"
+  aria-label={label || undefined}
+  bind:this={track}
+>
+  {#if thumb}
+    <span
+      class="thumb"
+      class:travel
+      aria-hidden="true"
+      style:width="{thumb.w}px"
+      style:height="{thumb.h}px"
+      style:transform="translate({thumb.x}px, -50%)"
+    ></span>
+  {/if}
   {#each items as it (it.key)}
     <button
       type="button"
@@ -81,6 +157,8 @@
      the whole visual argument, and it reads at a glance in both themes without
      a single colour. */
   .seg {
+    /* The thumb is placed against the track, and scrolls with it. */
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: var(--sx-s-1);
@@ -95,6 +173,7 @@
        idioma largo puede necesitar más. */
     min-height: var(--sx-s-10);
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     border-radius: var(--sx-r-pill);
     max-width: 100%;
     /* Long labels on a narrow column scroll rather than wrap: a segmented
@@ -121,6 +200,9 @@
   .full .sg { flex: 1 1 0; }
 
   .sg {
+    /* Above the thumb, which is drawn under every label. */
+    position: relative;
+    z-index: 1;
     flex: none;
     padding: var(--sx-s-2) var(--sx-s-4);
     border: 0;
@@ -132,15 +214,53 @@
     line-height: 1.25;
     white-space: nowrap;
     cursor: pointer;
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    /* The label inks in on the thumb's own clock, so the word lights as the
+       pill reaches it rather than before it has left the last one. */
+    transition: background var(--sx-fast) var(--sx-ease),
+                color 280ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
 
   .sg:hover:not(:disabled):not(.on) { color: var(--sx-ink); }
+  /* A press gives under the finger and springs back. */
+  .sg:active:not(:disabled) {
+    scale: .95;
+    transition: background var(--sx-fast) var(--sx-ease),
+                color 280ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
 
   .sg.on {
     background: var(--sx-surface);
     color: var(--sx-ink);
     box-shadow: var(--sx-e-1);
+  }
+  /* The thumb carries the raised fill, so the pressed segment stops drawing
+     its own — one pill, never two. */
+  .glide .sg.on { background: none; box-shadow: none; }
+
+  /* Centred by the same rule that centres the segments (align-items), not by
+     a measured top: offsets are whole pixels and the track is not. */
+  .thumb {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    border-radius: var(--sx-r-pill);
+    background: var(--sx-surface);
+    box-shadow: var(--sx-e-1);
+    pointer-events: none;
+  }
+  /* The trip glides; the SIZE springs. A spring on the trip overshoots by a
+     tenth of the distance — 17px on a 170px crossing — and this track clips
+     (the scroll box and the feathered edges above), so the pill would bury
+     itself in the wall at either end. On the width the overshoot is a tenth
+     of the difference between two labels: a small elastic give as the pill
+     settles onto its word, which is where the life is. */
+  .thumb.travel {
+    transition:
+      transform 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      width 460ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)),
+      height 460ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
 
   .seg.sm { min-height: var(--sx-s-8); }
@@ -163,5 +283,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .sg { transition: none; }
+    /* The thumb jumps to the new option: same place, no journey. */
+    .sg:active:not(:disabled) { scale: none; transition: none; }
+    .thumb.travel { transition: none; }
   }
 </style>

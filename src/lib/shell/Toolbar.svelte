@@ -47,8 +47,11 @@
   $: css = `--bar-gap:${step(gap)}`;
 </script>
 
+<!-- Con `aria-label`, el grupo rotulado que promete el comentario de arriba:
+     sin el rol, el nombre se ignoraba (un <div> no expone aria-label). -->
 <svelte:element
   this={as}
+  role={$$restProps['aria-label'] || $$restProps['aria-labelledby'] ? 'group' : undefined}
   {...$$restProps}
   class="bar a-{align} on-{on}"
   class:sticky
@@ -109,7 +112,9 @@
      being two sides: side by side they each get 45 % of 390px and every control
      in them wraps to two lines. Stacked, each gets the whole width. */
   @media (max-width: 480px) {
-    .bar { flex-direction: column; align-items: stretch; }
+    /* En columna, `wrap` hacía que cada línea tomara el ancho de su contenido:
+       un Segmented de cuatro opciones empujaba el otro lado fuera de la barra. */
+    .bar { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
     .side { justify-content: flex-start; }
   }
 </style>

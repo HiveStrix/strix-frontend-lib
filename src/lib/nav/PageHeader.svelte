@@ -185,6 +185,9 @@
           {#if eyebrow}<div class="sk sk-eyebrow" aria-hidden="true"></div>{/if}
           <div class="sk sk-title" aria-hidden="true"></div>
           {#if subtitle}<div class="sk sk-sub" aria-hidden="true"></div>{/if}
+          <!-- La fila `meta` también se reserva: sin ella, la banda crecía ~40px
+               al llegar los sellos y todo lo de abajo saltaba. -->
+          {#if hasMeta}<div class="meta" aria-hidden="true"><div class="sk sk-meta"></div><div class="sk sk-meta short"></div></div>{/if}
         {:else}
           {#if eyebrow}
             <p class="tag"><span class="dot" aria-hidden="true"></span>{eyebrow}</p>
@@ -208,6 +211,9 @@
           {#if eyebrow}<div class="sk sk-eyebrow" aria-hidden="true"></div>{/if}
           <div class="sk sk-title" aria-hidden="true"></div>
           {#if subtitle}<div class="sk sk-sub" aria-hidden="true"></div>{/if}
+          <!-- La fila `meta` también se reserva: sin ella, la banda crecía ~40px
+               al llegar los sellos y todo lo de abajo saltaba. -->
+          {#if hasMeta}<div class="meta" aria-hidden="true"><div class="sk sk-meta"></div><div class="sk sk-meta short"></div></div>{/if}
         {:else}
           {#if eyebrow}<p class="sx-cap eyebrow">{eyebrow}</p>{/if}
           <!-- El slot default se APPENDEA al título, para el caso que `title`
@@ -281,8 +287,11 @@
     font-weight: var(--sx-w-bold);
     letter-spacing: -.03em;
     line-height: 1.12;
-    /* Un titular más largo que esto deja de leerse y empieza a escanearse. */
-    max-width: 26ch;
+    /* Un titular más largo que esto deja de leerse y empieza a escanearse.
+       `--sx-ph-measure` lo abre para lo que no es un titular sino un NOMBRE
+       PROPIO (una razón social, un activo con su código): el core lo pone en
+       el contenedor del encabezado, y lo demás no cambia. */
+    max-width: var(--sx-ph-measure, 26ch);
     text-wrap: balance;
   }
 
@@ -315,7 +324,9 @@
      no la raya). */
   .sticky {
     position: sticky;
-    top: 0;
+    /* `--sx-sticky-top`: cuánto ocupa lo que ya está pegado arriba (la
+       ModuleBar de un core). Sin eso el encabezado se deslizaba debajo de ella. */
+    top: var(--sx-sticky-top, 0);
     z-index: var(--sx-z-sticky);
     background: var(--sx-ground);
     border-bottom: 1px solid var(--sx-line);
@@ -324,6 +335,14 @@
     padding-inline: var(--sx-s-4);
     border-radius: var(--sx-r-1);
   }
+  /* Una pieza con piel (`banda`, `soft`, `hero-card`) ya es su propio borde: el
+     sangrado negativo y la raya del sticky de `line` la hacían sobresalir 16px
+     por lado. Pegada, conserva su forma. */
+  .sticky.banda, .sticky.soft, .sticky.hero-card {
+    margin-inline: 0;
+    border-bottom: 0;
+  }
+
 
   /* ═══ VARIANT: line — el default, una raya ════════════════════════════════
      `.hd.line`, no una redeclaración de `.hd`: la especificidad tiene que
@@ -404,20 +423,26 @@
      relleno de ACENTO, tinta `--sx-accent-ink`. Recuperada de v0.8.2 —era el
      principal de strix-maintenance, y volvió a serlo. */
   .hd.banda {
-    --banda-fill: var(--sx-accent);
-    --banda-ink: var(--sx-accent-ink);
+    /* Perillas de la variante (tokens.js): --sx-banda-tint es cuánto acento
+       lleva el relleno y --sx-banda-ink la tinta; sin ellas, el acento pleno
+       con su tinta, como en main. `--banda-accent` guarda el acento de ACÁ
+       para que `.acts` pueda volver a él sin un ciclo. */
+    --banda-accent: var(--sx-accent);
+    --banda-accent-ink: var(--sx-accent-ink);
+    --banda-fill: color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface));
+    --banda-ink: var(--sx-banda-ink, var(--sx-accent-ink));
     /* 85%, NO 76%. La bajada y el eyebrow de la banda son texto corrido, así
        que les toca el piso de 4.5:1 —y al 76% el tema oscuro medía 4.01 sobre
        el acento (el claro apenas pasaba, 4.56). La asimetría es real: en
        oscuro `--sx-accent-ink` es tinta OSCURA sobre un acento CLARO, y bajar
        su alfa lo acerca al relleno en vez de alejarlo. Al 85% da 5.02 oscuro
        y 5.18 claro, y sigue leyéndose como una voz más baja que el título. */
-    --banda-ink-soft: color-mix(in srgb, var(--sx-accent-ink) 85%, transparent);
+    --banda-ink-soft: color-mix(in srgb, var(--banda-ink) 85%, transparent);
     --banda-edge: transparent;
     background: var(--banda-fill);
     color: var(--banda-ink);
     border: 1px solid var(--banda-edge);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-card, var(--sx-e-1));
     padding: var(--sx-s-6);
     border-radius: var(--sx-r-3);
   }
@@ -443,8 +468,12 @@
    * El estado no se queda mudo: el título ya dice la palabra («Una celda está
    * en negativo»), que es lo que la regla de la casa pide —el color decora un
    * reclamo que el contenido ya hace, nunca lo hace solo—. */
-  .hd.banda.attention { --banda-fill: color-mix(in srgb, var(--sx-accent) 92%, var(--sx-ink)); }
-  .hd.banda.critical  { --banda-fill: color-mix(in srgb, var(--sx-accent) 82%, var(--sx-ink)); }
+  /* `--sx-banda-alarm` (0|1) es cuánto de eso aplica. Sobre el acento pleno de
+     main, oscurecer se lee como alarma; sobre el pastel de la variante (22 %),
+     la tinta lo vuelve barro (Costeo con alertas: un oliva gris). La variante
+     lo apaga: el reclamo ya lo hacen el título y el Alert de abajo. */
+  .hd.banda.attention { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) calc(100% - 8% * var(--sx-banda-alarm, 1)), var(--sx-ink)); }
+  .hd.banda.critical  { --banda-fill: color-mix(in srgb, color-mix(in srgb, var(--sx-accent) var(--sx-banda-tint, 100%), var(--sx-surface)) calc(100% - 18% * var(--sx-banda-alarm, 1)), var(--sx-ink)); }
   /* `.hd.banda .ttl` (0,2,1) le gana a `.critical .ttl` (0,2,0): el título de
      una banda toma SIEMPRE su `--banda-ink` (el tono ya viajó al relleno). */
   .hd.banda .ttl { color: var(--banda-ink); }
@@ -457,9 +486,12 @@
      su valor: `.acts` hereda `--banda-fill/ink` YA resueltos a color, así que
      no hay ciclo. El sólido queda en la tinta de la banda con el relleno de
      la banda como texto —el negativo exacto del bloque que lo contiene. */
+  /* Con `--sx-banda-remap` en 0 % (banda pastel, variante colorida) las
+     acciones conservan el acento del producto: un botón de acento sobre un
+     pastel se ve perfectamente. En 100 % (main) se invierten como siempre. */
   .hd.banda .acts {
-    --sx-accent: var(--banda-ink);
-    --sx-accent-ink: var(--banda-fill);
+    --sx-accent: color-mix(in srgb, var(--banda-ink) var(--sx-banda-remap, 100%), var(--banda-accent));
+    --sx-accent-ink: color-mix(in srgb, var(--banda-fill) var(--sx-banda-remap, 100%), var(--banda-accent-ink));
   }
   /* `ghost` NO SE ARREGLA CON LOS TOKENS DE ACENTO, y por eso lleva regla
      propia: es la única variante que no pinta su propio fondo —es transparente
@@ -472,6 +504,35 @@
 
      `:global` porque el <button> lo dibuja Button, en su propio scope. */
   .hd.banda .acts :global(.sx-btn.ghost) { color: var(--banda-ink); }
+  /* EL OUTLINE TEÑIDO, TAMBIÉN. Desde v0.9.0 `outline` se tiñe con
+     --sx-accent (fondo Y tinta), y `.acts` re-liga --sx-accent a la tinta de la
+     banda. Con un acento OSCURO —el morado por defecto— eso daba un lavado
+     blanco con tinta blanca al 68 %: medido en el core de Mantenimiento, un
+     «+ Equipo» rgb(184,183,187) sobre una píldora casi blanca, habilitado e
+     ilegible. Con un acento claro (el ámbar de Mantenimiento) no se veía porque
+     la tinta de la banda es oscura. Dentro de la banda el teñido se hace con la
+     tinta de la banda, que es lo que la banda ya lee, en los dos casos. */
+  /* Con la banda pastel (`--sx-banda-remap` en 0 %) el teñido de la banda no
+     hace falta: el outline vuelve a su lavado de acento normal, que sobre un
+     pastel se lee. Cada valor mezcla las dos recetas por la misma perilla. */
+  .hd.banda .acts :global(.sx-btn.outline) {
+    background: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 16%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) var(--sx-btn-tint, 28%), var(--sx-surface)));
+    color: color-mix(in srgb, var(--banda-ink) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) 68%, var(--sx-ink)));
+    border-color: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 38%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) 34%, transparent));
+  }
+  .hd.banda .acts :global(.sx-btn.outline:not(:disabled):not(.locked):hover) {
+    background: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 24%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) calc(var(--sx-btn-tint, 28%) + 8%), var(--sx-surface)));
+    border-color: color-mix(in srgb,
+      color-mix(in srgb, var(--banda-ink) 52%, transparent) var(--sx-banda-remap, 100%),
+      color-mix(in srgb, var(--sx-accent) 44%, transparent));
+  }
   .hd.banda .acts :global(.sx-btn.ghost:not(:disabled):not(.locked):hover) {
     background: color-mix(in srgb, var(--banda-ink) 16%, transparent);
     color: var(--banda-ink);
@@ -615,7 +676,7 @@
     background: var(--sx-surface);
     border: 1px solid var(--sx-line);
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-card, var(--sx-e-1));
     overflow: hidden;
   }
   .hd.hero-card .grid { gap: 0; }
@@ -644,6 +705,9 @@
   .sk-eyebrow { height: var(--sx-t-2xs); width: 9ch; margin-bottom: var(--sx-s-2); }
   .sk-title { height: var(--sx-t-2xl); width: min(22ch, 100%); }
   .sk-sub { height: var(--sx-t-md); width: min(44ch, 100%); margin-top: var(--sx-s-3); }
+  /* Del alto de una Pill chica: la fila reservada mide lo que va a medir. */
+  .sk-meta { height: 1.5rem; width: 7ch; border-radius: var(--sx-r-pill); }
+  .sk-meta.short { width: 5ch; }
 
   @keyframes sk-pulse { from { opacity: 1; } to { opacity: .5; } }
   @keyframes livePulse { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }

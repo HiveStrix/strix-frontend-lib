@@ -192,14 +192,37 @@
     border: 0;
     border-radius: var(--sx-r-1);
     background: none;
+    /* Variante colorida: cada página es un control chico levantado (Stitch). */
+    background: color-mix(in srgb, var(--sx-surface) var(--sx-pg-raise, 0%), transparent);
+    box-shadow: var(--sx-e-chip, none);
     color: var(--sx-ink-2);
     font-size: var(--sx-t-sm);
     font-weight: var(--sx-w-medium);
     cursor: pointer;
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    /* The wash under the cursor glides in and out; the page being left and
+       the page arriving cross-fade their fills on the same clock. A press
+       gives and springs back — small chips, so the spring is theirs. */
+    transition: background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
   .nav { padding-inline: var(--sx-s-3); }
-  .nav svg { width: 12px; height: 12px; flex: none; }
+  .nav svg {
+    width: 12px; height: 12px; flex: none;
+    transition: translate 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
+  .nav:active:not(:disabled), .num:active:not(:disabled):not(.on) {
+    scale: .92;
+    transition: background 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                color 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
+  /* The arrow leans the way it goes — back for «Anterior», on for «Siguiente». */
+  @media (hover: hover) {
+    .nav:first-child:hover:not(:disabled) svg { translate: -2px 0; }
+    .nav:last-child:hover:not(:disabled) svg { translate: 2px 0; }
+  }
 
   /* Igual que un botón outline/ghost: la página bajo el cursor se ilumina,
      no se hunde en gris. */
@@ -215,6 +238,7 @@
     color: var(--sx-accent-ink);
     font-weight: var(--sx-w-semi);
     cursor: default;
+    box-shadow: var(--sx-e-primary, var(--sx-e-chip, none));
   }
 
   .nav:disabled { color: var(--sx-ink-3); opacity: .45; cursor: not-allowed; }
@@ -276,5 +300,13 @@
     .where { display: inline-flex; }
     .pg { justify-content: flex-start; }
     .count { flex: 1 0 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav, .num, .nav svg,
+    .nav:active:not(:disabled), .num:active:not(:disabled):not(.on) { transition: none; }
+    .nav:active:not(:disabled), .num:active:not(:disabled):not(.on) { scale: none; }
+    .nav:first-child:hover:not(:disabled) svg,
+    .nav:last-child:hover:not(:disabled) svg { translate: none; }
   }
 </style>

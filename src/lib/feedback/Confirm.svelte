@@ -147,7 +147,7 @@
       <p class="lede">{reversible ? 'Esto cambia:' : 'Esto se pierde:'}</p>
       <ul class="loses {tone}" class:counted>
         {#each rows as r, i (i)}
-          <li>
+          <li style="--n:{i}">
             <svg class="mk" viewBox="0 0 12 12" aria-hidden="true">{@html glyph}</svg>
             {#if counted}<b class="n sx-num">{r.n ?? ''}</b>{/if}
             <span>{r.text}</span>
@@ -159,7 +159,7 @@
     {#if keeps.length}
       <ul class="keeps">
         {#each keeps as k, i (i)}
-          <li>
+          <li style="--n:{rows.length + i}">
             <svg class="mk" viewBox="0 0 12 12" aria-hidden="true">{@html markOf('positive')}</svg>
             <span>{k}</span>
           </li>
@@ -249,6 +249,22 @@
   .n { font-weight: var(--sx-w-bold); color: var(--sx-ink); justify-self: end; }
 
   .mk { width: .72em; height: .72em; flex: none; align-self: center; }
+
+  /* La cuenta de lo que se pierde se ANOTA, renglón por renglón, justo después
+     de que el panel se asienta: el ojo baja por la lista al ritmo en que
+     aparece. La marca de cada renglón brota con resorte — es lo único chico
+     acá, y lo único que puede rebotar. El foco no espera a nada de esto:
+     `.say` lo recibe al montar, y la opacidad no le cambia nada a un lector. */
+  li {
+    animation: sx-tally 380ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+    animation-delay: calc(160ms + var(--n, 0) * 45ms);
+  }
+  li .mk {
+    animation: sx-mark-pop 460ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)) backwards;
+    animation-delay: calc(220ms + var(--n, 0) * 45ms);
+  }
+  @keyframes sx-tally { from { opacity: 0; transform: translateX(-6px); } }
+  @keyframes sx-mark-pop { from { opacity: 0; transform: scale(.3); } }
   .loses.critical .mk { color: var(--sx-critical); }
   .loses.attention .mk { color: var(--sx-attention); }
   .keeps { margin-top: var(--sx-s-3); }
@@ -273,6 +289,10 @@
     align-self: center;
     font-size: var(--sx-t-xs);
     color: var(--sx-ink-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    li, li .mk { animation: none; }
   }
 
   /* THE FORTY LINES THAT USED TO BE HERE were a second Button: its own radius

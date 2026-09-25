@@ -77,15 +77,19 @@
     /* Transparent, not absent: a border only on some tones makes the pills
        different heights and a row of them stops aligning. */
     border: 1px solid transparent;
+    /* Variante colorida: la pill de estado es un hueco teñido (Stitch). Sin la
+       perilla, plana como en main. */
+    box-shadow: var(--sx-e-pill, none);
   }
 
   .mk { flex: none; width: 9px; height: 9px; }
 
-  .positive  { background: var(--sx-positive-band);  color: var(--sx-positive);  border-color: var(--sx-positive-edge); }
-  .attention { background: var(--sx-attention-band); color: var(--sx-attention); border-color: var(--sx-attention-edge); }
-  .critical  { background: var(--sx-critical-band);  color: var(--sx-critical);  border-color: var(--sx-critical-edge); }
-  .info      { background: var(--sx-info-band);      color: var(--sx-info);      border-color: var(--sx-info-edge); }
-  .neutral   { background: var(--sx-neutral-band);   color: var(--sx-neutral);   border-color: var(--sx-neutral-edge); }
+  /* --sx-pill-line: perilla del filo (variante: transparent, como Stitch). */
+  .positive  { background: var(--sx-positive-band);  color: var(--sx-positive);  border-color: var(--sx-pill-line, var(--sx-positive-edge)); }
+  .attention { background: var(--sx-attention-band); color: var(--sx-attention); border-color: var(--sx-pill-line, var(--sx-attention-edge)); }
+  .critical  { background: var(--sx-critical-band);  color: var(--sx-critical);  border-color: var(--sx-pill-line, var(--sx-critical-edge)); }
+  .info      { background: var(--sx-info-band);      color: var(--sx-info);      border-color: var(--sx-pill-line, var(--sx-info-edge)); }
+  .neutral   { background: var(--sx-neutral-band);   color: var(--sx-neutral);   border-color: var(--sx-pill-line, var(--sx-neutral-edge)); }
 
   .solid { background: var(--sx-accent); color: var(--sx-accent-ink); border-color: transparent; }
 
@@ -97,15 +101,46 @@
   button.pill {
     cursor: pointer;
     font-family: inherit;
-    transition: transform var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
+    /* The lift glides; the press gives fast and springs back on release (the
+       spring is allowed here: a pill is small and tactile). The ring of the
+       pressed state closes in on the same glide. */
+    --pill-give: 420ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+    transition:
+      transform 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      box-shadow 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      scale var(--pill-give);
+    /* Un filtro en reposo es un control: se levanta (Stitch). */
+    box-shadow: var(--sx-e-chip, none);
   }
   button.pill:hover { transform: translateY(-1px); box-shadow: var(--sx-e-1); }
   button.pill:active { transform: none; }
+  button.pill:active {
+    --pill-give: 100ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    scale: .96;
+  }
   /* The pressed state is drawn with an inset ring in the tone's own ink, so a
      selected filter still reads as the state it names. */
-  button.pill[aria-pressed='true'] { box-shadow: 0 0 0 1.5px currentColor inset; }
+  button.pill[aria-pressed='true'] { box-shadow: var(--sx-e-pill, 0 0 transparent), 0 0 0 1.5px currentColor inset; }
+  /* Turning ON, the mark pops — a small swell past its size and back. A
+     keyframe and not a transition, because on and off rest at the same size;
+     it plays again every time the filter is switched back on. */
+  .mk { transform-origin: center; }
+  button.pill[aria-pressed='true'] .mk {
+    animation: sx-pill-pop 420ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+  }
+  @keyframes sx-pill-pop {
+    0% { scale: .4; }
+    100% { scale: 1; }
+  }
 
   @media (pointer: coarse) {
     button.pill { min-height: var(--sx-touch); padding-inline: var(--sx-s-4); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    button.pill { transition: none; }
+    button.pill:hover { transform: none; }
+    button.pill:active { scale: none; }
+    button.pill[aria-pressed='true'] .mk { animation: none; }
   }
 </style>

@@ -57,7 +57,7 @@
 // mide exactamente eso — dos tokens, resueltos, comparados ENTRE SÍ, nunca
 // contra un fondo— y es la razón por la que el archivo se llama «contraste» y
 // no «legibilidad»: hasta ahora medía sólo la mitad de lo que promete.
-import { TOKENS, TOKENS_DARK } from '../src/lib/tokens.js';
+import { TOKENS, TOKENS_DARK, clayTokens } from '../src/lib/tokens.js';
 
 const hex = (h) => {
   const s = h.length === 4 ? h.slice(1).split('').map((c) => c + c).join('') : h.slice(1);
@@ -289,6 +289,31 @@ const CHECKS = [
     3.0,
     'segmento "resta" de StackedBar sobre el fondo del track'
   ],
+  // EL CAMPO TALLADO (variante colorida). La caja de un control dejó de ser
+  // --sx-surface y pasó a pintarse con --sx-field (hoy --sx-sunk): el valor que
+  // se escribe, el placeholder y el borde viven encima de ese relleno, no de la
+  // tarjeta. Un fondo nuevo para texto sin su par en el contrato es exactamente
+  // el hueco que este archivo existe para cerrar.
+  ['--sx-ink',    '--sx-field', 4.5, 'texto dentro de un control'],
+  ['--sx-ink-3',  '--sx-field', 4.5, 'placeholder y ayuda dentro de un control'],
+  ['--sx-edge',   '--sx-field', 3.0, 'borde de control sobre su propio relleno'],
+  // LA BANDA PASTEL (variante colorida): el título y la bajada de
+  // `PageHeader variant="banda"` se escriben con --sx-banda-ink sobre el acento
+  // al 22 % (--sx-banda-tint) contra la superficie.
+  // El 22 % está escrito acá a mano: si la perilla se mueve, esta fila se mueve con ella.
+  ['--sx-banda-ink', 'color-mix(in srgb, var(--sx-accent) 22%, var(--sx-surface))', 4.5, 'título de la banda pastel'],
+  ['color-mix(in srgb, var(--sx-banda-ink) 85%, transparent)', 'color-mix(in srgb, var(--sx-accent) 22%, var(--sx-surface))', 4.5, 'bajada de la banda pastel'],
+  // EL POZO DE ÍCONO (IconWell, SidebarItems con `hue`, Panel con `hue`): el
+  // ícono es el matiz al 66 % contra --sx-ink, sobre el matiz al 16 % contra el
+  // pozo (--sx-sunk). Un ícono puede cargar significado ⇒ 3:1 (1.4.11). Los dos
+  // porcentajes están escritos en IconWell.svelte y en SidebarItems.svelte.
+  ['color-mix(in srgb, var(--sx-hue-violet) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-violet) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · violet'],
+  ['color-mix(in srgb, var(--sx-hue-aqua) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-aqua) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · aqua'],
+  ['color-mix(in srgb, var(--sx-hue-coral) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-coral) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · coral'],
+  ['color-mix(in srgb, var(--sx-hue-amber) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-amber) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · amber'],
+  ['color-mix(in srgb, var(--sx-hue-sage) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-sage) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · sage'],
+  ['color-mix(in srgb, var(--sx-hue-indigo) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-hue-indigo) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · indigo'],
+  ['color-mix(in srgb, var(--sx-accent-well, var(--sx-accent)) 66%, var(--sx-ink))', 'color-mix(in srgb, var(--sx-accent-well, var(--sx-accent)) 16%, var(--sx-sunk))', 3.0, 'ícono en su pozo · acento'],
   ['--sx-ink',    '--sx-surface', 4.5, 'texto principal'],
   ['--sx-ink-2',  '--sx-surface', 4.5, 'texto secundario'],
   ['--sx-ink-3',  '--sx-surface', 4.5, 'texto terciario'],
@@ -338,7 +363,9 @@ INFO.push(['--sx-thead', '--sx-ground', 'PageHeader banda, si se usara sin tarje
 // un color y pedirselo es ruido, no una comprobacion.
 // `color-scheme` no es custom property ni color: es la señal para los widgets
 // nativos (ver tokens.js). Entra en la exención por lo mismo que una sombra.
-const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch)|color-scheme$)/;
+// Las perillas de la variante que NO son color (un radio, una opacidad, dos
+// porcentajes) entran a la exención por lo mismo que una sombra.
+const NO_COLOR = /^(--sx-(glow$|e-|r-|t-|s-|w-|z-|font|ease|fast|beat|slow|touch|btn-(radius|gloss)$|banda-(tint|remap|alarm)$|pill-line$|nav-pick$|pg-raise$|tone-bar$|toast-(mark|mark-e)$|nest-(e|r)$|num-font$|strip-(gap|pad|e|cell-e|cell-r)$)|color-scheme$)/;
 
 // EL TERCER HUECO. Este archivo ya se extendió dos veces por la misma razón —
 // primero medía `--sx-edge` contra dos fondos que resolvían al mismo blanco
@@ -747,7 +774,60 @@ if (detalle.length) {
     }
   }
 }
-console.log(malas ? `\n${malas} comprobacion(es) fallando en la matriz` : '\nla matriz entera pasa: 4 combinaciones, 0 fallas (legibilidad y distinguibilidad)');
+// ── LA ARCILLA DE CADA MÓDULO — el mismo contrato, girado a cada acento ──────
+//
+// Cada core declara `clayHost(acento)`: la receta del lila girada al tono de su
+// acento (tokens.js, «LA ARCILLA DE CADA MÓDULO»). Guarda la luz y la
+// saturación de cada rol, así que en teoría mide lo mismo que el lila — pero
+// «en teoría» es la frase que este archivo existe para no creer. Corren las
+// DOS clases, en claro y en oscuro, con el acento REAL de cada módulo, y suman
+// a `malas`: un módulo cuya arcilla no se lee es un defecto de esta librería,
+// no del módulo, porque la receta es de acá.
+// [módulo, acento claro, tinta sobre el acento] — los que declara cada core.
+const MODULES = [
+  ['mantenimiento', '#F7B500', '#1B1B1E'], ['inventario', '#1D4ED8', '#FFFFFF'], ['clientes', '#BE185D', '#FFFFFF'],
+  ['facturación', '#0C6E68', '#FFFFFF'], ['costeo', '#4D7C0F', '#FFFFFF'], ['gastos y compras', '#B45309', '#FFFFFF'],
+  ['bandeja de entrada', '#6541BE', '#FFFFFF'], ['divisiones', '#4F46E5', '#FFFFFF']
+];
+const modResumen = [];
+const modInfo = [];
+for (const [mod, acc, accInk] of MODULES) {
+  const { light, dark } = clayTokens(acc);
+  for (const [tema, tokens] of [
+    ['claro', { ...TOKENS, ...light, '--sx-accent': acc, '--sx-accent-ink': accInk }],
+    ['oscuro', { ...TOKENS, ...light, ...TOKENS_DARK, ...dark }]
+  ]) {
+    const fails = [
+      ...evalContract(tokens).map((f) => ({ ...f, clase: 'legibilidad' })),
+      ...evalDistinct(tokens).map((f) => ({ ...f, clase: 'distinguibilidad' }))
+    ];
+    // LA SELECCIÓN CONTRA LAS BANDAS DE ESTADO (clase 3, la de ΔE2000), sólo
+    // en claro: el lavado de la selección lo calcula esta librería por módulo,
+    // así que un choque con «por vencer» sería un defecto de acá.
+    if (tema === 'claro') {
+      const pick = resolve(tokens['--sx-accent-pick'], tokens);
+      for (const tone of TONES) {
+        const band = resolve(tokens[`--sx-${tone}-band`], tokens);
+        const d = deltaE(pick, band);
+        // Informativo, como la clase 3 para cualquier acento que no es el de la
+        // librería: si un rosa choca con «crítico», lo decide el módulo.
+        if (d < ACCENT_MIN) modInfo.push(`${mod}: la fila elegida queda a ΔE ${d.toFixed(2)} de --sx-${tone}-band (piso ${ACCENT_MIN}) — choque de familia del acento`);
+      }
+    }
+    malas += fails.length;
+    modResumen.push({ label: `${mod} · ${tema}`, fails });
+  }
+}
+console.log('\n── LA ARCILLA DE CADA MÓDULO (clayHost) — mismo contrato, cada acento ──');
+for (const i of modInfo) console.log('  informativo · ' + i);
+for (const r of modResumen) {
+  console.log(`${r.label.padEnd(32)} ${r.fails.length ? r.fails.length + ' FALLAN' : 'pasa'}`);
+  for (const f of r.fails) {
+    console.log(`    ${String(f.fg).padEnd(22)} ${String(f.bg ?? '').padEnd(19)} ${f.r != null ? f.r.toFixed(3) : ''}  ${f.min ?? ''}  ${f.checkLabel}`);
+  }
+}
+
+console.log(malas ? `\n${malas} comprobacion(es) fallando en la matriz` : '\nla matriz entera pasa: 4 combinaciones, 0 fallas (legibilidad y distinguibilidad); y la arcilla de los 8 módulos, en claro y oscuro');
 
 // Las líneas de abajo son informativas (no suman a `malas`) y se miden una
 // sola vez, sobre el claro con la perilla por defecto: no cambian de rol

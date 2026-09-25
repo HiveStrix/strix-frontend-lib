@@ -158,7 +158,7 @@
           <span class="ttl">{o.title}</span>
           {#if o.badge}<span class="badge">{o.badge}</span>{/if}
           <span class="tick" aria-hidden="true">
-            <svg viewBox="0 0 12 12"><path d="M1.5 6.3 4.6 9.4 10.5 2.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <svg viewBox="0 0 12 12"><path pathLength="1" d="M1.5 6.3 4.6 9.4 10.5 2.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
           </span>
         </span>
         {#if o.detail}<span class="detail">{o.detail}</span>{/if}
@@ -186,11 +186,24 @@
     border-radius: var(--sx-r-2);
     box-shadow: var(--sx-e-1);
     font: inherit; color: var(--sx-ink-2);
-    transition: box-shadow var(--sx-fast) var(--sx-ease), border-color var(--sx-fast) var(--sx-ease),
-                transform var(--sx-fast) var(--sx-ease);
+    /* A card is a big surface, so it glides and never bounces: the spring is
+       kept for the tick inside it. The press is a fraction of a percent —
+       enough to feel under the finger, not enough to see the text swim. */
+    transition: box-shadow 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                border-color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                transform 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 320ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .card:hover:not(:disabled) { box-shadow: var(--sx-e-2); transform: translateY(-1px); border-color: var(--sx-ink-3); }
   .card:active:not(:disabled) { transform: none; }
+  .card:active:not(:disabled) {
+    scale: .992;
+    transition: box-shadow 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                border-color 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                transform 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
 
   /* Three signals for one state: the ring, the ink, and the tick. Take any one
      away and it still reads. */
@@ -233,6 +246,28 @@
   .tick svg { width: 12px; height: 12px; }
   .card.on .tick { background: var(--sx-accent); border-color: var(--sx-accent); color: var(--sx-accent-ink); }
 
+  /* The tick is the one small thing here, so it is the one that springs: it
+     swells in past its size and settles while the stroke draws itself (same
+     dash as Checkbox — `pathLength="1"`, rest offset inside the gap). Leaving,
+     it just retracts, quicker. */
+  .tick svg {
+    scale: .5;
+    transition: scale 160ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0));
+  }
+  .card.on .tick svg {
+    scale: 1;
+    transition: scale 420ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
+  }
+  .tick path {
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 1.1;
+    transition: stroke-dashoffset 130ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0));
+  }
+  .card.on .tick path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 360ms var(--sx-ease) 50ms;
+  }
+
   .detail { font-size: var(--sx-t-sm); line-height: 1.5; color: var(--sx-ink-3); }
   .card.on .detail { color: var(--sx-ink-2); }
 
@@ -245,5 +280,14 @@
      arrives long before the window looks narrow. */
   @media (max-width: 520px) {
     .cards, .cards.fixed { grid-template-columns: 1fr; }
+  }
+
+  /* The ring, the ink and the tick still change; they just do not travel. */
+  @media (prefers-reduced-motion: reduce) {
+    .card, .card:active:not(:disabled), .tick,
+    .tick svg, .card.on .tick svg, .tick path, .card.on .tick path { transition: none; }
+    .card:hover:not(:disabled) { transform: none; }
+    .card:active:not(:disabled) { scale: none; }
+    .tick svg { scale: none; }
   }
 </style>

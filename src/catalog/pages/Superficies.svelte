@@ -9,7 +9,7 @@
   // Es más corta que Formularios o Tablas a propósito, y eso también es honesto:
   // documenta cada componente en su forma principal y en el estado que lo rompe,
   // no en las quince combinaciones. Lo que falta está anotado en el README.
-  import { Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, InfoDot, Glyph, GLYPHS } from '../../lib/shell/index.js';
+  import { Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip, InfoDot, Glyph, GLYPHS, IconWell } from '../../lib/shell/index.js';
   import { Stat, StatStrip } from '../../lib/metric/index.js';
   import Pill from '../../lib/Pill.svelte';
   import Button from '../../lib/action/Button.svelte';
@@ -17,7 +17,7 @@
   const TOC = [
     ['hero', 'Hero'], ['card', 'Card'], ['panel', 'Panel'], ['well', 'Well'], ['aire', 'Stack · Row'],
     ['divider', 'Divider'], ['toolbar', 'Toolbar'], ['sheet', 'Sheet'],
-    ['tooltip', 'Tooltip'], ['infodot', 'InfoDot'], ['glyph', 'Glyph']
+    ['tooltip', 'Tooltip'], ['infodot', 'InfoDot'], ['glyph', 'Glyph'], ['iconwell', 'IconWell']
   ];
 
   let sheet = false;
@@ -768,6 +768,48 @@
         </p>
       </section>
 
+      <!-- ═══ ICONWELL ═══════════════════════════════════════════════════ -->
+      <section id="iconwell">
+        <h2>IconWell</h2>
+        <p class="why">
+          La dosis chica de color de la variante colorida: un Glyph dentro de un cuadrado
+          redondeado, apenas tallado, teñido con un matiz de la paleta de categoría
+          (<span class="sx-id">--sx-hue-*</span>). Identifica una <em>cosa</em> —un módulo, una
+          familia, un tipo de registro—; no dice un estado.
+        </p>
+
+        <div class="demo">
+          <Stack gap={4}>
+            <Row gap={3} wrap>
+              <IconWell name="gauge" hue="violet" />
+              <IconWell name="box" hue="aqua" />
+              <IconWell name="truck" hue="coral" />
+              <IconWell name="wrench" hue="amber" />
+              <IconWell name="check" hue="sage" />
+              <IconWell name="layers" hue="indigo" />
+              <IconWell name="clipboard" hue="accent" />
+            </Row>
+            <Row gap={3} wrap align="center">
+              <IconWell name="wrench" hue="amber" size="sm" />
+              <IconWell name="wrench" hue="amber" size="md" />
+              <IconWell name="wrench" hue="amber" size="lg" />
+            </Row>
+            <Panel title="Existencias por bodega" sub="Hoy" icon="box" hue="aqua">
+              <p style="margin:0">Panel con <span class="sx-id">icon</span> y <span class="sx-id">hue</span>: el ícono del título va en su pozo.</p>
+            </Panel>
+          </Stack>
+        </div>
+
+        <p class="note">
+          <b>Por qué 16&nbsp;% y 66&nbsp;%.</b> El fondo es el matiz al 16&nbsp;% sobre la superficie
+          y el ícono el matiz al 66&nbsp;% contra la tinta. Un ícono puede cargar significado, así que
+          pide 3:1 contra su pozo; el ámbar, el más claro de la paleta, daba 3.19 al 72&nbsp;% y 3.59
+          al 66&nbsp;%. Los siete pares están en <span class="sx-id">scripts/contrast.mjs</span>, en los
+          dos temas. También lo encienden <span class="sx-id">Sidebar</span> (un
+          <span class="sx-id">hue</span> por ítem) y <span class="sx-id">Panel</span>.
+        </p>
+      </section>
+
       <section class="closing">
         <h2>Lo que esta página todavía no muestra</h2>
         <ul>
@@ -832,7 +874,7 @@
 
   .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); margin-top: var(--sx-s-16); align-items: start; }
 
-  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc { position: sticky; top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .toc a {
     display: block;
@@ -846,7 +888,7 @@
   .toc a:hover { background: var(--sx-sunk); color: var(--sx-ink); }
 
   main { display: flex; flex-direction: column; gap: var(--sx-s-16); min-width: 0; }
-  section { min-width: 0; scroll-margin-top: var(--sx-s-16); }
+  section { min-width: 0; scroll-margin-top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   h2 { margin: 0; font-size: var(--sx-t-xl); font-weight: var(--sx-w-bold); letter-spacing: -.025em; }
   .why { margin: var(--sx-s-3) 0 0; max-width: 68ch; font-size: var(--sx-t-md); line-height: 1.6; color: var(--sx-ink-2); }
   /* Un sub-título dentro de una sección — «tone» adentro de Card, por ejemplo —

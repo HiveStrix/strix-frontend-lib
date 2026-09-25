@@ -32,11 +32,14 @@
   // is how a fleet ends up with «Heredia», «heredia» and «HEREDIA».
   import Field from './Field.svelte';
   import { createEventDispatcher } from 'svelte';
+  import { backOut } from 'svelte/easing';
 
   export let value = '';
   /** text | search | email | tel | url | password */
   export let type = 'text';
   export let label = '';
+  /** Nombre accesible sin rótulo a la vista (ver Field). */
+  export let labelHidden = false;
   export let hint = '';
   /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
    *  bajo el campo — así los campos de una misma fila quedan a igual altura y
@@ -88,10 +91,29 @@
   }
 
   $: showClear = clearable && !!value && !disabled && !readonly;
+
+  // The clear button and the «Verificando…» note come in and go out instead of
+  // blinking: the × swells in from small with a hint of overshoot, and both
+  // leave faster than they came. Local, so a field loaded with a value shows
+  // its × already there. Script transitions ask about reduced motion.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function popIn() {
+    if (still()) return { duration: 0 };
+    return { duration: 260, easing: backOut, css: (t) => `opacity: ${Math.min(1, t * 1.5)}; transform: scale(${0.5 + 0.5 * t})` };
+  }
+  function fadeIn() {
+    if (still()) return { duration: 0 };
+    return { duration: 200, css: (t) => `opacity: ${t}` };
+  }
+  function fadeOut() {
+    if (still()) return { duration: 0 };
+    return { duration: 110, css: (t) => `opacity: ${t}; transform: scale(${0.7 + 0.3 * t})` };
+  }
 </script>
 
 <Field
-  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
+  {label} {labelHidden} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {readonly} {dense}
   {id} {origin} {originValue} {changed}
   on:revert
   let:id={fid}
@@ -130,7 +152,7 @@
   {#if loading}
     <!-- The spinner is killed by `prefers-reduced-motion`, so the word is what
          actually carries the state and the spinner is the decoration. -->
-    <span class="busy">
+    <span class="busy" in:fadeIn>
       <svg class="spin" viewBox="0 0 16 16" aria-hidden="true">
         <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="26" stroke-dashoffset="9" />
       </svg>
@@ -139,7 +161,7 @@
   {/if}
 
   {#if showClear}
-    <button type="button" class="icon" on:click={clear} aria-label={`Limpiar ${label || 'el campo'}`}>
+    <button type="button" class="icon" in:popIn out:fadeOut on:click={clear} aria-label={`Limpiar ${label || 'el campo'}`}>
       <svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
     </button>
   {/if}
@@ -167,8 +189,11 @@
     align-self: center; width: var(--sx-s-6); height: var(--sx-s-6);
     padding: 0; border: 0; border-radius: var(--sx-r-pill);
     background: none; color: var(--sx-ink-3); cursor: pointer;
-    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease);
+    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
+  /* A tap on the × gives under the finger and springs back. */
+  .icon:active { scale: .86; transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease), scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
   /* El icono es redondo (--sx-r-pill) y flota sobre el frame, igual que el
      botón de cerrar de Toast/Dialog/SearchField: bajo el cursor se ilumina
      con el acento. No es el caso del icono cuadrado embebido en el borde de
@@ -178,5 +203,9 @@
 
   @media (pointer: coarse) {
     .icon { width: var(--sx-touch); height: var(--sx-touch); margin-right: calc(var(--sx-s-2) * -1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .icon, .icon:active { transition: none; scale: none; }
   }
 </style>

@@ -125,15 +125,35 @@
 
 <style>
   .card {
-    background: var(--sx-surface);
-    border-radius: var(--sx-r-3);
-    box-shadow: var(--sx-e-1);
+    /* `--sx-state-*`: la forma la decide DÓNDE está. Suelto en la página es una
+       tarjeta levantada; adentro de un contenedor (Table, Panel, Card o un
+       contenedor del core con `.sx-nest`) la variante lo hunde, porque una
+       tarjeta sobre otra tarjeta es lo que la lib no hace. */
+    background: var(--sx-state-bg, var(--sx-surface));
+    border-radius: var(--sx-state-r, var(--sx-r-3));
+    box-shadow: var(--sx-state-e, var(--sx-e-1));
     padding: var(--sx-s-12) var(--sx-s-6);
     text-align: center;
   }
 
   .art { display: flex; justify-content: center; color: var(--sx-ink-3); }
   .art svg { width: var(--sx-s-12); height: var(--sx-s-12); opacity: .55; }
+
+  /* LA LLEGADA. El dibujo flota hasta su sitio —un poco más chico, un poco
+     más abajo— y el texto lo sigue renglón por renglón: primero la frase,
+     después la explicación, al final la puerta. Todo keyframe con
+     `backwards`: si no corre, se ve lo de siempre. Sin resorte: una pantalla
+     vacía es una invitación, no un festejo. */
+  .card .art { animation: sx-es-float 620ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  .card .title, .card .say, .card .acts {
+    animation: sx-es-rise 520ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  .card .title { animation-delay: 90ms; }
+  .card .say { animation-delay: 150ms; }
+  .card .acts { animation-delay: 210ms; }
+  .line { animation: sx-es-rise 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  @keyframes sx-es-float { from { opacity: 0; transform: translateY(10px) scale(.9); } }
+  @keyframes sx-es-rise { from { opacity: 0; transform: translateY(6px); } }
   /* The filtered case is a correction, not an occasion: it gets a smaller mark
      and less air, because somebody is mid-task and wants their list back. */
   .filtered { padding: var(--sx-s-8) var(--sx-s-6); }
@@ -200,6 +220,10 @@
     text-decoration: underline;
     text-underline-offset: 3px;
     border-radius: var(--sx-r-1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card .art, .card .title, .card .say, .card .acts, .line { animation: none; }
   }
 
   @media (pointer: coarse) {

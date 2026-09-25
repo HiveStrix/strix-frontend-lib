@@ -413,14 +413,17 @@
             role="menuitem"
             tabindex={i === active ? 0 : -1}
             aria-disabled={it.disabled ? 'true' : undefined}
-            title={it.reason || undefined}
             on:click={() => choose(it, i)}
           >
             <span class="mk" aria-hidden="true">
               {#if it.icon}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
                 stroke-linecap="round" stroke-linejoin="round">{@html it.icon}</svg>{/if}
             </span>
-            <span class="lb">{it.label}</span>
+            <!-- El motivo de un ítem apagado se DIBUJA debajo de su etiqueta. En
+                 `title` sólo lo veía un mouse que se quedara quieto: en un
+                 teléfono o con teclado nunca aparecía, y «stay put and let the
+                 reason be read» no tenía nada que leer. -->
+            <span class="lb">{it.label}{#if it.disabled && it.reason}<span class="why">{it.reason}</span>{/if}</span>
             {#if it.hint}<span class="hint">{it.hint}</span>{/if}
           </button>
         {/if}
@@ -433,13 +436,16 @@
   .sx-menu { position: relative; display: inline-flex; max-width: 100%; }
 
   .tl { overflow: hidden; text-overflow: ellipsis; }
-  .lead { flex: none; width: 1.15em; height: 1.15em; }
+  .lead { display: inline-block; vertical-align: middle; flex: none; width: 1.15em; height: 1.15em; }
   /* The chevron turns because the state it reports is a direction: closed points
      down at what is coming, open points up at where it came from. 120ms, and
      `aria-expanded` says the same thing to anyone who cannot see it turn. */
   .cv {
+    /* inline-block propio: en un anfitrión sin shadow DOM, `svg{display:block}`
+       de base.css mandaba el chevrón a un segundo renglón. */
+    display: inline-block; vertical-align: middle;
     flex: none; width: 1em; height: 1em; margin-inline-end: calc(var(--sx-s-1) * -1);
-    transition: transform var(--sx-fast) var(--sx-ease);
+    transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .cv.on { transform: rotate(180deg); }
 
@@ -477,10 +483,21 @@
     width: auto;
     height: auto;
     overflow-x: visible;
+    /* EL PANEL SALE DEL DISPARADOR. Crece desde la esquina que toca el botón
+       —la de su `align`, arriba o abajo según `up`— con un poco de deriva, y
+       se asienta: una lista que brota de donde se la pidió, no una caja que
+       aparece. Sólo transform y opacidad: `place()` mide `offsetWidth` /
+       `offsetHeight`, que un `transform` no toca. Cierra de golpe, y así debe
+       ser: el `flushSync()` del Tab de abajo necesita que el nodo YA no esté. */
+    transform-origin: 100% 0;
+    animation: sx-menu-in 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
-  .panel.start { inset-inline-start: 0; }
+  .panel.start { inset-inline-start: 0; transform-origin: 0 0; }
   .panel.end { inset-inline-end: 0; }
-  .panel.up { top: auto; bottom: calc(100% + var(--sx-s-1)); }
+  .panel.up { top: auto; bottom: calc(100% + var(--sx-s-1)); transform-origin: 100% 100%; animation-name: sx-menu-up; }
+  .panel.start.up { transform-origin: 0 100%; }
+  @keyframes sx-menu-in { from { opacity: 0; transform: translateY(-4px) scale(.95); } }
+  @keyframes sx-menu-up { from { opacity: 0; transform: translateY(4px) scale(.95); } }
 
   /* Con `popover`, `top: calc(100% + …)` deja de leer nada — no hay ancestro
      posicionado del que sea el 100%. `.fx` cambia a `position: fixed` con
@@ -518,7 +535,9 @@
     border: 0;
     border-radius: var(--sx-r-1);
     cursor: pointer;
-    transition: background-color var(--sx-fast) var(--sx-ease);
+    /* El resaltado se desliza de un ítem al otro en vez de saltar: al llegar
+       se enciende con la curva larga; al irse, se apaga igual. */
+    transition: background-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   /* `:focus` and not only `:focus-visible`: after a mouse opens the menu the
      roving focus is real and has to be visible, or the arrow keys move a
@@ -538,6 +557,14 @@
   .mk { display: flex; flex: none; width: 1em; height: 1em; color: var(--sx-ink-3); }
   .mk :global(svg) { width: 100%; height: 100%; }
   .lb { flex: 1; min-width: 0; }
+  .why {
+    display: block;
+    margin-top: 2px;
+    font-size: var(--sx-t-xs);
+    font-weight: var(--sx-w-normal);
+    color: var(--sx-ink-3);
+    max-width: 32ch;
+  }
   /* A hint is a count or a shortcut — a figure beside other figures. */
   .hint {
     flex: none;
@@ -567,6 +594,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .cv, .item { transition: none; }
+    .panel { animation: none; }
   }
 
   @media (pointer: coarse) {

@@ -75,7 +75,25 @@
     /* El resplandor de la perilla del sistema. En 0 no dibuja nada. */
     box-shadow: var(--sx-e-2),
                 0 0 32px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
+    /* EL PRIMER BLOQUE LLEGA PRIMERO, y por partes: el campo se acerca desde
+       un pelo más chico, la columna que se lee entra desde la izquierda y la
+       de las cifras desde la derecha — cada una desde el lado donde vive —, y
+       se encuentran. Sin desenfoque en el campo: es ancho como la página, y
+       un filtro de ese tamaño es caro justo en el primer cuadro. Todo
+       `backwards`: al terminar no queda nada colgado. */
+    animation: sx-hero-in 620ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
+  .lead > *, .aside {
+    animation: sx-hero-side 680ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  .lead > * { --hero-dx: -18px; }
+  .lead > :nth-child(1) { animation-delay: 80ms; }
+  .lead > :nth-child(2) { animation-delay: 140ms; }
+  .lead > :nth-child(3) { animation-delay: 190ms; }
+  .lead > :nth-child(n+4) { animation-delay: 230ms; }
+  .aside { --hero-dx: 18px; animation-delay: 160ms; }
+  @keyframes sx-hero-in { from { opacity: 0; transform: translateY(10px) scale(.985); } }
+  @keyframes sx-hero-side { from { opacity: 0; transform: translate(var(--hero-dx, 0px), var(--hero-dy, 0px)); } }
 
   /* LAS TRES SUPERFICIES. La diferencia entre ellas es de qué está hecho el
      campo, no de cuánto color lleva: una toma el acento, otra la tinta, la
@@ -106,7 +124,11 @@
     background: linear-gradient(90deg, transparent, var(--hero-tone), transparent);
     opacity: .9;
     pointer-events: none;
+    /* El canto se ABRE desde el centro hacia los dos bordes, cuando el campo
+       ya llegó: de chico a grande, de un lado al otro. */
+    animation: sx-hero-edge 900ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 220ms backwards;
   }
+  @keyframes sx-hero-edge { from { opacity: 0; transform: scaleX(0); } }
 
   /* 1.4 a 1: la izquierda pesa más porque es la que se lee. */
   .grid {
@@ -138,6 +160,16 @@
 
   /* Se apila, no se oculta. En un tablero, esconder el número es esconder la
      respuesta — y el orden apilado es el mismo en que se lee de todos modos. */
+  /* A Core has no base.css to switch this off for it. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero, .lead > *, .aside, .toned::after { animation: none; }
+  }
+
+  /* Apilado, las dos columnas ya no viven a los costados: las dos suben. */
+  @media (max-width: 720px) {
+    .lead > *, .aside { --hero-dx: 0px; --hero-dy: 8px; }
+  }
+
   @media (max-width: 720px) {
     .hero { padding: var(--sx-s-6); }
     .grid { grid-template-columns: 1fr; gap: var(--sx-s-5); }

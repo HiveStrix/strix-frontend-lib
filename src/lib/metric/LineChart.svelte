@@ -257,9 +257,12 @@
         {/each}
 
         <!-- One path + one endpoint dot per series. -->
-        {#each geo.paths as p}
+        {#each geo.paths as p, i}
           {#if p.drawable}
             <path
+              class="ln"
+              style="--i: {i}"
+              pathLength="1"
               d={p.d}
               fill="none"
               stroke={p.tone}
@@ -268,7 +271,7 @@
               stroke-linecap="round"
             />
             {#if p.dot}
-              <circle cx={p.dot.x.toFixed(2)} cy={p.dot.y.toFixed(2)} r="3.2" fill="var(--sx-surface)" stroke={p.tone} stroke-width="2" />
+              <circle class="dot" style="--i: {i}" cx={p.dot.x.toFixed(2)} cy={p.dot.y.toFixed(2)} r="3.2" fill="var(--sx-surface)" stroke={p.tone} stroke-width="2" />
             {/if}
           {/if}
         {/each}
@@ -335,6 +338,32 @@
     fill: var(--sx-ink-3);
   }
 
+  /* EL ORDEN EN QUE SE ARMA, que es el orden en que se lee: primero la escala
+     (la grilla y las cifras se encienden), después cada línea SE DIBUJA de la
+     lectura más vieja a la de hoy —una serie detrás de la otra, por `--i`—, y
+     al final el punto de «hoy» de cada una brota con resorte. Sin área que
+     rellenar: este gráfico no tiene. Como en Sparkline, el guion del dibujo
+     vive sólo en los keyframes (`backwards`): terminado, no queda ninguno, y
+     `pathLength="1"` mide cada línea entera sin JS. Todo se monta cuando el
+     SVG existe —con el ancho ya medido—, así que un resize no lo repite. */
+  .grid, .tk { animation: sx-lc-fade 520ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards; }
+  .ln {
+    animation: sx-lc-draw 1000ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+    animation-delay: calc(160ms + var(--i, 0) * 140ms);
+  }
+  .dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sx-lc-pop 480ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)) backwards;
+    animation-delay: calc(860ms + var(--i, 0) * 140ms);
+  }
+  @keyframes sx-lc-fade { from { opacity: 0; } }
+  @keyframes sx-lc-draw {
+    from { stroke-dasharray: 1 2; stroke-dashoffset: 1; }
+    to   { stroke-dasharray: 1 2; stroke-dashoffset: 0; }
+  }
+  @keyframes sx-lc-pop { from { opacity: 0; transform: scale(0); } }
+
   .legend {
     display: flex;
     flex-wrap: wrap;
@@ -374,6 +403,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .bone { animation: none; background: var(--sx-sunk); }
+    .grid, .tk, .ln, .dot { animation: none; }
   }
 
   .say {

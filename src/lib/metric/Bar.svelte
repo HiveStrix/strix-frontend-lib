@@ -191,6 +191,7 @@
     height: var(--sx-s-3);
     border-radius: var(--sx-r-1);
     background: var(--sx-sunk);
+    box-shadow: var(--sx-e-sunk);
     overflow: hidden;
   }
   .sm .track { height: var(--sx-s-2); border-radius: var(--sx-r-1); }
@@ -200,8 +201,15 @@
     height: 100%;
     border-radius: var(--sx-r-1);
     background: var(--sx-ink);
-    transition: width var(--sx-beat) var(--sx-ease);
+    /* DE CHICO A GRANDE: al montarse el largo CRECE desde cero hasta la
+       lectura — un keyframe de `width` sin `to`, así el destino es el ancho
+       en línea que el script ya calculó. `width` y no `scaleX`: ni el rayado
+       del estimado ni la punta redondeada se deforman mientras crece. Una
+       lectura nueva después se desliza con la misma curva larga. */
+    transition: width 600ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    animation: sx-bar-grow 900ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 120ms backwards;
   }
+  @keyframes sx-bar-grow { from { width: 0; } }
   .fill.t-positive  { background: var(--sx-positive); }
   .fill.t-attention { background: var(--sx-attention); }
   .fill.t-critical  { background: var(--sx-critical); }
@@ -227,7 +235,10 @@
     width: 6px;
     height: 9px;
     color: var(--sx-surface);
+    /* La muesca aparece cuando el relleno ya llegó al tope, no antes. */
+    animation: sx-bar-notch 360ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 760ms backwards;
   }
+  @keyframes sx-bar-notch { from { opacity: 0; transform: translate(-4px, -50%); } }
 
   /* Nothing to draw is not a bar of length zero — a zero-length bar is a real
      reading. The groove is left empty and the sentence under it says why. */
@@ -283,6 +294,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .bone { animation: none; background: var(--sx-sunk); }
-    .fill { transition: none; }
+    .fill { transition: none; animation: none; }
+    .over { animation: none; }
   }
 </style>

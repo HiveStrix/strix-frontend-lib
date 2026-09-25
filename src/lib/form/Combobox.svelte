@@ -69,6 +69,7 @@
   // en cada `scroll` y `resize` mientras la lista está abierta. Donde
   // `popover` no existe, `.pop` cae en exactamente lo de siempre.
   import { createEventDispatcher, tick, onDestroy } from 'svelte';
+  import { backOut } from 'svelte/easing';
   import Field from './Field.svelte';
   import { supportsPopover, syncPopover } from '../shell/toplayer.js';
 
@@ -89,6 +90,10 @@
   export let maxVisible = 50;
 
   export let label = '';
+
+  /** Nombre accesible sin rótulo a la vista (ver Field). */
+
+  export let labelHidden = false;
   export let hint = '';
   /** Colapsa `hint` en un ⓘ junto a la etiqueta (tooltip) en vez de un párrafo
    *  bajo el campo — así los campos de una misma fila quedan a igual altura y
@@ -303,12 +308,25 @@
   }
 
   $: hasValue = allowFree ? !!query : !!selected;
+
+  // The × swells in and fades out instead of blinking (same as Input's).
+  // Script transitions do not hear the stylesheet's reduced-motion block.
+  const still = () =>
+    typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function popIn() {
+    if (still()) return { duration: 0 };
+    return { duration: 260, easing: backOut, css: (t) => `opacity: ${Math.min(1, t * 1.5)}; transform: scale(${0.5 + 0.5 * t})` };
+  }
+  function fadeOut() {
+    if (still()) return { duration: 0 };
+    return { duration: 110, css: (t) => `opacity: ${t}; transform: scale(${0.7 + 0.3 * t})` };
+  }
 </script>
 
 <svelte:window on:resize={() => open && place()} />
 
 <Field
-  {label} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
+  {label} {labelHidden} {hint} {hintDot} {error} {fix} {warning} {required} {optional} {disabled} {dense}
   id={fid} {origin} {originValue} {changed}
   frame={false}
   on:revert
@@ -348,7 +366,7 @@
       />
 
       {#if hasValue && !disabled}
-        <button type="button" class="icon" on:click={clear} aria-label={`Limpiar ${label || 'la búsqueda'}`}>
+        <button type="button" class="icon" in:popIn out:fadeOut on:click={clear} aria-label={`Limpiar ${label || 'la búsqueda'}`}>
           <svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
         </button>
       {/if}
@@ -434,17 +452,25 @@
     display: flex; align-items: stretch; gap: var(--sx-s-2);
     min-height: var(--sx-s-10);
     padding: var(--sx-s-2) var(--sx-s-3);
-    background: var(--sx-surface);
+    background: var(--sx-field);
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
-    transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
+    box-shadow: var(--sx-e-field);
+    /* The ring grows in from zero width, as in Field (and for the same
+       forced-colours reason it rests at width 0, not at a transparent colour). */
+    outline: 0 solid transparent;
+    outline-offset: 0;
+    transition: border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                outline-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                outline-width 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                outline-offset 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .frame:hover:not(.disabled) { border-color: var(--sx-ink-3); }
   .frame:focus-within { border-color: var(--sx-ink); outline: 2px solid var(--sx-ink); outline-offset: 2px; }
   :global([data-sx-theme='dark']) .frame:focus-within,
   :global(.sx-dark) .frame:focus-within { outline-color: var(--sx-n-0); border-color: var(--sx-n-0); }
-  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
+  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
   /* Mismo arreglo que Field.svelte/Radio.svelte: --sx-line contra --sx-sunk
      mide 1.11:1 en oscuro — --sx-edge es el token de este sistema ya medido
      a 3:1 para el límite de un control. Ver Radio.svelte para los números
@@ -480,8 +506,11 @@
     align-self: center; width: var(--sx-s-6); height: var(--sx-s-6);
     padding: 0; border: 0; border-radius: var(--sx-r-pill);
     background: none; color: var(--sx-ink-3); cursor: pointer;
+    /* The chevron's turn glides and eases into place — a direction changing,
+       not a glyph being swapped. The press rides `scale`, apart from it. */
     transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease),
-                transform var(--sx-fast) var(--sx-ease);
+                transform 300ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 380ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
   /* Mismo botón redondo (--sx-r-pill) que el de limpiar de Input/SearchField:
      se ilumina bajo el cursor, no se hunde. */
@@ -489,6 +518,12 @@
   .icon:disabled { cursor: not-allowed; opacity: .5; }
   .icon svg { width: 14px; height: 14px; }
   .chev.up { transform: rotate(180deg); }
+  .icon:active:not(:disabled) {
+    scale: .86;
+    transition: background var(--sx-fast) var(--sx-ease), color var(--sx-fast) var(--sx-ease),
+                transform 300ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                scale 90ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
 
   /* ── The list ────────────────────────────────────────────────────────────
      Elevation, not an outline: it is a surface floating over the form, and the
@@ -514,8 +549,20 @@
     padding: 0;
     color: inherit;
     height: auto;
+    /* THE LIST COMES TO THE FIELD. It unfolds from the edge it hangs off — a
+       touch smaller, a few pixels back toward the box, transparent — and
+       settles. A keyframe, not a transition: both ways of hiding this list
+       (`hidden` and a closed `popover`) are `display: none`, and a keyframe
+       restarts every time an element comes back from that, while a
+       transition has no «before» to start from. No `display` is declared
+       here — it would beat the popover sheet's `display: none`. */
+    transform-origin: top center;
+    animation: sx-cb-in 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .pop.up { top: auto; bottom: calc(100% + var(--sx-s-2)); }
+  .pop.up { transform-origin: bottom center; animation-name: sx-cb-in-up; }
+  @keyframes sx-cb-in { from { opacity: 0; transform: translateY(-4px) scale(.96); } }
+  @keyframes sx-cb-in-up { from { opacity: 0; transform: translateY(4px) scale(.96); } }
   .pop[hidden] { display: none; }
   :global([data-sx-theme='dark']) .pop,
   :global(.sx-dark) .pop { color-scheme: dark; }
@@ -545,6 +592,24 @@
     top: auto;
     bottom: calc(var(--sx-pop-y, 0px) + var(--sx-s-2));
   }
+  /* Leaving, quicker than arriving. Only where the engine can keep a closing
+     popover IN THE TOP LAYER until the fade ends (`overlay`, allow-discrete):
+     an engine that could hold `display` but not `overlay` would drop the list
+     out of the top layer mid-fade, into whatever transformed ancestor it sits
+     in — the very bug `popover` was brought in to fix. Elsewhere the list
+     closes in one frame, as it always did. It stops taking clicks the instant
+     it starts to go. */
+  @supports (overlay: auto) {
+    .pop.fx {
+      transition:
+        opacity 120ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+        transform 120ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+        overlay 120ms allow-discrete,
+        display 120ms allow-discrete;
+    }
+    .pop.fx:not(:popover-open) { opacity: 0; transform: translateY(-4px) scale(.97); pointer-events: none; }
+    .pop.fx.up:not(:popover-open) { transform: translateY(4px) scale(.97); }
+  }
 
   .count {
     margin: 0; padding: var(--sx-s-2) var(--sx-s-3);
@@ -569,6 +634,10 @@
     padding: var(--sx-s-2) var(--sx-s-3);
     border-radius: var(--sx-r-1); cursor: pointer;
     font-size: var(--sx-t-sm); color: var(--sx-ink-2);
+    /* The highlight follows the arrow keys with a short fade rather than a
+       blink — short, because the keyboard can outrun anything longer. */
+    transition: background-color 120ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                color 120ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   /* One highlight, driven by the keyboard, and the pointer feeds the same one.
      Two highlights — a hover and an active — is how somebody presses Enter and
@@ -597,5 +666,13 @@
     input { font-size: 16px; }
     .icon { width: var(--sx-touch); height: var(--sx-touch); }
     .list li { min-height: var(--sx-touch); }
+  }
+
+  /* The list is simply there, then simply gone; the chevron still turns (a
+     state, not a flourish) but does not travel. */
+  @media (prefers-reduced-motion: reduce) {
+    .frame, .icon, .icon:active:not(:disabled), .list li, .pop.fx { transition: none; }
+    .pop, .pop.up { animation: none; }
+    .icon:active:not(:disabled) { scale: none; }
   }
 </style>

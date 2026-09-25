@@ -158,6 +158,7 @@
           <!-- Dashed and lighter: a promise, drawn so it can never be mistaken
                for the solid line it continues. -->
           <path
+            class="proj"
             d={geo.projected}
             fill="none"
             stroke="var(--sx-ink-3)"
@@ -168,6 +169,8 @@
         {/if}
         {#if geo.observed}
           <path
+            class="trace"
+            pathLength="1"
             d={geo.observed}
             fill="none"
             stroke="currentColor"
@@ -178,6 +181,7 @@
         {/if}
         {#if (showLast || geo.single) && geo.last}
           <circle
+            class="last"
             cx={geo.last.x}
             cy={geo.last.y}
             r="2.6"
@@ -230,6 +234,28 @@
   .lg .box { height: var(--sx-s-10); }
   .box svg { display: block; width: 100%; overflow: visible; }
 
+  /* LA LÍNEA SE DIBUJA SOLA, de la lectura más vieja a la de hoy; después la
+     promesa punteada se enciende detrás, y el punto de «hoy» brota al final
+     con resorte — es chico, y es donde termina el trazo. `pathLength="1"` en
+     el trazo hace que el guion mida el largo entero sin medir nada en JS. El
+     `stroke-dasharray` vive SÓLO en los keyframes (`backwards`): al terminar
+     no queda ninguno, así que si un navegador no entendiera `pathLength`, la
+     línea quedaría sólida igual en vez de punteada para siempre. La
+     proyección tiene su propio guion (4 4) y por eso no se dibuja: aparece. */
+  .trace { animation: sx-draw 820ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 80ms backwards; }
+  .proj { animation: sx-spark-fade 420ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 640ms backwards; }
+  .last {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: sx-spark-pop 460ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1)) 700ms backwards;
+  }
+  @keyframes sx-draw {
+    from { stroke-dasharray: 1 2; stroke-dashoffset: 1; }
+    to   { stroke-dasharray: 1 2; stroke-dashoffset: 0; }
+  }
+  @keyframes sx-spark-fade { from { opacity: 0; } }
+  @keyframes sx-spark-pop { from { opacity: 0; transform: scale(0); } }
+
   .t-positive  { color: var(--sx-positive); }
   .t-attention { color: var(--sx-attention); }
   .t-critical  { color: var(--sx-critical); }
@@ -262,6 +288,7 @@
   }
   @media (prefers-reduced-motion: reduce) {
     .bone { animation: none; background: var(--sx-sunk); }
+    .trace, .proj, .last { animation: none; }
   }
 
   .say {

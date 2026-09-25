@@ -373,6 +373,10 @@
     border-radius: var(--sx-r-3);
     box-shadow: var(--sx-e-2);
     padding: var(--sx-s-5);
+    /* El veredicto llega primero y las fichas lo siguen, una por una, en el
+       orden en que hay que leerlas (las que piden algo, arriba). Keyframes con
+       `backwards`: si no corren, todo está donde siempre. */
+    animation: sx-rp-in 520ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
   .head {
     margin: 0;
@@ -401,11 +405,22 @@
     border-radius: var(--sx-r-2);
     box-shadow: var(--sx-e-1);
     padding: var(--sx-s-4);
+    animation: sx-rp-in 480ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 90ms backwards;
+    transition: opacity var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
+  /* El escalón se corta en la sexta: más allá, la última llega tan tarde que
+     se lee como lentitud — la misma regla que `.sx-stagger`. */
+  .item:nth-child(2) { animation-delay: 140ms; }
+  .item:nth-child(3) { animation-delay: 190ms; }
+  .item:nth-child(4) { animation-delay: 240ms; }
+  .item:nth-child(5) { animation-delay: 290ms; }
+  .item:nth-child(n+6) { animation-delay: 340ms; }
+  @keyframes sx-rp-in { from { opacity: 0; transform: translateY(10px) scale(.985); } }
   /* The tone bar is an inset fill, not a border: borders in this system are for
-     control outlines and focus. */
-  .item.flag.critical  { box-shadow: var(--sx-e-1), inset 3px 0 0 var(--sx-critical); }
-  .item.flag.attention { box-shadow: var(--sx-e-1), inset 3px 0 0 var(--sx-attention); }
+     control outlines and focus. `--sx-tone-bar` es su ancho (main 3px); la
+     variante lo apaga porque la ficha ya dice su tono con la Pill del sello. */
+  .item.flag.critical  { box-shadow: var(--sx-e-1), inset var(--sx-tone-bar, 3px) 0 0 var(--sx-critical); }
+  .item.flag.attention { box-shadow: var(--sx-e-1), inset var(--sx-tone-bar, 3px) 0 0 var(--sx-attention); }
   .item.out { opacity: .62; }
 
   .ihead { display: flex; align-items: flex-start; gap: var(--sx-s-3); }
@@ -492,9 +507,13 @@
     border-radius: var(--sx-r-1);
   }
   .more:hover { color: var(--sx-ink-2); }
-  .chev { width: .85em; height: .85em; transition: transform var(--sx-fast) var(--sx-ease); }
+  .chev { width: .85em; height: .85em; transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)); }
   .chev.open { transform: rotate(90deg); }
-  .fnote { margin: var(--sx-s-2) 0 0; font-size: var(--sx-t-xs); color: var(--sx-ink-3); line-height: 1.5; max-width: 62ch; }
+  .fnote {
+    margin: var(--sx-s-2) 0 0; font-size: var(--sx-t-xs); color: var(--sx-ink-3); line-height: 1.5; max-width: 62ch;
+    animation: sx-rp-reveal 320ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
+  }
+  @keyframes sx-rp-reveal { from { opacity: 0; transform: translateY(-4px); } }
 
   .acts { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: var(--sx-s-2); }
 
@@ -521,6 +540,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .chev { transition: none; }
+    .chev, .item { transition: none; }
+    .verdict, .item, .fnote { animation: none; }
   }
 </style>

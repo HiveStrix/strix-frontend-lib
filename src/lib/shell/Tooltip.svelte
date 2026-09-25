@@ -318,9 +318,20 @@
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
+    /* SALE DE SU DISPARADOR, no aparece encima de él: escondido está 4px más
+       cerca del control y un pelo más chico, y al mostrarse se separa hacia su
+       sitio. `translate`/`scale` sueltos y no dentro de `transform`, porque
+       `transform` ya es del centrado (`translate…(-50%)`, abajo) y se componen
+       sin pisarse. La salida es más corta que la llegada y acelera al irse.
+       `opacity` va PRIMERA en la lista: `scheduleExit()` lee la duración
+       computada con `parseFloat`, que se queda con el primer valor. */
+    translate: var(--tip-dx, 0) var(--tip-dy, 0);
+    scale: .96;
     transition:
-      opacity var(--sx-fast) var(--sx-ease),
-      visibility var(--sx-fast) var(--sx-ease);
+      opacity 110ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+      visibility 110ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+      translate 110ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+      scale 110ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0));
     /* Estos seis pisan la hoja de estilos de `popover` (`margin: auto; border:
        solid; overflow: auto; height: fit-content; inset: 0`), activa apenas
        el atributo está escrito — abierto o no. La más importante es `display:
@@ -342,12 +353,27 @@
     overflow: visible;
     height: auto;
   }
-  .shown { visibility: visible; opacity: 1; }
+  .shown {
+    visibility: visible;
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+    transition:
+      opacity 170ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      visibility 170ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      translate 170ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      scale 170ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+  }
 
-  .top    { bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: var(--sx-s-2); }
-  .bottom { top: 100%;    left: 50%; transform: translateX(-50%); margin-top: var(--sx-s-2); }
-  .left   { right: 100%;  top: 50%;  transform: translateY(-50%); margin-right: var(--sx-s-2); }
-  .right  { left: 100%;   top: 50%;  transform: translateY(-50%); margin-left: var(--sx-s-2); }
+  /* `--tip-dx/-dy` es el lado del disparador (de ahí viene la deriva) y el
+     `transform-origin` es el punto sobre el borde que lo toca. El origen en x
+     (o y) es 0 y no 50% a propósito: `scale` se aplica POR FUERA del
+     `translate…(-50%)` de centrado, así que el centro visual de la caja es
+     su origen local 0 — con 50% encogería hacia un costado. */
+  .top    { bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: var(--sx-s-2); --tip-dy: 4px;  transform-origin: 0 100%; }
+  .bottom { top: 100%;    left: 50%; transform: translateX(-50%); margin-top: var(--sx-s-2);    --tip-dy: -4px; transform-origin: 0 0; }
+  .left   { right: 100%;  top: 50%;  transform: translateY(-50%); margin-right: var(--sx-s-2);  --tip-dx: 4px;  transform-origin: 100% 0; }
+  .right  { left: 100%;   top: 50%;  transform: translateY(-50%); margin-left: var(--sx-s-2);   --tip-dx: -4px; transform-origin: 0 0; }
 
   /* Con `popover`, `.wrap` deja de ser el ancestro contra el que `top: 50%` o
      `left: 100%` significan algo — el tip vive en la top layer. `.fx` cambia
@@ -371,7 +397,7 @@
   .tip.fx.right  { left: var(--sx-tip-a, 0px); top: var(--sx-tip-c, 0px); }
 
   @media (prefers-reduced-motion: reduce) {
-    .tip { transition: none; }
+    .tip, .shown { transition: none; translate: none; scale: none; }
   }
 
   /* On a touch screen the tip only ever arrives through focus, so it must not
@@ -384,6 +410,9 @@
       top: 100%;
       transform: translateX(-50%);
       margin: var(--sx-s-2) 0 0;
+      --tip-dx: 0;
+      --tip-dy: -4px;
+      transform-origin: 0 0;
     }
     /* Mismo selector completo que `.tip.fx.left`/`.tip.fx.right` de más
        arriba (misma especificidad, 0,3,0): si acá se escribiera sólo

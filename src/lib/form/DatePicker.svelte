@@ -293,17 +293,17 @@
     display: flex; align-items: stretch; gap: var(--sx-s-2);
     min-height: var(--sx-s-10);
     padding: var(--sx-s-2) var(--sx-s-3);
-    background: var(--sx-surface);
+    background: var(--sx-field);
     border: 1px solid var(--sx-edge);
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-1);
+    box-shadow: var(--sx-e-field);
     transition: border-color var(--sx-fast) var(--sx-ease), box-shadow var(--sx-fast) var(--sx-ease);
   }
   .frame:hover:not(.disabled):not(.readonly) { border-color: var(--sx-ink-3); }
   .frame:focus-within { border-color: var(--sx-ink); outline: 2px solid var(--sx-ink); outline-offset: 2px; }
   :global([data-sx-theme='dark']) .frame:focus-within,
   :global(.sx-dark) .frame:focus-within { outline-color: var(--sx-n-0); border-color: var(--sx-n-0); }
-  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-1), 0 0 0 1px var(--sx-critical); }
+  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
   /* Mismo arreglo que Field.svelte/Radio.svelte: --sx-line contra --sx-sunk
      mide 1.11:1 en oscuro — --sx-edge es el token de este sistema ya medido
      a 3:1 para el límite de un control. Ver Radio.svelte para los números

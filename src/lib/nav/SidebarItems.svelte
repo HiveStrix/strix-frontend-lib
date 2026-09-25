@@ -20,6 +20,7 @@
   // `:global()`. Más simple pasar los dos booleanos como props y aplicar las
   // clases acá mismo que andar marcando selectores como globales.
   import { GLYPH_VIEWBOX } from '../shell/Glyph.svelte';
+  import IconWell from '../shell/IconWell.svelte';
 
   export let items = [];
   export let value = '';
@@ -76,8 +77,12 @@
             title={it.label}
             use:activate={it}
           >
-            <span class="ic" aria-hidden="true">
-              {#if it.icon}
+            <!-- `hue` (variante colorida): el ícono en un pozo de color, como en la
+                 dirección de Stitch. Sin `hue`, el trazo suelto de siempre. -->
+            <span class="ic" class:hasw={it.hue && it.icon} aria-hidden="true">
+              {#if it.icon && it.hue}
+                <IconWell path={it.icon} hue={it.hue} size="sm" />
+              {:else if it.icon}
                 <svg viewBox={GLYPH_VIEWBOX}><path d={it.icon} fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg>
               {:else}
                 <span class="ini">{initial(it.label)}</span>
@@ -115,7 +120,17 @@
      anima de 240 a 64px— cualquier desborde horizontal momentáneo de un ítem
      asomaba una barra de scroll horizontal en el riel. La lista de navegación
      nunca scrollea en horizontal; el scroll vertical (muchos módulos) queda. */
-  ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+  /* AIRE PARA LA SOMBRA. Un contenedor con scroll recorta todo lo que asoma de
+     su caja, y la pill del ítem activo (--sx-e-nav: luz arriba-izquierda,
+     sombra abajo-derecha, ~12px) se cortaba en seco a la derecha. La lista se
+     da el aire de la sombra hacia adentro (padding) y lo devuelve hacia afuera
+     (margin negativo): los ítems quedan donde estaban y la sombra entra. */
+  ul {
+    list-style: none;
+    margin: calc(var(--sx-s-2) * -1) calc(var(--sx-s-3) * -1) calc(var(--sx-s-4) * -1);
+    padding: var(--sx-s-2) var(--sx-s-3) var(--sx-s-4);
+    display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden;
+  }
 
   .sect { padding: var(--sx-s-3) var(--sx-s-3) var(--sx-s-1); }
   .tuck .sect { padding-inline: 0; text-align: center; overflow: hidden; }
@@ -154,7 +169,12 @@
      autor sobre el propio `path` sí pisa el atributo (los atributos de
      presentación son la prioridad más baja de la cascada SVG). */
   .it.on {
+    /* Variante colorida: el activo es un control LEVANTADO sobre la barra
+       (Stitch, riel B): superficie + --sx-e-nav. Sin la perilla, el relleno
+       de selección plano de main. */
     background: var(--sx-accent-pick);
+    background: color-mix(in srgb, var(--sx-accent-pick) var(--sx-nav-pick, 100%), var(--sx-surface));
+    box-shadow: var(--sx-e-nav, none);
     color: var(--sx-ink);
     font-weight: var(--sx-w-semi);
   }
@@ -164,6 +184,8 @@
 
   .ic { display: flex; align-items: center; justify-content: center; flex: none; width: 20px; height: 20px; }
   .ic svg { width: 20px; height: 20px; }
+  /* Con pozo el hueco crece a 28: el pozo es la pieza, no un adorno del trazo. */
+  .ic.hasw { width: 28px; height: 28px; margin-inline: -4px; }
   /* La transición vive en el `path`, que es donde cambia el `stroke-width`. */
   .ic svg path { transition: stroke-width var(--sx-fast) var(--sx-ease); }
   .ini {
@@ -186,6 +208,7 @@
     background: var(--sx-sunk);
     border-radius: var(--sx-r-pill);
     padding: 1px var(--sx-s-2);
+    box-shadow: var(--sx-e-pill, none);
   }
   .it.on .n { color: var(--sx-ink-2); background: var(--sx-surface); }
 

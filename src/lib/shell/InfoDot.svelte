@@ -97,14 +97,21 @@
     font-style: normal;
     cursor: help;
     vertical-align: middle;
-    transition: color var(--sx-fast) var(--sx-ease), border-color var(--sx-fast) var(--sx-ease);
+    /* Lo único chico que se permite el resorte: al apuntarlo se hincha un
+       pelo y vuelve, como un botón que responde al dedo; el color se desliza
+       con la curva larga. */
+    transition:
+      color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+      transform 320ms var(--sx-ease-spring, cubic-bezier(.34, 1.56, .64, 1));
   }
   /* El `i` centrado ópticamente pide un pelo de aire a la izquierda que el `?`
      no necesita. */
   .dot span { transform: translateY(-.02em); }
   .dot:not(.help) span { padding-inline-start: .04em; }
 
-  .dot:hover { color: var(--sx-ink); border-color: var(--sx-ink-3); }
+  .dot:hover { color: var(--sx-ink); border-color: var(--sx-ink-3); transform: scale(1.12); }
+  .dot:active { transform: scale(.94); transition-duration: 90ms; }
 
   .dot:focus-visible {
     outline: 2px solid var(--sx-ink);
@@ -123,5 +130,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     .dot { transition: none; }
+    .dot:hover, .dot:active { transform: none; }
   }
 </style>

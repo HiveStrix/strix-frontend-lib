@@ -21,7 +21,7 @@
 // ── The system itself ────────────────────────────────────────────────────
 // The tokens as data and as CSS-for-a-shadow-root; the five tone marks; the
 // three type registers. See README.md for which shape a given app needs.
-export { TOKENS, TOKENS_DARK, hostTokens, hostTokensDark, hostBase, stylesheet } from './tokens.js';
+export { TOKENS, TOKENS_DARK, hostTokens, hostTokensDark, hostBase, stylesheet, clayHost, clayTokens } from './tokens.js';
 export { MARKS, TONES, markOf } from './marks.js';
 
 // ── The signature ────────────────────────────────────────────────────────
@@ -35,7 +35,7 @@ export { default as Pill } from './Pill.svelte';
 // things that DO say something are the only things on screen with an opinion.
 export {
   Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip,
-  Glyph, GLYPHS, GLYPH_PATHS, scrollbar
+  Glyph, GLYPHS, GLYPH_PATHS, IconWell, scrollbar
 } from './shell/index.js';
 
 // ── action · what makes something happen ─────────────────────────────────

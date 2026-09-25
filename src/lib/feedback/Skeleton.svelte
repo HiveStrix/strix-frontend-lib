@@ -67,15 +67,27 @@
     /* The sweep is mixed from the surface's own ink so it works on both themes
        without a second colour: 7 % of the text colour is a highlight on a light
        sunk fill and on a dark one alike. */
+    /* Más ancha y más suave: la luz entra y sale con una rampa larga en vez
+       de un borde, y cruza con una curva simétrica (sin el frenazo del ease de
+       salida), así se lee como un brillo que pasa y no como una franja que se
+       arrastra. Mismo 7 % de tinta en el pico. */
     background-image: linear-gradient(
       90deg,
       transparent 0%,
-      color-mix(in srgb, var(--sx-ink) 7%, transparent) 45%,
-      transparent 90%
+      color-mix(in srgb, var(--sx-ink) 3%, transparent) 30%,
+      color-mix(in srgb, var(--sx-ink) 7%, transparent) 50%,
+      color-mix(in srgb, var(--sx-ink) 3%, transparent) 70%,
+      transparent 100%
     );
-    background-size: 240% 100%;
+    background-size: 260% 100%;
     background-repeat: no-repeat;
-    animation: sweep 1400ms var(--sx-ease) infinite;
+    /* La forma se ASOMA en vez de estar: 120ms de espera y un fundido. Una
+       carga rápida termina antes de que el esqueleto se vea, que es lo que la
+       cabecera pide («under about 300 ms … a skeleton that flashes reads as a
+       glitch»). Keyframe con `backwards`: si la animación no corre, se ve. */
+    animation:
+      sk-in 360ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) 120ms backwards,
+      sweep 1700ms cubic-bezier(.45, 0, .55, 1) infinite;
   }
 
   .text .bar {
@@ -103,6 +115,7 @@
     from { background-position: 140% 0; }
     to   { background-position: -40% 0; }
   }
+  @keyframes sk-in { from { opacity: 0; } }
 
   @media (prefers-reduced-motion: reduce) {
     .bar { animation: none; background-image: none; }

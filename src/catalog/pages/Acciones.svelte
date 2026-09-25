@@ -1055,7 +1055,7 @@
   /* Mismo componente que las otras seis páginas. */
   .body { display: grid; grid-template-columns: 13rem minmax(0, 1fr); gap: var(--sx-s-10); margin-top: var(--sx-s-16); align-items: start; }
 
-  .toc { position: sticky; top: calc(var(--sx-s-16) + var(--sx-s-2)); }
+  .toc { position: sticky; top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4)); }
   .toc ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
   .toc a {
     display: block;
@@ -1086,7 +1086,7 @@
     font-weight: var(--sx-w-bold);
     letter-spacing: -.028em;
     line-height: 1.15;
-    scroll-margin-top: var(--sx-s-16);
+    scroll-margin-top: calc(var(--cat-bar-h, 64px) + var(--sx-s-4));
   }
   h3 {
     margin: var(--sx-s-8) 0 0;
