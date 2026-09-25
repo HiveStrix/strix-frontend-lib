@@ -662,10 +662,15 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     }
     @keyframes sx-read { to { transform: scaleX(1); } }
   }
+  /* DOS RENGLONES, SIEMPRE: la marca y las herramientas arriba, las familias
+     abajo. Hubo una versión en una sola fila por encima de 1040px, pero en
+     una fila la barra pide ~1400px y su contenido nunca pasa de 1140 (1180
+     de máximo menos el relleno): la fila no entraba en NINGÚN ancho, y las
+     herramientas caían solas a un segundo renglón, pegadas a la izquierda. */
   .barin {
     display: flex;
     align-items: center;
-    gap: var(--sx-s-4);
+    gap: var(--sx-s-3);
     flex-wrap: wrap;
     max-width: 1180px;
     margin: 0 auto;
@@ -705,7 +710,11 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
     display: flex;
     align-items: center;
     gap: var(--sx-s-1);
-    flex: 1 1 auto;
+    order: 3;
+    /* Corrida a la izquierda lo que mide el relleno de un link, para que la
+       palabra «Superficies» —no su pastilla— quede alineada con la marca. */
+    flex: 1 1 calc(100% + var(--sx-s-3));
+    margin-left: calc(var(--sx-s-3) * -1);
     min-width: 0;
     /* Se desplaza en vez de envolver: una barra de familias en dos líneas deja
        de leerse como una barra. */
@@ -775,7 +784,7 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
   .sw .ti { transition: transform 600ms var(--mo-out); }
   .sw.on .ti { transform: rotate(360deg); }
 
-  .tools { display: flex; align-items: center; gap: var(--sx-s-2); flex: none; }
+  .tools { display: flex; align-items: center; gap: var(--sx-s-2); flex: none; margin-left: auto; }
 
   /* La pista hundida con un segmento levantado: el elegido parece la superficie
      sobre la que está el contenido, el resto parece el hueco donde se apoya. */
@@ -1184,12 +1193,7 @@ import { Button, Table } from '@strix/frontend-lib';`}</code></pre>
   .foot p { margin: 0; max-width: 74ch; font-size: var(--sx-t-sm); line-height: 1.6; color: var(--sx-ink-3); }
 
   /* ── Angosto ──────────────────────────────────────────────────────────── */
-  /* Debajo de esto la barra deja de ser una barra: la marca y las herramientas
-     comparten la primera línea y las familias se desplazan en la segunda. */
   @media (max-width: 1040px) {
-    .barin { gap: var(--sx-s-3); }
-    .links { order: 3; flex-basis: 100%; }
-    .tools { margin-left: auto; }
     .proof { grid-template-columns: minmax(0, 1fr); }
   }
 
