@@ -4,6 +4,70 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## v0.11.0 — 2026-09-25
+
+> Construida **sobre `v0.10.0`** (que ya trae el `hintDot` de `v0.9.2`). Es,
+> byte por byte, el `src/lib` que el clúster ya corre fijado por el commit
+> `04644f2` desde el despliegue de la variante del 2026-09-24: esta versión
+> sólo le pone nombre, para que nadie dependa de una rama.
+
+### Nuevo
+- **La variante colorida — «arcilla».** Soft-UI sobre lila: cada pieza se
+  levanta del lienzo con luz blanca arriba a la izquierda y sombra teñida abajo
+  a la derecha, o se hunde con lo inverso. Relieve por pieza (`--sx-e-card`,
+  `--sx-e-chip`, `--sx-e-well`, `--sx-e-pill`, `--sx-e-primary`), campos
+  tallados (`--sx-field`, `--sx-e-field`) y pozo hondo. Las reglas de uso están
+  en `DESIGN.md`.
+- **`clayTokens(accent)` y `clayHost(accent, selector?, darkSelector?)`** — la
+  arcilla de un módulo a partir de su acento: la receta del lila girada al tono
+  del acento y muy diluida. Los lavados del acento (`soft`, `pick`, `edge`) y el
+  nuevo **`--sx-accent-well`** se MIDEN contra esa arcilla en vez de salir de un
+  porcentaje fijo, así un acento claro (el ámbar de Mantenimiento) no pierde el
+  hover ni el filo.
+- **`PALETTE_TOKENS`** — lo que `adoptPalette` copia ahora es la atmósfera
+  entera del core: rampa, acento, superficie, pozo y elevación. La Shell no
+  tiene luz propia; adopta la del módulo que está mostrando.
+- **`IconWell`** (`shell`) — el pozo de ícono de color.
+- **Glifos** `star`, `mail` y `chat`.
+- **`Button`**: `solid` pasa a brillante (glossy), `outline` a teñido con la
+  perilla `--sx-btn-tint`, y hay una quinta variante, **`frosted`** (vidrio).
+  Los nombres y los números de las cuatro anteriores no se movieron.
+- **`ErrorState`** acepta `retryVariant`.
+- **La moción.** Tres tokens nuevos —`--sx-ease-out` (llegada),
+  `--sx-ease-spring` (resorte, sólo para lo chico) y `--sx-ease-in` (salida)—
+  y los componentes los usan: presión con resorte en los botones, perilla del
+  `Switch` que se estira, visto del `Checkbox` que se dibuja, indicador que
+  viaja en `Segmented` y `Tabs`, `Dialog`/`Sheet`/`Toast`/`Menu`/`Tooltip` que
+  llegan, detalle de `Table` que se despliega, barras que crecen y líneas que
+  se dibujan. Cada componente los pide con fallback, y cada uno apaga su moción
+  con `prefers-reduced-motion` (base.css no cruza un shadow root).
+
+### Ojo al migrar
+- **Es un rediseño, no un parche.** Subir desde `v0.10.0` cambia cómo se ve
+  todo; que compile no alcanza, pide una pasada a ojo por pantalla.
+- **El acento SÍ se adopta** (CONTRACT §6, reescrito). Un core emite su arcilla
+  con `clayHost(acento)` y no declara a mano ni la rampa ni los lavados del
+  acento: los mide la receta.
+- **Tests en jsdom:** las transiciones de Svelte 5 y la moción llaman a
+  `element.animate`, que jsdom no tiene. Hay que stubbearlo en el setup de los
+  tests (inbox lo hace en `ui/src/test/setup.ts`).
+- **`Checkbox`** dibuja el visto y la barra de indeterminado siempre, en un
+  solo `<svg>`, y el CSS elige cuál se ve. Un test que buscaba la AUSENCIA del
+  trazo del visto tiene que mirar el estado (`aria-checked`) en su lugar.
+- **`Button`** agrega la perilla `--sx-btn-press` (cuánto se achica al
+  apretar); dentro de un `ButtonGroup` pegado vale `1`, porque una mitad soldada
+  que se achica abre una rendija en la costura.
+
+### Arreglado
+- Los alias de la variante y `--sx-field`/`--sx-e-field` se re-declaran en el
+  tema oscuro; antes quedaban con el valor claro.
+- La pill del ítem activo de la barra lateral ya no se corta a la derecha.
+- La acción de un `Alert` habla en su tono; `Stat` sólo calla el «Sin datos
+  todavía» de fábrica cuando hay nota; `Toolbar` en columna ya no envuelve;
+  el outline teñido de `PageHeader` se lee dentro de la banda con acento oscuro.
+- Los hallazgos del pulido de los módulos (clients, divisions,
+  inventory, billing, costing, inbox y el Shell).
+
 ## v0.10.0 — 2026-09-11
 
 > Construida **sobre `v0.9.1`**: incorpora su arreglo de `dense` en `Combobox` y
