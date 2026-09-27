@@ -24,7 +24,7 @@
 
   export let label = 'División';
   export let hint = '';
-  /** Sólo llega al Select: el Combobox no tiene `hintDot`. */
+  /** Colapsa `hint` en un ⓘ; llega al Select y al Combobox por igual. */
   export let hintDot = false;
   export let placeholder = 'Elegir…';
   /**
@@ -73,7 +73,7 @@
 {#if visible}
   {#if asCombobox}
     <Combobox
-      {label} {hint} {options} {disabled} {dense} {required} {optional} {error}
+      {label} {hint} {hintDot} {options} {disabled} {dense} {required} {optional} {error}
       value={current}
       noun="división"
       nounPlural="divisiones"
