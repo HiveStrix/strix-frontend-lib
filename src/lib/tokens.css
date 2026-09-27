@@ -69,6 +69,10 @@
   --sx-e-pill: inset 1.5px 1.5px 3px rgba(101,65,190,0.14), inset -1.5px -1.5px 3px rgba(251,249,254,0.6);
   --sx-e-field: var(--sx-e-sunk);
   --sx-field: var(--sx-sunk);
+  --sx-field-edge: color-mix(in srgb, var(--sx-edge) 40%, var(--sx-field));
+  --sx-ink-placeholder: color-mix(in srgb, var(--sx-ink-3) 64%, var(--sx-field));
+  --sx-focus: color-mix(in srgb, var(--sx-accent) 55%, var(--sx-ink));
+  --sx-focus-halo: color-mix(in srgb, var(--sx-accent) 22%, transparent);
   --sx-r-1: 8px;
   --sx-r-2: 16px;
   --sx-r-3: 28px;
@@ -191,6 +195,10 @@
   --sx-e-pill: inset 1.5px 1.5px 3px rgba(0,0,0,.4), inset -1.5px -1.5px 3px rgba(255,255,255,.04);
   --sx-e-field: var(--sx-e-sunk);
   --sx-field: var(--sx-sunk);
+  --sx-field-edge: color-mix(in srgb, var(--sx-edge) 40%, var(--sx-field));
+  --sx-ink-placeholder: color-mix(in srgb, var(--sx-ink-3) 45%, var(--sx-field));
+  --sx-focus: color-mix(in srgb, var(--sx-accent) 55%, var(--sx-ink));
+  --sx-focus-halo: color-mix(in srgb, var(--sx-accent) 30%, transparent);
   --sx-glow-color: var(--sx-accent);
   --sx-toast-mark-e: var(--sx-e-pill);
   --sx-nest-bg: var(--sx-sunk);

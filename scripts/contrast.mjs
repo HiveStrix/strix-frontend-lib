@@ -295,8 +295,17 @@ const CHECKS = [
   // tarjeta. Un fondo nuevo para texto sin su par en el contrato es exactamente
   // el hueco que este archivo existe para cerrar.
   ['--sx-ink',    '--sx-field', 4.5, 'texto dentro de un control'],
-  ['--sx-ink-3',  '--sx-field', 4.5, 'placeholder y ayuda dentro de un control'],
+  // Hasta la v0.11 esta fila decía «placeholder y ayuda». El placeholder se
+  // fue a su propio token (--sx-ink-placeholder) con su propio piso, más abajo
+  // en BANDS; acá queda lo que sí es contenido: la pista, el texto apagado.
+  ['--sx-ink-3',  '--sx-field', 4.5, 'ayuda y texto apagado dentro de un control'],
   ['--sx-edge',   '--sx-field', 3.0, 'borde de control sobre su propio relleno'],
+  // EL FOCO DE UN CAMPO (v0.12). El halo del acento es decoración; lo que
+  // indica el foco es el filo --sx-focus (el acento oscurecido con la tinta),
+  // y ése sí es un límite que tiene que leerse a 3:1 (WCAG 1.4.11 / 2.4.13)
+  // contra lo que tiene a los dos lados: el relleno del campo y la tarjeta.
+  ['--sx-focus',  '--sx-field',   3.0, 'filo de foco de un campo sobre su relleno'],
+  ['--sx-focus',  '--sx-surface', 3.0, 'filo de foco de un campo sobre la tarjeta'],
   // LA BANDA PASTEL (variante colorida): el título y la bajada de
   // `PageHeader variant="banda"` se escriben con --sx-banda-ink sobre el acento
   // al 22 % (--sx-banda-tint) contra la superficie.
@@ -417,6 +426,42 @@ function evalContract(tokens) {
     } catch (e) {
       fails.push({ fg: k, bg: null, r: null, min: null, checkLabel: 'NO RESUELVE — ' + e.message });
     }
+  }
+  return fails;
+}
+
+// ── LOS PISOS BLANDOS (v0.12) ─────────────────────────────────────────────
+// Dos colores del campo NO son contenido y por eso no van a 4.5 ni a 3.0:
+//
+//   · EL PLACEHOLDER es una pista que desaparece apenas se escribe. Pedirle
+//     4.5 es exactamente lo que lo volvía indistinguible de un valor tecleado
+//     («no se sabe si el campo está lleno o no», reporte del producto). WCAG
+//     no fija un piso para el placeholder mientras el campo tenga su etiqueta
+//     visible —que en esta librería siempre tiene—, así que el piso de acá es
+//     de diseño: se tiene que poder leer (≥ 2.2) y NO se puede parecer a lo
+//     tecleado (techo 3.6, y lo tecleado a ≥ 3.0 del ejemplo).
+//   · EL FILO DEL CAMPO. El límite de un campo tallado lo carga el tallado (el
+//     pozo y su sombra interna); el filo de 1 px es un refuerzo tenue y el
+//     3:1 aparece en hover, foco y error. Piso 1.4 para que no desaparezca.
+//
+// Cada fila: [frente, fondo, piso, techo|null, qué es]. Cuenta como
+// legibilidad en la matriz: una banda rota es tan falla como un CHECK roto.
+const BANDS = [
+  ['--sx-ink-placeholder', '--sx-field', 2.2, 3.6, 'placeholder sobre el campo: una pista, no contenido'],
+  ['--sx-ink', '--sx-ink-placeholder', 3.0, null, 'lo tecleado contra el ejemplo: lleno no se confunde con vacío'],
+  ['--sx-ink-3', '--sx-ink-placeholder', 1.5, null, 'la ayuda contra el ejemplo: el placeholder es más tenue'],
+  ['--sx-field-edge', '--sx-surface', 1.4, null, 'filo suave del campo contra la tarjeta'],
+  ['--sx-field-edge', '--sx-ground', 1.4, null, 'filo suave del campo contra el lienzo']
+];
+
+function evalBands(tokens) {
+  const fails = [];
+  const ground = resolve(tokens['--sx-ground'], tokens);
+  for (const [fg, bg, min, max, checkLabel] of BANDS) {
+    const b = resolve(lookup(bg, tokens), tokens, ground);
+    const r = ratio(resolve(lookup(fg, tokens), tokens, b), b);
+    if (r < min) fails.push({ fg, bg, r, min, checkLabel });
+    else if (max != null && r > max) fails.push({ fg, bg, r, min: max, checkLabel: `SOBRE EL TECHO — ${checkLabel}` });
   }
   return fails;
 }
@@ -728,13 +773,13 @@ for (const [temaNombre, apilar] of THEMES) {
   for (const [tint, tintLabel] of CHROME_KNOBS) {
     const label = `${temaNombre} · ${tintLabel}`;
     const tokens = apilar(tint);
-    const legibilidad = evalContract(tokens).map((f) => ({ ...f, clase: 'legibilidad' }));
+    const legibilidad = [...evalContract(tokens), ...evalBands(tokens)].map((f) => ({ ...f, clase: 'legibilidad' }));
     const distinguibilidad = evalDistinct(tokens).map((f) => ({ ...f, clase: 'distinguibilidad' }));
     const fails = [...legibilidad, ...distinguibilidad];
     malas += fails.length;
     resumen.push({
       label,
-      totalLeg: CHECKS.length,
+      totalLeg: CHECKS.length + BANDS.length,
       failLeg: legibilidad.length,
       totalDist: DISTINCT.length,
       failDist: distinguibilidad.length,
@@ -799,6 +844,7 @@ for (const [mod, acc, accInk] of MODULES) {
   ]) {
     const fails = [
       ...evalContract(tokens).map((f) => ({ ...f, clase: 'legibilidad' })),
+      ...evalBands(tokens).map((f) => ({ ...f, clase: 'legibilidad' })),
       ...evalDistinct(tokens).map((f) => ({ ...f, clase: 'distinguibilidad' }))
     ];
     // LA SELECCIÓN CONTRA LAS BANDAS DE ESTADO (clase 3, la de ΔE2000), sólo
