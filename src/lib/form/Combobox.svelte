@@ -447,35 +447,45 @@
 
   /* The same box Field draws, redeclared here because the popup has to be
      positioned against it and a component cannot reach into another one's
-     scoped styles. The duplication is the price of surviving a shadow root. */
+     scoped styles. The duplication is the price of surviving a shadow root.
+     COPIA LITERAL de la caja de Field.svelte (v0.12: filo suave, halo del
+     acento al foco) — ver ahí el porqué de cada línea. Si se toca una, se
+     tocan las tres (Field, Combobox, DatePicker). */
   .frame {
+    box-sizing: border-box;
     display: flex; align-items: stretch; gap: var(--sx-s-2);
     min-height: var(--sx-s-10);
     padding: var(--sx-s-2) var(--sx-s-3);
     background: var(--sx-field);
-    border: 1px solid var(--sx-edge);
+    border: 1px solid var(--sx-field-edge, var(--sx-edge));
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-field);
-    /* The ring grows in from zero width, as in Field (and for the same
-       forced-colours reason it rests at width 0, not at a transparent colour). */
-    outline: 0 solid transparent;
-    outline-offset: 0;
-    transition: border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                box-shadow 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                outline-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                outline-width 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                outline-offset 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    box-shadow: var(--sx-e-field), 0 0 0 0 transparent, 0 0 0 0 transparent;
+    outline: none;
+    transition: border-color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
-  .frame:hover:not(.disabled) { border-color: var(--sx-ink-3); }
-  .frame:focus-within { border-color: var(--sx-ink); outline: 2px solid var(--sx-ink); outline-offset: 2px; }
-  :global([data-sx-theme='dark']) .frame:focus-within,
-  :global(.sx-dark) .frame:focus-within { outline-color: var(--sx-n-0); border-color: var(--sx-n-0); }
-  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
-  /* Mismo arreglo que Field.svelte/Radio.svelte: --sx-line contra --sx-sunk
-     mide 1.11:1 en oscuro — --sx-edge es el token de este sistema ya medido
-     a 3:1 para el límite de un control. Ver Radio.svelte para los números
-     completos. */
+  .frame:hover:not(.disabled):not(.readonly) { border-color: var(--sx-edge); }
+  .frame:focus-within {
+    border-color: var(--sx-focus, var(--sx-ink));
+    box-shadow: var(--sx-e-field),
+                0 0 0 1px var(--sx-focus, var(--sx-ink)),
+                0 0 0 4px var(--sx-focus-halo, transparent);
+  }
+  .frame.invalid {
+    border-color: var(--sx-critical);
+    box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical), 0 0 0 0 transparent;
+  }
+  .frame.invalid:focus-within {
+    box-shadow: var(--sx-e-field),
+                0 0 0 1px var(--sx-critical),
+                0 0 0 4px color-mix(in srgb, var(--sx-critical) 20%, transparent);
+  }
   .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; }
+  .frame.readonly { background: var(--sx-sunk); box-shadow: none; }
+  @media (forced-colors: active) {
+    .frame:focus-within { outline: 2px solid Highlight; outline-offset: 2px; }
+  }
 
   /* El peldaño COMPACTO. El Combobox dibuja su propio marco (frame={false} en
      Field, porque el popup se ancla contra él), así que la regla dense de
@@ -495,7 +505,7 @@
     margin: 0; padding: 0; border: 0; background: none; outline: none;
     font: inherit; font-size: var(--sx-t-md); line-height: 1.45; color: inherit;
   }
-  input::placeholder { color: var(--sx-ink-3); opacity: 1; }
+  input::placeholder { color: var(--sx-ink-placeholder, var(--sx-ink-3)); opacity: 1; }
   input:disabled { cursor: not-allowed; color: var(--sx-ink-3); -webkit-text-fill-color: var(--sx-ink-3); opacity: 1; }
 
   .lead { display: inline-flex; align-items: center; flex: none; color: var(--sx-ink-3); }
