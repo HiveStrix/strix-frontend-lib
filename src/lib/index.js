@@ -46,7 +46,7 @@ export { Button, ButtonGroup, IconButton, Menu, SplitButton } from './action/ind
 // Field is the wrapper; every text-like control is that Field plus one element,
 // which is why they line up without anybody arranging them.
 export {
-  Field, Input, NumberInput, Textarea, Select, Combobox,
+  Field, Input, NumberInput, Textarea, Select, Combobox, SearchPicker,
   Checkbox, Radio, Switch, DateInput, FileDrop, ImportPreview, ChoiceCards, today,
   Calendar, DateRange, DatePicker, parseLocalDate,
   DivisionPicker, divisionOptions
