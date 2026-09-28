@@ -87,6 +87,16 @@ en la 0.8.0.
 - **El anillo de foco de los campos cambió de forma**: una captura de pantalla
   de referencia (visual regression) de un campo enfocado cambia.
 
+### Arreglado
+- **`Tooltip` (y todo `hintDot`/`InfoDot`) ya no tira `state_unsafe_mutation`**
+  cuando el control que describe se desmonta enfocado — la fila de un `{#each}`
+  que se vacía o se quita con el foco en su ⓘ. Chrome despacha `blur` en pleno
+  flush de Svelte y el listener crudo cerraba el tip ahí adentro; ahora los
+  listeners van con `on()` de `svelte/events`, que corre fuera del contexto
+  reactivo. Los demás componentes con `blur`/`focusout` ya usaban `on:` del
+  marcado y no tenían el problema. El rodeo del consumidor (quitar el foco
+  antes de vaciar la tabla) deja de hacer falta.
+
 ## v0.11.0 — 2026-09-25
 
 > Construida **sobre `v0.10.0`** (que ya trae el `hintDot` de `v0.9.2`). Es,
