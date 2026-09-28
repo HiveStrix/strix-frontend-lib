@@ -6,6 +6,9 @@ en la 0.8.0.
 
 ## Unreleased (v0.12.0)
 
+- **Combobox**: la lista se abre sola al enfocar sólo cuando la persona llegó con Tab; un foco programático (el primer campo de un Dialog) ya no la despliega tapando el formulario. Con el puntero abre el clic, como antes.
+- **Select y Combobox**: la lista mide al menos 14rem aunque el campo sea más angosto (celdas de tabla) y se corre hacia la izquierda si se sale del borde.
+
 - **Combobox**: `selectOnFocus` (por defecto) selecciona el texto al enfocar un campo con valor, así lo que se escribe reemplaza la etiqueta en vez de pegarse detrás; `searchIcon={false}` y `clearable={false}` para campos angostos (p. ej. un prefijo telefónico) sin tocar clases internas.
 
 > Construida sobre `v0.11.0`. Responde al reporte del producto sobre los

@@ -296,8 +296,14 @@
     const want = Math.min(popEl?.scrollHeight || 320, 320) + 8;
     dropUp = r.bottom + want > vh && r.top > vh - r.bottom;
     if (!supportsPopover || !popEl) return;
-    popEl.style.setProperty('--sx-pop-x', `${r.left}px`);
-    popEl.style.setProperty('--sx-pop-w', `${r.width}px`);
+    // Nunca más angosta que 14rem: en una celda chica de tabla la lista del
+    // ancho del campo partía cada opción en dos renglones. Si así se sale por
+    // la derecha, se corre hacia la izquierda sin pasar del borde.
+    const vw = document.documentElement.clientWidth;
+    const w = Math.min(Math.max(r.width, 224), vw - 16);
+    const x = Math.max(8, Math.min(r.left, vw - 8 - w));
+    popEl.style.setProperty('--sx-pop-x', `${x}px`);
+    popEl.style.setProperty('--sx-pop-w', `${w}px`);
     popEl.style.setProperty('--sx-pop-y', `${dropUp ? vh - r.top : r.bottom}px`);
   }
 

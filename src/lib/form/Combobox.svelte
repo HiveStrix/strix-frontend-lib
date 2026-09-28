@@ -3,6 +3,18 @@
   // field's own root, so this mints the root instead of borrowing Field's.
   let seq = 0;
 
+  // ¿El foco llegó porque la persona navegó con Tab? Un foco programático —el
+  // Dialog que enfoca su primer campo al abrirse, un `focus()` del producto—
+  // no tiene que desplegar la lista sola: eso tapa el formulario apenas abre.
+  // El foco por puntero no necesita esto: el `click` que le sigue abre la lista.
+  let lastTabAt = -Infinity;
+  if (typeof document !== 'undefined') {
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') lastTabAt = performance.now();
+    }, true);
+  }
+  const focusByTab = () => performance.now() - lastTabAt < 500;
+
   // Spanish is written with tildes and typed without them. «Alajuela» has to be
   // found by «alajuela», «Muñoz» by «munoz», «Batidora eléctrica» by «electrica».
   // Folding once here is the difference between a search box that works in this
@@ -337,8 +349,14 @@
     const vh = document.documentElement.clientHeight;
     dropUp = r.bottom + want > vh && r.top > vh - r.bottom;
     if (!supportsPopover || !popEl) return;
-    popEl.style.setProperty('--sx-pop-x', `${r.left}px`);
-    popEl.style.setProperty('--sx-pop-w', `${r.width}px`);
+    // Nunca más angosta que 14rem: en una celda chica de tabla la lista del
+    // ancho del campo partía cada opción en dos renglones. Si así se sale por
+    // la derecha, se corre hacia la izquierda sin pasar del borde.
+    const vw = document.documentElement.clientWidth;
+    const w = Math.min(Math.max(r.width, 224), vw - 16);
+    const x = Math.max(8, Math.min(r.left, vw - 8 - w));
+    popEl.style.setProperty('--sx-pop-x', `${x}px`);
+    popEl.style.setProperty('--sx-pop-w', `${w}px`);
     popEl.style.setProperty('--sx-pop-y', `${dropUp ? vh - r.top : r.bottom}px`);
   }
 
@@ -416,7 +434,7 @@
   }
 
   function onFocus() {
-    if (openOnFocus && !quiet) openList();
+    if (openOnFocus && !quiet && focusByTab()) openList();
     // En el cuadro siguiente: un foco por clic coloca el cursor en el mouseup,
     // después de este evento, y deshace una selección hecha acá.
     if (selectOnFocus && hasValue) {
