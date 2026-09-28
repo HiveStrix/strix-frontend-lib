@@ -118,6 +118,15 @@
   export let maxVisible = 50;
   /** Abrir la lista con sugerencias apenas el campo recibe el foco. */
   export let openOnFocus = true;
+  /** Al enfocar un campo que ya tiene un valor elegido, selecciona su texto:
+   *  lo que se escriba reemplaza la etiqueta en vez de pegarse detrás
+   *  («Costa Ricapana»). `selectOnFocus={false}` lo apaga. */
+  export let selectOnFocus = true;
+  /** La lupa de la izquierda. Apagala donde el campo es angosto (un prefijo
+   *  telefónico) y la lupa no dice nada. */
+  export let searchIcon = true;
+  /** El botón ✕ que limpia el valor. Apagalo donde vaciar no tiene sentido. */
+  export let clearable = true;
   /**
    * `async (query) => options[]`. Presente ⇒ la lista la trae el servidor: se
    * llama con '' al abrir y con lo tecleado tras `debounce` ms; una respuesta
@@ -408,6 +417,13 @@
 
   function onFocus() {
     if (openOnFocus && !quiet) openList();
+    // En el cuadro siguiente: un foco por clic coloca el cursor en el mouseup,
+    // después de este evento, y deshace una selección hecha acá.
+    if (selectOnFocus && hasValue) {
+      requestAnimationFrame(() => {
+        if (inputEl && document.activeElement === inputEl && inputEl.value) inputEl.select();
+      });
+    }
   }
 
   function clear() {
@@ -501,9 +517,11 @@
 >
   <div class="wrap" bind:this={wrapEl} on:focusout={onFocusOut}>
     <div class="frame" class:invalid class:disabled class:dense>
-      <span class="lead" aria-hidden="true">
-        <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7" /><path d="M9.2 9.2 12.4 12.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg>
-      </span>
+      {#if searchIcon}
+        <span class="lead" aria-hidden="true">
+          <svg viewBox="0 0 14 14"><circle cx="6" cy="6" r="4.2" fill="none" stroke="currentColor" stroke-width="1.7" /><path d="M9.2 9.2 12.4 12.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg>
+        </span>
+      {/if}
 
       <input
         bind:this={inputEl}
@@ -532,7 +550,7 @@
         on:click={() => openList()}
       />
 
-      {#if hasValue && !disabled}
+      {#if clearable && hasValue && !disabled}
         <button type="button" class="icon" in:popIn out:fadeOut on:click={clear} aria-label={`Limpiar ${label || 'la búsqueda'}`}>
           <svg viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
         </button>

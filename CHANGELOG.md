@@ -6,6 +6,8 @@ en la 0.8.0.
 
 ## Unreleased (v0.12.0)
 
+- **Combobox**: `selectOnFocus` (por defecto) selecciona el texto al enfocar un campo con valor, así lo que se escribe reemplaza la etiqueta en vez de pegarse detrás; `searchIcon={false}` y `clearable={false}` para campos angostos (p. ej. un prefijo telefónico) sin tocar clases internas.
+
 > Construida sobre `v0.11.0`. Responde al reporte del producto sobre los
 > formularios: campos «toscos» en una interfaz blanda, ejemplos que no se
 > distinguen de un valor, menús del sistema operativo, y búsquedas de
