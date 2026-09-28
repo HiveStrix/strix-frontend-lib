@@ -40,6 +40,13 @@
   // es una parada de Tab: cincuenta paradas entre la búsqueda y «Cerrar» no son
   // una forma de moverse.
   //
+  // ENTRA EN EL DIÁLOGO. Las cifras, los códigos y el botón se quedan con su
+  // ancho y el texto parte en renglones; cuando la caja se angosta se van
+  // primero las columnas `optional` y al final el botón de la fila. Si ni así
+  // entra —cinco columnas en un teléfono y ninguna marcada `optional`— la tabla
+  // se desliza de costado dentro de su caja: marcá `optional` lo que ayuda
+  // pero no decide (el tipo, la existencia) y no llega a eso.
+  //
   // LA BÚSQUEDA ES DEL SERVIDOR. `loader: async (query) => filas[]` se llama con
   // '' al abrir (así hay filas de referencia apenas aparece) y con lo tecleado
   // tras `debounce` ms. Una respuesta vieja que llega tarde se descarta.
@@ -66,8 +73,10 @@
    * Las columnas, como en Table: `{ key, label, align?, mono?, value?, optional? }`.
    * `align: 'right'` para cifras (tabulares); `mono` para códigos;
    * `value: (fila) => texto` para formatear (montos, fechas) una vez, acá;
-   * `optional` la esconde en una pantalla angosta (la hoja del teléfono),
-   * donde cinco columnas no entran.
+   * `optional` la esconde cuando la tabla se angosta (una ventana chica, la
+   * hoja del teléfono): son las primeras en irse, antes que el botón de la
+   * fila. Las columnas de texto (ni `mono` ni `align: 'right'`) parten en
+   * hasta dos renglones; las cifras y los códigos no se parten nunca.
    */
   export let columns = [];
   /** `async (query) => filas[]`. Se llama con '' al abrir. */
@@ -199,6 +208,9 @@
   }
 
   const cell = (row, col) => (typeof col.value === 'function' ? col.value(row) : row?.[col.key]);
+  // Cifras y códigos se miden por su contenido y no se parten; el texto se
+  // queda con el ancho que sobra y parte en renglones. Ver `.fit` en el estilo.
+  const fits = (col) => !!col.mono || col.align === 'right';
 
   $: q = query.trim();
   $: createText = !createLabel || !q
@@ -268,7 +280,7 @@
           <thead>
             <tr>
               {#each columns as col (col.key)}
-                <th scope="col" class:right={col.align === 'right'} class:opt={col.optional}>{col.label}</th>
+                <th scope="col" class:right={col.align === 'right'} class:fit={fits(col)} class:opt={col.optional}>{col.label}</th>
               {/each}
               <th scope="col" class="act"><span class="sr">Acción</span></th>
             </tr>
@@ -286,7 +298,8 @@
                 on:click={() => pick(row)}
               >
                 {#each columns as col (col.key)}
-                  <td role="gridcell" class:right={col.align === 'right'} class:mono={col.mono} class:opt={col.optional}>{cell(row, col) ?? '—'}</td>
+                  <td role="gridcell" class:right={col.align === 'right'} class:mono={col.mono} class:fit={fits(col)} class:opt={col.optional}
+                  >{#if fits(col)}{cell(row, col) ?? '—'}{:else}<span class="clip">{cell(row, col) ?? '—'}</span>{/if}</td>
                 {/each}
                 <td role="gridcell" class="act">
                   <button
@@ -355,6 +368,11 @@
   /* La tabla, con el mismo cuerpo que Table: levantada, radio 28 → r-3, la
      cabecera pegada arriba y las filas separadas por la raya de ambiente. */
   .box {
+    /* El contenedor contra el que la tabla decide qué columnas entran (ver el
+       final del estilo): el ancho que importa es el de la caja dentro del
+       diálogo, no el de la ventana — un diálogo `lg` en una pantalla ancha y
+       la hoja de un teléfono se angostan por razones distintas. */
+    container: sxsp / inline-size;
     border-radius: var(--sx-r-3);
     background: var(--sx-surface);
     box-shadow: var(--sx-e-card, var(--sx-e-1));
@@ -379,17 +397,38 @@
     box-shadow: 0 1px 0 var(--sx-line);
   }
   th.right, td.right { text-align: right; }
-  th.act, td.act { width: 1%; text-align: right; }
+  /* LA TABLA ENTRA EN LA CAJA, SIEMPRE. `width: 1%` en una tabla automática
+     es «lo justo para el contenido»: los códigos, las cifras y el botón se
+     quedan con su ancho natural sin partir, y todo lo que sobra se reparte
+     entre las columnas de texto, que son las únicas que pueden ceder. Antes
+     todas las celdas iban en un solo renglón y el ancho de la tabla era la
+     suma de sus textos más largos: con un «Tipo» o una existencia con unidad
+     un poco largos pasaba el ancho del diálogo y la última columna quedaba
+     cortada en el borde derecho. */
+  th.fit, td.fit, th.act, td.act { width: 1%; white-space: nowrap; }
+  th.act, td.act { text-align: right; }
 
   tbody td {
     padding: var(--sx-s-2) var(--sx-s-4);
     height: var(--sx-s-12);
     font-size: var(--sx-t-sm); color: var(--sx-ink-2);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 32ch;
+    line-height: 1.35;
     box-shadow: inset 0 -1px 0 var(--sx-line);
     transition: background-color 160ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   tbody tr:last-child td { box-shadow: none; }
+  /* Hasta dos renglones y los puntos suspensivos: el nombre entero de un
+     artículo es para leerlo, pero una fila de cinco renglones rompe la
+     lectura de la columna. `break-word` y no `anywhere`: parte una palabra
+     sólo si no entra sola, sin achicar el mínimo de la columna a una letra. */
+  .clip {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: break-word;
+  }
   td.right {
     font-family: var(--sx-num-font, inherit);
     font-variant-numeric: tabular-nums lining-nums slashed-zero;
@@ -437,17 +476,26 @@
     tbody td { height: var(--sx-touch); }
     .add { min-height: var(--sx-touch); }
   }
-  /* LA HOJA DEL TELÉFONO. Cinco columnas no entran en 390 px: se van las
-     `optional`, el nombre puede partir en dos renglones, y la columna del
-     botón se va entera — en una pantalla táctil la fila ENTERA es el botón, y
-     el pie lo dice («Tocá una fila…»). */
-  @media (max-width: 560px) {
+  /* CUANDO LA CAJA SE ANGOSTA, POR ESCALONES y medidos sobre la caja (el
+     `container` de `.box`), no sobre la ventana:
+       · primero se aprieta el aire entre columnas;
+       · después se van las `optional` — el dato que ayuda pero no decide;
+       · por último la columna del botón: en la hoja del teléfono la fila
+         ENTERA es el botón, y el pie lo dice («Tocá una fila…»). Con el
+         puntero también: el clic en la fila elige igual que «Agregar». */
+  @container sxsp (max-width: 44rem) {
+    thead th, tbody td { padding-inline: var(--sx-s-3); }
+  }
+  @container sxsp (max-width: 36rem) {
+    th.opt, td.opt { display: none; }
+  }
+  @container sxsp (max-width: 28rem) {
     thead th, tbody td { padding-inline: var(--sx-s-2); }
     thead th:first-child, tbody td:first-child { padding-left: var(--sx-s-3); }
-    thead th:last-of-type, tbody td:nth-last-child(2) { padding-right: var(--sx-s-3); }
-    th.opt, td.opt, th.act, td.act { display: none; }
-    tbody td { white-space: normal; max-width: none; }
-    td.mono, td.right { white-space: nowrap; }
+    thead th:nth-last-child(2), tbody td:nth-last-child(2) { padding-right: var(--sx-s-3); }
+    th.act, td.act { display: none; }
+  }
+  @media (max-width: 560px) {
     .hint { flex-basis: 100%; }
   }
 

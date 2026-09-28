@@ -31,8 +31,10 @@ en la 0.8.0.
   Flechas mueven la fila marcada sin sacar el foco del campo, Enter elige (la
   primera queda marcada al llegar resultados), Escape cierra. `createLabel`
   habilita «+ Crear «q»» en el pie. `closeOnPick={false}` para agregar varias
-  líneas seguidas. En el teléfono es una hoja; las columnas `optional` y la del
-  botón se esconden.
+  líneas seguidas. La tabla entra en el diálogo: cifras, códigos y el botón con
+  su ancho, el texto en hasta dos renglones; cuando la caja se angosta (medida
+  con una container query, no con la ventana) se van primero las columnas
+  `optional` y al final la del botón. En el teléfono es una hoja.
 - **`Combobox`**:
   - **sugiere al recibir el foco** (`openOnFocus`, por defecto `true`): las
     primeras `maxVisible` opciones, filtradas letra a letra;

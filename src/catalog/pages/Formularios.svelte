@@ -251,14 +251,14 @@
   }
 
   const ARTICULOS = [
-    { id: 'ART-0012', codigo: 'ART-0012', nombre: 'Cemento gris 50 kg', tipo: 'Producto', precio: 7450, stock: 128 },
-    { id: 'ART-0031', codigo: 'ART-0031', nombre: 'Casco de seguridad clase E', tipo: 'Producto', precio: 9800, stock: 24 },
-    { id: 'ART-0032', codigo: 'ART-0032', nombre: 'Cascarilla de arroz (saco)', tipo: 'Producto', precio: 2300, stock: 60 },
-    { id: 'ART-0044', codigo: 'ART-0044', nombre: 'Casa de bodega prefabricada 3×3', tipo: 'Producto', precio: 1285000, stock: 2 },
-    { id: 'ART-0051', codigo: 'ART-0051', nombre: 'Cable eléctrico THHN #12 (m)', tipo: 'Producto', precio: 640, stock: 900 },
-    { id: 'ART-0102', codigo: 'ART-0102', nombre: 'Filtro de aceite HINO 500', tipo: 'Repuesto', precio: 14750, stock: 11 },
-    { id: 'ART-0110', codigo: 'ART-0110', nombre: 'Empaque de tapa de balde', tipo: 'Repuesto', precio: 3100, stock: 2 },
-    { id: 'ART-0118', codigo: 'ART-0118', nombre: 'Retén de cilindro 45 mm', tipo: 'Repuesto', precio: 18500, stock: 4 },
+    { id: 'ART-0012', codigo: 'ART-0012', nombre: 'Cemento gris 50 kg', tipo: 'Materiales de construcción', precio: 7450, stock: 128, unidad: 'sacos' },
+    { id: 'ART-0031', codigo: 'ART-0031', nombre: 'Casco de seguridad clase E', tipo: 'Equipo de protección personal', precio: 9800, stock: 24, unidad: 'u' },
+    { id: 'ART-0032', codigo: 'ART-0032', nombre: 'Cascarilla de arroz (saco)', tipo: 'Producto', precio: 2300, stock: 60, unidad: 'sacos' },
+    { id: 'ART-0044', codigo: 'ART-0044', nombre: 'Casa de bodega prefabricada 3×3 con piso de concreto y techo de zinc', tipo: 'Producto', precio: 1285000, stock: 2, unidad: 'u' },
+    { id: 'ART-0051', codigo: 'ART-0051', nombre: 'Cable eléctrico THHN #12 (m)', tipo: 'Producto', precio: 640, stock: 12500, unidad: 'm' },
+    { id: 'ART-0102', codigo: 'ART-0102', nombre: 'Filtro de aceite HINO 500', tipo: 'Repuesto', precio: 14750, stock: 11, unidad: 'u' },
+    { id: 'ART-0110', codigo: 'ART-0110', nombre: 'Empaque de tapa de balde', tipo: 'Repuesto', precio: 3100, stock: 2, unidad: 'u' },
+    { id: 'ART-0118', codigo: 'ART-0118', nombre: 'Retén de cilindro 45 mm', tipo: 'Repuesto', precio: 18500, stock: 4, unidad: 'u' },
     { id: 'SRV-0003', codigo: 'SRV-0003', nombre: 'Alquiler de batidora 1 saco (día)', tipo: 'Servicio', precio: 18000, stock: null },
     { id: 'SRV-0007', codigo: 'SRV-0007', nombre: 'Transporte de equipo a proyecto', tipo: 'Servicio', precio: 45000, stock: null },
     { id: 'SRV-0009', codigo: 'SRV-0009', nombre: 'Mantenimiento preventivo batidora', tipo: 'Servicio', precio: 32000, stock: null }
@@ -269,7 +269,7 @@
     { key: 'nombre', label: 'Nombre' },
     { key: 'tipo', label: 'Tipo', optional: true },
     { key: 'precio', label: 'Precio', align: 'right', value: (r) => colones(r.precio) },
-    { key: 'stock', label: 'Stock', align: 'right', optional: true, value: (r) => (r.stock == null ? '—' : r.stock) }
+    { key: 'stock', label: 'Stock', align: 'right', optional: true, value: (r) => (r.stock == null ? '—' : `${new Intl.NumberFormat('es-CR').format(r.stock)} ${r.unidad}`) }
   ];
   async function buscarArticulos(q) {
     await esperar(140 + Math.random() * 360);
