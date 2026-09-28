@@ -42,6 +42,25 @@
   //   • IT OPENS UPWARDS when there is no room below, because a module renders
   //     inside a Shell and the bottom of the viewport is not where the developer
   //     thought it was.
+  //   • IT SUGGESTS BEFORE YOU TYPE (v0.12). Con el foco la lista ya se abre con
+  //     las primeras `maxVisible` opciones, y se va achicando letra a letra: el
+  //     que busca «casa» ve artículos de referencia al entrar al campo, y al
+  //     tipear C-A-S la lista se reduce. Es el pedido del producto, textual,
+  //     para todo campo que busca un relacionado. `openOnFocus={false}` lo apaga.
+  //   • IT CAN ASK THE SERVER (v0.12). `loader: async (query) => options[]`
+  //     reemplaza a `options` como fuente de la lista: se llama con '' al abrir
+  //     (así hay sugerencias de una) y con lo tecleado después de `debounce` ms.
+  //     Una respuesta vieja que llega tarde se descarta —gana siempre la última
+  //     pregunta—, y mientras vuela el renglón de arriba dice «Buscando…». Con
+  //     `loader` el filtro local se apaga (el servidor ya filtró); `filter` lo
+  //     fuerza. `options` sigue sirviendo para resolver la etiqueta del valor
+  //     ya elegido cuando el servidor todavía no lo devolvió.
+  //   • IT CAN CREATE IN PLACE (v0.12). Con `creatable`, cuando lo tecleado no
+  //     coincide exacto con ninguna opción, la lista termina en «+ Crear «…»»
+  //     —alcanzable con ↓ y Enter como cualquier fila—. Elegirla despacha
+  //     `create` con `{ query, select }`: el padre crea el registro y o bien
+  //     llama `select({ value, label })`, o bien pone `value` y suma la opción.
+  //     La librería no crea nada: no tiene capa de datos.
   //
   //   <Combobox label="Equipo" bind:value={assetId} options={assets}
   //             noun="equipo" nounPlural="equipos"
@@ -50,11 +69,18 @@
   //
   //   options = [{ value, label, hint?, meta? }]
   //
-  // WHEN NOT TO USE IT: under about a dozen options — Select opens the platform
-  // picker and costs no typing. For a value that does not exist yet, this is the
-  // wrong shape entirely: a combobox that quietly accepts anything is a text box
-  // wearing a costume, so pair it with a real «crear» action instead of
-  // `allowFree`. And never as a filter over a table that is already on screen —
+  //   <Combobox label="Proveedor" bind:value={proveedorId}
+  //             loader={(q) => api.proveedores({ q, limit: 20 })}
+  //             creatable on:create={async (e) => {
+  //               const p = await api.crearProveedor(e.detail.query);
+  //               e.detail.select({ value: p.id, label: p.nombre });
+  //             }} />
+  //
+  // WHEN NOT TO USE IT: under about a dozen options — Select costs no typing.
+  // For a value that does not exist yet, `allowFree` is the wrong shape: a
+  // combobox that quietly accepts anything is a text box wearing a costume.
+  // `creatable` is the right one — the new record is created on purpose, with a
+  // row that says so. And never as a filter over a table that is already on screen —
   // that is a search field, and the table itself is the result list.
   //
   // DÓNDE VIVE LA LISTA. Donde existe `popover` (Chrome 114+, Safari 17+,
@@ -80,6 +106,8 @@
   /** What the rows ARE, so the count reads «12 equipos», never «12 resultados». */
   export let noun = 'resultado';
   export let nounPlural = 'resultados';
+  /** 'm' | 'f' — el género de `noun`: «Ningún equipo», pero «Ninguna categoría». */
+  export let gender = 'm';
   export let placeholder = 'Buscar…';
   /** Accept text that is not an option. Read the note above before turning it on. */
   export let allowFree = false;
@@ -88,6 +116,24 @@
   export let loadingLabel = 'Buscando…';
   /** Rows drawn at once. The count above the list always tells the whole truth. */
   export let maxVisible = 50;
+  /** Abrir la lista con sugerencias apenas el campo recibe el foco. */
+  export let openOnFocus = true;
+  /**
+   * `async (query) => options[]`. Presente ⇒ la lista la trae el servidor: se
+   * llama con '' al abrir y con lo tecleado tras `debounce` ms; una respuesta
+   * que llega después de una más nueva se descarta.
+   */
+  export let loader = null;
+  /** Milisegundos de espera entre la última tecla y la pregunta al `loader`. */
+  export let debounce = 200;
+  /** Filtrar localmente. Por defecto sí, salvo con `loader` (el servidor ya filtró). */
+  export let filter = undefined;
+  /** Ofrecer «+ Crear «…»» cuando lo tecleado no coincide con ninguna opción. */
+  export let creatable = false;
+  /** El texto de esa fila. */
+  export let createLabel = (q) => `Crear «${q}»`;
+  /** Lo que dice el renglón de arriba si el `loader` falla. */
+  export let loadErrorLabel = 'No se pudo buscar. Seguí escribiendo para reintentar.';
 
   export let label = '';
 
@@ -129,10 +175,72 @@
 
   export const focus = () => inputEl?.focus();
 
-  $: items = (options ?? []).map((o) =>
-    o !== null && typeof o === 'object' ? o : { value: o, label: String(o) }
-  );
-  $: selected = items.find((o) => o.value === value) ?? null;
+  const norm = (list) =>
+    (Array.isArray(list) ? list : []).map((o) =>
+      o !== null && typeof o === 'object' ? o : { value: o, label: String(o) }
+    );
+
+  // ── La fuente de la lista: `options`, o lo que devolvió el `loader` ─────
+  let loaded = [];
+  let fetching = false;
+  let loadError = '';
+  let reqSeq = 0;
+  let debounceTimer;
+  // La última opción elegida, guardada entera: con `loader` la lista cambia en
+  // cada pregunta y el valor elegido puede no estar en la respuesta de ahora,
+  // pero su etiqueta tiene que seguir en el campo.
+  let picked = null;
+
+  $: optionItems = norm(options);
+  $: items = loader ? norm(loaded) : optionItems;
+  $: selected =
+    items.find((o) => o.value === value) ??
+    optionItems.find((o) => o.value === value) ??
+    (picked && picked.value === value ? picked : null);
+
+  function load(qs, now = false) {
+    if (!loader) return;
+    clearTimeout(debounceTimer);
+    const run = () => {
+      // Cada pregunta lleva su número; sólo la última escribe. Sin esto, «ca»
+      // que tarda 400ms pisa a «casa» que tardó 90, y la lista muestra
+      // resultados de algo que ya no está escrito.
+      const my = ++reqSeq;
+      fetching = true;
+      loadError = '';
+      Promise.resolve()
+        .then(() => loader(qs))
+        .then(
+          (res) => {
+            if (my !== reqSeq) return;
+            loaded = Array.isArray(res) ? res : [];
+            fetching = false;
+            if (open) tick().then(place);
+          },
+          () => {
+            if (my !== reqSeq) return;
+            loaded = [];
+            fetching = false;
+            loadError = loadErrorLabel;
+          }
+        );
+    };
+    if (now || !(debounce > 0)) run();
+    else debounceTimer = setTimeout(run, debounce);
+  }
+  onDestroy(() => {
+    clearTimeout(debounceTimer);
+    reqSeq++; // lo que esté en vuelo ya no tiene a quién escribirle
+  });
+
+  // Un valor que cambia desde afuera (el padre lo puso, o `create` terminó y
+  // eligió el registro nuevo) devuelve el campo a mostrar la etiqueta elegida.
+  // Con `allowFree` no: ahí el valor ES lo tecleado y cambia en cada tecla.
+  let lastValue = value;
+  $: if (value !== lastValue) {
+    lastValue = value;
+    if (!allowFree) touched = false;
+  }
 
   // The box shows the chosen label until somebody starts typing over it.
   $: if (!touched) query = selected ? selected.label : allowFree ? (value ?? '') : '';
@@ -142,17 +250,30 @@
   // classic legacy trap, and the reason three lists in this ecosystem kept
   // showing the previous keystroke's results.
   $: q = touched ? fold(query) : '';
-  $: hits = q
+  $: doFilter = filter ?? !loader;
+  $: hits = q && doFilter
     ? items.filter((o) => fold(o.label).includes(q) || fold(o.value).includes(q) || fold(o.hint).includes(q))
     : items;
   $: shown = hits.slice(0, maxVisible);
 
+  // La fila de crear: sólo con algo tecleado que no sea, plegado, EXACTAMENTE
+  // una opción que ya existe — «Casa» con «casa» en la lista es elegirla, no
+  // crear un duplicado. Mientras el servidor contesta no se ofrece: la
+  // respuesta que viene puede traer justo ese registro.
+  $: exact = !!q && items.some((o) => fold(o.label) === q);
+  $: showCreate = creatable && touched && !!q && !exact && !fetching;
+  // Las filas que el teclado recorre: las opciones y, al final, la de crear.
+  $: navCount = shown.length + (showCreate ? 1 : 0);
+  $: busy = loading || fetching;
+
   $: countWord = hits.length === 1 ? noun : nounPlural;
-  $: countLine = loading
+  $: countLine = busy
     ? loadingLabel
-    : hits.length === 0
+    : loadError
+      ? loadError
+      : hits.length === 0
       ? q
-        ? `Ningún ${noun} coincide con «${query}».`
+        ? `${gender === 'f' ? 'Ninguna' : 'Ningún'} ${noun} coincide con «${query}».`
         : `No hay ${nounPlural} para elegir.`
       : `${hits.length} ${countWord}${hits.length > shown.length ? ` · se muestran ${shown.length}` : ''}`;
 
@@ -160,7 +281,12 @@
   // a live region that talks over the rest of the form.
   $: announce = open ? countLine : '';
 
-  $: activeId = open && active >= 0 && active < shown.length ? `${fid}-o${active}` : undefined;
+  $: activeId =
+    open && active >= 0 && active < shown.length
+      ? `${fid}-o${active}`
+      : open && showCreate && active === shown.length
+        ? `${fid}-create`
+        : undefined;
 
   async function openList(moveTo = null) {
     if (disabled || open) {
@@ -168,6 +294,9 @@
       return;
     }
     open = true;
+    // Con `loader`, abrir ES preguntar: con '' si todavía no se tecleó nada,
+    // así las sugerencias aparecen al entrar al campo y no a la primera letra.
+    if (loader) load(touched ? query : '', true);
     active = moveTo !== null ? clamp(moveTo) : shown.findIndex((o) => o.value === value);
     await tick();
     place();
@@ -227,7 +356,7 @@
     if (typeof document !== 'undefined') document.removeEventListener('scroll', onScroll, true);
   });
 
-  const clamp = (i) => (shown.length === 0 ? -1 : (i + shown.length) % shown.length);
+  const clamp = (i) => (navCount === 0 ? -1 : (i + navCount) % navCount);
 
   function move(i) {
     active = clamp(i);
@@ -239,24 +368,57 @@
     listEl?.querySelector('[data-on="1"]')?.scrollIntoView({ block: 'nearest' });
   }
 
+  // Devolver el foco al campo después de elegir no tiene que volver a abrir la
+  // lista (`openOnFocus`): esa vuelta es de la librería, no de la persona.
+  let quiet = false;
+  function refocus() {
+    quiet = true;
+    inputEl?.focus();
+    quiet = false;
+  }
+
   function choose(o) {
     if (!o || o.disabled) return;
+    picked = o;
     value = o.value;
+    lastValue = value;
     touched = false;
     query = o.label;
     open = false;
     active = -1;
     dispatch('change', o);
-    inputEl?.focus();
+    refocus();
+  }
+
+  // «+ Crear «…»». La librería no crea nada: le pasa al padre lo tecleado y
+  // una forma de elegir el registro nuevo en cuanto exista.
+  function create() {
+    const text = query.trim();
+    if (!text) return;
+    open = false;
+    active = -1;
+    dispatch('create', {
+      query: text,
+      select: (o) => {
+        if (o === null || o === undefined) return;
+        choose(typeof o === 'object' ? o : { value: o, label: String(o) });
+      }
+    });
+  }
+
+  function onFocus() {
+    if (openOnFocus && !quiet) openList();
   }
 
   function clear() {
     value = '';
     query = '';
     touched = true;
+    picked = null;
     dispatch('change', null);
-    inputEl?.focus();
-    openList();
+    refocus();
+    if (open) load('', true);
+    else openList();
   }
 
   function onInput(e) {
@@ -264,7 +426,10 @@
     query = e.currentTarget.value;
     active = -1;
     if (!open) openList();
-    else place();
+    else {
+      place();
+      load(query);
+    }
     if (allowFree) value = query;
     dispatch('search', query);
   }
@@ -278,16 +443,17 @@
         break;
       case 'ArrowUp':
         e.preventDefault();
-        open ? move(active - 1) : openList(shown.length - 1);
+        open ? move(active - 1) : openList(navCount - 1);
         break;
       case 'Home':
         if (open) { e.preventDefault(); move(0); }
         break;
       case 'End':
-        if (open) { e.preventDefault(); move(shown.length - 1); }
+        if (open) { e.preventDefault(); move(navCount - 1); }
         break;
       case 'Enter':
-        if (open && active >= 0) { e.preventDefault(); choose(shown[active]); }
+        if (open && showCreate && active === shown.length) { e.preventDefault(); create(); }
+        else if (open && active >= 0) { e.preventDefault(); choose(shown[active]); }
         break;
       case 'Tab':
         close();
@@ -357,10 +523,11 @@
         aria-activedescendant={activeId}
         aria-describedby={describedBy}
         aria-invalid={invalid || undefined}
-        aria-busy={loading || undefined}
+        aria-busy={busy || undefined}
         required={required || undefined}
         on:input={onInput}
         on:keydown={onKey}
+        on:focus={onFocus}
         on:focus
         on:click={() => openList()}
       />
@@ -393,7 +560,7 @@
       popover={supportsPopover ? 'manual' : undefined}
       bind:this={popEl}
     >
-      <p class="count" class:none={!loading && hits.length === 0}>{countLine}</p>
+      <p class="count" class:none={!busy && (hits.length === 0 || !!loadError)}>{countLine}</p>
       <!-- Pointer down is swallowed so focus never leaves the input: without it
            the field blurs, the list closes, and the click lands on nothing. -->
       <ul
@@ -433,7 +600,28 @@
             {/if}
           </li>
         {/each}
+        {#if showCreate}
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <li
+            id={`${fid}-create`}
+            role="option"
+            aria-selected="false"
+            class="create"
+            data-on={active === shown.length ? '1' : '0'}
+            class:on={active === shown.length}
+            on:click={create}
+            on:mousemove={() => (active = shown.length)}
+          >
+            <svg class="plus" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1.5v9M1.5 6h9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg>
+            <span class="lb">{createLabel(query.trim())}</span>
+          </li>
+        {/if}
       </ul>
+      {#if $$slots.foot}
+        <!-- Lo que el producto quiera al pie de la lista: un «Ver todos», una
+             búsqueda avanzada. Recibe lo tecleado. -->
+        <div class="pfoot"><slot name="foot" {query} /></div>
+      {/if}
     </div>
 
     <span class="sr" role="status">{announce}</span>
@@ -465,7 +653,7 @@
                 box-shadow 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
                 background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
-  .frame:hover:not(.disabled):not(.readonly) { border-color: var(--sx-edge); }
+  .frame:hover:not(.disabled) { border-color: var(--sx-edge); }
   .frame:focus-within {
     border-color: var(--sx-focus, var(--sx-ink));
     box-shadow: var(--sx-e-field),
@@ -482,7 +670,6 @@
                 0 0 0 4px color-mix(in srgb, var(--sx-critical) 20%, transparent);
   }
   .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; }
-  .frame.readonly { background: var(--sx-sunk); box-shadow: none; }
   @media (forced-colors: active) {
     .frame:focus-within { outline: 2px solid Highlight; outline-offset: 2px; }
   }
@@ -665,6 +852,27 @@
     font-variant-numeric: tabular-nums lining-nums slashed-zero;
   }
   .tick { flex: none; width: 12px; height: 12px; color: var(--sx-accent); }
+
+  /* La fila de crear: la última, separada por una raya de ambiente y en la
+     tinta principal, con su «+» — una acción, no una opción más. */
+  .list li.create {
+    margin-top: var(--sx-s-1);
+    color: var(--sx-ink); font-weight: var(--sx-w-medium);
+    box-shadow: 0 -1px 0 var(--sx-line);
+    border-radius: 0 0 var(--sx-r-1) var(--sx-r-1);
+  }
+  .list li.create:first-child { margin-top: 0; box-shadow: none; border-radius: var(--sx-r-1); }
+  .list li.create.on { border-radius: var(--sx-r-1); box-shadow: none; }
+  .plus {
+    flex: none; width: 12px; height: 12px; color: var(--sx-accent);
+    padding: 4px; box-sizing: content-box;
+    border-radius: var(--sx-r-pill); background: var(--sx-accent-soft);
+  }
+  .pfoot {
+    padding: var(--sx-s-2) var(--sx-s-3);
+    background: var(--sx-sunk);
+    font-size: var(--sx-t-sm);
+  }
 
   .sr {
     position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
