@@ -147,7 +147,9 @@
   $: current = value ?? '';
   $: selected = flat.find((o) => o.value === current) ?? null;
   $: empty = !selected;
-  $: shown = selected ? selected.label : placeholder;
+  // Trimmed: a tree list indents its labels with hard spaces (divisionOptions),
+  // and the indent means something in the list, not in the closed box.
+  $: shown = selected ? String(selected.label).trim() : placeholder;
   $: activeId = open && active >= 0 && active < flat.length ? `${fid}-o${active}` : undefined;
 
   const enabled = (i) => i >= 0 && i < flat.length && !flat[i].disabled;
@@ -427,7 +429,7 @@
             <div class="grp" role="group" aria-labelledby={`${fid}-g${gi}`}>
               <p class="gh" id={`${fid}-g${gi}`}>{gname || 'Otros'}</p>
               {#each list as o (o.i)}
-                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                <!-- svelte-ignore a11y_click_events_have_key_events a11y_interactive_supports_focus -->
                 <div
                   id={`${fid}-o${o.i}`}
                   role="option"
@@ -454,7 +456,7 @@
           {/each}
         {:else}
           {#each flat as o (o.i)}
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_click_events_have_key_events a11y_interactive_supports_focus -->
             <div
               id={`${fid}-o${o.i}`}
               role="option"
