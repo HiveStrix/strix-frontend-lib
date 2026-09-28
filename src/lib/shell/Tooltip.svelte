@@ -57,6 +57,7 @@
   // sirviendo igual bajo `fixed`. Donde `popover` no existe, nada de esto
   // corre y el tip cae en el `position: absolute` de siempre.
   import { onMount } from 'svelte';
+  import { on } from 'svelte/events';
   import { supportsPopover, syncPopover } from './toplayer.js';
 
   /** The repair. One short line; a tooltip is not a paragraph. */
@@ -84,26 +85,33 @@
   // If the slot holds nothing focusable, NOTHING is bound: no description, no
   // hover, no tip. That is the component refusing to paper over a control a
   // keyboard cannot reach.
+  //
+  // CON `on()` DE `svelte/events`, NUNCA CON `addEventListener` A SECAS. Un
+  // control enfocado que se desmonta —la fila de un `{#each}` que se vacía con
+  // el foco adentro— recibe `blur` SINCRÓNICO, en medio del flush de Svelte
+  // que lo está sacando del DOM (Chrome lo despacha con el nodo todavía
+  // conectado, así que preguntar `isConnected` no sirve). Un listener crudo
+  // corre ahí adentro, con el efecto del bloque como reacción activa, y el
+  // `shown = false` de `hide()` es exactamente lo que Svelte 5 rechaza con
+  // `state_unsafe_mutation` — en una app de runas, donde el chequeo aplica.
+  // `on()` es el mismo camino que usa un `on:blur` del marcado: envuelve al
+  // handler fuera del contexto reactivo, así que la mutación es legal y el
+  // tip se cierra sincrónico como siempre, sin diferirlo a ningún lado.
   onMount(() => {
     const target = host?.querySelector(FOCUSABLE);
     if (!target || !text) return;
-    const enter = (e) => onPointer(e);
-    const leave = () => hide();
-    const gotFocus = () => show(true);
     target.setAttribute('aria-describedby', id);
-    target.addEventListener('pointerenter', enter);
-    target.addEventListener('pointerleave', leave);
-    target.addEventListener('focus', gotFocus);
-    target.addEventListener('blur', leave);
-    target.addEventListener('keydown', onKeydown);
+    const off = [
+      on(target, 'pointerenter', onPointer),
+      on(target, 'pointerleave', () => hide()),
+      on(target, 'focus', () => show(true)),
+      on(target, 'blur', () => hide()),
+      on(target, 'keydown', onKeydown)
+    ];
     return () => {
       clearTimeout(timer);
       target.removeAttribute('aria-describedby');
-      target.removeEventListener('pointerenter', enter);
-      target.removeEventListener('pointerleave', leave);
-      target.removeEventListener('focus', gotFocus);
-      target.removeEventListener('blur', leave);
-      target.removeEventListener('keydown', onKeydown);
+      for (const stop of off) stop();
       // Por si el componente se desmonta con el tip todavía mostrándose: la
       // reactividad de abajo no llega a correr una limpieza final propia.
       document.removeEventListener('scroll', onReposition, true);
