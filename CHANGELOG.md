@@ -4,7 +4,7 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
-## Unreleased (v0.12.0)
+## v0.12.0 (2026-09-28)
 
 - **Segunda revisión**: la selección al enfocar funciona dentro del shadow root de un core; el valor de un Select deshabilitado ya no asoma por el borde; el campo invisible que viaja al formulario es un `<select>` (no bloquea el envío con Enter ni atrae el autocompletado de direcciones); en SearchPicker una elección explícita anula el Enter pendiente.
 
