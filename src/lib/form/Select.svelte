@@ -42,6 +42,11 @@
   //   • El marcador de posición sigue siendo una puerta de una sola vía: se ve
   //     en el campo mientras `value === ''`, pero no es una opción de la lista.
   //   • `name` sigue llegando a un <form> nativo, por un <input type="hidden">.
+  //   • Se cierra con un clic afuera por sí misma, no porque el botón pierda
+  //     el foco: en Safari y en Firefox de Mac un clic NO enfoca un <button>,
+  //     así que no había `blur` y la lista quedaba flotando en la top layer.
+  //     Por lo mismo el clic enfoca el disparador a mano: sin eso, después de
+  //     abrir con el puntero el teclado no llegaba a ninguna parte.
   //   • `on:change` sigue siendo un evento del DOM con `currentTarget.value`
   //     (la cadena, como la daba el <select>) y además trae `detail` con el
   //     valor tal cual, sin pasarlo a cadena. Un consumidor viejo que leía
@@ -318,6 +323,42 @@
     if (typeof document !== 'undefined') document.removeEventListener('scroll', onScroll, true);
   });
 
+  // ── Clic afuera ─────────────────────────────────────────────────────────
+  // El `blur` del botón no alcanza para cerrar: Safari y Firefox de Mac no
+  // enfocan un <button> con el clic, así que ahí nunca llega un `blur` y la
+  // lista se quedaba abierta encima de todo. Mientras está abierta, un
+  // `pointerdown` en captura sobre el documento cierra si cayó fuera de la
+  // caja y de la lista. `composedPath()` y no `contains(e.target)`: dentro del
+  // shadow root de un Core, en el documento `target` llega re-apuntado al
+  // host y todo clic parecería «afuera».
+  function onDocPointer(e) {
+    if (!open) return;
+    const path = typeof e.composedPath === 'function' ? e.composedPath() : [];
+    const hit = (node) => !!node && (path.length ? path.includes(node) : node.contains(e.target));
+    if (hit(el?.parentElement) || hit(popEl)) return;
+    close();
+  }
+  $: if (typeof document !== 'undefined') {
+    document.removeEventListener('pointerdown', onDocPointer, true);
+    if (open) document.addEventListener('pointerdown', onDocPointer, true);
+  }
+  onDestroy(() => {
+    if (typeof document !== 'undefined') document.removeEventListener('pointerdown', onDocPointer, true);
+  });
+
+  // El clic abre o cierra según cómo estaba la lista cuando BAJÓ el puntero:
+  // si algo la cerró entre medio (un `blur` que un navegador dispara al
+  // presionar), el clic no la vuelve a abrir. Y enfoca el botón, porque
+  // Safari no lo hace solo y sin foco el teclado no llega a la lista.
+  let openAtDown = null;
+  function onTrigClick() {
+    const was = openAtDown ?? open;
+    openAtDown = null;
+    if (document.activeElement !== el) el?.focus();
+    if (was) close();
+    else openList();
+  }
+
   // An option list that lost its active row (options changed under it) goes
   // back to a row that exists.
   $: if (open && active >= flat.length) active = firstEnabled();
@@ -391,7 +432,8 @@
       aria-invalid={invalid || undefined}
       aria-required={required || undefined}
       {disabled}
-      on:click={() => (open ? close() : openList())}
+      on:pointerdown={() => (openAtDown = open)}
+      on:click={onTrigClick}
       on:keydown={onKey}
       on:blur={close}
       on:focus

@@ -383,6 +383,27 @@
     if (typeof document !== 'undefined') document.removeEventListener('scroll', onScroll, true);
   });
 
+  // Clic afuera, la misma red que Select. Hoy el `focusout` de `.wrap`
+  // alcanza —el input siempre tiene el foco cuando la lista está abierta, y
+  // un clic afuera lo saca en todos los navegadores—, pero si algún día la
+  // lista abre sin foco (un navegador que no enfoca, un `openList()` desde
+  // afuera) no queda flotando en la top layer. `composedPath()` por el
+  // shadow root de los Cores (ver Select).
+  function onDocPointer(e) {
+    if (!open) return;
+    const path = typeof e.composedPath === 'function' ? e.composedPath() : [];
+    const hit = (node) => !!node && (path.length ? path.includes(node) : node.contains(e.target));
+    if (hit(wrapEl) || hit(popEl)) return;
+    close();
+  }
+  $: if (typeof document !== 'undefined') {
+    document.removeEventListener('pointerdown', onDocPointer, true);
+    if (open) document.addEventListener('pointerdown', onDocPointer, true);
+  }
+  onDestroy(() => {
+    if (typeof document !== 'undefined') document.removeEventListener('pointerdown', onDocPointer, true);
+  });
+
   const clamp = (i) => (navCount === 0 ? -1 : (i + navCount) % navCount);
 
   function move(i) {
