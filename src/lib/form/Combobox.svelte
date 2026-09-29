@@ -207,6 +207,14 @@
   let loadError = '';
   let reqSeq = 0;
   let debounceTimer;
+  // A QUÉ PREGUNTA CONTESTA LA LISTA. `pendingFor`: lo que se va a preguntar o
+  // ya se preguntó y no volvió (incluye la espera del debounce, cuando
+  // `fetching` todavía es false). `loadedFor`: lo que contestan las opciones
+  // de ahora. Sin esto la fila «Crear» se ofrecía mirando la lista de la
+  // pregunta ANTERIOR —durante el debounce— y dejaba crear un duplicado de un
+  // registro que la búsqueda nueva iba a traer.
+  let pendingFor = null;
+  let loadedFor = null;
   // La última opción elegida, guardada entera: con `loader` la lista cambia en
   // cada pregunta y el valor elegido puede no estar en la respuesta de ahora,
   // pero su etiqueta tiene que seguir en el campo.
@@ -222,6 +230,7 @@
   function load(qs, now = false) {
     if (!loader) return;
     clearTimeout(debounceTimer);
+    pendingFor = qs;
     const run = () => {
       // Cada pregunta lleva su número; sólo la última escribe. Sin esto, «ca»
       // que tarda 400ms pisa a «casa» que tardó 90, y la lista muestra
@@ -235,12 +244,17 @@
           (res) => {
             if (my !== reqSeq) return;
             loaded = Array.isArray(res) ? res : [];
+            loadedFor = qs;
+            pendingFor = null;
             fetching = false;
             if (open) tick().then(place);
           },
           () => {
             if (my !== reqSeq) return;
             loaded = [];
+            // Sin respuesta no se sabe si ya existe: no se ofrece crear.
+            loadedFor = null;
+            pendingFor = null;
             fetching = false;
             loadError = loadErrorLabel;
           }
@@ -279,10 +293,13 @@
 
   // La fila de crear: sólo con algo tecleado que no sea, plegado, EXACTAMENTE
   // una opción que ya existe — «Casa» con «casa» en la lista es elegirla, no
-  // crear un duplicado. Mientras el servidor contesta no se ofrece: la
-  // respuesta que viene puede traer justo ese registro.
+  // crear un duplicado. Con `loader`, sólo contra la respuesta a ESTO que está
+  // escrito: mientras hay una pregunta pendiente —en vuelo o todavía en el
+  // debounce— no se ofrece, porque la respuesta que viene puede traer justo
+  // ese registro.
   $: exact = !!q && items.some((o) => fold(o.label) === q);
-  $: showCreate = creatable && touched && !!q && !exact && !fetching;
+  $: fresh = !loader || (pendingFor === null && loadedFor !== null && fold(loadedFor) === q);
+  $: showCreate = creatable && touched && !!q && !exact && fresh;
   // Las filas que el teclado recorre: las opciones y, al final, la de crear.
   $: navCount = shown.length + (showCreate ? 1 : 0);
   $: busy = loading || fetching;
