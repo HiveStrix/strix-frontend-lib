@@ -227,6 +227,10 @@
   }
 
   function pick(row) {
+    // Un Enter que esperaba su búsqueda queda anulado por cualquier elección
+    // explícita: sin esto, con `closeOnPick={false}` un clic en «Agregar»
+    // mientras la búsqueda sigue en vuelo sumaba además la primera fila.
+    pickWhen = null;
     dispatch('pick', row);
     if (closeOnPick) {
       dispatch('close');
@@ -241,6 +245,7 @@
   }
 
   function create() {
+    pickWhen = null;
     const text = query.trim();
     if (!text) return;
     dispatch('create', { query: text });

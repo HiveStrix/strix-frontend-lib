@@ -6,6 +6,8 @@ en la 0.8.0.
 
 ## Unreleased (v0.12.0)
 
+- **Segunda revisión**: la selección al enfocar funciona dentro del shadow root de un core; el valor de un Select deshabilitado ya no asoma por el borde; el campo invisible que viaja al formulario es un `<select>` (no bloquea el envío con Enter ni atrae el autocompletado de direcciones); en SearchPicker una elección explícita anula el Enter pendiente.
+
 - **Combobox**: la lista se abre sola al enfocar sólo cuando la persona llegó con Tab; un foco programático (el primer campo de un Dialog) ya no la despliega tapando el formulario. Con el puntero abre el clic, como antes.
 - **Select y Combobox**: la lista mide al menos 14rem aunque el campo sea más angosto (celdas de tabla) y se corre hacia la izquierda si se sale del borde.
 - **Select**: la lista se cierra con un clic afuera también en Safari y Firefox de Mac. Antes sólo cerraba con el `blur` del botón, y esos navegadores no enfocan un `<button>` con el clic: la lista quedaba flotando en la top layer y el teclado no llegaba a ella. Ahora, mientras está abierta, un `pointerdown` en captura sobre el documento cierra si cae fuera de la caja y de la lista (mirando `composedPath()`, así funciona dentro del shadow root de un Core), y el clic enfoca el disparador. **Combobox** suma la misma red, aunque ahí el `focusout` ya alcanzaba.

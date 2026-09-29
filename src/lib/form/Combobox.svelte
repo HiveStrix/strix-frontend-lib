@@ -477,7 +477,9 @@
     // después de este evento, y deshace una selección hecha acá.
     if (selectOnFocus && hasValue) {
       requestAnimationFrame(() => {
-        if (inputEl && document.activeElement === inputEl && inputEl.value) inputEl.select();
+        // `getRootNode()`: dentro del shadow root de un core, `document.activeElement`
+        // es el host, nunca este input.
+        if (inputEl && inputEl.getRootNode().activeElement === inputEl && inputEl.value) inputEl.select();
       });
     }
   }

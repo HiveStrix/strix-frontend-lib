@@ -462,7 +462,7 @@
          the submit. Invisible, out of the tab order and of the accessibility
          tree; if the browser focuses it to report it, focus goes to the
          trigger, which is what the person has to operate. -->
-    <input
+    <select
       class="proxy"
       bind:this={hiddenEl}
       {name}
@@ -474,7 +474,15 @@
       autocomplete="off"
       on:focus={() => el?.focus()}
       on:change
-    />
+    >
+      <!-- Un <select> y no un <input>: no bloquea el envío implícito con Enter
+           de un formulario con un solo campo de texto, y el autocompletado de
+           direcciones del navegador no le escribe una etiqueta encima. Lleva
+           TODAS las opciones para que asignar `value` en `choose` funcione en
+           el acto, sin esperar un tick. -->
+      <option value=""></option>
+      {#each flat as o (o.i)}<option value={String(o.value ?? '')}>{o.label}</option>{/each}
+    </select>
 
     <div
       class="pop"
@@ -591,10 +599,17 @@
 
   /* El <input> que viaja al formulario: pegado al pie de la caja (ahí apunta
      el globo del navegador si se queja), sin ocupar lugar ni recibir clics. */
-  .proxy {
+  .proxy,
+  .proxy:disabled,
+  :global(.frame) .proxy.proxy:disabled {
     position: absolute; left: 0; right: 0; bottom: 0;
     width: 100%; height: 1px; margin: 0; padding: 0; border: 0;
+    /* `:disabled` también: la regla de Field para controles deshabilitados
+       (`opacity: 1`) le gana en especificidad a una clase sola, y el valor
+       crudo asomaba como una franja en el borde de abajo. */
     opacity: 0; pointer-events: none;
+    clip-path: inset(50%);
+    appearance: none;
   }
 
   .chev {
