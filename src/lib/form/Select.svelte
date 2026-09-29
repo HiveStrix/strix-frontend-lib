@@ -41,7 +41,11 @@
   //     apagadas se saltan con el teclado y no se eligen con el puntero.
   //   • El marcador de posición sigue siendo una puerta de una sola vía: se ve
   //     en el campo mientras `value === ''`, pero no es una opción de la lista.
-  //   • `name` sigue llegando a un <form> nativo, por un <input type="hidden">.
+  //   • `name` sigue llegando a un <form> nativo, y `required` lo sigue
+  //     frenando: el valor viaja en un <input> invisible pero VALIDABLE (un
+  //     `type="hidden"` queda fuera de la validación y el formulario se
+  //     enviaba con el Select vacío). Si el navegador lo enfoca para quejarse,
+  //     el foco pasa al disparador.
   //   • Se cierra con un clic afuera por sí misma, no porque el botón pierda
   //     el foco: en Safari y en Firefox de Mac un clic NO enfoca un <button>,
   //     así que no había `blur` y la lista quedaba flotando en la top layer.
@@ -93,7 +97,7 @@
   export let optional = false;
   export let disabled = false;
   export let dense = false;
-  /** Llega a un <form> nativo por un <input type="hidden">. */
+  /** Llega a un <form> nativo por un <input> invisible (ver `.proxy`). */
   export let name = undefined;
   export let id = '';
   export let origin = '';
@@ -105,6 +109,8 @@
    * que se llena con el pulgar y quiere esa rueda a propósito.
    */
   export let native = false;
+  /** Lo que dice el navegador si un <form> se envía con un `required` vacío. */
+  export let requiredMessage = 'Elegí una opción de la lista.';
 
   const dispatch = createEventDispatcher();
   const n = ++seq;
@@ -359,6 +365,11 @@
     else openList();
   }
 
+  // `required` sobre el <input> que viaja al formulario, con el mensaje en
+  // castellano en vez del «Completá este campo» de un campo de texto.
+  $: missing = required && !disabled && !native && (current === '' || current === null);
+  $: if (hiddenEl) hiddenEl.setCustomValidity(missing ? requiredMessage : '');
+
   // An option list that lost its active row (options changed under it) goes
   // back to a row that exists.
   $: if (open && active >= flat.length) active = firstEnabled();
@@ -446,8 +457,24 @@
     </button>
 
     <!-- The value, for a native <form>, and the node the change event is
-         dispatched from (see `choose`). -->
-    <input type="hidden" bind:this={hiddenEl} {name} value={current === null ? '' : String(current)} on:change />
+         dispatched from (see `choose`). NOT `type="hidden"`: a hidden input is
+         barred from constraint validation, and `required` stopped blocking
+         the submit. Invisible, out of the tab order and of the accessibility
+         tree; if the browser focuses it to report it, focus goes to the
+         trigger, which is what the person has to operate. -->
+    <input
+      class="proxy"
+      bind:this={hiddenEl}
+      {name}
+      value={current === null ? '' : String(current)}
+      required={required || undefined}
+      disabled={disabled || undefined}
+      tabindex="-1"
+      aria-hidden="true"
+      autocomplete="off"
+      on:focus={() => el?.focus()}
+      on:change
+    />
 
     <div
       class="pop"
@@ -561,6 +588,14 @@
      does — with the placeholder's own ink, fainter than a chosen value. It is
      not an error and must not look like one. */
   .trig.empty .val { color: var(--sx-ink-placeholder, var(--sx-ink-3)); }
+
+  /* El <input> que viaja al formulario: pegado al pie de la caja (ahí apunta
+     el globo del navegador si se queja), sin ocupar lugar ni recibir clics. */
+  .proxy {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 1px; margin: 0; padding: 0; border: 0;
+    opacity: 0; pointer-events: none;
+  }
 
   .chev {
     display: inline-flex; align-items: center; flex: none; align-self: center;
