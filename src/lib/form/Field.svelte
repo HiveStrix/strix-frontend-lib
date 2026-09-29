@@ -273,9 +273,22 @@
   }
 
   /* ── The box ─────────────────────────────────────────────────────────────
-     A control outline is the one place a border is the right tool: it is what
-     says «type here», and elevation alone cannot say that. Depth still does the
-     rest of the work. */
+     TALLADO Y SUAVE (v0.12). La caja se lee por el tallado —el pozo
+     (--sx-field) y su sombra interna (--sx-e-field)—, no por una raya. Hasta la
+     v0.11 llevaba además el borde pleno de 3:1 (--sx-edge), y esa raya gris
+     dura alrededor de una pieza blanda era lo «tosco» que reportó el producto.
+     Ahora el filo en reposo es tenue (--sx-field-edge) y el límite a 3:1 llega
+     cuando importa: bajo el puntero, con el foco y con el error.
+
+     EL FOCO ES UN HALO DEL ACENTO, no el anillo de tinta de 2 px: el filo pasa a
+     --sx-focus (el acento del módulo oscurecido con la tinta, medido a 3:1
+     contra el campo y la tarjeta — ése es el indicador), se engrosa a 2 px con
+     una sombra de 1 px pegada al borde, y alrededor se abre un resplandor de
+     3 px (--sx-focus-halo), que es la parte blanda. Todo en `box-shadow`, que
+     se interpola: el halo CRECE en vez de aparecer.
+
+     Cada token nuevo trae su fallback a lo de la v0.11, por si un anfitrión
+     trae tokens viejos. */
   .frame {
     /* Propio, no del anfitrión: un core cuyo reset `*` Svelte acota a sus
        propios elementos no llega acá, y la caja medía 58px en vez de 40. */
@@ -284,52 +297,55 @@
     display: flex; align-items: stretch; gap: var(--sx-s-2);
     min-height: var(--sx-s-10);
     padding: var(--sx-s-2) var(--sx-s-3);
-    /* TALLADO, no levantado (variante colorida): el relleno y la elevación de
-       la caja son perillas — --sx-field y --sx-e-field — para que la decisión
-       viva en tokens.js y no repetida en cada control. El borde se queda: es
-       el que dice «escribí acá» y el que el contrato mide a 3:1. */
+    /* El relleno y la elevación son perillas —--sx-field y --sx-e-field— para
+       que la decisión viva en tokens.js y no repetida en cada control. */
     background: var(--sx-field);
-    border: 1px solid var(--sx-edge);
+    border: 1px solid var(--sx-field-edge, var(--sx-edge));
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-field);
+    box-shadow: var(--sx-e-field), 0 0 0 0 transparent, 0 0 0 0 transparent;
     color: var(--sx-ink);
-    /* The ring GROWS in: it rests at zero width hugging the border and opens
-       out to 2px at 2px off, instead of being stamped on in one frame. Zero
-       width and not a transparent colour, so forced-colours mode (which paints
-       transparent outlines) never shows a ring on a field nobody focused. */
-    outline: 0 solid transparent;
-    outline-offset: 0;
-    transition: border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                box-shadow 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                background var(--sx-fast) var(--sx-ease),
-                outline-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                outline-width 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                outline-offset 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    outline: none;
+    transition: border-color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                background 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
-  .frame:hover:not(.disabled):not(.readonly) { border-color: var(--sx-ink-3); }
+  .frame:hover:not(.disabled):not(.readonly) { border-color: var(--sx-edge); }
 
   /* focus-WITHIN, not focus-visible: a text box that was clicked into still has
-     to show where the caret went. The ring is the system's one focus rule, drawn
-     on the box rather than on the naked input inside it. */
+     to show where the caret went. Drawn on the box rather than on the naked
+     input inside it. Las tres capas de `box-shadow` son siempre tres —en
+     reposo, dos transparentes de 0 px— para que el navegador interpole capa
+     por capa y el halo se abra en vez de estamparse. */
   .frame:focus-within {
-    border-color: var(--sx-ink);
-    outline: 2px solid var(--sx-ink);
-    outline-offset: 2px;
+    border-color: var(--sx-focus, var(--sx-ink));
+    box-shadow: var(--sx-e-field),
+                0 0 0 1px var(--sx-focus, var(--sx-ink)),
+                0 0 0 4px var(--sx-focus-halo, transparent);
   }
-  :global([data-sx-theme='dark']) .frame:focus-within,
-  :global(.sx-dark) .frame:focus-within { outline-color: var(--sx-n-0); border-color: var(--sx-n-0); }
 
-  /* The ring is the second signal; the word underneath is the first. */
-  .frame.invalid { border-color: var(--sx-critical); box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical); }
-  /* --sx-line contra --sx-sunk mide 1.25:1 en claro y 1.11:1 en oscuro —
-     visible acá sólo porque el marco es grande; el mismo par, en un radio o
-     checkbox de 16px, medía igual de mal y se leía como una mancha, no como
-     un control (ver Radio.svelte, arreglado con el mismo cambio, para los
-     números completos). --sx-edge es el token que este sistema ya mide a
-     3:1 para el límite de un control — más robusto acá también, no sólo
-     donde ya se había roto. */
+  /* The ring is the second signal; the word underneath is the first. Con el
+     foco adentro el error conserva su color y suma su propio halo: un campo
+     inválido con el cursor sigue diciendo las dos cosas. */
+  .frame.invalid {
+    border-color: var(--sx-critical);
+    box-shadow: var(--sx-e-field), 0 0 0 1px var(--sx-critical), 0 0 0 0 transparent;
+  }
+  .frame.invalid:focus-within {
+    box-shadow: var(--sx-e-field),
+                0 0 0 1px var(--sx-critical),
+                0 0 0 4px color-mix(in srgb, var(--sx-critical) 20%, transparent);
+  }
+  /* --sx-edge, y no el filo suave: un campo apagado ya perdió el tallado (sin
+     sombra, sobre el pozo), así que el borde es lo único que le queda para
+     seguir leyéndose como un control. Ver Radio.svelte para los números. */
   .frame.disabled { background: var(--sx-sunk); border-color: var(--sx-edge); box-shadow: none; color: var(--sx-ink-3); }
   .frame.readonly { background: var(--sx-sunk); box-shadow: none; }
+
+  /* Colores forzados (Windows de alto contraste) no pinta `box-shadow`: sin
+     esto el foco sería invisible. Ahí vuelve el contorno de siempre. */
+  @media (forced-colors: active) {
+    .frame:focus-within { outline: 2px solid Highlight; outline-offset: 2px; }
+  }
 
   /* The native form controls the slot drops in here. Scoped to this component,
      so it works inside a shadow root where a global reset would not. */
@@ -341,7 +357,7 @@
     font: inherit; font-size: var(--sx-t-md); line-height: 1.45; color: inherit;
   }
   .frame :global(input)::placeholder,
-  .frame :global(textarea)::placeholder { color: var(--sx-ink-3); opacity: 1; }
+  .frame :global(textarea)::placeholder { color: var(--sx-ink-placeholder, var(--sx-ink-3)); opacity: 1; }
   /* iOS greys a disabled control on its own and ignores `color`; without the
      fill-color the text drops below any contrast the theme promised. */
   .frame :global(input):disabled,

@@ -308,6 +308,23 @@ fila en una dirección donde `sunk` era blanco translúcido, y oscurecía la mis
 dirección donde `sunk` era un gris opaco. Verificar quiere decir resolver el valor final y comparar
 números, no mirar el nombre de la variable y confiar en que suene razonable.
 
+### El campo: filo suave, halo al foco, ejemplo tenue (v0.12)
+
+El borde a 3:1 de arriba sigue siendo la regla para un control **que no tiene otra forma de decir
+«acá se escribe»**. El campo tallado sí la tiene —el pozo y su sombra interna—, y la raya dura
+encima de eso era lo que el producto llamó «tosco». Desde la v0.12:
+
+- **En reposo**, el filo de un campo es `--sx-field-edge` (el borde al 40 % sobre el relleno,
+  ~1.8:1). `--sx-edge` pleno vuelve bajo el puntero, en el campo apagado y en el error. `Checkbox`
+  y `Radio`, chicos y sin tallado, lo conservan siempre.
+- **El foco** es un filo `--sx-focus` de 2 px —el acento oscurecido con la tinta, medido a 3:1
+  contra el campo y la tarjeta con los acentos reales de los módulos (un ámbar pleno no llegaría)—
+  con un halo de 3 px de `--sx-focus-halo` alrededor.
+- **El placeholder** tiene su tinta, `--sx-ink-placeholder` (~2.5:1 contra el campo): una pista,
+  no contenido, y claramente más tenue que la ayuda (`--sx-ink-3`, que sigue en 4.5:1) y que lo
+  tecleado. `pnpm contrast` lo mide con piso **y techo** (la tabla `BANDS`): si alguien lo vuelve
+  a oscurecer hasta parecer un valor, falla.
+
 ### La verificación
 
 `pnpm contrast` es parte de la verificación, no un extra: resuelve cada token a color real y
@@ -581,9 +598,10 @@ src/lib/
 │                    Sheet · Tooltip · Glyph  → catálogo: «Superficies»
 ├── action/    (5)   Button · ButtonGroup · IconButton · Menu · SplitButton
 │                                             → «Acciones»
-├── form/      (15)  Field · Input · NumberInput · Textarea · Select · Combobox ·
-│                    Checkbox · Radio · Switch · DateInput · Calendar · DateRange ·
-│                    DatePicker · FileDrop · ChoiceCards · today() · parseLocalDate()
+├── form/      (16)  Field · Input · NumberInput · Textarea · Select · Combobox ·
+│                    SearchPicker · Checkbox · Radio · Switch · DateInput · Calendar ·
+│                    DateRange · DatePicker · FileDrop · ChoiceCards · today() ·
+│                    parseLocalDate()
 │                                             → «Formularios»
 ├── nav/       (11)  TopBar · Sidebar · PageHeader · Breadcrumb · Tabs · Segmented ·
 │                    FilterChips · SearchField · Pagination · SideRail ·
@@ -629,6 +647,35 @@ prefirió reusar la palabra que ya existe en el vocabulario del sistema —«est
 ve, no QUÉ es»— antes que inventar una cuarta palabra (`shape`, `mechanism`) para decir casi lo
 mismo. Si esto termina confundiendo más de lo que ahorra, la salida es nombrar el eje de Card y
 PageHeader aparte; no se hizo acá porque el pedido que trajo estas dos variantes no lo pidió.
+
+### Las listas de la familia `form` (v0.12)
+
+Ninguna lista de la librería la dibuja el sistema operativo: todas flotan en la top layer
+(`shell/toplayer.js`), bajan, y suben sólo si no entran.
+
+| Componente | Para qué | Lo que hay que saber |
+|---|---|---|
+| `Select` | una lista cerrada de menos de una docena | Misma API de siempre (`value`, `options` `[{ value, label, hint?, disabled?, group? }]`, `placeholder`, `name`, `focus()`, `change`/`focus`/`blur`). `change` es un evento del DOM: `e.currentTarget.value` (cadena) y `e.detail` (el valor tal cual). `native` devuelve el `<select>` de la plataforma. |
+| `Combobox` | una lista larga, encontrable escribiendo | Sugiere al recibir el foco (`openOnFocus`). `loader: async (q) => options[]` + `debounce` para buscar en el servidor (race-safe). `creatable` + `createLabel` → evento `create` con `{ query, select }`. Slot `foot`. |
+| `SearchPicker` | elegir comparando (código, precio, existencia) | Se monta en un `{#if}` como `Dialog`. `columns`, `loader`, `rowKey`, `actionLabel`, `createLabel`, `closeOnPick`. Eventos `pick` (la fila), `create` (`{ query }`), `close`. |
+
+```svelte
+<Combobox label="Proveedor" bind:value={proveedorId}
+          loader={(q) => api.proveedores({ q, limit: 8 })}
+          creatable
+          on:create={async (e) => {
+            const p = await api.crearProveedor(e.detail.query);
+            e.detail.select({ value: p.id, label: p.nombre });
+          }} />
+
+{#if buscando}
+  <SearchPicker title="Agregar artículo" columns={cols}
+                loader={(q) => api.articulos({ q })} createLabel="Crear artículo"
+                on:pick={(e) => agregarLinea(e.detail)}
+                on:create={(e) => crearArticulo(e.detail.query)}
+                on:close={() => (buscando = false)} />
+{/if}
+```
 
 ---
 

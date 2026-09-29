@@ -4,6 +4,110 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## v0.12.0 (2026-09-28)
+
+- **Segunda revisión**: la selección al enfocar funciona dentro del shadow root de un core; el valor de un Select deshabilitado ya no asoma por el borde; el campo invisible que viaja al formulario es un `<select>` (no bloquea el envío con Enter ni atrae el autocompletado de direcciones); en SearchPicker una elección explícita anula el Enter pendiente.
+
+- **Combobox**: la lista se abre sola al enfocar sólo cuando la persona llegó con Tab; un foco programático (el primer campo de un Dialog) ya no la despliega tapando el formulario. Con el puntero abre el clic, como antes.
+- **Select y Combobox**: la lista mide al menos 14rem aunque el campo sea más angosto (celdas de tabla) y se corre hacia la izquierda si se sale del borde.
+- **Select**: la lista se cierra con un clic afuera también en Safari y Firefox de Mac. Antes sólo cerraba con el `blur` del botón, y esos navegadores no enfocan un `<button>` con el clic: la lista quedaba flotando en la top layer y el teclado no llegaba a ella. Ahora, mientras está abierta, un `pointerdown` en captura sobre el documento cierra si cae fuera de la caja y de la lista (mirando `composedPath()`, así funciona dentro del shadow root de un Core), y el clic enfoca el disparador. **Combobox** suma la misma red, aunque ahí el `focusout` ya alcanzaba.
+- **Select**: `required` vuelve a frenar el envío de un `<form>` nativo. El valor viajaba en un `<input type="hidden">`, que queda fuera de la validación, y el formulario se enviaba con el Select vacío. Ahora viaja en un `<input>` invisible pero validable (fuera del orden de Tab y del árbol de accesibilidad); si el navegador lo enfoca para quejarse, el foco pasa al disparador. El mensaje es `requiredMessage` (por defecto «Elegí una opción de la lista.»). Como el `<select>` nativo, un Select `disabled` ya no manda su `name` al formulario.
+- **Combobox**: con `loader` y `creatable`, la fila «+ Crear «…»» ya no se ofrece sobre la respuesta de la búsqueda ANTERIOR. Antes sólo se escondía mientras la pregunta estaba en vuelo, no durante el debounce: con lo tecleado todavía sin respuesta, un registro que ya existía parecía no existir y se podía crear un duplicado. Ahora se ofrece sólo cuando las opciones contestan exactamente lo escrito y no hay otra pregunta pendiente (y no se ofrece si la búsqueda falló).
+- **SearchPicker**: Enter ya no elige de una lista vieja. Un lector de códigos de barras teclea el código y Enter en pocos milisegundos, dentro del debounce, y se agregaba la primera fila de la búsqueda ANTERIOR. Ahora, si lo escrito todavía no tiene su respuesta, Enter adelanta la pregunta y elige la primera fila cuando llega ESA respuesta; si no trae ninguna, no elige nada. Seguir escribiendo cancela ese Enter. El catálogo suma «Servidor lento» en la demo para probarlo.
+
+- **Combobox**: `selectOnFocus` (por defecto) selecciona el texto al enfocar un campo con valor, así lo que se escribe reemplaza la etiqueta en vez de pegarse detrás; `searchIcon={false}` y `clearable={false}` para campos angostos (p. ej. un prefijo telefónico) sin tocar clases internas.
+
+> Construida sobre `v0.11.0`. Responde al reporte del producto sobre los
+> formularios: campos «toscos» en una interfaz blanda, ejemplos que no se
+> distinguen de un valor, menús del sistema operativo, y búsquedas de
+> relacionados que no sugieren ni dejan crear.
+
+### Nuevo
+- **Tokens del campo.** `--sx-ink-placeholder` (la terciaria disuelta en el
+  campo: ~2.5:1 en claro, ~2.8:1 en oscuro), `--sx-field-edge` (el filo suave,
+  el borde al 40 % sobre el relleno), `--sx-focus` (el acento oscurecido con la
+  tinta, 3:1 contra campo y tarjeta con los acentos reales de los módulos) y
+  `--sx-focus-halo`. Los cuatro siguen a la arcilla de cada módulo y están
+  re-declarados en el oscuro.
+- **`scripts/contrast.mjs` suma `BANDS`**: pisos blandos, con techo, para lo que
+  no es contenido. El placeholder tiene que leerse (≥ 2.2) y NO parecerse a lo
+  tecleado (techo 3.6 contra el campo, y la tinta a ≥ 3.0 del ejemplo); el filo
+  suave, ≥ 1.4. Y dos `CHECKS` duros nuevos: `--sx-focus` a 3:1 contra el campo y
+  la tarjeta. `--sx-ink-3` sobre el campo sigue en 4.5 (la ayuda).
+- **`SearchPicker`** (`form` y la raíz): buscar un registro relacionado cuando
+  hay que comparar antes de elegir. Un `Dialog` `lg` con la búsqueda enfocada
+  arriba y una tabla (`columns` como en `Table`: `{ key, label, align?, mono?,
+  value?, optional? }`) con «Agregar» por fila. `loader: async (q) => filas[]`
+  con '' al abrir, `debounce` y protección contra respuestas fuera de orden.
+  Flechas mueven la fila marcada sin sacar el foco del campo, Enter elige (la
+  primera queda marcada al llegar resultados), Escape cierra. `createLabel`
+  habilita «+ Crear «q»» en el pie. `closeOnPick={false}` para agregar varias
+  líneas seguidas. La tabla entra en el diálogo: cifras, códigos y el botón con
+  su ancho, el texto en hasta dos renglones; cuando la caja se angosta (medida
+  con una container query, no con la ventana) se van primero las columnas
+  `optional` y al final la del botón. En el teléfono es una hoja.
+- **`Combobox`**:
+  - **sugiere al recibir el foco** (`openOnFocus`, por defecto `true`): las
+    primeras `maxVisible` opciones, filtradas letra a letra;
+  - **`loader`** `async (query) => options[]`: la lista la trae el servidor, con
+    '' al abrir y lo tecleado tras `debounce` ms (200); gana siempre la última
+    pregunta; «Buscando…» mientras vuela y `loadErrorLabel` si falla. Con
+    `loader` el filtro local se apaga (`filter` lo fuerza);
+  - **`creatable`** + `createLabel`: una fila «+ Crear «q»» al final cuando lo
+    tecleado no coincide exacto con ninguna opción, alcanzable con el teclado.
+    Despacha `create` con `{ query, select }`: el padre crea el registro y llama
+    `select({ value, label })`, o pone `value` y suma la opción;
+  - slot **`foot`** dentro de la lista (recibe `query`);
+  - `gender` (`'m'` | `'f'`) para «Ninguna categoría coincide…».
+- **`Select` dibuja su propia lista** (ver *Ojo al migrar*): un botón con la caja
+  de Field y un listbox en la top layer, con el teclado del patrón select-only
+  combobox (flechas, Inicio/Fin, RePág/AvPág, Enter/Espacio, Escape detenido,
+  Tab, Alt+↑, tipeo anticipado sin tildes), grupos con nombre, opciones apagadas
+  que se saltan, `hint` por opción y volteo hacia arriba si no entra. `native`
+  devuelve el `<select>` de la plataforma.
+
+### Cambiado
+- **Campos más suaves** (`Field`, y sus copias en `Combobox`, `DatePicker`;
+  también `SearchField`): el filo en reposo es `--sx-field-edge`; el borde a 3:1
+  vuelve en hover, apagado y error. **El foco dejó de ser el anillo de tinta de
+  2 px** y pasó a un filo `--sx-focus` de 2 px con un halo del acento de 3 px,
+  todo en `box-shadow` (se abre, no se estampa). Un campo inválido con foco
+  conserva su rojo y suma su halo. En colores forzados vuelve el contorno.
+- **Todos los placeholders** (`Field`/`Input`/`Textarea`/`NumberInput`,
+  `Combobox`, `DatePicker`, `SearchField`, `Select` sin elegir) usan
+  `--sx-ink-placeholder`.
+- `DivisionPicker` reenvía `hintDot` también al `Combobox`, y al `Select` le
+  pasa las opciones sin la pista del path (la sangría ya la dice).
+
+### Ojo al migrar
+- **`Select` ya no es un `<select>`.** Misma API (`value`, `options`,
+  `placeholder`, `name`, `focus()`, eventos `change`/`focus`/`blur`), y `change`
+  sigue siendo un evento del DOM: `e.currentTarget.value` da la cadena, como
+  antes, y `e.detail` trae el valor sin convertir. Lo que cambia:
+  - un test que buscaba `select`/`option` en el DOM tiene que buscar
+    `[role=combobox]` y `[role=option]` (o pasar `native`);
+  - `required` ya no bloquea el envío de un `<form>` nativo (el valor viaja en un
+    `<input type="hidden">`, que no valida): validá en el `submit`, como el
+    resto de la librería;
+  - en un teléfono ya no abre la rueda del sistema: `native` si se quiere.
+- **`Combobox` abre con el foco.** Un Combobox que recibe el foco al montar (el
+  primer campo de un `Dialog`) aparece con la lista abierta. `openOnFocus={false}`
+  devuelve el comportamiento anterior.
+- **Tests en jsdom:** `Select` usa `popover` si existe (`showPopover`), igual que
+  Combobox: jsdom no lo tiene y cae en el camino de `hidden`, sin cambios.
+- **El anillo de foco de los campos cambió de forma**: una captura de pantalla
+  de referencia (visual regression) de un campo enfocado cambia.
+
+### Arreglado
+- **`Tooltip` (y todo `hintDot`/`InfoDot`) ya no tira `state_unsafe_mutation`**
+  cuando el control que describe se desmonta enfocado — la fila de un `{#each}`
+  que se vacía o se quita con el foco en su ⓘ. Chrome despacha `blur` en pleno
+  flush de Svelte y el listener crudo cerraba el tip ahí adentro; ahora los
+  listeners van con `on()` de `svelte/events`, que corre fuera del contexto
+  reactivo. Los demás componentes con `blur`/`focusout` ya usaban `on:` del
+  marcado y no tenían el problema. El rodeo del consumidor (quitar el foco
+  antes de vaciar la tabla) deja de hacer falta.
+
 ## v0.11.0 — 2026-09-25
 
 > Construida **sobre `v0.10.0`** (que ya trae el `hintDot` de `v0.9.2`). Es,

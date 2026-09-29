@@ -613,6 +613,32 @@ export const TOKENS = {
   // DatePicker, Checkbox ni Radio.
   '--sx-e-field': 'var(--sx-e-sunk)',
   '--sx-field': 'var(--sx-sunk)',
+  // EL FILO DEL CAMPO, SUAVE (v0.12). El campo tallado se lee por el tallado
+  // —el pozo y su sombra interna— y el borde de 1 px pleno (--sx-edge, 3:1)
+  // encima de eso lo volvía «tosco»: una raya gris dura alrededor de una pieza
+  // blanda. Queda un filo tenue, el borde mezclado al 40 % con el propio
+  // relleno (~1.8:1 contra la tarjeta), y el límite a 3:1 aparece donde hace
+  // falta: bajo el puntero (hover), en el anillo de foco y en el error. Un
+  // Checkbox o un Radio —chicos, sin tallado que los cargue— siguen con
+  // --sx-edge pleno. Piso propio en scripts/contrast.mjs.
+  '--sx-field-edge': 'color-mix(in srgb, var(--sx-edge) 40%, var(--sx-field))',
+  // EL PLACEHOLDER (v0.12). Era --sx-ink-3, la tinta de la AYUDA, medida a
+  // 4.5:1 — y a esa altura un campo vacío con su ejemplo se leía como un campo
+  // lleno. El ejemplo no es contenido: es una pista que se va apenas se
+  // escribe, así que tiene su propio token, la tinta terciaria disuelta en el
+  // relleno del campo (~2.5:1 contra --sx-field), claramente más tenue que lo
+  // tecleado (--sx-ink). --sx-ink-3 NO se tocó: sigue siendo la de las pistas y
+  // sigue en 4.5. Mezcla contra --sx-field, así que sigue a la arcilla de cada
+  // módulo sin receta aparte. Piso y techo propios en scripts/contrast.mjs.
+  '--sx-ink-placeholder': 'color-mix(in srgb, var(--sx-ink-3) 64%, var(--sx-field))',
+  // EL FOCO DE UN CAMPO (v0.12): un halo suave del acento del módulo en vez del
+  // anillo de tinta de 2 px. Son dos piezas: `--sx-focus` es el filo que SÍ
+  // carga la indicación (el acento oscurecido con la tinta, medido a 3:1 contra
+  // el campo y la tarjeta con los acentos reales de los módulos — un ámbar
+  // pleno no llegaría) y `--sx-focus-halo` es el resplandor de alrededor,
+  // decoración que acompaña.
+  '--sx-focus': 'color-mix(in srgb, var(--sx-accent) 55%, var(--sx-ink))',
+  '--sx-focus-halo': 'color-mix(in srgb, var(--sx-accent) 22%, transparent)',
 
   // La forma de Prisma: 12 y 22. Nada cuadrado, y nada casi-cuadrado.
   // VARIANTE COLORIDA: 16 y 24 — los de Stitch (campos rounded-2xl, tarjetas
@@ -994,6 +1020,14 @@ export const TOKENS_DARK = {
   // catálogo móvil: el buscador del teléfono Android oscuro salía claro.
   '--sx-e-field': 'var(--sx-e-sunk)',
   '--sx-field': 'var(--sx-sunk)',
+  // Los cuatro del campo (v0.12), re-declarados por lo mismo. El placeholder
+  // cambia de porcentaje: la terciaria oscura contra el pozo oscuro mide 8.4:1,
+  // y al 64 % del claro el ejemplo quedaba casi como texto. Al 45 %, ~2.8:1. El
+  // halo sube al 30 %: sobre un fondo oscuro el acento claro al 22 % no se ve.
+  '--sx-field-edge': 'color-mix(in srgb, var(--sx-edge) 40%, var(--sx-field))',
+  '--sx-ink-placeholder': 'color-mix(in srgb, var(--sx-ink-3) 45%, var(--sx-field))',
+  '--sx-focus': 'color-mix(in srgb, var(--sx-accent) 55%, var(--sx-ink))',
+  '--sx-focus-halo': 'color-mix(in srgb, var(--sx-accent) 30%, transparent)',
   // Los alias de la variante, por la misma razón. Faltaban y un estado anidado,
   // la tira de cifras o la marca del Toast dentro de un `.sx-dark` se pintaban
   // con el pozo CLARO (lo encontró el pulido de strix-mobile-lib). Desde acá,

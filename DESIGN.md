@@ -249,9 +249,30 @@ radio redondo: «cualquiera» contra «uno».
 - **`Pill`:** hundida y sin filo. Estado = tono + palabra, siempre.
 - **`Button`:** radio 14. Hay un primario por vista, que es el sólido de acento;
   el resto va `outline` (teñido) o `ghost`.
-- **Campos** (`Field`, `Combobox`, `DatePicker`, `SearchField`, `Checkbox`,
-  `Radio`): tallados con `--sx-field` / `--sx-e-field`. El borde de 1 px se queda,
-  porque es el límite que el contrato mide a 3:1.
+- **Campos** (`Field`, `Select`, `Combobox`, `DatePicker`, `SearchField`): tallados
+  con `--sx-field` / `--sx-e-field`. El campo se lee por el **tallado**, no por una
+  raya: en reposo el filo es tenue (`--sx-field-edge`, el borde al 40 % sobre el
+  relleno, ~1.8:1), y el límite pleno a 3:1 (`--sx-edge`) aparece bajo el puntero,
+  en el campo apagado y en el error. La raya dura de antes era lo «tosco».
+  - **El foco es un halo del acento**, no un anillo de tinta: el filo pasa a
+    `--sx-focus` (el acento oscurecido con la tinta, medido a 3:1 contra campo y
+    tarjeta con los acentos reales de los módulos) y se engrosa a 2 px, con un
+    resplandor de 3 px de `--sx-focus-halo` alrededor. Todo en `box-shadow`, así
+    que se abre en vez de estamparse; en colores forzados vuelve el contorno.
+  - **El placeholder es una pista, no contenido**: `--sx-ink-placeholder`
+    (~2.5:1 contra el campo), claramente más tenue que la ayuda (`--sx-ink-3`,
+    4.5:1) y que lo tecleado (`--sx-ink`). Un campo vacío no se confunde con uno
+    lleno. `--sx-ink-3` no se aclara para esto: es la tinta de las pistas.
+  - `Checkbox` y `Radio` conservan el borde a 3:1: son chicos y no tienen
+    tallado que los cargue.
+- **Listas** (`Select`, `Combobox`, `SearchPicker`): ninguna la dibuja el sistema
+  operativo. Flotan con `--sx-e-3` en la top layer, bajan y sólo suben si no
+  entran, y marcan UNA fila (la del teclado; el puntero alimenta la misma) con
+  `--sx-accent-soft`. Todo campo que busca un registro relacionado **sugiere al
+  recibir el foco** y filtra letra a letra; si lo buscado no existe, se crea desde
+  el mismo campo (`creatable`), nunca con texto libre. Cuando elegir pide comparar
+  tres o más datos (código, precio, existencia), `SearchPicker`: la tabla con
+  búsqueda en un diálogo.
 
 - **Estados** (`EmptyState`, `ErrorState`, y el `DataState` de `Table`): suelto
   en la página, una tarjeta levantada. Adentro de un contenedor se **hunde**
@@ -267,8 +288,9 @@ radio redondo: «cualquiera» contra «uno».
 Cada perilla de la variante tiene en el componente un fallback que reproduce el
 look de `main`: `--sx-btn-*`, `--sx-banda-*`, `--sx-pill-line`, `--sx-nav-pick`,
 `--sx-pg-raise`, `--sx-e-card`, `--sx-e-chip`, `--sx-e-pill`, `--sx-e-primary`,
-`--sx-e-nav`, `--sx-e-well`, `--sx-tone-bar`, `--sx-toast-mark*`, `--sx-nest-*` y
-`--sx-num-font`. Dos más son de layout y las pone el consumidor:
+`--sx-e-nav`, `--sx-e-well`, `--sx-tone-bar`, `--sx-toast-mark*`, `--sx-nest-*`,
+`--sx-num-font`, y los del campo (v0.12): `--sx-field-edge`, `--sx-focus`,
+`--sx-focus-halo` e `--sx-ink-placeholder`. Dos más son de layout y las pone el consumidor:
 `--sx-ph-measure` (el tope del título de `PageHeader` para un nombre propio largo)
 y `--sx-sticky-top` (lo que ya está pegado arriba de un `PageHeader sticky`).
 
@@ -291,6 +313,9 @@ y `--sx-sticky-top` (lo que ya está pegado arriba de un `PageHeader sticky`).
 - Luz blanca en lo que flota.
 - Más de un primario por vista.
 - Un `border-left` de color en fichas o avisos.
+- El menú nativo del sistema operativo para una lista (`<select>` pelado,
+  `<datalist>`): se ve de otra familia. `Select` (o `Select native`, a propósito).
+- Un placeholder con la tinta de la ayuda o del texto: se lee como un valor.
 
 ### Checklist para migrar un módulo
 

@@ -256,25 +256,33 @@
     /* Las perillas de la caja de un control (variante colorida), las mismas
        que Field: tallado, como dice el comentario de arriba. */
     background: var(--sx-field);
-    border: 1px solid var(--sx-edge);
+    /* El filo suave del campo (v0.12), el mismo de Field: el tallado dice
+       «escribí acá»; el límite a 3:1 llega con el puntero y con el foco. */
+    border: 1px solid var(--sx-field-edge, var(--sx-edge));
     border-radius: var(--sx-r-2);
-    box-shadow: var(--sx-e-field);
+    box-shadow: var(--sx-e-field), 0 0 0 0 transparent, 0 0 0 0 transparent;
     min-width: 0;
-    /* The ring closes in over the carved well on a glide, rather than being
+    /* The halo opens over the carved well on a glide, rather than being
        stamped on in one frame. */
-    transition: border-color 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
-                box-shadow 180ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    transition: border-color 200ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)),
+                box-shadow 240ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
+  .box:hover { border-color: var(--sx-edge); }
 
   /* Drawn on the BOX, not the input, because the box is what looks like the
      control. Tracking plain `focus` rather than `:focus-visible` is not a
      shortcut: a text field matches :focus-visible on a mouse click too, so this
      is the same behaviour, written where the ring has to be painted. Repeated
-     in-component because base.css does not cross a shadow boundary — and
-     `--sx-ink` already re-binds in dark, so there is no second rule to write. */
+     in-component because base.css does not cross a shadow boundary. Es el foco
+     de Field (v0.12): filo --sx-focus medido a 3:1 y un halo del acento. */
   .box.focused {
-    border-color: var(--sx-ink);
-    box-shadow: 0 0 0 2px var(--sx-ink) inset;
+    border-color: var(--sx-focus, var(--sx-ink));
+    box-shadow: var(--sx-e-field),
+                0 0 0 1px var(--sx-focus, var(--sx-ink)),
+                0 0 0 4px var(--sx-focus-halo, transparent);
+  }
+  @media (forced-colors: active) {
+    .box.focused { outline: 2px solid Highlight; outline-offset: 2px; }
   }
 
   .ic {
@@ -305,7 +313,7 @@
        box. */
     text-overflow: ellipsis;
   }
-  .in::placeholder { color: var(--sx-ink-3); }
+  .in::placeholder { color: var(--sx-ink-placeholder, var(--sx-ink-3)); opacity: 1; }
   /* We draw our own clear button, and two of them side by side is a bug report. */
   .in::-webkit-search-cancel-button, .in::-webkit-search-decoration { appearance: none; }
 

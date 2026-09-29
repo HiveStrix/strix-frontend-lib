@@ -24,7 +24,7 @@
 
   export let label = 'División';
   export let hint = '';
-  /** Sólo llega al Select: el Combobox no tiene `hintDot`. */
+  /** Colapsa `hint` en un ⓘ; llega al Select y al Combobox por igual. */
   export let hintDot = false;
   export let placeholder = 'Elegir…';
   /**
@@ -56,6 +56,10 @@
   $: pool = nodes.filter((n) => n && n.id != null && (includeInactive || n.active !== false));
   $: asCombobox = pool.length + (allLabel ? 1 : 0) > COMBOBOX_THRESHOLD;
   $: options = divisionOptions(nodes, { includeInactive, allLabel, indent: !asCombobox });
+  // El Select dibuja la pista de cada opción (v0.12) y la del árbol es el path,
+  // que la sangría ya dice: en la lista corta va sin ella. El Combobox la
+  // conserva, porque ahí la lista es plana y se filtra también por el path.
+  $: selectOptions = options.map(({ hint: _hint, ...o }) => o);
 
   $: current = String(value ?? '');
 
@@ -73,7 +77,7 @@
 {#if visible}
   {#if asCombobox}
     <Combobox
-      {label} {hint} {options} {disabled} {dense} {required} {optional} {error}
+      {label} {hint} {hintDot} {options} {disabled} {dense} {required} {optional} {error}
       value={current}
       noun="división"
       nounPlural="divisiones"
@@ -82,7 +86,8 @@
     />
   {:else}
     <Select
-      {label} {hint} {hintDot} {options} {disabled} {dense} {required} {optional} {error}
+      {label} {hint} {hintDot} {disabled} {dense} {required} {optional} {error}
+      options={selectOptions}
       value={current}
       placeholder={allLabel ? '' : placeholder}
       on:change={(e) => pick(e.currentTarget.value)}

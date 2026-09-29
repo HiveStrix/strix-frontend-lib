@@ -21,6 +21,10 @@ export { default as NumberInput } from './NumberInput.svelte';
 export { default as Textarea } from './Textarea.svelte';
 export { default as Select } from './Select.svelte';
 export { default as Combobox } from './Combobox.svelte';
+// Buscar un registro relacionado cuando hay que COMPARAR antes de elegir
+// (código, precio, existencia): una tabla con búsqueda, en un Dialog. Para
+// elegir de una lista dentro del formulario, Combobox.
+export { default as SearchPicker } from './SearchPicker.svelte';
 export { default as Checkbox } from './Checkbox.svelte';
 export { default as Radio } from './Radio.svelte';
 export { default as Switch } from './Switch.svelte';

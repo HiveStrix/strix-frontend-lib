@@ -15,7 +15,7 @@
   import { onDestroy } from 'svelte';
   import Pill from '../../lib/Pill.svelte';
   import {
-    Field, Input, NumberInput, Textarea, Select, Combobox,
+    Field, Input, NumberInput, Textarea, Select, Combobox, SearchPicker,
     Checkbox, Radio, Switch, DateInput, FileDrop, ChoiceCards, today,
     Calendar, DateRange, DatePicker, DivisionPicker
   } from '../../lib/form/index.js';
@@ -31,6 +31,7 @@
     { id: 'textarea', label: 'Textarea' },
     { id: 'select', label: 'Select' },
     { id: 'combobox', label: 'Combobox' },
+    { id: 'searchpicker', label: 'SearchPicker' },
     { id: 'divisionpicker', label: 'DivisionPicker' },
     { id: 'date', label: 'DateInput' },
     { id: 'calendar', label: 'Calendar' },
@@ -199,6 +200,108 @@
   let modo = 'alquiler';
   let archivos = [];
 
+  // ── v0.12: sugerencias al foco, servidor, creación in situ, SearchPicker ──
+  // Un «servidor» de mentira, con la latencia desordenada a propósito: una
+  // respuesta vieja puede llegar DESPUÉS que una nueva, y así se ve que el
+  // Combobox y el SearchPicker se quedan con la última pregunta.
+  const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+  const plegar = (x) => String(x ?? '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+
+  const PROVEEDORES_DB = [
+    { value: 'PRV-001', label: 'Casa Blanca Ferretería', hint: 'Heredia · crédito 30 d' },
+    { value: 'PRV-002', label: 'Casa del Tornillo', hint: 'San José · contado' },
+    { value: 'PRV-003', label: 'Cascada Distribuidora', hint: 'Alajuela · crédito 15 d' },
+    { value: 'PRV-004', label: 'Castro & Asociados', hint: 'Cartago · crédito 30 d' },
+    { value: 'PRV-005', label: 'Materiales El Castillo', hint: 'Heredia · contado' },
+    { value: 'PRV-006', label: 'Holcim Costa Rica', hint: 'San José · crédito 45 d' },
+    { value: 'PRV-007', label: 'Repuestos HINO del Valle', hint: 'Alajuela · crédito 30 d' },
+    { value: 'PRV-008', label: 'EPA Heredia', hint: 'Heredia · contado' },
+    { value: 'PRV-009', label: 'Llantas y Frenos Opra', hint: 'Heredia · crédito 15 d' },
+    { value: 'PRV-010', label: 'Lubricantes Guanacaste', hint: 'Liberia · contado' }
+  ];
+  async function buscarProveedores(q) {
+    await esperar(160 + Math.random() * 480);
+    const k = plegar(q.trim());
+    return PROVEEDORES_DB.filter((p) => !k || plegar(p.label).includes(k) || plegar(p.hint).includes(k)).slice(0, 8);
+  }
+  let proveedor = '';
+  // Crear in situ con `select`: el padre crea el registro (acá, con la misma
+  // latencia de mentira) y lo elige con la función que trae el evento.
+  async function crearProveedor(e) {
+    await esperar(350);
+    const nuevo = { value: `PRV-${String(PROVEEDORES_DB.length + 1).padStart(3, '0')}`, label: e.detail.query, hint: 'Recién creado' };
+    PROVEEDORES_DB.push(nuevo);
+    e.detail.select(nuevo);
+  }
+
+  // Crear in situ SIN `select`: el padre suma la opción y pone el valor.
+  let CATEGORIAS = [
+    { value: 'rep', label: 'Repuestos' },
+    { value: 'lub', label: 'Lubricantes' },
+    { value: 'llantas', label: 'Llantas' },
+    { value: 'herr', label: 'Herramienta menor' },
+    { value: 'epp', label: 'Equipo de protección' },
+    { value: 'comb', label: 'Combustible' }
+  ];
+  let categoria = '';
+  function crearCategoria(e) {
+    const v = plegar(e.detail.query).replace(/[^a-z0-9]+/g, '-');
+    CATEGORIAS = [...CATEGORIAS, { value: v, label: e.detail.query, hint: 'Recién creada' }];
+    categoria = v;
+  }
+
+  const ARTICULOS = [
+    { id: 'ART-0012', codigo: 'ART-0012', nombre: 'Cemento gris 50 kg', tipo: 'Materiales de construcción', precio: 7450, stock: 128, unidad: 'sacos' },
+    { id: 'ART-0031', codigo: 'ART-0031', nombre: 'Casco de seguridad clase E', tipo: 'Equipo de protección personal', precio: 9800, stock: 24, unidad: 'u' },
+    { id: 'ART-0032', codigo: 'ART-0032', nombre: 'Cascarilla de arroz (saco)', tipo: 'Producto', precio: 2300, stock: 60, unidad: 'sacos' },
+    { id: 'ART-0044', codigo: 'ART-0044', nombre: 'Casa de bodega prefabricada 3×3 con piso de concreto y techo de zinc', tipo: 'Producto', precio: 1285000, stock: 2, unidad: 'u' },
+    { id: 'ART-0051', codigo: 'ART-0051', nombre: 'Cable eléctrico THHN #12 (m)', tipo: 'Producto', precio: 640, stock: 12500, unidad: 'm' },
+    { id: 'ART-0102', codigo: 'ART-0102', nombre: 'Filtro de aceite HINO 500', tipo: 'Repuesto', precio: 14750, stock: 11, unidad: 'u' },
+    { id: 'ART-0110', codigo: 'ART-0110', nombre: 'Empaque de tapa de balde', tipo: 'Repuesto', precio: 3100, stock: 2, unidad: 'u' },
+    { id: 'ART-0118', codigo: 'ART-0118', nombre: 'Retén de cilindro 45 mm', tipo: 'Repuesto', precio: 18500, stock: 4, unidad: 'u' },
+    { id: 'SRV-0003', codigo: 'SRV-0003', nombre: 'Alquiler de batidora 1 saco (día)', tipo: 'Servicio', precio: 18000, stock: null },
+    { id: 'SRV-0007', codigo: 'SRV-0007', nombre: 'Transporte de equipo a proyecto', tipo: 'Servicio', precio: 45000, stock: null },
+    { id: 'SRV-0009', codigo: 'SRV-0009', nombre: 'Mantenimiento preventivo batidora', tipo: 'Servicio', precio: 32000, stock: null }
+  ];
+  const colones = (x) => '₡' + new Intl.NumberFormat('es-CR').format(x);
+  const COLS_ARTICULO = [
+    { key: 'codigo', label: 'Código', mono: true },
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'tipo', label: 'Tipo', optional: true },
+    { key: 'precio', label: 'Precio', align: 'right', value: (r) => colones(r.precio) },
+    { key: 'stock', label: 'Stock', align: 'right', optional: true, value: (r) => (r.stock == null ? '—' : `${new Intl.NumberFormat('es-CR').format(r.stock)} ${r.unidad}`) }
+  ];
+  // «Servidor lento»: 1,2 s fijos, para probar lo que pasa cuando se escribe
+  // (o se escanea un código) y se aprieta Enter antes de que vuelva la
+  // respuesta — Enter espera la de lo escrito, no elige de la lista vieja.
+  let spLento = false;
+  async function buscarArticulos(q) {
+    await esperar(spLento ? 1200 : 140 + Math.random() * 360);
+    const k = plegar(q.trim());
+    return ARTICULOS.filter((a) => !k || [a.codigo, a.nombre, a.tipo].some((x) => plegar(x).includes(k)));
+  }
+  let lineas = [
+    { art: ARTICULOS[0], cant: 2 },
+    { art: null, cant: 1 }
+  ];
+  // El índice de la línea que abrió la búsqueda, o 'varios' para agregar
+  // líneas seguidas; null ⇒ cerrado. El SearchPicker se MONTA con esto.
+  let buscandoPara = null;
+  function elegirArticulo(art) {
+    if (buscandoPara === 'varios') lineas = [...lineas, { art, cant: 1 }];
+    else lineas = lineas.map((l, i) => (i === buscandoPara ? { ...l, art } : l));
+  }
+  function crearArticulo(e) {
+    const n = ARTICULOS.length + 1;
+    const nuevo = { id: `ART-9${String(n).padStart(3, '0')}`, codigo: `ART-9${String(n).padStart(3, '0')}`, nombre: e.detail.query, tipo: 'Producto', precio: 0, stock: 0 };
+    ARTICULOS.push(nuevo);
+    elegirArticulo(nuevo);
+    if (buscandoPara !== 'varios') buscandoPara = null;
+  }
+
+  let selNativo = 'MO';
+  let selHint = '';
+
   // ── El valor heredado ────────────────────────────────────────────────────
   const HEREDADO = '180';
   let periodo = HEREDADO;
@@ -303,11 +406,42 @@
 
     select: `<Select label="Familia" bind:value={familia} options={FAMILIAS}
         placeholder="Elegí una familia"
-        hint="Decide qué actividades y qué plantillas le aplican." />`,
+        hint="Decide qué actividades y qué plantillas le aplican." />
+
+<!-- El de la plataforma, si un formulario de campo quiere la rueda del teléfono: -->
+<Select native label="Categoría" bind:value={cat} options={CATS} />`,
 
     combobox: `<Combobox label="Equipo" bind:value={equipo} options={EQUIPOS}
           noun="equipo" nounPlural="equipos"
-          placeholder="Código o nombre…" />`,
+          placeholder="Código o nombre…" />
+
+<!-- Del servidor, con creación in situ: -->
+<Combobox label="Proveedor" bind:value={proveedorId}
+          loader={(q) => api.proveedores({ q, limit: 8 })}
+          creatable
+          on:create={async (e) => {
+            const p = await api.crearProveedor(e.detail.query);
+            e.detail.select({ value: p.id, label: p.nombre });
+          }} />`,
+
+    searchpicker: `<button on:click={() => (buscando = true)}>🔍</button>
+
+{#if buscando}
+  <SearchPicker
+    title="Agregar artículo"
+    columns={[
+      { key: 'codigo', label: 'Código', mono: true },
+      { key: 'nombre', label: 'Nombre' },
+      { key: 'tipo',   label: 'Tipo' },
+      { key: 'precio', label: 'Precio', align: 'right', value: (r) => colones(r.precio) },
+      { key: 'stock',  label: 'Stock',  align: 'right' }
+    ]}
+    loader={(q) => api.articulos({ q, limit: 50 })}
+    createLabel="Crear artículo"
+    on:pick={(e) => agregarLinea(e.detail)}
+    on:create={(e) => crearArticulo(e.detail.query)}
+    on:close={() => (buscando = false)} />
+{/if}`,
 
     divisionpicker: `<DivisionPicker
   divisions={arbol}
@@ -373,7 +507,7 @@
     <p class="sx-cap kicker">Familia · Entrada</p>
     <h1>Formularios</h1>
     <p class="stand">
-      Todo lo que una persona contesta. Quince componentes, casi todos con un solo envoltorio compartido, para que
+      Todo lo que una persona contesta. Dieciséis componentes, casi todos con un solo envoltorio compartido, para que
       un formulario de nueve campos se lea como un formulario y no como nueve decisiones distintas
       tomadas en nueve martes distintos.
     </p>
@@ -726,6 +860,19 @@
           <Input label="Responsable" value="Jose Leobardo Gonzalez" optional hint="Prosa: nunca mono, nunca cifras tabulares." />
         </div>
 
+        <p class="why">
+          <b>El ejemplo no es un valor.</b> El marcador de posición va en su propia tinta
+          (<span class="sx-id">--sx-ink-placeholder</span>), bastante más tenue que la ayuda y mucho
+          más que lo tecleado: de un vistazo se sabe qué campo está lleno y cuál todavía espera. Los
+          dos de abajo tienen el mismo ejemplo; sólo uno tiene algo escrito.
+        </p>
+        <div class="demo grid2">
+          <Input label="Placa · vacío" mono placeholder="p. ej. CL445926" hint="Vacío: se ve el ejemplo, apagado." />
+          <Input label="Placa · lleno" mono value="CL445926" placeholder="p. ej. CL445926" hint="Lleno: la tinta principal, sin duda posible." />
+          <Select label="Familia · vacío" value="" options={FAMILIAS} placeholder="Elegí una familia" hint="Un Select sin elegir usa la misma tinta." />
+          <Select label="Familia · elegido" value="bat-e" options={FAMILIAS} placeholder="Elegí una familia" hint="Elegido: tinta principal." />
+        </div>
+
         <div class="code">
           <pre><code>{C.input}</code></pre>
           <button class="copy" on:click={() => copy(C.input, 'input')}>
@@ -872,11 +1019,17 @@
       <section id="select">
         <h2>Select</h2>
         <p class="why">
-          El <span class="sx-id">&lt;select&gt;</span> nativo, a propósito. No porque sea fácil, sino
-          porque es <b>mejor</b> en lo suyo: en la tablet que sostiene un técnico abre la rueda de la
-          plataforma, que es un movimiento de pulgar por opción y nunca le mueve la página debajo.
-          Cualquier desplegable a mano tendría que reimplementar el tipeo anticipado, el ajuste, el
-          contrato del Escape y cómo lo acomoda un teléfono, y terminaría peor.
+          Una lista cerrada y corta, <b>dibujada por el sistema</b>. Hasta la v0.11 era el
+          <span class="sx-id">&lt;select&gt;</span> nativo, y en el escritorio eso significaba el menú
+          de macOS encima del campo o la caja gris de Windows: la única pieza de la pantalla que no
+          era de la familia. Ahora la lista es nuestra —la misma superficie flotante que la de
+          Combobox, en la top layer— y lo que el nativo regalaba está hecho a mano: el tipeo
+          anticipado (sin tildes), el Escape que se detiene en el campo, las opciones apagadas que el
+          teclado salta, los grupos con nombre.
+        </p>
+        <p class="why">
+          Si un formulario de campo prefiere la rueda del teléfono, <span class="sx-id">native</span>
+          devuelve el <span class="sx-id">&lt;select&gt;</span> de la plataforma con el mismo marco.
         </p>
 
         <div class="two">
@@ -884,7 +1037,7 @@
             <h3 class="sx-cap">Usalo</h3>
             <ul>
               <li>Listas cerradas de menos de una docena: familias, modos de falla, categorías de costo (REP / MO / DOM).</li>
-              <li>Cuando las opciones se agrupan de verdad: <span class="sx-id">group</span> arma los <span class="sx-id">optgroup</span>.</li>
+              <li>Cuando las opciones se agrupan de verdad: <span class="sx-id">group</span> arma los grupos, cada uno con su nombre.</li>
             </ul>
           </div>
           <div class="when no">
@@ -911,6 +1064,25 @@
             fix="La familia decide qué plan hereda. Si todavía no existe, creala en Catálogos y volvé."
           />
           <Select label="Estado" value="" options={[]} placeholder="No hay estados configurados" hint="Vacío: la lista existe pero no tiene nada. Decilo en el marcador de posición." />
+          <Select
+            label="Tipo de mantenimiento"
+            bind:value={selHint}
+            placeholder="Elegí el tipo"
+            options={[
+              { value: 'prev', label: 'Preventivo', hint: 'Del plan de la familia' },
+              { value: 'corr', label: 'Correctivo', hint: 'Por una falla reportada' },
+              { value: 'pred', label: 'Predictivo', hint: 'Fase 2 — todavía no disponible', disabled: true },
+              { value: 'insp', label: 'Inspección', hint: 'Sin trabajo, sólo lectura' }
+            ]}
+            hint="Con pista por opción y una apagada: el teclado la salta."
+          />
+          <Select native label="Categoría de costo · nativo" bind:value={selNativo} options={[{ value: 'REP', label: 'REP · Repuestos' }, { value: 'MO', label: 'MO · Mano de obra' }, { value: 'DOM', label: 'DOM · Servicio a domicilio' }]} hint="native: el menú de la plataforma, para quien lo quiera a propósito." />
+        </div>
+
+        <div class="demo grid3 dense-row">
+          <Input dense label="Cantidad" value="2" mono hint="dense: la caja de 32 px." />
+          <Select dense label="Unidad" value="un" options={[{ value: 'un', label: 'Unidades' }, { value: 'kg', label: 'Kilogramos' }, { value: 'm', label: 'Metros' }]} hint="El Select compacto, a la misma altura." />
+          <Combobox dense label="Artículo" value="" options={REPUESTOS} noun="repuesto" nounPlural="repuestos" placeholder="Buscar…" hint="Y el Combobox compacto." />
         </div>
 
         <div class="code">
@@ -919,11 +1091,26 @@
             {copied === 'select' ? 'Copiado' : failed === 'select' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
           </button>
         </div>
+
+        <p class="aside">
+          Teclado del patrón <i>select-only combobox</i>: ↓, ↑, Enter o Espacio abren; con la lista
+          abierta ↓ ↑ mueven, Inicio y Fin van a las puntas, RePág y AvPág saltan de a diez, Enter y
+          Espacio eligen, Tab y Escape cierran sin elegir. Escribí «co» con el campo enfocado: salta a
+          la primera opción que empieza así.
+        </p>
       </section>
 
       <!-- ═══ COMBOBOX ════════════════════════════════════════════════════ -->
       <section id="combobox">
         <h2>Combobox</h2>
+        <p class="why">
+          <b>Sugiere antes de que escribas.</b> Al entrar al campo la lista ya está abierta con las
+          primeras opciones, y se va achicando con cada letra: buscar «casa» muestra proveedores de
+          referencia al enfocar y, al tipear C-A-S, quedan los que coinciden. Con
+          <span class="sx-id">loader</span> la lista la trae el servidor —con '' al abrir y con lo
+          tecleado después de una pausa corta— y una respuesta vieja que llega tarde se descarta.
+          Con <span class="sx-id">creatable</span>, lo que no existe se crea desde el mismo campo.
+        </p>
         <p class="why">
           Una lista demasiado larga para mirarla, hecha encontrable escribiendo. Escribí
           <span class="sx-id">bat</span>, <span class="sx-id">hino</span> o
@@ -950,8 +1137,9 @@
           <div class="when no">
             <h3 class="sx-cap">No lo usés</h3>
             <ul>
-              <li>Bajo una docena de opciones: Select abre el selector nativo y no cuesta teclear.</li>
-              <li>Para un valor que todavía no existe. Un combobox que acepta cualquier cosa en silencio es un campo de texto disfrazado: poné al lado una acción de «crear» de verdad, en vez de <span class="sx-id">allowFree</span>.</li>
+              <li>Bajo una docena de opciones: Select se recorre con la vista y no cuesta teclear.</li>
+              <li>Con <span class="sx-id">allowFree</span> para un valor que todavía no existe. Un combobox que acepta cualquier cosa en silencio es un campo de texto disfrazado: para eso está <span class="sx-id">creatable</span>, que crea el registro a propósito, con una fila que lo dice.</li>
+              <li>Cuando hay que comparar tres o más datos antes de elegir (código, precio, existencia): eso es SearchPicker.</li>
               <li>Como filtro de una tabla que ya está en pantalla. Eso es un campo de búsqueda, y la tabla misma es la lista de resultados.</li>
             </ul>
           </div>
@@ -972,6 +1160,30 @@
             error="Una orden sin equipo no se puede costear."
             fix="Elegí la máquina a la que se le hizo el trabajo; si no está, registrala primero en Flota."
           />
+          <Combobox
+            label="Proveedor"
+            bind:value={proveedor}
+            loader={buscarProveedores}
+            creatable
+            on:create={crearProveedor}
+            noun="proveedor"
+            nounPlural="proveedores"
+            placeholder="Nombre o condición…"
+            hint="Del servidor (latencia de mentira, desordenada). Escribí «casa»; o un nombre nuevo y elegí «Crear»."
+          />
+          <Combobox
+            label="Categoría"
+            bind:value={categoria}
+            options={CATEGORIAS}
+            creatable
+            createLabel={(q) => `Crear la categoría «${q}»`}
+            on:create={crearCategoria}
+            noun="categoría"
+            nounPlural="categorías"
+            gender="f"
+            placeholder="Buscar o crear…"
+            hint="Local, con creación: el padre suma la opción y pone el valor."
+          />
         </div>
 
         <div class="code">
@@ -982,11 +1194,96 @@
         </div>
 
         <p class="aside">
-          Teclado completo: ↓ abre y baja, ↑ sube, Inicio y Fin van a las puntas, Enter elige,
-          Tab cierra, Escape cierra y —con la lista ya cerrada— limpia. El foco nunca sale del
+          Teclado completo: el foco abre, ↓ abre y baja, ↑ sube, Inicio y Fin van a las puntas
+          (la fila de crear incluida), Enter elige, Tab cierra, Escape cierra y —con la lista ya
+          cerrada— limpia. El foco nunca sale del
           campo: se mueve <span class="sx-id">aria-activedescendant</span>, que es el patrón que
           este control es.
         </p>
+      </section>
+
+      <!-- ═══ SEARCHPICKER ══════════════════════════════════════════════ -->
+      <section id="searchpicker">
+        <h2>SearchPicker</h2>
+        <p class="why">
+          Buscar un registro relacionado cuando hay que <b>comparar antes de elegir</b>. Agregar un
+          artículo a una línea de factura no es elegir un nombre: es mirar código, tipo, precio y
+          existencia, y eso es una tabla. Se abre desde la línea (el 🔍), con la búsqueda enfocada y
+          filas de referencia de una; las flechas mueven la fila marcada sin sacar el foco del campo,
+          Enter elige, Escape cierra. En un teléfono es una hoja que sube desde abajo.
+        </p>
+
+        <div class="two">
+          <div class="when yes">
+            <h3 class="sx-cap">Usalo</h3>
+            <ul>
+              <li>Líneas de un documento: artículos de una factura, repuestos de una orden, equipos de un despacho.</li>
+              <li>Cuando la fila necesita tres o más datos para decidir. Con <span class="sx-id">closeOnPick={'{'}false{'}'}</span>, para agregar varias seguidas.</li>
+            </ul>
+          </div>
+          <div class="when no">
+            <h3 class="sx-cap">No lo usés</h3>
+            <ul>
+              <li>Para un campo de un formulario con nombre y poco más: eso es Combobox, sin diálogo.</li>
+              <li>Como pantalla de administración del catálogo. Esto elige; editar vive en su módulo.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="lines" role="table" aria-label="Líneas de la factura">
+            <div class="line head" role="row">
+              <span role="columnheader">#</span>
+              <span role="columnheader">Artículo</span>
+              <span role="columnheader" class="num">Cant.</span>
+              <span role="columnheader" class="num">Precio</span>
+            </div>
+            {#each lineas as l, i (i)}
+              <div class="line" role="row">
+                <span role="cell" class="idx">{i + 1}</span>
+                <span role="cell" class="art">
+                  {#if l.art}
+                    <span class="sx-id">{l.art.codigo}</span> {l.art.nombre}
+                  {:else}
+                    <span class="vacio">Sin artículo</span>
+                  {/if}
+                  <button type="button" class="lupa" aria-label={`Buscar artículo para la línea ${i + 1}`} title="Buscar artículo" on:click={() => (buscandoPara = i)}>
+                    <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6" fill="none" stroke="currentColor" stroke-width="1.7" /><path d="M10.6 10.6 14 14" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" /></svg>
+                  </button>
+                </span>
+                <span role="cell" class="num">{l.cant}</span>
+                <span role="cell" class="num">{l.art ? colones(l.art.precio * l.cant) : '—'}</span>
+              </div>
+            {/each}
+          </div>
+          <div class="acts" style="margin-top: var(--sx-s-4)">
+            <button type="button" class="ghost" on:click={() => (buscandoPara = 'varios')}>Agregar varias líneas…</button>
+            <Switch id="sp-lento" bind:checked={spLento} label="Servidor lento (1,2 s)" hint="Escribí un código y Enter enseguida, como un lector de barras." />
+          </div>
+        </div>
+
+        {#if buscandoPara !== null}
+          <SearchPicker
+            title={buscandoPara === 'varios' ? 'Agregar artículos' : 'Buscar artículo'}
+            note={buscandoPara === 'varios' ? 'Cada fila elegida es una línea nueva.' : `Línea ${buscandoPara + 1} de la factura`}
+            columns={COLS_ARTICULO}
+            loader={buscarArticulos}
+            noun="artículo"
+            nounPlural="artículos"
+            createLabel="Crear artículo"
+            closeOnPick={buscandoPara !== 'varios'}
+            on:pick={(e) => elegirArticulo(e.detail)}
+            on:create={crearArticulo}
+            on:close={() => (buscandoPara = null)}
+          />
+        {/if}
+
+        <div class="code">
+          <pre><code>{C.searchpicker}</code></pre>
+          <button class="copy" on:click={() => copy(C.searchpicker, 'searchpicker')}>
+            {copied === 'searchpicker' ? 'Copiado' : failed === 'searchpicker' ? 'No se pudo — usá Ctrl+C' : 'Copiar'}
+          </button>
+        </div>
       </section>
 
       <!-- ═══ DIVISIONPICKER ═══════════════════════════════════════════════ -->
@@ -1928,6 +2225,32 @@
   tbody tr { box-shadow: inset 0 1px 0 var(--sx-line); }
   tbody td:nth-child(2) { color: var(--sx-ink); font-weight: var(--sx-w-medium); }
   tbody td:nth-child(3) { color: var(--sx-ink-3); }
+
+  /* ── Las líneas de la demo de SearchPicker ─────────────────────────────── */
+  .lines { display: flex; flex-direction: column; background: var(--sx-surface); border-radius: var(--sx-r-3); box-shadow: var(--sx-e-1); overflow: hidden; }
+  .line {
+    display: grid; grid-template-columns: 2.5rem minmax(0, 1fr) 4rem 7.5rem; align-items: center;
+    gap: var(--sx-s-3); padding: var(--sx-s-2) var(--sx-s-4); min-height: var(--sx-s-12);
+    font-size: var(--sx-t-sm); color: var(--sx-ink-2); box-shadow: inset 0 1px 0 var(--sx-line);
+  }
+  .line.head {
+    min-height: 0; padding-block: var(--sx-s-3); background: var(--sx-thead); box-shadow: none;
+    font-size: var(--sx-t-2xs); font-weight: var(--sx-w-semi); letter-spacing: .07em; text-transform: uppercase; color: var(--sx-ink-3);
+  }
+  .line .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .line .idx { color: var(--sx-ink-3); font-variant-numeric: tabular-nums; }
+  .line .art { display: flex; align-items: center; gap: var(--sx-s-2); min-width: 0; color: var(--sx-ink); }
+  .line .vacio { color: var(--sx-ink-3); font-style: italic; }
+  .lupa {
+    margin-left: auto; flex: none; display: inline-flex; align-items: center; justify-content: center;
+    width: var(--sx-s-8); height: var(--sx-s-8); padding: 0; border: 0; border-radius: var(--sx-r-pill);
+    background: var(--sx-sunk); box-shadow: var(--sx-e-pill); color: var(--sx-ink-2); cursor: pointer;
+  }
+  .lupa:hover { background: var(--sx-accent-soft); color: var(--sx-ink); }
+  .lupa svg { width: 15px; height: 15px; }
+  @media (max-width: 30rem) {
+    .line { grid-template-columns: 1.5rem minmax(0, 1fr) 2.5rem 5.5rem; padding-inline: var(--sx-s-3); }
+  }
 
   /* ── Ancho ─────────────────────────────────────────────────────────────── */
   @media (min-width: 68rem) {
