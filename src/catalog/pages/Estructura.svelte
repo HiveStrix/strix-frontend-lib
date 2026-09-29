@@ -358,89 +358,55 @@
           situación es a lo que alguien vino.
         </p>
 
-        <!-- Sobre una superficie SIN padding a propósito: así se ve el gutter
-             garantizado del componente — el texto respira por los cuatro lados
-             aunque el contenedor no ponga nada. Antes, acá el título rozaba el
-             borde. Dentro de una Card que YA rellena, en cambio, se pasa
-             `bleed` (ver el three-up de variantes más abajo). -->
         <div class="demo">
-          <div class="bare">
-            <PageHeader
-              level={3}
-              eyebrow="Flota"
-              title="3 máquinas están vencidas."
-              subtitle="BAT014 lleva 12 días vencida en «Cambio de aceite 250 h»."
-              tone="critical"
-            >
-              <svelte:fragment slot="crumbs"><Breadcrumb items={ruta.slice(0, 2)} label="Ruta del encabezado" /></svelte:fragment>
-              <svelte:fragment slot="meta">
-                <Pill tone="critical" size="sm">12 planes vencidos</Pill>
-                <Pill tone="attention" size="sm">5 esta semana</Pill>
-              </svelte:fragment>
-              <svelte:fragment slot="actions">
-                <Button variant="ghost">Exportar</Button>
-                <Button variant="solid">Registrar servicio</Button>
-              </svelte:fragment>
-            </PageHeader>
-          </div>
+          <PageHeader
+            level={3}
+            eyebrow="Flota"
+            title="3 máquinas están vencidas."
+            subtitle="BAT014 lleva 12 días vencida en «Cambio de aceite 250 h»."
+            tone="critical"
+          >
+            <svelte:fragment slot="crumbs"><Breadcrumb items={ruta.slice(0, 2)} label="Ruta del encabezado" /></svelte:fragment>
+            <svelte:fragment slot="meta">
+              <Pill tone="critical" size="sm">12 planes vencidos</Pill>
+              <Pill tone="attention" size="sm">5 esta semana</Pill>
+            </svelte:fragment>
+            <svelte:fragment slot="actions">
+              <Button variant="ghost">Exportar</Button>
+              <Button variant="solid">Registrar servicio</Button>
+            </svelte:fragment>
+          </PageHeader>
 
-          <div class="bare">
-            <PageHeader level={3} eyebrow="Flota" title="Cargando" loading />
-          </div>
+          <PageHeader level={3} eyebrow="Flota" title="Cargando" loading />
         </div>
 
         <p class="note">
-          <span class="sx-id">tone</span> pinta el título, y es <b>el único lugar de esta librería
-          donde la tinta lleva significado por sí sola</b> —&nbsp;así que sólo es legal cuando el
-          título ya dice la palabra. «3 máquinas están vencidas» en tinta crítica es la regla
-          aguantando. «Flota» en tinta crítica es la regla rota: quien no separe el rojo del gris
-          no aprende nada, y todos los demás aprenden que el color es ruido.
+          <span class="sx-id">tone</span> sólo es legal cuando el título ya dice la palabra: «3
+          máquinas están vencidas» con tono crítico es la regla aguantando; «Flota» con tono crítico
+          es la regla rota. En <span class="sx-id">hero-card</span> pinta el título y el punto del
+          eyebrow. En <span class="sx-id">banda</span> no pinta nada: el acento dice de qué módulo es
+          la pantalla y no se lo lleva un estado —&nbsp;el reclamo lo hacen el título y, si urge, un
+          <span class="sx-id">Alert</span> debajo.
         </p>
 
-        <h3 class="sx-cap sub">variant — una escalera de intensidad</h3>
+        <h3 class="sx-cap sub">variant — las dos de arcilla</h3>
         <p class="why">
-          Seis formas de encabezar, de más a menos ruido. En el extremo intenso, el encabezado de
-          un ERP real (Sarion) replicado a dos zonas: la narrativa a un lado, la <b>cifra</b> al
-          otro. De ahí baja a lo discreto. El default, <span class="sx-id">line</span>, es una raya
-          —reemplazó al viejo halo—. El contrato no cambió: mismas props, mismos slots.
+          <span class="sx-id">banda</span>, el default, es el encabezado del destino: el pastel del
+          acento del módulo, a una columna. <span class="sx-id">hero-card</span> es el del tablero:
+          la misma pieza levantada, a dos zonas —la narrativa a un lado, la <b>cifra</b> al otro—.
+          Las otras seis (line, section, plain, aire, soft, hero) se borraron en la v0.13: separaban
+          con una raya, un lavado plano o una isla oscura, y la arcilla separa por volumen. Un valor
+          viejo cae a <span class="sx-id">banda</span>.
         </p>
         <p class="note">
           <b>Cada variante tiene un número</b>, para pedir «usá la variante N» — el número es un
-          alias del nombre (<span class="sx-id">variant="hero"</span> es lo mismo que
-          <span class="sx-id">variant="1"</span>):
-          &nbsp;<b>1</b>&nbsp;hero&nbsp;·&nbsp; <b>2</b>&nbsp;hero-card&nbsp;·&nbsp;
-          <b>3</b>&nbsp;soft&nbsp;·&nbsp; <b>4</b>&nbsp;line&nbsp;(default)&nbsp;·&nbsp;
-          <b>5</b>&nbsp;section&nbsp;·&nbsp; <b>6</b>&nbsp;plain.
+          alias del nombre (<span class="sx-id">variant="hero-card"</span> es lo mismo que
+          <span class="sx-id">variant="2"</span>):
+          &nbsp;<b>1</b>&nbsp;banda&nbsp;(default)&nbsp;·&nbsp; <b>2</b>&nbsp;hero-card.
         </p>
 
-        <!-- hero: la isla oscura a sangre. El fragmento en acento del título entra
-             por el slot default (<em>), la cifra por el slot `figure`, y todo lo
-             ranurado adentro (Button, Pill) cae en modo oscuro solo. -->
-        <div class="demo">
-          <PageHeader
-            variant="hero"
-            eyebrow="Atención requerida"
-            title="Mayo cierra con "
-            subtitle="La cartera vencida acumula ₡81.4M. Cuatro clientes concentran el 41% del riesgo."
-          >
-            <em>caída del 88%</em> en ingresos cobrados.
-            <svelte:fragment slot="actions">
-              <Button variant="ghost">Reporte completo</Button>
-              <Button variant="solid">Abrir cobranza</Button>
-            </svelte:fragment>
-            <svelte:fragment slot="figure">
-              <span class="fig-lbl">Por cobrar · total</span>
-              <div class="fig-big"><span class="u">₡</span><span class="n">81.4</span><span class="u">M</span></div>
-              <span class="fig-delta">▼ 2.4% vs ABR · 83% vencido</span>
-              <svg class="fig-spark" viewBox="0 0 260 60" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M0,44 L26,40 L52,42 L78,30 L104,34 L130,20 L156,25 L182,12 L208,27 L234,42 L260,54" fill="none" stroke="var(--sx-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-              </svg>
-            </svelte:fragment>
-          </PageHeader>
-        </div>
-
-        <!-- hero-card: la misma anatomía, tarjeta nativa del tema (se adapta a
-             claro/oscuro sola). La derecha suele llevar un desglose. -->
+        <!-- hero-card: la tarjeta del tablero. El fragmento en acento del título
+             entra por el slot default (<em>), la cifra por el slot `figure`. -->
         <div class="demo">
           <PageHeader
             variant="hero-card"
@@ -467,44 +433,10 @@
         </div>
 
         <p class="note">
-          <b>hero</b> es el único bloque que se permite volverse oscuro y quedarse con toda la luz
-          —un banner de tablero, no de cada ruta—. <b>hero-card</b> baja el foco a una tarjeta que
-          respeta el tema. El fragmento en <em>acento</em> del título y la cifra del slot
-          <span class="sx-id">figure</span> son el gesto que los dos comparten con el original; si
-          nadie pasa <span class="sx-id">figure</span>, la grilla colapsa a una columna sola.
+          El fragmento en <em>acento</em> del título y la cifra del slot
+          <span class="sx-id">figure</span> son el gesto del original; si nadie pasa
+          <span class="sx-id">figure</span>, la grilla colapsa a una columna sola.
         </p>
-
-        <h3 class="sx-cap sub">soft — el bloque tranquilo</h3>
-        <p class="why">
-          Una columna sobre un relleno tenue. Por defecto el acento al 10%; con
-          <span class="sx-id">tone</span>, la banda medida de ese estado —con color y legible, sin
-          encender un banner—.
-        </p>
-        <div class="demo three-up">
-          <PageHeader variant="soft" level={3} eyebrow="Servicios" title="Los últimos 12 meses" subtitle="18 preventivas, 7 correctivas, 2 canceladas." />
-          <PageHeader variant="soft" tone="critical" level={3} eyebrow="Flota" title="3 máquinas vencidas." subtitle="BAT014 lleva 12 días sin servicio." />
-          <PageHeader variant="soft" tone="positive" level={3} eyebrow="Cierre" title="Período sin incidencias." subtitle="Todos los planes al día." />
-        </div>
-
-        <h3 class="sx-cap sub">line, section y plain — lo discreto</h3>
-        <p class="why">
-          <span class="sx-id">line</span> es el <b>default</b>: el título de la página separado por
-          una raya (reemplazó al halo). <span class="sx-id">section</span> es la cabecera de sección
-          compacta —título apretado, subtítulo monoespaciado— para adentro del contenido, donde el
-          título grande de <span class="sx-id">line</span> pesaría de más. <span class="sx-id">plain</span>
-          no pone ni raya, para un header que ya vive dentro de una Card.
-        </p>
-        <div class="demo three-up">
-          <div class="bare" style="padding: var(--sx-s-2)">
-            <PageHeader level={3} eyebrow="Servicios" title="Los últimos 12 meses" subtitle="18 preventivas, 7 correctivas, 2 canceladas." />
-          </div>
-          <div class="bare" style="padding: var(--sx-s-2)">
-            <PageHeader level={3} variant="section" eyebrow="Servicios" title="Los últimos 12 meses" subtitle="OT-0042 · BAT007 · 18 jul 2026" />
-          </div>
-          <Card pad={5}>
-            <PageHeader level={3} variant="plain" bleed eyebrow="Servicios" title="Los últimos 12 meses" subtitle="Sólo texto, sin cromo." />
-          </Card>
-        </div>
       </section>
 
       <!-- ═══ BREADCRUMB ═════════════════════════════════════════════════ -->
@@ -903,20 +835,11 @@
   .tiny { margin: 0; font-size: var(--sx-t-xs); line-height: 1.6; color: var(--sx-ink-3); max-width: 66ch; }
 
   .demo { margin-top: var(--sx-s-6); display: flex; flex-direction: column; gap: var(--sx-s-4); }
-  /* Para poner variantes una al lado de la otra sobre el mismo contenido —
-     ver `Superficies.svelte`, que ya tiene el mismo patrón para Card. */
-  .demo.three-up { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); gap: var(--sx-s-4); }
   .panel p { margin: 0; font-size: var(--sx-t-sm); line-height: 1.6; color: var(--sx-ink-2); }
   .seg-out { margin: 0; font-size: var(--sx-t-sm); line-height: 1.6; color: var(--sx-ink-2); max-width: 68ch; }
   .big { margin: 0; font-size: var(--sx-t-xl); font-weight: var(--sx-w-semi); letter-spacing: -.025em; }
 
-  /* Superficie de demostración SIN padding, a propósito: el margen que separa
-     el texto del borde lo pone el GUTTER del propio PageHeader, no esta caja.
-     Es lo que deja ver que el encabezado ya no roza el borde aunque el
-     contenedor no ponga nada. */
-  .bare { background: var(--sx-surface); border-radius: var(--sx-r-3); box-shadow: var(--sx-e-1); }
-
-  /* Átomos de la CIFRA (slot `figure` de hero/hero-card). No viven en
+  /* Átomos de la CIFRA (slot `figure` de hero-card). No viven en
      PageHeader —la cifra es de un componente de datos—: acá se componen a mano
      para la demo, con los mismos tokens, y los estilos del padre alcanzan al
      contenido ranurado. */
@@ -924,8 +847,6 @@
   .fig-big { display: flex; align-items: baseline; gap: 4px; line-height: 1; font-family: var(--sx-font-mono); }
   .fig-big .u { font-size: var(--sx-t-xl); color: var(--sx-ink-3); font-weight: var(--sx-w-medium); }
   .fig-big .n { font-size: 56px; font-weight: var(--sx-w-semi); letter-spacing: -.04em; color: var(--sx-ink); font-variant-numeric: tabular-nums; }
-  .fig-delta { font-size: var(--sx-t-xs); color: var(--sx-critical); }
-  .fig-spark { width: 100%; height: 56px; display: block; margin-top: var(--sx-s-1); }
   .brk { margin-top: auto; padding-top: var(--sx-s-3); border-top: 1px solid var(--sx-line); display: flex; flex-direction: column; gap: var(--sx-s-2); }
   .brk-row { display: flex; align-items: center; gap: var(--sx-s-2); font-size: var(--sx-t-xs); }
   .brk-row .sw { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }

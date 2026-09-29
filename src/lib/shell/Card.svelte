@@ -1,5 +1,4 @@
 <script>
-  import { pickVariant } from '../variants.js';
   // THE SURFACE. One object, lifted off the ground.
   //
   // Everything a Strix screen shows sits on something, and this is the something:
@@ -60,111 +59,11 @@
   // would not reach in here anyway (different scope, and in a Core a different
   // shadow root), so compose with props and slots instead of reaching in.
   //
-  // ─────────────────────────────────────────────────────────────────────────
-  // EL MARCO: TRES MANERAS DE CERRAR UNA SUPERFICIE — y por qué importa más
-  // que las tres variantes que lo usan.
-  //
-  // Una superficie sólo se distingue de su fondo de tres maneras: por luz,
-  // por línea o por tono. Nácar eligió la luz como ley — la sombra de arriba
-  // ES esa elección, y `--sx-halo` en `PageHeader` es la misma elección
-  // dicha con otra sintaxis. `variant` no la contradice: expone las otras
-  // dos, que siempre estuvieron disponibles y nunca tuvieron nombre.
-  //
-  //   raised (default — NO SE TOCA) — la luz. Lo de siempre: `--sx-e-1/2/3`.
-  //
-  //   crest — la línea, dibujada donde no estorba. Adaptada de un ERP real
-  //   — de ahí salió el pedido de abrir esta salida — y RECOMPUESTA con
-  //   tokens de Nácar, no copiada: las tres capas ya existían, sueltas.
-  //     · `--card-crest-line`         el filo de arriba (token PROPIO — ver
-  //                                    por qué más abajo)
-  //     · `0 0 0 1px var(--sx-edge)`   el anillo, EN LA SOMBRA — no en
-  //                                    `border`: no ocupa layout, no pelea
-  //                                    con el radio. `ChoiceCards.svelte` usa
-  //                                    `border` para su propio anillo y paga
-  //                                    ese costo; acá no hace falta pagarlo.
-  //     · `--sx-e-1/2/3`               la sombra de siempre, según `elevation`
-  //   LA PRIMERA VERSIÓN USABA `--sx-e-inset` — el reflejo blanco que ya
-  //   tenían Button y Toast — y ERA UN DEFECTO, la novena repetición del
-  //   mismo error de este repo: un valor copiado de otro sistema no
-  //   significa lo mismo donde se pega. En Sarion las tarjetas viven sobre
-  //   un fondo oscuro y un reflejo blanco AHÍ lee. Acá `--sx-surface` en
-  //   claro es `#FFFFFF` — blanco al 90% sobre blanco mide 1.000:1, ni un
-  //   defecto sutil: no hay línea, literalmente. Nadie lo vio en pantalla
-  //   hasta que una persona miró la variante; `pnpm contrast` no lo atrapaba
-  //   porque el par no estaba medido — ver `DISTINCT` en
-  //   `scripts/contrast.mjs`, ahora sí lo está.
-  //   UN REFLEJO BLANCO NECESITA ALGO OSCURO DEBAJO. Por eso NO se tocó
-  //   `--sx-e-inset` — lo usa `Button.svelte` sobre el acento pleno
-  //   (`.solid`/`.danger`), oscuro en los dos temas, donde el reflejo SÍ
-  //   trabaja. `Toast.svelte` es un caso distinto y se revisó aparte
-  //   (ver el comentario junto a su propio `box-shadow`): medido, el mismo
-  //   defecto de acá — 1.000:1, blanco sobre blanco — se repite en claro,
-  //   porque su superficie también es `--sx-surface`. La diferencia es que
-  //   ahí no rompe nada: lo que separa un Toast de lo que tiene debajo es
-  //   `--sx-e-3`, una sombra EXTERIOR, ajena a si el reflejo INTERIOR se ve
-  //   — una sombra fuerte no hace leer un reflejo invisible, son dos capas
-  //   independientes, y decir lo contrario acá habría sido la misma clase de
-  //   copia sin verificar que rompió esta variante. En oscuro el reflejo del
-  //   Toast sí mide algo real (1.16–1.17:1, el mismo orden que el filo de
-  //   `crest` de abajo), así que retocar `--sx-e-inset` para «arreglar» esto
-  //   le habría quitado a Button y al Toast oscuro un reflejo que ahí sí
-  //   lee — el mismo error una vez más, sólo que en la dirección contraria.
-  //   `crest`
-  //   tiene su propio token, `--card-crest-line`, definido como
-  //   `color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface))` — un 6% de
-  //   la TINTA sobre la SUPERFICIE, no un rgba fijo. Es opaco (no depende de
-  //   qué haya detrás) y no necesita un bloque `[data-sx-theme="dark"]`
-  //   aparte: `--sx-ink` y `--sx-surface` ya se reamarran solos por tema, así
-  //   que UNA fórmula sirve para las dos. En claro, `--sx-ink` es casi
-  //   negro: el filo sale apenas más oscuro que la superficie — un canto
-  //   iluminado desde arriba, leído sobre papel, no un reflejo. En oscuro,
-  //   `--sx-ink` es casi blanco: la MISMA fórmula da, sola, el reflejo claro
-  //   que antes había que escribir a mano. Medido: 1.12–1.18 en las cuatro
-  //   combinaciones de tema y perilla, todas por encima del piso de 1.05 —
-  //   ver el par nuevo en `DISTINCT`.
-  //
-  //   filled — el tono. Sin sombra, o con la mínima: el relleno hace el
-  //   trabajo que antes hacía la luz, así que una grilla de muchas tarjetas
-  //   no acumula sombra como ruido. LA PRIMERA VERSIÓN TAMPOCO TENÍA TONO:
-  //   `--sx-edge` 8% sobre `--sx-sunk` es gris sobre gris — separaba de
-  //   `--sx-ground` (medido, 1.15–1.20) pero no llevaba el color que el
-  //   nombre de la variante promete, y las otras dos variantes ya cubren luz
-  //   (`raised`) y línea (`crest`): un tono gris es la misma escala neutra
-  //   otra vez, no un tercer mecanismo. `--card-fill` ahora es
-  //   `var(--sx-accent-soft)` — el mismo lavado al 10% que ya usan
-  //   `Combobox`/`ChoiceCards`/`Calendar` para su estado pasajero, reusado
-  //   tal cual, no un tercer escalón inventado. Ya estaba medido: legible
-  //   con `--sx-ink`/`-2`/`-3` encima (`CHECKS`, en las cuatro
-  //   combinaciones) y separado de `--sx-ground`/`--sx-surface` (`DISTINCT`).
-  //   LA TRAMPA, Y POR QUÉ NO ES `--sx-accent-pick`: ese es el OTRO
-  //   escalón medido (18%), y ya significa «esto está elegido» en
-  //   `Table`/`Calendar`/`SideRail` — si `filled` lo hubiera usado, una
-  //   Card sin seleccionar habría llevado el MISMO color que una fila
-  //   elegida, 1.000:1 contra sí mismo, cero distancia. `--sx-accent-soft`
-  //   contra `--sx-accent-pick` ya mide 1.14–1.22 en las cuatro
-  //   combinaciones — un par nuevo en `DISTINCT` deja esto medido, no
-  //   supuesto, para que nadie lo retinte a `-pick` sin que nada avise.
-  //
-  // POR QUÉ EL MARCO IMPORTA MÁS QUE LAS VARIANTES: sin él, `crest` y
-  // `filled` son dos opciones que alguien elige por gusto, y a los seis
-  // meses hay tres mecanismos mezclados en la misma pantalla sin que nadie
-  // pueda explicar por qué — peor que tener uno solo. Con el marco, elegir
-  // `crest` es decir «acá separo con línea, a propósito», no «me gustó más».
-  //
-  // POR QUÉ LA SALIDA EXISTE, Y POR QUÉ EL DEFAULT NO SE MUEVE: «al final es
-  // una lib — no pasa nada por dar más herramientas al diseñador», y con
-  // razón: que dos módulos se sientan distintos usando los mismos tokens no
-  // es decoración, es lo que separa una librería que da herramientas de una
-  // que impone una respuesta. `raised` sigue siendo la ley — es lo que se
-  // dibuja si nadie escribe nada. `variant` es una perilla explícita, la
-  // misma clase de salida que el README ya documenta para `--sx-thead` o
-  // `--sx-chrome-tint`: un nivel más alto que tocar un token, uno más bajo
-  // que reescribir el componente.
-  //
-  // El mismo mapa, con los mismos tres nombres de mecanismo, se repite en
-  // `PageHeader` (`halo` / `sarion` / `banda`) — no es coincidencia: es el
-  // mismo marco, aplicado a otro objeto. Ver la cabecera de ese archivo.
-  // ─────────────────────────────────────────────────────────────────────────
+  // UNA SOLA FORMA: `raised`, la de la arcilla. Hasta la v0.12 había también
+  // `variant="crest"` (una raya de acento arriba) y `variant="filled"` (un
+  // lavado de acento sin sombra); separaban con línea y con tono, no con
+  // volumen, y se borraron junto con las demás variantes que no son de la
+  // arcilla. La tarjeta se separa del lienzo por su relieve, siempre.
 
   /** A step on the spacing scale for the inner padding. 0 ⇒ flush. */
   export let pad = 5;
@@ -186,22 +85,10 @@
    * alongside a Pill or a sentence that names the state, never alone.
    */
   export let tone = '';
-  /**
-   * raised(1) | crest(2) | filled(3) — HOW this surface leaves its background:
-   * light, line or tone. Por nombre o por número (`variant="crest"` ===
-   * `variant="2"`). `raised` is the default and is not the same as writing
-   * nothing wrong; it is the law. See «EL MARCO» above before reaching for
-   * the other two.
-   */
-  export let variant = 'raised';
-  /** El color de la barra de `crest`. Por defecto el acento del producto. */
-  export let crestColor = '';
 
   const STEPS = new Set([1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20]);
   const step = (n) => (STEPS.has(Number(n)) ? `var(--sx-s-${n})` : '0px');
   const TONES = new Set(['positive', 'attention', 'critical', 'info', 'neutral']);
-  // El orden ES la numeración: 1 raised · 2 crest · 3 filled.
-  const VARIANTS = ['raised', 'crest', 'filled'];
 
   // A disabled link is not a thing: an <a> with no href is not focusable and an
   // <a> with one still navigates. So a card that is both a destination and
@@ -209,18 +96,13 @@
   $: kind = href && !disabled ? 'a' : interactive || href ? 'button' : 'div';
   $: live = kind !== 'div' && !disabled;
   $: t = TONES.has(tone) ? tone : '';
-  // Acepta el nombre o el número (1 raised · 2 crest · 3 filled). Un valor no
-  // reconocido cae a `raised` en vez de a nada: un typo en `variant` tiene que
-  // fallar SEGURO (la ley) y no INVISIBLE (una card sin forma).
-  $: v = pickVariant(variant, VARIANTS, 'raised');
   // `--card-tone` carries the tone colour as a variable rather than a class per
   // tone, because `--card-glow` (below) has to mix it in once for all five
   // tones plus "none". Undefined resolves through the `transparent` fallback in
   // the rule itself, so an untoned card pays for nothing — its glow layer is
   // fully transparent and costs nothing visible.
   $: css = `--card-pad:${step(pad)}`
-    + (t ? `;--card-tone:var(--sx-${t})` : '')
-    + (crestColor ? `;--crest-c:${crestColor}` : '');
+    + (t ? `;--card-tone:var(--sx-${t})` : '');
 </script>
 
 <svelte:element
@@ -230,8 +112,6 @@
   class:live
   class:selected
   class:off={disabled}
-  class:crest={v === 'crest'}
-  class:filled={v === 'filled'}
   style={css}
   href={kind === 'a' ? href : undefined}
   type={kind === 'button' ? 'button' : undefined}
@@ -272,29 +152,6 @@
        faint and raise the percentage later if it turns out to under-read — it
        is one number, not a rewrite. */
     --card-glow: color-mix(in srgb, var(--card-tone, transparent) 22%, transparent);
-    /* THE CREST EDGE — `crest` only, costs nothing otherwise. A token OF ITS
-       OWN, not a re-bind of `--sx-e-inset` (Button/Toast keep that one
-       untouched, see the note at the top of this file for why). Built
-       entirely from `--sx-ink` and `--sx-surface`, which already re-bind
-       under `[data-sx-theme="dark"]`, so one formula covers both themes:
-       dark ink on a light surface reads as a hairline shadow, light ink on
-       a dark surface reads as the reflection the mechanism was named for.
-       Measured: 1.12–1.18 across theme × chrome-tint. See `pnpm contrast`. */
-    --card-crest-line: color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface));
-    /* THE FILL FOR `filled` ONLY — costs nothing when the variant is not
-       `filled` since nothing reads it otherwise. Carries the accent, not a
-       neutral mix: `raised` separates by light and `crest` by line, so
-       `filled` has to separate by TONE to be a third mechanism and not the
-       same grey scale again. Reuses `--sx-accent-soft` (10%) as-is — already
-       measured legible with `--sx-ink`/`-2`/`-3` on top (`CHECKS`) and
-       already distinct from `--sx-ground`/`--sx-surface` (`DISTINCT`).
-       Deliberately NOT `--sx-accent-pick` (18%): that token already means
-       "selected" in Table/Calendar/SideRail, and an unselected filled Card
-       carrying the same value would read as a selected one — see the new
-       `DISTINCT` pair that guards this. No dark override needed here, same
-       as the crest edge above: built entirely from role tokens that already
-       re-bind themselves under `[data-sx-theme="dark"]`. */
-    --card-fill: var(--sx-accent-soft);
   }
 
   :global([data-sx-theme='dark']) .card,
@@ -367,79 +224,6 @@
 
   .off { opacity: .5; cursor: not-allowed; }
 
-  /* ═══ VARIANT: crest — la línea ═══════════════════════════════════════════
-     Combined-class selectors (`.crest.e1`, not a redeclared `.e1`) on purpose:
-     specificity wins outright over the plain `.eN`/`.selected` rules above
-     regardless of source order, so this block can live anywhere in the file
-     without silently depending on being written after them. Same three-layer
-     order everywhere — reflejo, anillo, sombra — plus the tone glow riding
-     last, exactly like `raised`. The ring survives at `.e0` (a crest card can
-     be flat and still show its line; that is the whole point of choosing a
-     line over light) where `raised` shows nothing at `.e0` — altitude is not
-     what identifies a crest card, the ring is. */
-  .crest.e0 { box-shadow: none; }
-  .crest.e1 {
-    box-shadow: var(--sx-e-card, var(--sx-e-1)), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.e2 {
-    box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.e3 {
-    box-shadow: var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.selected {
-    box-shadow:
-      0 0 0 2px var(--sx-accent) inset, none,
-      var(--sx-e-card, var(--sx-e-1)), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.selected.e2 {
-    box-shadow:
-      0 0 0 2px var(--sx-accent) inset, none,
-      var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.selected.e3 {
-    box-shadow:
-      0 0 0 2px var(--sx-accent) inset, none,
-      var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.live:hover {
-    box-shadow: var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.live.selected:hover {
-    box-shadow:
-      0 0 0 2px var(--sx-accent) inset, none,
-      var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .crest.live:active {
-    box-shadow: var(--sx-e-card, var(--sx-e-1)), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-
-  /* ═══ VARIANT: filled — el tono ═══════════════════════════════════════════
-     The resting shadow (the altitude layer) drops at e1 — the common case, a
-     grid of many of these — because the fill already does the identifying;
-     stacking a real shadow on top of it is the noise this variant exists to
-     avoid. e2/e3 keep their real shadow untouched (no override below): those
-     mean "came forward" / "took the screen", a fact that does not stop being
-     true just because this card is also filled. Same source-order dependency
-     as `raised` itself between the plain elevation rule and `.selected`
-     (equal specificity; `.selected` still has to come after `.eN`, exactly
-     like the base rules above) — `.selected.e2`/`.selected.e3` exist for the
-     same reason the base ones do: to stop depending on that tie at all. */
-  .filled { background: var(--card-fill); }
-  .filled.e1 { box-shadow: 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
-  .filled.selected { box-shadow: 0 0 0 2px var(--sx-accent) inset, 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
-  .filled.selected.e2 {
-    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-2), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .filled.selected.e3 {
-    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-3), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .filled.live:hover { box-shadow: var(--sx-e-card, var(--sx-e-1)), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
-  .filled.live.selected:hover {
-    box-shadow: 0 0 0 2px var(--sx-accent) inset, var(--sx-e-card, var(--sx-e-1)), 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent);
-  }
-  .filled.live:active { box-shadow: 0 12px 28px -18px var(--card-glow), 0 0 24px 2px color-mix(in srgb, var(--sx-glow-color) var(--sx-glow), transparent); }
-
   /* base.css owns the focus ring for a document; a Core has no base.css, so the
      component states it again. Offset outward so the ring never sits on top of
      the content, and the radius follows the card's own. */
@@ -455,37 +239,4 @@
     .live { transition: none; }
     .live:hover { transform: none; }
   }
-  /* ── crest · LA BARRA DE ARRIBA ───────────────────────────────────────────
-     Calcada de un ERP real, que la resuelve así:
-
-       height: 2px;
-       background: linear-gradient(90deg, transparent, ACENTO, transparent);
-
-     Dos píxeles de alto, en color, desvaneciéndose a transparente en los dos
-     extremos. Eso es lo que se ve desde el otro lado de la habitación.
-
-     LA VERSIÓN ANTERIOR ERA UN ANILLO GRIS DE 1px A 1.12 DE CONTRASTE. Cumplía
-     el piso del sistema y era invisible en la práctica: el humano miró la
-     pantalla tres veces y dijo que no veía nada. Tenía razón. Pasar un umbral
-     medido no es lo mismo que verse, y cuando las dos cosas se contradicen gana
-     la pantalla.
-
-     El color sale del acento del producto, así que cada módulo la tiñe con lo
-     suyo sin tocar la librería. `crestColor` la fuerza a otra cosa cuando hace
-     falta. */
-  .crest { position: relative; }
-  .crest::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0; top: 0;
-    height: 2px;
-    border-radius: var(--sx-r-2) var(--sx-r-2) 0 0;
-    background: linear-gradient(90deg,
-      transparent,
-      var(--crest-c, var(--sx-accent)),
-      transparent);
-    opacity: .85;
-    pointer-events: none;
-  }
-
 </style>

@@ -1,6 +1,6 @@
 // VARIANTES POR NOMBRE O POR NÚMERO.
 //
-// Un componente con `variant` (o `headVariant`) acepta la variante por su
+// Un componente con `variant` acepta la variante por su
 // NOMBRE descriptivo (`variant="solid"`) o por su NÚMERO (`variant="1"`) —son
 // lo mismo—. El número es un alias, una comodidad para poder pedir «usá la
 // variante N» al implementar sin tener que acordarse del nombre; el nombre
@@ -11,6 +11,12 @@
 // así. Mantener el orden estable (agregar al final, no intercalar) y —cuando
 // dos componentes comparten vocabulario, como la familia de botones— mantener
 // el MISMO orden en los dos, así «la 1» es lo mismo en todos.
+//
+// SÓLO VARIANTES DE ARCILLA. En la v0.13 se borraron todas las variantes que no
+// son de la arcilla (PageHeader line/section/plain/aire/soft/hero, Card
+// crest/filled, Panel headVariant=sarion, Hero surface=ink), y las listas se
+// renumeraron. Una variante nueva entra sólo si se moldea con el relieve de la
+// arcilla (DESIGN.md), y se agrega AL FINAL.
 
 /**
  * Resuelve una variante dada por nombre o por número (1-based) a su nombre

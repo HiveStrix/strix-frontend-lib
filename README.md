@@ -638,15 +638,15 @@ encontrás otra que no, es un bug.
 | `noun` / `nounPlural` / `gender` | Para que el componente escriba en español correcto | `'m'` · `'f'` |
 
 \* **`variant` no es un solo eje.** En `Button` / `Menu` / `SplitButton` / `IconButton` es cuánto
-peso visual tiene una acción (`solid` uno por vista · `outline` el de siempre · `ghost` · `danger`).
-En `Skeleton` es qué forma dibuja (`text` · `circle` · …). En `Card` y `PageHeader` es CON QUÉ
-MECANISMO una superficie se separa de su fondo — luz, línea o tono — y el marco completo vive en
-la cabecera de `Card.svelte` (`raised` / `crest` / `filled`, y su espejo en `PageHeader`: `halo` /
-`sarion` / `banda`). Tres ejes bajo el mismo nombre es una tensión real, no un descuido: se
-prefirió reusar la palabra que ya existe en el vocabulario del sistema —«esta prop cambia CÓMO se
-ve, no QUÉ es»— antes que inventar una cuarta palabra (`shape`, `mechanism`) para decir casi lo
-mismo. Si esto termina confundiendo más de lo que ahorra, la salida es nombrar el eje de Card y
-PageHeader aparte; no se hizo acá porque el pedido que trajo estas dos variantes no lo pidió.
+peso visual tiene una acción (`solid` uno por vista · `outline` teñido, el de siempre · `ghost` ·
+`danger` · `frosted`). En `Skeleton` es qué forma dibuja (`text` · `block` · `circle`). En
+`PageHeader` es qué encabezado es (`banda`, el del destino y default · `hero-card`, el del tablero).
+
+**Sólo hay variantes de arcilla.** En la v0.13 se borraron todas las que no se moldeaban con el
+relieve de la arcilla: `PageHeader` `line` / `section` / `plain` / `aire` / `soft` / `hero`, `Card`
+`crest` / `filled` (Card quedó con una sola forma y sin `variant`), `Panel` `headVariant="sarion"`
+(la prop se fue) y `Hero` `surface="ink"`. Un valor viejo no rompe: cae a `banda` / `soft`. Una
+variante nueva entra sólo si sigue el relieve de `DESIGN.md`.
 
 ### Las listas de la familia `form` (v0.12)
 
@@ -757,7 +757,7 @@ se exporta desde `/metric`, y es el que dibuja una cifra contra la línea que no
   `scripts/novelties.mjs` busca qué archivo de componente nació hace poco, filtrando el commit que
   los trajo a todos juntos (`--diff-filter=A --follow`, agrupado por cuántos archivos comparten
   cada marca de tiempo). Lo que no ve: una prop nueva en un componente que ya existía —`tone` en
-  `Card`, las variantes de `Card` y `PageHeader`— porque eso no crea un archivo nuevo. Ningún
+  `Card`, una variante nueva— porque eso no crea un archivo nuevo. Ningún
   heurístico barato distingue con confianza «se agregó una prop» de «se corrigió una».
 - **Nada está probado automáticamente.** No hay tests. La verificación de este repo es mirar las
   siete páginas en los dos temas a 1200 y a 390 px, que es exactamente lo que hay que rehacer

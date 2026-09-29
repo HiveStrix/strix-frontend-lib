@@ -30,28 +30,6 @@
   // because a shadow is drawn OUTSIDE the card's box, never behind its
   // children — see `--card-glow` in Card.svelte.
   //
-  // `variant` (Card.svelte — «EL MARCO») ALSO FORWARDS, unlisted here on
-  // purpose: it is not one of this component's own props, so `$$restProps`
-  // carries it straight to the Card underneath, the same way it already
-  // carries `href` or `interactive`. `<Panel variant="crest" …>` is measured
-  // and correct — the ring lives on the outer Card, independent of `.head`.
-  //
-  // `<Panel variant="filled" …>` IS NOW VERIFIED, both ways this repo has
-  // learned to insist on. `.head`/`.foot` paint `--sx-thead`, and `filled`
-  // separates `Card` from the field with `--card-fill` — which is
-  // `var(--sx-accent-soft)`, unchanged (`Card.svelte`) — instead of a
-  // shadow. `scripts/contrast.mjs`'s `DISTINCT` class already measured
-  // exactly this pair, under the name «cabecera contra el hover de su
-  // control» (`Table.svelte`'s `.sortbtn`); its comment now says both. Worst
-  // case (claro, cromo morado — the catalogue's own default) is 1.06:1,
-  // thinner margin over the 1.05 floor than `crest`'s ring had at 1.12 when
-  // a person looked at a real screen and saw nothing. Looked at anyway
-  // (`Superficies` → Panel → variant): the band still reads as a piece
-  // sitting on top of the tint in all four theme × chrome combinations —
-  // this pair survives on screen where the ring did not, most likely because
-  // it separates two large flat fields, not a hairline the eye has to hunt
-  // for. See the catalogue demo for the reasoning, in place, not just here.
-  //
   // FLUSH is for content that owns the edge: a table, a list of rows, a chart.
   // The head keeps its padding, the body loses its horizontal one, and the
   // bottom corners are clipped so the last row follows the card's radius instead
@@ -62,41 +40,14 @@
   // definite height. A Panel told to scroll inside an unbounded parent simply
   // grows, which is the right failure: nothing is hidden.
   //
-  // `headVariant`: EL HUECO QUE DEJABA «SARION» A MEDIAS.
-  //
-  // El estilo compacto de sección —adaptado de un ERP real (Sarion)— es una
-  // barra: título apretado en negativo, subtítulo monoespaciado en positivo,
-  // una línea en vez de banda. Vive en dos lugares con la MISMA tipografía:
-  // acá, en `headVariant`, y suelto como `PageHeader variant="section"`. Se
-  // pidió una segunda vez porque no hay forma de evaluar la pieza real (una
-  // cabecera de sección DENTRO de un objeto con cuerpo) mirando una barra
-  // suelta. La pieza real es un Panel con esa
-  // cabecera puesta, y Panel no la tenía: su `.head` siempre fue
-  // `--sx-thead`, la banda, sin salida — ni siquiera vía `variant`, que ya
-  // está tomado (ver la nota sobre `tone`/`variant` más abajo: reenvía a
-  // `Card`, la TARJETA entera, no el `.head`). Un prop nuevo, no una reforma
-  // del que ya existía — la regla de este repo es que una salida nueva es
-  // una dirección nueva, la vieja no se edita.
-  //
-  // `headVariant="sarion"` no reimporta `PageHeader` — lo intentó y no
-  // encajaba: `PageHeader.level` sólo entiende 1 y 2 (`h1`/`h2`, cualquier
-  // otro valor cae a `h1`), y el `level` de Panel entiende 2 a 6 porque un
-  // panel vive a cualquier profundidad real del documento. Forzar a
-  // `PageHeader` adentro le habría puesto un techo a la profundidad que
-  // Panel ya soporta hoy — una regresión para arreglar una ausencia. Así que
-  // `headVariant` es la MISMA fórmula tipográfica, calibrada con los mismos
-  // números (`--sx-t-md`/`--sx-w-bold`/`-.015em` para el título;
-  // `--sx-font-mono`/`--sx-t-2xs`/`.04em` para el subtítulo — ver el
-  // comentario de `sarion` en `PageHeader.svelte` para por qué esos números
-  // y no otros), aplicada sobre el propio `<svelte:element this={tag}>` de
-  // Panel — que ya resuelve 2 a 6 correctamente — en vez de sobre un
-  // componente ajeno. Dos archivos, un solo resultado visual.
-  //
-  // `banda` (default, no se toca) sigue siendo `--sx-thead` — lo de siempre.
+  // LA CABECERA ES UNA SOLA: pozo · título · contador sobre la misma superficie
+  // (`--sx-panel-head`). Hasta la v0.12 había también `headVariant="sarion"`,
+  // una raya bajo un título compacto; se borró con las demás variantes que no
+  // son de la arcilla, porque la raya como única separación es justo lo que la
+  // arcilla no hace.
   import Card from './Card.svelte';
   import Glyph from './Glyph.svelte';
   import IconWell from './IconWell.svelte';
-  import { pickVariant } from '../variants.js';
 
   /** The heading. A Panel without one is a Card — use that instead. */
   export let title = '';
@@ -121,25 +72,12 @@
   export let flush = false;
   /** The body owns its own scroll. Needs a bounded height from its parent. */
   export let scroll = false;
-  /**
-   * banda | sarion — HOW THE HEAD, and only the head, separates from the
-   * body: tone, or line. `banda` is the default and is `--sx-thead`, same as
-   * always. `sarion` swaps it for PageHeader's own sarion typography — see
-   * the note above this component's props for why it is its own formula and
-   * not `<PageHeader>` mounted inside `.head`.
-   */
-  export let headVariant = 'banda';
 
   const STEPS = new Set([1, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20]);
   const step = (n) => (STEPS.has(Number(n)) ? `var(--sx-s-${n})` : '0px');
   const RADII = { 1: 'var(--sx-r-1)', 2: 'var(--sx-r-2)', 3: 'var(--sx-r-3)' };
-  // El orden ES la numeración: 1 banda · 2 sarion.
-  const HEAD_VARIANTS = ['banda', 'sarion'];
 
   $: tag = `h${Math.min(6, Math.max(1, Number(level) || 2))}`;
-  // Acepta nombre o número (1 banda · 2 sarion). Un typo cae SEGURO a `banda`
-  // (la ley) y no invisible — la misma regla que Card y PageHeader.
-  $: hv = pickVariant(headVariant, HEAD_VARIANTS, 'banda');
   // The footer band and the flush body both have to round exactly like the card
   // they sit in, and the card's radius is a prop — so it travels down as a
   // variable rather than as three near-miss guesses.
@@ -149,7 +87,7 @@
 <Card pad={0} {elevation} {radius} {tone} {...$$restProps}>
   <div class="panel" style={css}>
     {#if title || $$slots.actions}
-      <div class="head" class:sarion={hv === 'sarion'}>
+      <div class="head">
         <div class="titles">
           <div class="tline">
             {#if icon && hue}<IconWell name={icon} {hue} size="sm" />{:else if icon}<span class="ic"><Glyph name={icon} size={16} /></span>{/if}
@@ -224,39 +162,6 @@
        and tabular digits inside a sentence read as a stutter. */
   }
   .acts { display: flex; align-items: center; gap: var(--sx-s-2); flex-wrap: wrap; }
-
-  /* ═══ headVariant: sarion — la línea ══════════════════════════════════════
-     Los mismos números que `.hd.sarion`/`.sarion .ttl`/`.sarion .sub` en
-     PageHeader.svelte, por lo que ese archivo ya deja escrito junto a cada
-     uno — acá no se repite el argumento, sólo el valor. `--sx-line`, no
-     `--sx-edge`: el README ya describe este trabajo exacto para `--sx-line`
-     («cierra una cabecera, divide una fila»), y PageHeader ya lo usa para lo
-     mismo. Combined-class (`.head.sarion`), no una redeclaración de `.head`,
-     para ganarle en especificidad a `background`/`padding` sin depender del
-     orden de las reglas. */
-  .head.sarion {
-    background: none;
-    border-radius: 0;
-    padding-bottom: var(--sx-s-4);
-    border-bottom: 1px solid var(--sx-line);
-  }
-  .head.sarion .t {
-    font-size: var(--sx-t-md);
-    font-weight: var(--sx-w-bold);
-    letter-spacing: -.015em;
-    line-height: 1.3;
-  }
-  /* Mono, chico, tracking POSITIVO — lo opuesto del título — es el
-     contraste que le da carácter a la variante. Reemplaza `.s`, no lo
-     extiende: la nota de arriba sobre «prosa, sin cifras tabulares» es del
-     registro `banda`; acá el subtítulo se lee como una referencia, no como
-     una oración. */
-  .head.sarion .s {
-    font-family: var(--sx-font-mono);
-    font-size: var(--sx-t-2xs);
-    letter-spacing: .04em;
-    line-height: 1.4;
-  }
 
   .body {
     padding: var(--panel-pad);

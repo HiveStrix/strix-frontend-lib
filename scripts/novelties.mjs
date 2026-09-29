@@ -20,7 +20,7 @@
 // portada lo dice (ver App.svelte): nada nunca se disfraza de novedad.
 //
 // LO QUE ESTO NO VE. Un prop nuevo en un componente que ya existía —`tone`
-// en Card, las tres variantes de Card y PageHeader— no crea un archivo, así
+// en Card, una variante nueva— no crea un archivo, así
 // que no tiene fecha de nacimiento propia y esta función no lo encuentra.
 // Detectarlo con confianza pediría analizar el diff de cada commit contra
 // cada prop, y ningún heurístico barato distingue «se agregó una prop» de

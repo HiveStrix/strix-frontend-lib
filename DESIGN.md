@@ -240,9 +240,16 @@ radio redondo: «cualquiera» contra «uno».
 
 ## Components
 
+- **Sólo variantes de arcilla.** Cada variante de la lib se moldea con el relieve
+  de arriba; las que separaban con una raya, con un lavado plano o con una isla
+  oscura se borraron en la v0.13 (`PageHeader` line/section/plain/aire/soft/hero,
+  `Card` crest/filled, `Panel headVariant="sarion"`, `Hero surface="ink"`). Una
+  variante nueva entra sólo con su relieve, y se agrega al final de su lista.
 - **`PageHeader variant="banda"`:** el encabezado del destino, en el pastel del
   acento del módulo con tinta oscura. Adentro va una sola acción primaria (el
   sólido conserva el acento) y, si hace falta, pills de resumen.
+- **`PageHeader variant="hero-card"`:** el del tablero. La misma pieza levantada,
+  a dos zonas: la narrativa a un lado y la cifra (slot `figure`) al otro.
 - **`IconWell`:** el pozo de ícono. Va en la cabecera de un contenedor, en la
   navegación (`hue` por ítem) y en `Panel` (`hue`). El fondo es el matiz al 16 %
   sobre el pozo y el ícono el matiz al 66 % contra la tinta, medido a 3:1.
@@ -316,6 +323,8 @@ y `--sx-sticky-top` (lo que ya está pegado arriba de un `PageHeader sticky`).
 - El menú nativo del sistema operativo para una lista (`<select>` pelado,
   `<datalist>`): se ve de otra familia. `Select` (o `Select native`, a propósito).
 - Un placeholder con la tinta de la ayuda o del texto: se lee como un valor.
+- Una variante sin relieve de arcilla (una raya, un lavado plano, una isla
+  oscura), ni como prop de la lib ni copiada a mano en un módulo.
 
 ### Checklist para migrar un módulo
 

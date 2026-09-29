@@ -410,13 +410,13 @@
      tema oscuro, zoom) el borde superior es un relleno plano sin traza de
      reflejo — no un caso límite, un cero real. --sx-e-inset SIGUE SIN
      TOCARSE: Button en claro (5.55–5.91) y Toast en oscuro (1.16–1.17) lo
-     usan y ahí sí trabaja — la misma lección de `Card crest` otra vez, un
+     usan y ahí sí trabaja — la misma lección de la vieja `Card crest` otra vez, un
      valor compartido no significa lo mismo en cada superficie donde se pega.
      `--btn-inset` es el token PROPIO de este componente, con el MISMO
      mecanismo (blanco arriba, en la sombra) y más opacidad — la única
      variable con margen para moverse cuando el fondo ya es pálido. .20
-     mide 1.11 (acento) y 1.15 (crítico), el mismo orden que el filo de
-     `crest` (1.12–1.18) y el reflejo oscuro de Toast (1.16–1.17) — ver el
+     mide 1.11 (acento) y 1.15 (crítico), el mismo orden que el filo de la
+     vieja `crest` (1.12–1.18) y el reflejo oscuro de Toast (1.16–1.17) — ver el
      par nuevo en `scripts/contrast.mjs`. */
   :global([data-sx-theme='dark']) .sx-btn.solid,
   :global(.sx-dark) .sx-btn.solid,

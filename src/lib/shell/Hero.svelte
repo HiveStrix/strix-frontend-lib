@@ -37,17 +37,21 @@
   export let level = 1;
   /** Una frase, no un párrafo. Lo que hay que saber antes de mirar las cifras. */
   export let lede = '';
-  /** `soft` toma el acento; `ink` va oscuro; `plain` usa la superficie normal. */
+  /** `soft` toma el acento; `plain` usa la superficie normal. Hasta la v0.12
+   *  había también `ink`, una isla oscura; se borró con las demás variantes que
+   *  no son de la arcilla. Un valor que no es uno de estos dos cae a `soft`. */
   export let surface = 'soft';
   /** Un tono semántico para cuando el estado general urge. */
   export let tone = '';
 
   const TONES = ['positive', 'attention', 'critical', 'info', 'neutral'];
+  const SURFACES = ['soft', 'plain'];
   $: t = TONES.includes(tone) ? tone : '';
+  $: sf = SURFACES.includes(surface) ? surface : 'soft';
   $: css = t ? `--hero-tone:var(--sx-${t})` : '';
 </script>
 
-<section class="hero {surface}" class:toned={!!t} style={css}>
+<section class="hero {sf}" class:toned={!!t} style={css}>
   <div class="grid">
     <div class="lead">
       {#if title}
@@ -95,20 +99,15 @@
   @keyframes sx-hero-in { from { opacity: 0; transform: translateY(10px) scale(.985); } }
   @keyframes sx-hero-side { from { opacity: 0; transform: translate(var(--hero-dx, 0px), var(--hero-dy, 0px)); } }
 
-  /* LAS TRES SUPERFICIES. La diferencia entre ellas es de qué está hecho el
-     campo, no de cuánto color lleva: una toma el acento, otra la tinta, la
-     tercera no toma nada. Un producto elige una y la repite. */
+  /* LAS DOS SUPERFICIES. La diferencia entre ellas es de qué está hecho el
+     campo, no de cuánto color lleva: una toma el acento, la otra no toma nada.
+     Un producto elige una y la repite. */
   .soft {
     background:
       linear-gradient(135deg,
         color-mix(in srgb, var(--sx-accent) 12%, var(--sx-surface)) 0%,
         color-mix(in srgb, var(--sx-accent) 4%, var(--sx-surface)) 100%);
     color: var(--sx-ink);
-  }
-  .ink {
-    background:
-      linear-gradient(135deg, var(--sx-n-900) 0%, var(--sx-n-800) 100%);
-    color: var(--sx-n-0);
   }
   .plain { background: var(--sx-surface); color: var(--sx-ink); }
 

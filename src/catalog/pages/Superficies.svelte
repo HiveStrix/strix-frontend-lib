@@ -103,18 +103,12 @@
     </Hero>
 
     <p class="stand" style="margin-top: var(--sx-s-6)">
-      <b>Tres campos.</b> La diferencia entre ellos es de qué está hecho el fondo,
-      no de cuánto color lleva. Un producto elige uno y lo repite.
+      <b>Dos campos.</b> La diferencia entre ellos es de qué está hecho el fondo,
+      no de cuánto color lleva: <span class="sx-id">soft</span> toma el acento,
+      <span class="sx-id">plain</span> no toma nada. Un producto elige uno y lo repite.
+      (<span class="sx-id">ink</span>, la isla oscura, se borró en la v0.13 con las demás
+      variantes que no son de la arcilla.)
     </p>
-
-    <Hero surface="ink" title="Cierre de mes" lede="Todo conciliado.">
-      <svelte:fragment slot="aside">
-        <StatStrip>
-          <Stat label="Órdenes" value={148} />
-          <Stat label="Sin cerrar" value={0} />
-        </StatStrip>
-      </svelte:fragment>
-    </Hero>
 
     <Hero surface="plain" title="Repuestos" lede="Sin movimientos hoy." />
   </section>
@@ -232,59 +226,12 @@
           el comentario junto a <span class="sx-id">--card-glow</span> en <span class="sx-id">Card.svelte</span>.
         </p>
 
-        <h3 class="sx-cap sub">variant — tres maneras de cerrar una superficie</h3>
-        <p class="why">
-          Luz, línea o tono: las tres maneras en que una superficie puede distinguirse de su
-          fondo. <span class="sx-id">raised</span> es la ley — la sombra — y no se toca.
-          <span class="sx-id">crest</span> y <span class="sx-id">filled</span> son salidas
-          explícitas, no un reemplazo: la misma tarjeta, el mismo contenido, separada del fondo
-          de otra manera. El argumento completo —por qué existen y por qué el marco importa más
-          que ellas— está en la cabecera de <span class="sx-id">Card.svelte</span>.
-        </p>
-
         <p class="note">
-          <b>Las variantes tienen número</b>, para pedir «usá la variante N» — el número es un alias
-          del nombre (<span class="sx-id">variant="crest"</span> es lo mismo que
-          <span class="sx-id">variant="2"</span>):
-          &nbsp;<b>1</b>&nbsp;raised&nbsp;·&nbsp; <b>2</b>&nbsp;crest&nbsp;·&nbsp; <b>3</b>&nbsp;filled.
-        </p>
-
-        <div class="demo">
-          <div class="cards">
-            <Card>
-              <p class="cl">
-                <b>raised · default</b>
-                <span>BAT014 — la sombra. No se toca.</span>
-              </p>
-            </Card>
-            <Card variant="crest" crestColor="#2563EB">
-              <p class="cl">
-                <b>crest</b>
-                <span>
-                  BAT014 — un anillo de 1&nbsp;px en la sombra, no en <span class="sx-id">border</span>,
-                  con un reflejo arriba. Adaptada de un ERP real, recompuesta con tokens de Nácar.
-                </span>
-              </p>
-            </Card>
-            <Card variant="filled">
-              <p class="cl">
-                <b>filled</b>
-                <span>BAT014 — el relleno, sin sombra. Para cuando muchas tarjetas juntas acumulan ruido.</span>
-              </p>
-            </Card>
-          </div>
-        </div>
-
-        <p class="note">
-          <b>Cuándo usar cada una.</b> <span class="sx-id">raised</span>, siempre que no haya un
-          motivo concreto para otra cosa — es el default por algo. <span class="sx-id">crest</span>
-          cuando una superficie tiene que leerse «cerrada» sin pedir más sombra —un formulario
-          compuesto, un panel de configuración— y el anillo hace ese trabajo mejor que otro
-          escalón de <span class="sx-id">elevation</span>. <span class="sx-id">filled</span> cuando
-          hay muchas tarjetas juntas —una grilla, un tablero— y la sombra de cada una deja de
-          separar y empieza a acumularse como ruido de fondo. Elegir una no es gusto: es decir con
-          qué mecanismo se separa esa superficie, a propósito — y una pantalla con las tres
-          mezcladas sin ese criterio es peor que una pantalla con una sola.
+          <b>Una sola forma.</b> La tarjeta se separa del lienzo por su relieve, siempre. Hasta la
+          v0.12 había también <span class="sx-id">variant="crest"</span> (una raya de acento arriba)
+          y <span class="sx-id">variant="filled"</span> (un lavado de acento sin sombra); separaban
+          con línea y con tono, no con volumen, y se borraron en la v0.13 junto con las demás
+          variantes que no son de la arcilla.
         </p>
       </section>
 
@@ -332,63 +279,6 @@
           de esta sección.
         </p>
 
-        <h3 class="sx-cap sub">headVariant — el estilo Sarion, comparado con el default</h3>
-        <p class="why">
-          Se pidió ver la pieza trabajando, no la barra sola: el estilo compacto de sección vive
-          suelto como <span class="sx-id">PageHeader variant="section"</span> (en
-          <span class="sx-id">Estructura</span>), y una barra sola no alcanza para juzgar cómo se ve
-          cerrando un Panel de verdad.
-          Panel no tenía esa cabecera — su <span class="sx-id">.head</span> siempre fue la banda de
-          <span class="sx-id">--sx-thead</span>, sin salida —, así que ahora es un prop propio,
-          <span class="sx-id">headVariant</span>, con esa tipografía compacta —título apretado en
-          negativo, subtítulo monoespaciado— adaptada de <span class="sx-id">Sarion</span>
-          (no <span class="sx-id">PageHeader</span> montado adentro: ver la nota en
-          <span class="sx-id">Panel.svelte</span> sobre por qué — en corto, su <span class="sx-id">level</span>
-          sólo entiende <span class="sx-id">h1</span>/<span class="sx-id">h2</span> y el de Panel
-          tiene que llegar hasta <span class="sx-id">h6</span>). Mismo título, mismo subtítulo,
-          mismas acciones, mismo cuerpo, mismo pie — sólo la cabecera cambia, para que se pueda
-          comparar en vez de sólo mirar dos cosas lindas.
-        </p>
-
-        <p class="note">
-          <b><span class="sx-id">headVariant</span> tiene número</b>, para pedir «usá la variante N»
-          — es un alias del nombre (<span class="sx-id">headVariant="sarion"</span> es lo mismo que
-          <span class="sx-id">headVariant="2"</span>): &nbsp;<b>1</b>&nbsp;banda&nbsp;·&nbsp;
-          <b>2</b>&nbsp;sarion.
-        </p>
-
-        <div class="demo two-up">
-          <Panel title="Servicios" sub="Los últimos 12 meses" icon="clipboard" level={3}>
-            <svelte:fragment slot="actions">
-              <Button size="sm" variant="ghost">Exportar CSV</Button>
-              <Button size="sm">Registrar</Button>
-            </svelte:fragment>
-            <Stack gap={2}>
-              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
-              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
-              <Row justify="between"><span>Canceladas</span><b class="sx-num">2</b></Row>
-            </Stack>
-            <svelte:fragment slot="footer">
-              <Row justify="between"><span>Costo del período</span><b class="sx-num">₡4 820 000</b></Row>
-            </svelte:fragment>
-          </Panel>
-
-          <Panel title="Servicios" sub="Los últimos 12 meses" icon="clipboard" level={3} headVariant="sarion">
-            <svelte:fragment slot="actions">
-              <Button size="sm" variant="ghost">Exportar CSV</Button>
-              <Button size="sm">Registrar</Button>
-            </svelte:fragment>
-            <Stack gap={2}>
-              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
-              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
-              <Row justify="between"><span>Canceladas</span><b class="sx-num">2</b></Row>
-            </Stack>
-            <svelte:fragment slot="footer">
-              <Row justify="between"><span>Costo del período</span><b class="sx-num">₡4 820 000</b></Row>
-            </svelte:fragment>
-          </Panel>
-        </div>
-
         <h3 class="sx-cap sub">tone — el mismo tinte, forwardeado a Card</h3>
         <p class="why">
           <span class="sx-id">tone</span> viaja a la <span class="sx-id">Card</span> de adentro tal
@@ -411,56 +301,6 @@
           </Panel>
         </div>
 
-        <h3 class="sx-cap sub">variant — reenviado a Card, medido acá</h3>
-        <p class="why">
-          <span class="sx-id">variant</span> (de <span class="sx-id">Card</span>) también reenvía,
-          sin listarse entre los props de este componente a propósito —
-          <span class="sx-id">$$restProps</span> lo lleva igual que <span class="sx-id">href</span>
-          o <span class="sx-id">interactive</span>. <span class="sx-id">crest</span> ya estaba medido:
-          el anillo vive en la Card exterior, independiente de <span class="sx-id">.head</span>.
-          <span class="sx-id">filled</span> no lo estaba — su cabecera del catálogo, hasta hoy, decía
-          que nadie había medido <span class="sx-id">--sx-thead</span> contra el relleno nuevo de
-          <span class="sx-id">--card-fill</span>. Es exactamente el par que el arnés ya mide con otro
-          nombre: <span class="sx-id">--card-fill</span> es <span class="sx-id">var(--sx-accent-soft)</span>
-          tal cual, y la fila <i>«cabecera contra el hover de su control»</i> de
-          <span class="sx-id">DISTINCT</span> ya compara <span class="sx-id">--sx-thead</span> contra
-          <span class="sx-id">--sx-accent-soft</span> en las cuatro combinaciones. El peor caso —claro,
-          cromo morado, el que este catálogo pinta por defecto— da 1.06:1: pasa el piso de 1.05, con
-          menos margen que el que <span class="sx-id">crest</span> tenía cuando medía 1.12 y no se veía
-          nada. Por eso la banda de acá abajo no se da por buena sólo con el número: la línea que seguía
-          se sacó mirando esta misma tarjeta en pantalla, en las cuatro combinaciones.
-        </p>
-
-        <div class="demo two-up">
-          <Panel title="Servicios" sub="raised — el default" icon="clipboard" level={3}>
-            <svelte:fragment slot="actions">
-              <Button size="sm" variant="ghost">Exportar CSV</Button>
-            </svelte:fragment>
-            <Stack gap={2}>
-              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
-              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
-            </Stack>
-          </Panel>
-
-          <Panel title="Servicios" sub="filled — el relleno con acento" icon="clipboard" level={3} variant="filled">
-            <svelte:fragment slot="actions">
-              <Button size="sm" variant="ghost">Exportar CSV</Button>
-            </svelte:fragment>
-            <Stack gap={2}>
-              <Row justify="between"><span>Preventivas</span><b class="sx-num">18</b></Row>
-              <Row justify="between"><span>Correctivas</span><b class="sx-num">7</b></Row>
-            </Stack>
-          </Panel>
-        </div>
-
-        <p class="note">
-          <b>Medido, no sólo calculado.</b> La banda superior se sigue leyendo como una pieza posada
-          sobre el relleno en las dos combinaciones de tema y las dos de cromo — el mismo veredicto que
-          el número. Queda como verificado en <span class="sx-id">Panel.svelte</span>: no hizo falta una
-          fila nueva en <span class="sx-id">DISTINCT</span> —la que ya medía «cabecera contra el hover
-          de su control» es, token por token, esta misma comparación— así que lo que cambió fue su
-          comentario, para que diga las dos cosas que mide.
-        </p>
       </section>
 
       <!-- ═══ WELL ═══════════════════════════════════════════════════════ -->

@@ -224,12 +224,12 @@
        used to credit `--sx-e-inset` with that job too, and it does not do it:
        resolved, in the light theme rgba(255,255,255,.9) over --sx-surface
        (also white) composites to identical white, 1.000:1 — the exact defect
-       `Card.svelte` found and fixed for `crest` (see the note there), just
+       `Card.svelte` found and fixed for its old `crest` variant, just
        never measured here because nothing LOOKED broken — e-3 alone was
        already enough to read the toast against its background. Reviewed
        instead of copying that fix: in dark, the same reflection genuinely
-       works — 1.16–1.17:1 against --sx-surface, the same order as crest's
-       fixed edge — so the token stays. Removing it would cost dark theme a
+       works — 1.16–1.17:1 against --sx-surface, the same order as that old
+       crest edge — so the token stays. Removing it would cost dark theme a
        real highlight to tidy up a light-theme layer that was already free: an
        invisible white-on-white shadow costs nothing to draw, it just does
        nothing. The tone is a bar in the fill, not a border.

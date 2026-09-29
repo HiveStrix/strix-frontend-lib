@@ -234,11 +234,6 @@ const lookup = (key, tokens) => (key in tokens ? tokens[key] : key);
 // sobre qué rol, y el tema es sólo con qué diccionario se resuelve ese rol.
 const TONES = ['positive', 'attention', 'critical', 'info', 'neutral'];
 const CHECKS = [
-  // Estas dos primeras filas también son el anillo de `Card variant="crest"`
-  // (Card.svelte): el anillo vive en `box-shadow` en vez de en `border`,
-  // pero es el mismo --sx-edge, el mismo 3:1, y el mismo par — «superficie» y
-  // «fondo» son literalmente donde vive una Card. No hace falta una fila
-  // nueva para una variante que reusa el token tal cual.
   ['--sx-edge',   '--sx-surface', 3.0, 'borde de control sobre superficie'],
   ['--sx-edge',   '--sx-ground',  3.0, 'borde de control sobre el fondo'],
   // UN BORDE TIENE DOS LADOS. Las dos comprobaciones de arriba miden contra
@@ -478,20 +473,9 @@ const DISTINCT = [
   // y el primer valor elegido quedó por debajo de este mismo piso — nadie se dio
   // cuenta porque el par no estaba acá. Ahora está.
   ['--sx-surface', '--sx-ground', 'la superficie contra el campo'],
-  // SEGUNDO NOMBRE, MISMO PAR. Nació por `Table.svelte`'s `.sortbtn` (el
-  // hover de un botón de orden pintado sobre la cabecera de la tabla), pero
-  // es TOKEN POR TOKEN la misma comprobación que `Panel variant="filled"`
-  // necesitaba: `--card-fill` (Card.svelte) es `var(--sx-accent-soft)` sin
-  // modificar, así que la banda de `.head`/`.foot` de un Panel relleno
-  // separa contra exactamente este valor. No se agregó una fila nueva para
-  // Panel — el mismo argumento que ya sostiene el anillo de `crest` más
-  // abajo, «no hace falta una fila nueva para una variante que reusa el
-  // token tal cual» — así que esta fila ahora es la que deja verificado a
-  // los dos: el hover de Table Y el `filled` de Panel/Card. Peor caso: 1.06
-  // en claro/cromo morado (el default del catálogo) — visto en pantalla en
-  // `Superficies` → Panel → variant, no sólo calculado (ver el comentario en
-  // Panel.svelte).
-  ['--sx-thead', '--sx-accent-soft', 'cabecera contra el hover de su control — y contra Panel/Card variant="filled"'],
+  // Nació por `Table.svelte`'s `.sortbtn`: el hover de un botón de orden
+  // pintado sobre la cabecera de la tabla.
+  ['--sx-thead', '--sx-accent-soft', 'cabecera contra el hover de su control'],
   ['--sx-thead', '--sx-surface', 'la banda contra la tarjeta'],
   ['--sx-accent-soft', '--sx-accent-pick', 'pasajero contra persistente'],
   ['--sx-accent-soft', '--sx-surface', 'el hover contra el reposo'],
@@ -511,39 +495,10 @@ const DISTINCT = [
     '--sx-edge',
     '"resta" de StackedBar contra su propio último paso (.s-d)'
   ],
-  // EL PAR QUE TRAJO `Card variant="filled"`. La ley de Nácar separa una
-  // Card de --sx-ground con SOMBRA; `filled` la separa con RELLENO en su
-  // lugar — así que, a diferencia de `--sx-sunk` en un Well o un control
-  // (que siempre viven sobre --sx-surface, ya medido arriba), acá el fondo
-  // real es el CAMPO, no la tarjeta. La primera versión mezclaba --sx-edge
-  // 8% sobre --sx-sunk — gris sobre gris, sin el tono que la variante
-  // promete — y esta fila medía exactamente esa fórmula. `--card-fill`
-  // (Card.svelte) ahora es var(--sx-accent-soft) tal cual; la fila se
-  // actualizó para seguir esa fórmula, no la vieja, que ya no se dibuja en
-  // pantalla.
-  ['--sx-accent-soft', '--sx-ground', 'Card variant="filled": el relleno (con acento) contra el campo, sin sombra que lo separe'],
-  // SEXTA EXTENSIÓN DEL ARNÉS. La arista de `crest` (Card.svelte) usaba
-  // --sx-e-inset — blanco al 90% sobre --sx-surface blanco en claro — y
-  // nadie medía la arista CONTRA su propia superficie porque el par no
-  // existía. 1.000:1, exactamente cero distancia: no había defecto sutil,
-  // había ausencia. `--card-crest-line`, el token propio que reemplaza
-  // --sx-e-inset ahí (ver el comentario en Card.svelte para por qué no se
-  // tocó el compartido), es lo que se mide acá.
-  [
-    'color-mix(in srgb, var(--sx-ink) 6%, var(--sx-surface))',
-    '--sx-surface',
-    'Card variant="crest": la arista contra su propia superficie'
-  ],
-  // SÉPTIMA EXTENSIÓN DEL ARNÉS, Y LA TRAMPA DEL PAR DE ARRIBA. Si
-  // `--card-fill` hubiera usado --sx-accent-pick (el otro escalón medido,
-  // 18%) en vez de --sx-accent-soft, esta fila mediría 1.000:1 contra sí
-  // misma: --sx-accent-pick ya significa "elegido" en Table, Calendar y
-  // SideRail, y una Card sin seleccionar con el MISMO valor sería
-  // indistinguible de una fila elegida. No es hipotético — es la razón por
-  // la que se descartó --accent-pick al elegir la fórmula. Esta fila deja
-  // eso medido para que nadie retinte --card-fill a -pick sin que nada
-  // avise.
-  ['--sx-accent-soft', '--sx-accent-pick', 'Card variant="filled" contra "seleccionado": el relleno no puede leerse como fila elegida'],
+  // El lavado del acento apoyado directo en el campo (un hover sobre el
+  // lienzo). Lo trajo la vieja `Card variant="filled"`, que se borró en v0.13;
+  // el par sigue siendo real y es el que subió --sx-accent-soft a 14 %.
+  ['--sx-accent-soft', '--sx-ground', 'el lavado del acento contra el campo'],
   // OCTAVA EXTENSIÓN DEL ARNÉS. El mismo patrón por tercera vez: --sx-e-inset
   // no significa lo mismo donde se pega. En claro, Button.svelte lo pinta
   // sobre --sx-accent/--sx-critical PLENOS (oscuros) y separa de sobra
@@ -553,12 +508,13 @@ const DISTINCT = [
   // del piso, y confirmado en pantalla (catálogo, Acciones, tema oscuro): la
   // esquina superior es un relleno plano, sin traza de reflejo. Anotado y no
   // tocado una vez (Toast: `624e58d`); acá se tocó: Button.svelte suma
-  // `--btn-inset`, un token PROPIO del componente (mismo patrón que
-  // `--card-crest-line`) que sólo se re-liga bajo `[data-sx-theme="dark"]` —
+  // `--btn-inset`, un token PROPIO del componente (mismo patrón que el
+  // `--card-crest-line` de la vieja Card crest) que sólo se re-liga bajo
+  // `[data-sx-theme="dark"]` —
   // --sx-e-inset compartido sigue intacto, porque en claro (acá) y en Toast
   // oscuro sigue trabajando. Las dos filas de abajo miden la fórmula que
   // `--btn-inset` usa en OSCURO (20% de blanco): 1.108 (acento) y 1.152
-  // (crítico), el mismo orden que la arista de `crest` (1.12–1.18) y el
+  // (crítico), el mismo orden que la arista de la vieja `crest` (1.12–1.18) y el
   // reflejo oscuro de Toast (1.16–1.17) — no un número al azar, el mismo
   // rango que este repo ya aceptó dos veces para «una luz leída de cerca,
   // no un foco». La fórmula corre igual contra el tema CLARO (1.43–1.57,

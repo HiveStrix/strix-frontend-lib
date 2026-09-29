@@ -4,6 +4,38 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## Sin publicar (v0.13.0)
+
+> Sólo quedan las variantes de arcilla. Todo lo que no se moldeaba con el
+> relieve de la variante colorida se borró, para que ningún módulo nuevo se
+> construya sobre un estilo que ya no es el del sistema.
+
+### Borrado
+- **`PageHeader`**: `line`, `section`, `plain`, `aire`, `soft` y `hero`. Quedan
+  `banda` (ahora el default) y `hero-card`. Se va también la prop `bleed`, que
+  sólo movía el relleno de las variantes de texto.
+- **`Card`**: `variant="crest"` y `variant="filled"`, y con ellas las props
+  `variant` y `crestColor`. La tarjeta tiene una sola forma.
+- **`Panel`**: la prop `headVariant` (`sarion`, la cabecera con raya).
+- **`Hero`**: `surface="ink"`, la isla oscura. Quedan `soft` y `plain`.
+- `scripts/contrast.mjs`: las filas que medían sólo a `crest`/`filled` (la
+  arista de `crest` y un duplicado de «pasajero contra persistente»).
+
+Se quedan los cinco botones (`solid`, `outline`, `ghost`, `danger`, `frosted`),
+los tres de `Skeleton` (formas, no estilos) y los fallbacks de «main» dentro de
+cada componente.
+
+### Ojo al migrar
+- **Un valor borrado no rompe, cae al default**: un `PageHeader` con `line`,
+  `section`, `aire`… (o sin `variant`) se dibuja como `banda`; un `Hero
+  surface="ink"` (o cualquier valor desconocido), como `soft`. Antes, un
+  `PageHeader` sin `variant` era `line`. Pasar `bleed`, `headVariant` o
+  `crestColor` ya no hace nada.
+- **La numeración de `PageHeader` cambió**: `1` es `banda` y `2` es
+  `hero-card` (antes `1` era `line`).
+- Usos en `main` al 2026-09-29 que cambian de cara al subir: el Shell en
+  `users/invite` (`aire`) y strix-maintenance en `Registro` (`section`).
+
 ## v0.12.0 (2026-09-28)
 
 - **Segunda revisión**: la selección al enfocar funciona dentro del shadow root de un core; el valor de un Select deshabilitado ya no asoma por el borde; el campo invisible que viaja al formulario es un `<select>` (no bloquea el envío con Enter ni atrae el autocompletado de direcciones); en SearchPicker una elección explícita anula el Enter pendiente.

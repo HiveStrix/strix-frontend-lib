@@ -72,8 +72,9 @@ export const CHROME_RECIPES = {
     '--sx-n-200': [8, '#DDDDE2'], '--sx-n-300': [8, '#BBBBC2'], '--sx-n-400': [8, '#7A7A7F'],
     '--sx-n-500': [8, '#5E5E64'], '--sx-n-700': [8, '#414146'], '--sx-n-800': [8, '#27272B'],
     // El campo baja de 11 % a 9 % con la variante colorida: con la traza morada
-    // (TINT) el 11 % quedaba a 1.048 de --sx-accent-soft — `Card
-    // variant="filled"` no se despegaba del campo, piso 1.05. A 9 % mide 1.08, y
+    // (TINT) el 11 % quedaba a 1.048 de --sx-accent-soft — la `Card
+    // variant="filled"` de entonces (se borró en v0.13) no se despegaba del
+    // campo, piso 1.05. A 9 % mide 1.08, y
     // la tarjeta blanca sigue a ~1.15 del campo: más escalón que el 11 % gris.
     '--sx-n-900': [7, '#1B1B1E'], '--sx-ground': [9, '#FFFFFF'], '--sx-thead': [9, '#FFFFFF']
   },
@@ -506,9 +507,9 @@ export const TOKENS = {
   //     --sx-edge  sobre accent-soft:  3.84 morado / 3.59 gris
   //     --sx-ink-3 sobre accent-soft:  5.61 morado / 5.22 gris
   // Sube de 10 % a 14 % junto con el campo. Al profundizar --sx-ground (6→11 %)
-  // el relleno suave quedó a 1.048 contra él —por debajo del piso de 1.05— y una
-  // `Card variant="filled"`, que no tiene sombra que la separe, se perdía sobre
-  // el campo. Más traza acá la devuelve a ser una superficie; de paso sube el
+  // el relleno suave quedó a 1.048 contra él —por debajo del piso de 1.05— y la
+  // `Card variant="filled"` de entonces (se borró en v0.13), que no tenía sombra
+  // que la separe, se perdía sobre el campo. Más traza acá la devuelve a ser una superficie; de paso sube el
   // contraste del texto que se apoya encima, no lo baja.
   '--sx-accent-soft': 'color-mix(in srgb, var(--sx-accent) 14%, #FFFFFF)',
   // EL RELLENO DE SELECCIÓN. Existe separado de --sx-accent-soft porque son dos

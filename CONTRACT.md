@@ -21,9 +21,8 @@ contenido no es decoración — es lo que dice dónde empieza y termina una cosa
 
 Quién pone el margen:
 
-- El **cromo se auto-rellena.** `PageHeader` trae su propio gutter por los
-  cuatro lados (ver `bleed` para desactivarlo cuando el padre YA rellena);
-  `banda`, `Hero`, `Card`, `Panel` traen el suyo. No hace falta acordarse.
+- El **cromo se auto-rellena.** `PageHeader` (`banda` y `hero-card`), `Hero`,
+  `Card` y `Panel` traen su propio relleno. No hace falta acordarse.
 - El **shell garantiza el gutter** alrededor de lo que flota. Los carriles
   desprendidos (`Sidebar`, `SideRail`) NO se dibujan un margen encima: es el
   layout del shell el que los separa del borde y entre sí, con un padding y un
