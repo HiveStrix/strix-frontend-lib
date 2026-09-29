@@ -271,8 +271,12 @@
     { key: 'precio', label: 'Precio', align: 'right', value: (r) => colones(r.precio) },
     { key: 'stock', label: 'Stock', align: 'right', optional: true, value: (r) => (r.stock == null ? '—' : `${new Intl.NumberFormat('es-CR').format(r.stock)} ${r.unidad}`) }
   ];
+  // «Servidor lento»: 1,2 s fijos, para probar lo que pasa cuando se escribe
+  // (o se escanea un código) y se aprieta Enter antes de que vuelva la
+  // respuesta — Enter espera la de lo escrito, no elige de la lista vieja.
+  let spLento = false;
   async function buscarArticulos(q) {
-    await esperar(140 + Math.random() * 360);
+    await esperar(spLento ? 1200 : 140 + Math.random() * 360);
     const k = plegar(q.trim());
     return ARTICULOS.filter((a) => !k || [a.codigo, a.nombre, a.tipo].some((x) => plegar(x).includes(k)));
   }
@@ -1254,6 +1258,7 @@
           </div>
           <div class="acts" style="margin-top: var(--sx-s-4)">
             <button type="button" class="ghost" on:click={() => (buscandoPara = 'varios')}>Agregar varias líneas…</button>
+            <Switch id="sp-lento" bind:checked={spLento} label="Servidor lento (1,2 s)" hint="Escribí un código y Enter enseguida, como un lector de barras." />
           </div>
         </div>
 

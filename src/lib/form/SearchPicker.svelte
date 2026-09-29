@@ -36,7 +36,13 @@
   // flechas mueven la fila marcada (`aria-activedescendant` sobre una grilla,
   // el patrón combobox → grid); Enter elige la marcada —la primera, apenas
   // llegan resultados, así «escribir y Enter» agrega el primero—; Escape cierra
-  // (lo hace Dialog). El botón «Agregar» de cada fila es para el puntero y no
+  // (lo hace Dialog). ENTER NUNCA ELIGE DE UNA LISTA VIEJA: si lo escrito
+  // todavía no tiene su respuesta —el debounce no venció, o la pregunta está
+  // en vuelo—, Enter adelanta la pregunta y elige la primera fila cuando ESA
+  // respuesta llega (si no trae ninguna, no elige nada). Es el caso del lector
+  // de códigos de barras: teclea el código entero y Enter en unos pocos
+  // milisegundos, y antes se agregaba la primera fila de la búsqueda anterior.
+  // El botón «Agregar» de cada fila es para el puntero y no
   // es una parada de Tab: cincuenta paradas entre la búsqueda y «Cerrar» no son
   // una forma de moverse.
   //
@@ -117,7 +123,13 @@
   let fetching = false;
   let failed = false;
   let reqSeq = 0;
-  let timer;
+  let timer = null;
+  // `rowsFor`: la búsqueda que contestan las filas de ahora. `pendingFor`: la
+  // que espera el debounce o está en vuelo. `pickWhen`: Enter llegó antes que
+  // la respuesta; se elige cuando vuelva la de esa búsqueda.
+  let rowsFor = null;
+  let pendingFor = null;
+  let pickWhen = null;
   let added = null;
   let addedTimer;
 
@@ -127,7 +139,10 @@
   function load(qs, now = false) {
     if (!loader) return;
     clearTimeout(timer);
+    timer = null;
+    pendingFor = qs;
     const run = () => {
+      timer = null;
       const my = ++reqSeq;
       fetching = true;
       failed = false;
@@ -137,14 +152,23 @@
           (res) => {
             if (my !== reqSeq) return;
             rows = Array.isArray(res) ? res : [];
+            rowsFor = qs;
+            pendingFor = null;
             fetching = false;
             // La primera fila queda marcada: «escribir y Enter» agrega la que
             // encabeza la lista, que es casi siempre la que se buscaba.
             active = rows.length ? 0 : -1;
             if (scroller) scroller.scrollTop = 0;
+            // Enter llegó antes que esta respuesta: ahora sí, la primera.
+            if (pickWhen !== null && pickWhen === qs) {
+              pickWhen = null;
+              if (rows.length) pick(rows[0]);
+            }
           },
           () => {
             if (my !== reqSeq) return;
+            pendingFor = null;
+            pickWhen = null;
             fetching = false;
             failed = true;
           }
@@ -163,7 +187,22 @@
 
   function onInput(e) {
     query = e.currentTarget.value;
+    // Seguir escribiendo después de Enter es cambiar de idea: ese Enter ya no
+    // elige nada.
+    pickWhen = null;
     load(query);
+  }
+
+  function onEnter() {
+    const typed = inputEl ? inputEl.value : query;
+    if (loader && (pendingFor !== null || rowsFor !== typed)) {
+      // Las filas de ahora no son las de lo escrito. Adelantar la pregunta (si
+      // todavía esperaba el debounce, o si nunca se hizo) y elegir al volver.
+      pickWhen = typed;
+      if (timer !== null || pendingFor !== typed) load(typed, true);
+      return;
+    }
+    if (active >= 0 && rows[active]) pick(rows[active]);
   }
 
   async function move(to) {
@@ -181,7 +220,7 @@
       case 'PageUp': e.preventDefault(); move(active - 10); break;
       case 'Enter':
         e.preventDefault();
-        if (active >= 0 && rows[active]) pick(rows[active]);
+        onEnter();
         break;
       // Escape no se toca acá: sube hasta Dialog, que cierra y avisa `close`.
     }
