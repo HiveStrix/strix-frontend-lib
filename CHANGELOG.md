@@ -6,14 +6,16 @@ en la 0.8.0.
 
 ## Sin publicar (v0.13.0)
 
-> Sólo quedan las variantes de arcilla. Todo lo que no se moldeaba con el
-> relieve de la variante colorida se borró, para que ningún módulo nuevo se
-> construya sobre un estilo que ya no es el del sistema.
+> Se borran las variantes que no son de arcilla y que nadie usa, para que
+> ningún módulo nuevo se construya sobre un estilo que ya no es el del sistema.
+> Lo que ya está en uso se queda: ninguna pantalla existente cambia.
 
 ### Borrado
-- **`PageHeader`**: `line`, `section`, `plain`, `aire`, `soft` y `hero`. Quedan
-  `banda` (ahora el default) y `hero-card`. Se va también la prop `bleed`, que
-  sólo movía el relleno de las variantes de texto.
+- **`PageHeader`**: `line`, `plain`, `soft` y `hero`. Quedan `banda` (ahora el
+  default) y `hero-card`, más `section` y `aire` como **heredadas**: las usan
+  pantallas en producción (el diálogo de Registro de strix-maintenance y la
+  invitación de usuarios del Shell) y se quedan tal cual, con `bleed`, pero no
+  son para código nuevo.
 - **`Card`**: `variant="crest"` y `variant="filled"`, y con ellas las props
   `variant` y `crestColor`. La tarjeta tiene una sola forma.
 - **`Panel`**: la prop `headVariant` (`sarion`, la cabecera con raya).
@@ -27,14 +29,14 @@ cada componente.
 
 ### Ojo al migrar
 - **Un valor borrado no rompe, cae al default**: un `PageHeader` con `line`,
-  `section`, `aire`… (o sin `variant`) se dibuja como `banda`; un `Hero
+  `plain`, `soft` o `hero` (o sin `variant`) se dibuja como `banda`; un `Hero
   surface="ink"` (o cualquier valor desconocido), como `soft`. Antes, un
-  `PageHeader` sin `variant` era `line`. Pasar `bleed`, `headVariant` o
-  `crestColor` ya no hace nada.
-- **La numeración de `PageHeader` cambió**: `1` es `banda` y `2` es
-  `hero-card` (antes `1` era `line`).
-- Usos en `main` al 2026-09-29 que cambian de cara al subir: el Shell en
-  `users/invite` (`aire`) y strix-maintenance en `Registro` (`section`).
+  `PageHeader` sin `variant` era `line`. Pasar `headVariant` o `crestColor` ya
+  no hace nada.
+- **La numeración de `PageHeader` cambió**: `1` `banda` · `2` `hero-card` ·
+  `3` `section` · `4` `aire` (antes `1` era `line`).
+- **Ninguna pantalla en `main` cambia**: medido en el clúster local con los
+  seis cores y el Shell, el render queda igual.
 
 ## v0.12.0 (2026-09-28)
 

@@ -240,11 +240,13 @@ radio redondo: «cualquiera» contra «uno».
 
 ## Components
 
-- **Sólo variantes de arcilla.** Cada variante de la lib se moldea con el relieve
-  de arriba; las que separaban con una raya, con un lavado plano o con una isla
-  oscura se borraron en la v0.13 (`PageHeader` line/section/plain/aire/soft/hero,
-  `Card` crest/filled, `Panel headVariant="sarion"`, `Hero surface="ink"`). Una
-  variante nueva entra sólo con su relieve, y se agrega al final de su lista.
+- **Sólo variantes de arcilla para lo nuevo.** Cada variante de la lib se moldea
+  con el relieve de arriba; las que separaban con una raya, con un lavado plano o
+  con una isla oscura y nadie usaba se borraron en la v0.13 (`PageHeader`
+  line/plain/soft/hero, `Card` crest/filled, `Panel headVariant="sarion"`, `Hero
+  surface="ink"`). `PageHeader` `section` y `aire` quedan como **heredadas** para
+  las pantallas que ya las usan: no se usan en código nuevo. Una variante nueva
+  entra sólo con su relieve, y se agrega al final de su lista.
 - **`PageHeader variant="banda"`:** el encabezado del destino, en el pastel del
   acento del módulo con tinta oscura. Adentro va una sola acción primaria (el
   sólido conserva el acento) y, si hace falta, pills de resumen.
@@ -324,7 +326,9 @@ y `--sx-sticky-top` (lo que ya está pegado arriba de un `PageHeader sticky`).
   `<datalist>`): se ve de otra familia. `Select` (o `Select native`, a propósito).
 - Un placeholder con la tinta de la ayuda o del texto: se lee como un valor.
 - Una variante sin relieve de arcilla (una raya, un lavado plano, una isla
-  oscura), ni como prop de la lib ni copiada a mano en un módulo.
+  oscura), ni como prop de la lib ni copiada a mano en un módulo. Tampoco
+  `PageHeader` `section` o `aire` en una pantalla nueva: siguen en la lib sólo
+  por las que ya existían.
 
 ### Checklist para migrar un módulo
 

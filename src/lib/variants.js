@@ -12,11 +12,12 @@
 // dos componentes comparten vocabulario, como la familia de botones— mantener
 // el MISMO orden en los dos, así «la 1» es lo mismo en todos.
 //
-// SÓLO VARIANTES DE ARCILLA. En la v0.13 se borraron todas las variantes que no
-// son de la arcilla (PageHeader line/section/plain/aire/soft/hero, Card
+// SÓLO VARIANTES DE ARCILLA PARA LO NUEVO. En la v0.13 se borraron las variantes
+// que no son de la arcilla y nadie usaba (PageHeader line/plain/soft/hero, Card
 // crest/filled, Panel headVariant=sarion, Hero surface=ink), y las listas se
-// renumeraron. Una variante nueva entra sólo si se moldea con el relieve de la
-// arcilla (DESIGN.md), y se agrega AL FINAL.
+// renumeraron. PageHeader section y aire quedan como heredadas por las
+// pantallas que ya las usan. Una variante nueva entra sólo si se moldea con el
+// relieve de la arcilla (DESIGN.md), y se agrega AL FINAL.
 
 /**
  * Resuelve una variante dada por nombre o por número (1-based) a su nombre

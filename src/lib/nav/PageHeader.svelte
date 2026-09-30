@@ -27,18 +27,22 @@
   //   </PageHeader>
   //
   // ─────────────────────────────────────────────────────────────────────────
-  // `variant`: SÓLO LAS DE ARCILLA.
+  // `variant`: LAS DE ARCILLA, MÁS DOS HEREDADAS.
   //
   // Hasta la v0.12 había ocho (line · section · plain · aire · soft · banda ·
-  // hero-card · hero). Quedan las dos que la variante colorida moldeó —las que
-  // se levantan del lienzo con el relieve de contenedor (`--sx-e-card`)—. Las
-  // otras seis separaban con una raya, con un lavado plano o con una isla
-  // oscura, que es justo lo que el DESIGN.md de la arcilla prohíbe, y se
-  // borraron para que nadie construya encima de un estilo que ya no es el del
-  // sistema. Un valor viejo (`line`, `section`, `hero`, …) cae SEGURO a `banda`.
+  // hero-card · hero). Se borraron las que nadie usaba y no son de la arcilla
+  // (line, plain, soft, hero): separaban con una raya, con un lavado plano o con
+  // una isla oscura, y se sacaron para que nadie construya encima de un estilo
+  // que ya no es el del sistema. Un valor borrado cae SEGURO a `banda`.
+  //
+  // `section` y `aire` se QUEDAN porque hay pantallas en producción que las
+  // usan (el diálogo de Registro de strix-maintenance y la invitación de
+  // usuarios del Shell), y esas pantallas no cambian. Son HEREDADAS: no llevan
+  // el relieve de la arcilla y no son para código nuevo — lo nuevo va con
+  // `banda` o `hero-card`.
   //
   // ÍNDICE (el número es un alias del nombre: `variant="banda"` === `variant="1"`):
-  //   1 banda (default) · 2 hero-card
+  //   1 banda (default) · 2 hero-card · 3 section (heredada) · 4 aire (heredada)
   //
   //   banda     El encabezado del DESTINO: una columna en el pastel del acento
   //             del módulo (`--sx-banda-tint`) con tinta oscura. Adentro, una
@@ -50,13 +54,19 @@
   //             slot default). Adaptado de Sarion «Forge». Si nadie pasa
   //             `figure`, la grilla colapsa a una columna sin dejar un hueco.
   //
+  //   section   HEREDADA. La cabecera de sección compacta: título apretado,
+  //             subtítulo monoespaciado y una raya abajo.
+  //
+  //   aire      HEREDADA. Sólo texto —ni raya ni piel— con el eyebrow en el
+  //             acento de marca.
+  //
   // ABOUT `tone`
   //
   // Es el ÚNICO lugar de esta librería donde la tinta lleva significado por sí
   // sola —así que sólo es legal cuando el título ya dice la palabra—. «3
   // máquinas están vencidas» en tinta crítica es la regla aguantando; «Flota» en
   // crítica es la regla rota. En `hero-card` pinta el título y el punto del
-  // eyebrow.
+  // eyebrow; en `section` y `aire`, el título.
   //
   // EL TONO NO SE LLEVA PUESTO EL ACENTO. En `banda` el relleno se queda SIEMPRE
   // en el acento del producto; el tono, como mucho, cambia su profundidad (con
@@ -86,16 +96,23 @@
   /** Esqueleto hasta que aterriza el primer payload. Evita que el layout salte. */
   export let loading = false;
   /**
-   * banda | hero-card — ver arriba. `banda` es el default. Un valor viejo o
-   * inválido (`line`/`section`/`plain`/`aire`/`soft`/`hero`) cae SEGURO a
-   * `banda`: se eliminó el diseño, no se rompió el llamado.
+   * banda | hero-card — ver arriba; `section` y `aire` son heredadas, no para
+   * código nuevo. `banda` es el default. Un valor borrado o inválido
+   * (`line`/`plain`/`soft`/`hero`) cae SEGURO a `banda`: se eliminó el diseño,
+   * no se rompió el llamado.
    */
   export let variant = 'banda';
+  /**
+   * Sólo para las heredadas (`section`/`aire`): apaga el gutter lateral de
+   * `.hd` cuando el header ya vive dentro de un padre que rellena. No afecta a
+   * `banda` ni a `hero-card`: su relleno es parte de su piel.
+   */
+  export let bleed = false;
 
-  // El orden ES la numeración (ver el ÍNDICE de arriba): 1 banda · 2 hero-card.
-  // `pickVariant` (../variants.js) acepta el nombre o el número —son
-  // intercambiables—; los nombres siguen siendo los canónicos.
-  const VARIANTS = ['banda', 'hero-card'];
+  // El orden ES la numeración (ver el ÍNDICE de arriba): 1 banda · 2 hero-card ·
+  // 3 section · 4 aire. `pickVariant` (../variants.js) acepta el nombre o el
+  // número —son intercambiables—; los nombres siguen siendo los canónicos.
+  const VARIANTS = ['banda', 'hero-card', 'section', 'aire'];
 
   // `$:` y no `const`: un reactive statement legacy sólo rastrea los nombres
   // escritos adentro, así que un helper que cerrara sobre `level` sería
@@ -115,6 +132,7 @@
   class="hd {v} {tone}"
   class:sticky
   class:loading
+  class:bleed
   aria-busy={loading || undefined}
 >
   {#if hasCrumbs}
@@ -202,8 +220,22 @@
     display: flex;
     flex-direction: column;
     gap: var(--sx-s-3);
+    /* EL GUTTER GARANTIZADO, para las variantes de texto. Padding propio por
+       los cuatro lados para que el texto nunca roce el borde. `hero`/`hero-card`
+       lo pisan con su propia piel; `bleed` lo apaga. */
+    padding: var(--sx-s-4) var(--sx-s-5);
     position: relative;
   }
+
+  /* Salida del gutter: un header dentro de un padre que ya rellena no quiere
+     padding HORIZONTAL doble. Sólo se apaga el gutter lateral —el vertical se
+     conserva SIEMPRE— para que el título alinee a sangre con el cuerpo sin que
+     la raya inferior quede pegada al subtítulo ni el bloque pierda su aire
+     arriba/abajo. No toca a `banda`/`hero-card` —su relleno es su piel.
+     `:not(.hero)` ya no excluye a nadie, pero se queda: sacarlo le baja la
+     especificidad a la regla y un core que la pisa podría ganarle. */
+  .hd.bleed:not(.hero):not(.hero-card):not(.banda) { padding-left: 0; padding-right: 0; }
+
 
   /* ═══ LAYOUT COMÚN ═════════════════════════════════════════════════════════ */
   .row {
@@ -239,8 +271,8 @@
     max-width: 58ch;
   }
 
-  /* El tono pinta el título en `hero-card`. En `banda` el título toma siempre
-     la tinta de la banda (ver `.hd.banda .ttl`): ahí el tono va al relleno, y
+  /* El tono pinta el título en `hero-card`, `section` y `aire`. En `banda` el
+     título toma siempre la tinta de la banda (ver `.hd.banda .ttl`): ahí el tono va al relleno, y
      con la arcilla (`--sx-banda-alarm` en 0) ni eso. */
   .attention .ttl { color: var(--sx-attention); }
   .critical  .ttl { color: var(--sx-critical); }
@@ -256,17 +288,68 @@
   .acts { display: flex; align-items: center; gap: var(--sx-s-2); flex-wrap: wrap; flex: none; }
 
   /* ═══ STICKY ═══════════════════════════════════════════════════════════════
-     Para ledgers largos donde las acciones importan. Sube a --sx-z-sticky
-     porque tiene que montar el contenido que pasa por debajo. Las dos variantes
-     son piezas con piel —su propio fondo, radio y relieve—, así que pegada
-     conserva su forma: no hace falta pintarle un fondo ni una raya. */
+     Pensado para las variantes de texto en ledgers largos. Sube a --sx-z-sticky
+     porque ahí sí tiene que montar el contenido que pasa por debajo, y se
+     apoya en un borde que no depende del halo (un producto puede apagar la luz,
+     no la raya). */
   .sticky {
     position: sticky;
     /* `--sx-sticky-top`: cuánto ocupa lo que ya está pegado arriba (la
        ModuleBar de un core). Sin eso el encabezado se deslizaba debajo de ella. */
     top: var(--sx-sticky-top, 0);
     z-index: var(--sx-z-sticky);
+    background: var(--sx-ground);
+    border-bottom: 1px solid var(--sx-line);
+    padding-block: var(--sx-s-3);
+    margin-inline: calc(var(--sx-s-4) * -1);
+    padding-inline: var(--sx-s-4);
+    border-radius: var(--sx-r-1);
   }
+  /* Una pieza con piel (`banda`, `hero-card`) ya es su propio borde: el
+     sangrado negativo y la raya del sticky la hacían sobresalir 16px por lado.
+     Pegada, conserva su forma. */
+  .sticky.banda, .sticky.hero-card {
+    margin-inline: 0;
+    border-bottom: 0;
+  }
+
+
+  /* ═══ VARIANT: section (HEREDADA) — la cabecera de sección compacta ═══════
+     La tipografía que Panel calibró para su `headVariant`, ahora también como
+     variante propia: título apretado en negativo (-.015em, el mismo tracking
+     que `.sx-id` para texto compacto y en negrita) contra un subtítulo
+     monoespaciado en positivo (+.04em) —ese contraste es su carácter— y una
+     línea en vez de banda. Para un encabezado DENTRO del contenido (level 2/3),
+     donde el título grande de `line` (33px) pesaría de más. */
+  .hd.section {
+    border-bottom: 1px solid var(--sx-line);
+    padding-bottom: var(--sx-s-4);
+  }
+  .section .ttl {
+    font-size: var(--sx-t-md);
+    font-weight: var(--sx-w-bold);
+    letter-spacing: -.015em;
+    line-height: 1.3;
+    max-width: none;
+  }
+  .section .sub {
+    margin-top: var(--sx-s-1);
+    font-family: var(--sx-font-mono);
+    font-size: var(--sx-t-2xs);
+    letter-spacing: .04em;
+    line-height: 1.4;
+    color: var(--sx-ink-3);
+  }
+
+  /* ═══ VARIANT: aire (HEREDADA) — texto limpio con eyebrow de acento ════════
+     Como `plain` (ni raya ni piel) pero el eyebrow toma el acento de marca y el
+     bloque respira un peldaño más (gap y márgenes propios). La marca la lleva el
+     COLOR del eyebrow —no una línea ni una sombra—, para un header aireado y
+     propio sin encender un banner. El `tone` sigue pintando el título como en el
+     resto de las variantes de texto; el eyebrow se queda en acento a propósito. */
+  .hd.aire { gap: var(--sx-s-4); }
+  .aire .eyebrow { color: var(--sx-accent); margin-bottom: var(--sx-s-3); }
+  .aire .sub { margin-top: var(--sx-s-3); }
 
   /* ═══ VARIANT: banda — el encabezado del destino ═══════════════════════════
      Un encabezado de RUTA teñido del acento: una columna, sin cifra y sin

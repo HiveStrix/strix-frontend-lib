@@ -640,13 +640,15 @@ encontrás otra que no, es un bug.
 \* **`variant` no es un solo eje.** En `Button` / `Menu` / `SplitButton` / `IconButton` es cuánto
 peso visual tiene una acción (`solid` uno por vista · `outline` teñido, el de siempre · `ghost` ·
 `danger` · `frosted`). En `Skeleton` es qué forma dibuja (`text` · `block` · `circle`). En
-`PageHeader` es qué encabezado es (`banda`, el del destino y default · `hero-card`, el del tablero).
+`PageHeader` es qué encabezado es (`banda`, el del destino y default · `hero-card`, el del tablero ·
+`section` y `aire`, heredadas).
 
-**Sólo hay variantes de arcilla.** En la v0.13 se borraron todas las que no se moldeaban con el
-relieve de la arcilla: `PageHeader` `line` / `section` / `plain` / `aire` / `soft` / `hero`, `Card`
+**Sólo variantes de arcilla para lo nuevo.** En la v0.13 se borraron las que no se moldeaban con el
+relieve de la arcilla y nadie usaba: `PageHeader` `line` / `plain` / `soft` / `hero`, `Card`
 `crest` / `filled` (Card quedó con una sola forma y sin `variant`), `Panel` `headVariant="sarion"`
-(la prop se fue) y `Hero` `surface="ink"`. Un valor viejo no rompe: cae a `banda` / `soft`. Una
-variante nueva entra sólo si sigue el relieve de `DESIGN.md`.
+(la prop se fue) y `Hero` `surface="ink"`. Un valor borrado no rompe: cae a `banda` / `soft`.
+`PageHeader` `section` y `aire` se quedan como **heredadas** porque hay pantallas en producción que
+las usan; no son para código nuevo. Una variante nueva entra sólo si sigue el relieve de `DESIGN.md`.
 
 ### Las listas de la familia `form` (v0.12)
 

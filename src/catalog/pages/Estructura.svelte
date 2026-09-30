@@ -389,20 +389,23 @@
           <span class="sx-id">Alert</span> debajo.
         </p>
 
-        <h3 class="sx-cap sub">variant — las dos de arcilla</h3>
+        <h3 class="sx-cap sub">variant — las de arcilla</h3>
         <p class="why">
           <span class="sx-id">banda</span>, el default, es el encabezado del destino: el pastel del
           acento del módulo, a una columna. <span class="sx-id">hero-card</span> es el del tablero:
           la misma pieza levantada, a dos zonas —la narrativa a un lado, la <b>cifra</b> al otro—.
-          Las otras seis (line, section, plain, aire, soft, hero) se borraron en la v0.13: separaban
-          con una raya, un lavado plano o una isla oscura, y la arcilla separa por volumen. Un valor
-          viejo cae a <span class="sx-id">banda</span>.
+          line, plain, soft y hero se borraron en la v0.13: separaban con una raya, un lavado plano
+          o una isla oscura, y la arcilla separa por volumen. Un valor borrado cae a
+          <span class="sx-id">banda</span>. <span class="sx-id">section</span> y
+          <span class="sx-id">aire</span> siguen, <b>heredadas</b>, sólo por las pantallas que ya las
+          usan: no son para código nuevo, y por eso este catálogo no las muestra.
         </p>
         <p class="note">
           <b>Cada variante tiene un número</b>, para pedir «usá la variante N» — el número es un
           alias del nombre (<span class="sx-id">variant="hero-card"</span> es lo mismo que
           <span class="sx-id">variant="2"</span>):
-          &nbsp;<b>1</b>&nbsp;banda&nbsp;(default)&nbsp;·&nbsp; <b>2</b>&nbsp;hero-card.
+          &nbsp;<b>1</b>&nbsp;banda&nbsp;(default)&nbsp;·&nbsp; <b>2</b>&nbsp;hero-card&nbsp;·&nbsp;
+          <b>3</b>&nbsp;section&nbsp;(heredada)&nbsp;·&nbsp; <b>4</b>&nbsp;aire&nbsp;(heredada).
         </p>
 
         <!-- hero-card: la tarjeta del tablero. El fragmento en acento del título
