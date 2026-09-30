@@ -4,13 +4,15 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
-## Sin publicar
+## v0.13.0 (2026-09-30)
 
 - **La arcilla de los módulos, más ligera.** La traza del acento en el fondo de un core baja del 50 % al 30 %. Afecta a dos cosas: el color de la sombra que rodea cada pieza —que es la que se lee como «toda la pantalla es rosa», porque un blur de 20 px pinta mucha más superficie que cualquier fondo plano— y la traza de la rampa, o sea la cabecera de una tabla (`--sx-n-100`) y todas las líneas (`--sx-n-150`). El tono y la LUZ no se tocan: `hexOfOklch` conserva la luminosidad, así que la sombra pesa igual y el volumen de la arcilla es idéntico; lo único que baja es la saturación. La identidad del módulo sigue en el acento (el pill del nombre, la fila elegida, el botón primario).
 
   De paso queda medido que `CLAY_BG` —la perilla que se venía girando (100 → 30 → 36 → 10)— ya estaba agotada: al 10 % el fondo de Clientes resuelve a `#EEEDED`, croma 0.0011, indistinguible de un gris. Bajarla a 0.05 mueve un escalón de un canal y a 0.03 no mueve nada. El fondo plano ya era neutro; lo que quedaba teñido era la sombra y la rampa.
 
   `pnpm contrast` da exactamente la misma salida que antes del cambio: ningún piso de legibilidad ni de distinguibilidad se mueve.
+
+- **CI, por fin.** El repo tenía dos arneses escritos (`scripts/tokens.mjs` y `scripts/contrast.mjs`) y ningún workflow que los corriera: la pieza de la que dependen nueve frontends era la única cuya verificación dependía de que alguien se acordara. Ahora, en cada push a `main` y en cada PR: se regenera `tokens.css` y se falla si el commiteado quedó viejo (la misma guarda que el bundle de un core), se corre el arnés de contraste y ΔE2000, y se construye el catálogo para que un componente que no compila se descubra acá y no en el `npm ci` del core que lo instala.
 
 ## v0.12.0 (2026-09-28)
 

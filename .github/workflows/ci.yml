@@ -1,0 +1,89 @@
+# CI de la librería de diseño.
+#
+# POR QUÉ LLEGA TAN TARDE, Y POR QUÉ IMPORTA MÁS ACÁ QUE EN UN CORE. Este repo
+# tenía DOS arneses escritos —`scripts/tokens.mjs`, que regenera `tokens.css` a
+# partir de `tokens.js`, y `scripts/contrast.mjs`, que resuelve cada token a
+# color real y mide contraste y ΔE2000 en los dos temas y en la arcilla de los
+# ocho módulos— y ni un solo workflow que los corriera. O sea: la única pieza
+# del clúster de la que dependen nueve frontends era la única cuya verificación
+# dependía de que alguien se acordara de escribir `pnpm contrast` a mano.
+#
+# Y el costo de olvidarse no es un test rojo: es un color. Un lavado que deja
+# de leerse, una fila seleccionada que se confunde con una banda de estado, un
+# `tokens.css` que quedó viejo respecto de `tokens.js` — tres cosas que «se ven
+# bastante bien» en el navegador, que es exactamente la trampa que esos dos
+# scripts existen para cerrar.
+name: ci
+on:
+  # Lista negra, no blanca: igual que en los cores, un directorio nuevo que
+  # nadie recordó añadir no puede quedarse sin verificar en silencio.
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  # LOS DOS ARNESES. No instalan nada: los dos scripts son node puro contra
+  # `src/lib/tokens.js`, sin una sola dependencia (está dicho en la cabecera de
+  # cada uno). Por eso este job no necesita pnpm ni lockfile y corre en
+  # segundos — no hay excusa de costo para no tenerlo.
+  tokens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      # LA GUARDA DE LA DERIVA. `tokens.css` es una SEGUNDA forma de `TOKENS`,
+      # generada — el propio archivo dice «never edit tokens.css by hand». Nada
+      # impedía que alguien tocara `tokens.js` y no regenerara: el Shell carga
+      # el CSS y un Core emite el JS, así que la deriva se manifiesta como «el
+      # módulo y su marco no son del mismo color», que nadie lee como un bug de
+      # build. Se regenera acá y se falla si el commiteado quedó viejo, igual
+      # que la guarda del bundle en los cores.
+      - name: Regenerar tokens.css
+        run: node scripts/tokens.mjs
+
+      - name: Fallar si tokens.css commiteado quedó viejo
+        run: |
+          if ! git diff --exit-code -- src/lib/tokens.css; then
+            echo "::error::src/lib/tokens.css está desactualizado. Corré 'pnpm tokens' y commiteá el resultado."
+            exit 1
+          fi
+
+      # EL ARNÉS DE COLOR. Sale 1 si alguna combinación medida cae debajo de su
+      # piso; imprime la matriz entera igual, para que el log del PR sirva de
+      # evidencia y no sólo de semáforo.
+      - name: Medir contraste y distinguibilidad
+        run: node scripts/contrast.mjs
+
+  # QUE LOS COMPONENTES COMPILEN. Los arneses de arriba miden colores, no
+  # Svelte: un error de sintaxis o un import roto en cualquiera de los ~60
+  # componentes no lo atrapa ninguno de los dos, y en este repo no se descubre
+  # al mergear sino en el `npm ci` del core que lo instala — o sea en el CI de
+  # OTRO repo, con el pin ya subido.
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Construir el catálogo
+        run: pnpm build
