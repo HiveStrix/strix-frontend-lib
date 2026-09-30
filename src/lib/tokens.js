@@ -181,12 +181,33 @@ const rot = (role, h, k = 1) => { const [L, C, h0] = CLAY_LC[role]; return hexOf
 // ser muy muy ligero — ahora toda la página se ve rosa»). Con la saturación
 // entera del lila, el fondo de un módulo ERA su color: Clientes pintaba la
 // pantalla de rosa. Los fondos de un módulo guardan el 10 % de la saturación
-// del lila (un soplo del tono) y la sombra y la traza de los grises el 50 %. La luz no se toca: el volumen y el contraste son los mismos.
+// del lila (un soplo del tono) y la sombra y la traza de los grises el 30 %. La luz no se toca: el volumen y el contraste son los mismos.
 // El lila del Tablero (TOKENS) no se diluye: es la casa del Shell.
 // 10 %: el usuario lo fue ajustando (100 → 30 → 36 → 10, 2026-09-23). El fondo
 // de un módulo es casi neutro, apenas un soplo del tono; lo que dice en qué
 // módulo se está es la sombra, la luz y el acento, que la Shell adopta igual.
-const CLAY_BG = 0.1, CLAY_SHADOW = 0.5;
+//
+// CLAY_BG YA NO ES LA PERILLA, Y ESO ESTÁ MEDIDO (2026-09-30, el usuario pidió
+// «bajarle un poco más al acento de fondo de los cores — se ve muy de cada
+// color»). Al 10 % los fondos YA son neutros: con el rosa de Clientes,
+// --sx-ground resuelve a #EEEDED (croma OKLCH 0.0011) y --sx-surface a #F5F4F4,
+// que al lado de un gris puro no se distinguen. Bajar CLAY_BG a 0.05 mueve un
+// solo escalón de un canal y a 0.03 no mueve nada: la perilla está agotada, y
+// volver a girarla habría sido un arreglo de mentira.
+//
+// LO QUE TODAVÍA TIÑE LA PANTALLA ES CLAY_SHADOW, que hace DOS cosas a la vez:
+//   • es el color de la sombra de cada pieza — el tono al .22–.26 de alfa sobre
+//     16–20 px de blur, que es MUCHA más superficie pintada que cualquier
+//     fondo plano, y es lo que se lee como «toda la pantalla es rosa»;
+//   • es la traza de la rampa (`tint` → chromeRamp), o sea --sx-n-100, la
+//     cabecera de una tabla, y --sx-n-150, todas las líneas. Al 50 % esos
+//     peldaños salían con 5 veces el croma del propio fondo del módulo.
+// Baja de 50 % a 30 %. El TONO no se toca y la LUZ tampoco —`hexOfOklch`
+// conserva L—, así que la sombra pesa exactamente lo mismo y el volumen de la
+// arcilla es idéntico: lo único que baja es la saturación. La identidad del
+// módulo sigue donde estaba, en el acento: el pill del nombre, la fila
+// seleccionada y el botón primario.
+const CLAY_BG = 0.1, CLAY_SHADOW = 0.3;
 const rgba = (hex, a) => `rgba(${rgbOf(hex).join(',')},${a})`;
 const lumOf = (hex) => { const [r, g, b] = rgbOf(hex).map((v) => toLin(v / 255)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 /** La razón WCAG entre dos hex — la misma que mide scripts/contrast.mjs. */
