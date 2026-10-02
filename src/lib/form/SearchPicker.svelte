@@ -57,9 +57,22 @@
   // '' al abrir (así hay filas de referencia apenas aparece) y con lo tecleado
   // tras `debounce` ms. Una respuesta vieja que llega tarde se descarta.
   //
+  // ABRE BUSCANDO LO QUE LA LÍNEA YA DICE. Con `initial`, el campo arranca con
+  // ese texto —seleccionado, para escribir encima— y la primera pregunta va
+  // con él. Quien abre la lupa desde un renglón que dice «tornillo galvanizado»
+  // no tiene por qué volver a escribirlo para ver si existe, y el catálogo
+  // entero no es la respuesta a esa pregunta.
+  //
   // CREAR IN SITU. Con `createLabel`, el pie ofrece «+ Crear «lo tecleado»» y
   // despacha `create` con `{ query }`. El padre crea el registro; esta
   // librería no tiene capa de datos.
+  //
+  // EL BOTÓN DE CREAR NO SE GANA ESCRIBIENDO. Antes aparecía sólo con algo
+  // tecleado: quien abría la lupa a ver si el registro estaba, veía que no, y
+  // cerraba, se quedaba sin salida —a darlo de alta a otro módulo—. Ahora,
+  // con `createLabel`, el botón está siempre: con texto se lee «Crear artículo
+  // «tuerca»» y sin texto, «Crear artículo», y `create` despacha
+  // `{ query: '' }`. Buscar y no encontrar es justo cuando hace falta crear.
   //
   // En un teléfono o una tablet es una hoja que sube desde abajo: eso lo pone
   // Dialog.
@@ -85,8 +98,14 @@
    * hasta dos renglones; las cifras y los códigos no se parten nunca.
    */
   export let columns = [];
-  /** `async (query) => filas[]`. Se llama con '' al abrir. */
+  /** `async (query) => filas[]`. Se llama con `initial` al abrir. */
   export let loader = null;
+  /**
+   * Con qué texto abre la búsqueda: lo que la línea que abrió la lupa ya dice.
+   * Va seleccionado, para escribir encima, y es la primera pregunta al
+   * `loader`. '' abre con el listado de referencia, como siempre.
+   */
+  export let initial = '';
   /** Milisegundos entre la última tecla y la pregunta al `loader`. */
   export let debounce = 200;
   /** Identidad estable de cada fila. */
@@ -117,7 +136,7 @@
 
   let inputEl;
   let scroller;
-  let query = '';
+  let query = initial;
   let rows = [];
   let active = -1;
   let fetching = false;
@@ -178,7 +197,12 @@
     else timer = setTimeout(run, debounce);
   }
 
-  onMount(() => load('', true));
+  onMount(() => {
+    load(query, true);
+    // Con texto de arranque queda seleccionado: la primera tecla lo reemplaza,
+    // sin tener que borrarlo.
+    if (query) tick().then(() => inputEl?.select?.());
+  });
   onDestroy(() => {
     clearTimeout(timer);
     clearTimeout(addedTimer);
@@ -246,9 +270,7 @@
 
   function create() {
     pickWhen = null;
-    const text = query.trim();
-    if (!text) return;
-    dispatch('create', { query: text });
+    dispatch('create', { query: query.trim() });
   }
 
   const cell = (row, col) => (typeof col.value === 'function' ? col.value(row) : row?.[col.key]);
@@ -257,11 +279,15 @@
   const fits = (col) => !!col.mono || col.align === 'right';
 
   $: q = query.trim();
-  $: createText = !createLabel || !q
+  // Sin nada escrito el botón sigue estando, con su etiqueta a secas: el
+  // padre recibe `create` con `query: ''` y abre su alta en blanco.
+  $: createText = !createLabel
     ? ''
     : typeof createLabel === 'function'
       ? createLabel(q)
-      : `${createLabel} «${q}»`;
+      : q
+        ? `${createLabel} «${q}»`
+        : createLabel;
   $: activeId = active >= 0 && active < rows.length ? `${gridId}-r${active}` : undefined;
   $: status = fetching
     ? loadingLabel

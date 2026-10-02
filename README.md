@@ -657,7 +657,7 @@ Ninguna lista de la librería la dibuja el sistema operativo: todas flotan en la
 |---|---|---|
 | `Select` | una lista cerrada de menos de una docena | Misma API de siempre (`value`, `options` `[{ value, label, hint?, disabled?, group? }]`, `placeholder`, `name`, `focus()`, `change`/`focus`/`blur`). `change` es un evento del DOM: `e.currentTarget.value` (cadena) y `e.detail` (el valor tal cual). `native` devuelve el `<select>` de la plataforma. |
 | `Combobox` | una lista larga, encontrable escribiendo | Sugiere al recibir el foco (`openOnFocus`). `loader: async (q) => options[]` + `debounce` para buscar en el servidor (race-safe). `creatable` + `createLabel` → evento `create` con `{ query, select }`. Slot `foot`. |
-| `SearchPicker` | elegir comparando (código, precio, existencia) | Se monta en un `{#if}` como `Dialog`. `columns`, `loader`, `rowKey`, `actionLabel`, `createLabel`, `closeOnPick`. Eventos `pick` (la fila), `create` (`{ query }`), `close`. |
+| `SearchPicker` | elegir comparando (código, precio, existencia) | Se monta en un `{#if}` como `Dialog`. `columns`, `loader`, `initial` (con qué texto abre la búsqueda), `rowKey`, `actionLabel`, `createLabel`, `closeOnPick`. Eventos `pick` (la fila), `create` (`{ query }`, vacío si no se buscó nada), `close`. Con `createLabel`, el botón de crear está SIEMPRE. |
 
 ```svelte
 <Combobox label="Proveedor" bind:value={proveedorId}
@@ -670,7 +670,8 @@ Ninguna lista de la librería la dibuja el sistema operativo: todas flotan en la
 
 {#if buscando}
   <SearchPicker title="Agregar artículo" columns={cols}
-                loader={(q) => api.articulos({ q })} createLabel="Crear artículo"
+                loader={(q) => api.articulos({ q })} initial={linea.texto}
+                createLabel="Crear artículo"
                 on:pick={(e) => agregarLinea(e.detail)}
                 on:create={(e) => crearArticulo(e.detail.query)}
                 on:close={() => (buscando = false)} />
