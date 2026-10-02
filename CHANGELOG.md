@@ -4,6 +4,12 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## Sin publicar
+
+- **SearchPicker: crear deja de ser un premio por haber escrito.** Con `createLabel`, el botón del pie estaba sólo si había algo tecleado ADENTRO del buscador. Quien abría la lupa a ver si el registro estaba, veía que no, y la cerraba, se quedaba sin salida: a darlo de alta al otro módulo, por cada documento. Ahora el botón está siempre —con texto se lee «Crear artículo «tuerca»», sin texto «Crear artículo»— y `create` despacha `query: ''`. Buscar y no encontrar es justo cuando hace falta crear.
+
+- **SearchPicker: `initial`, con qué texto abre la búsqueda.** La lupa de una línea que ya dice «tornillo galvanizado» abría con el catálogo entero y la caja vacía, y había que volver a escribirlo. Con `initial` el campo arranca con ese texto —seleccionado, para escribir encima— y la primera pregunta al `loader` va con él. '' abre con el listado de referencia, como siempre.
+
 ## v0.13.0 (2026-09-30)
 
 - **La arcilla de los módulos, más ligera.** La traza del acento en el fondo de un core baja del 50 % al 30 %. Afecta a dos cosas: el color de la sombra que rodea cada pieza —que es la que se lee como «toda la pantalla es rosa», porque un blur de 20 px pinta mucha más superficie que cualquier fondo plano— y la traza de la rampa, o sea la cabecera de una tabla (`--sx-n-100`) y todas las líneas (`--sx-n-150`). El tono y la LUZ no se tocan: `hexOfOklch` conserva la luminosidad, así que la sombra pesa igual y el volumen de la arcilla es idéntico; lo único que baja es la saturación. La identidad del módulo sigue en el acento (el pill del nombre, la fila elegida, el botón primario).

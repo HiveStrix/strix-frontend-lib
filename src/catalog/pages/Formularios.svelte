@@ -282,7 +282,9 @@
   }
   let lineas = [
     { art: ARTICULOS[0], cant: 2 },
-    { art: null, cant: 1 }
+    // Lo que el papel dice y todavía no es un artículo: con esto la lupa abre
+    // BUSCÁNDOLO (`initial`), no con el catálogo entero.
+    { art: null, cant: 1, texto: 'Cascarilla de arroz' }
   ];
   // El índice de la línea que abrió la búsqueda, o 'varios' para agregar
   // líneas seguidas; null ⇒ cerrado. El SearchPicker se MONTA con esto.
@@ -293,7 +295,9 @@
   }
   function crearArticulo(e) {
     const n = ARTICULOS.length + 1;
-    const nuevo = { id: `ART-9${String(n).padStart(3, '0')}`, codigo: `ART-9${String(n).padStart(3, '0')}`, nombre: e.detail.query, tipo: 'Producto', precio: 0, stock: 0 };
+    // `query` llega vacío cuando se crea sin haber buscado nada: el alta de
+    // verdad abre su formulario en blanco, y acá se nombra para que se vea.
+    const nuevo = { id: `ART-9${String(n).padStart(3, '0')}`, codigo: `ART-9${String(n).padStart(3, '0')}`, nombre: e.detail.query || 'Artículo nuevo', tipo: 'Producto', precio: 0, stock: 0 };
     ARTICULOS.push(nuevo);
     elegirArticulo(nuevo);
     if (buscandoPara !== 'varios') buscandoPara = null;
@@ -437,6 +441,7 @@
       { key: 'stock',  label: 'Stock',  align: 'right' }
     ]}
     loader={(q) => api.articulos({ q, limit: 50 })}
+    initial={linea.texto}
     createLabel="Crear artículo"
     on:pick={(e) => agregarLinea(e.detail)}
     on:create={(e) => crearArticulo(e.detail.query)}
@@ -1212,6 +1217,13 @@
           filas de referencia de una; las flechas mueven la fila marcada sin sacar el foco del campo,
           Enter elige, Escape cierra. En un teléfono es una hoja que sube desde abajo.
         </p>
+        <p class="why">
+          <b>Abre buscando lo que la línea ya dice</b> (<span class="sx-id">initial</span>, acá la
+          segunda línea) y <b>el botón de crear está siempre</b>: buscar y no encontrar es justo
+          cuando hace falta crear, y antes había que escribir algo para que el botón apareciera —el
+          que abría la lupa, veía que no estaba y la cerraba, se quedaba sin salida—. Sin texto,
+          <span class="sx-id">create</span> despacha <span class="sx-id">query: ''</span>.
+        </p>
 
         <div class="two">
           <div class="when yes">
@@ -1244,6 +1256,8 @@
                 <span role="cell" class="art">
                   {#if l.art}
                     <span class="sx-id">{l.art.codigo}</span> {l.art.nombre}
+                  {:else if l.texto}
+                    <span class="vacio">{l.texto}</span>
                   {:else}
                     <span class="vacio">Sin artículo</span>
                   {/if}
@@ -1268,6 +1282,7 @@
             note={buscandoPara === 'varios' ? 'Cada fila elegida es una línea nueva.' : `Línea ${buscandoPara + 1} de la factura`}
             columns={COLS_ARTICULO}
             loader={buscarArticulos}
+            initial={typeof buscandoPara === 'number' ? (lineas[buscandoPara]?.texto ?? '') : ''}
             noun="artículo"
             nounPlural="artículos"
             createLabel="Crear artículo"
