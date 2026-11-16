@@ -823,7 +823,16 @@
   .scroll {
     --sx-scroll-shade: color-mix(in srgb, var(--sx-n-900) 16%, transparent);
     overflow: auto;
-    overscroll-behavior: contain;
+    /* EL SCROLL ENCADENA HACIA LA PÁGINA EN VERTICAL (2026-11-16). Con
+       `contain` una tabla con alto máximo se quedaba con la rueda al llegar a
+       su última fila: con el puntero adentro la página no bajaba más, y quien
+       leía quedaba pegado. Una tabla es CONTENIDO de la página, no una capa
+       que flota encima (ésas —Menu, Select, Dialog— sí contienen): al tocar
+       el borde, la rueda sigue con la página. En horizontal se sigue
+       conteniendo, para que deslizar una tabla ancha no dispare el «atrás»
+       del navegador. */
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
     /* Longhands, not the shorthand, on purpose: an unresolvable colour makes a
        declaration invalid at computed-value time, and with the shorthand that
        would take the surface colour down with the gradients and leave a
