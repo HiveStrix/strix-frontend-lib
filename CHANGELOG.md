@@ -4,7 +4,7 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
-## Sin publicar
+## v0.14.0 (2026-11-16)
 
 - **Los desplegables vienen y se van, no aparecen.** Menu (y con él el menú de sesión de TopBar, SplitButton y todo `<Menu>`) y el desplegable de un grupo de Tabs entran en 160 ms —un fundido que se completa al 60 % del tiempo, más 6 px de viaje y una escala de 0.96 a 1 desde la esquina que toca el disparador— y se van en 110 ms, acelerando hacia el disparador. Antes la entrada era un keyframe de 220 ms con la curva exponencial, que dejaba la opacidad en 0.6 a los 30 ms (se leía como «apareció»), y la salida no existía: el panel vivía en un `{#if}` y se iba en el mismo cuadro. Ahora es una transición de Svelte, `in:pop` / `out:pop`; mientras se va el panel queda `inert`, así que el Tab de Menu sigue saltándolo y no toma clics. Select y Combobox, cuya lista nunca se desmonta, conservan su mecánica de keyframe + `allow-discrete` pero con las mismas cifras.
 - **Moción con nombre para popovers propios.** Tokens nuevos `--sx-dur-pop-in` (160ms) y `--sx-dur-pop-out` (110ms). La transición `pop` se exporta desde `@strix/frontend-lib/shell` (y la raíz), junto con `POP_IN_MS` / `POP_OUT_MS`: `{#if abierto}<div in:pop={{ up }} out:pop={{ up }}>…</div>{/if}`. Lee las duraciones del token en el nodo y, con `prefers-reduced-motion`, se reduce a un fundido de opacidad.
