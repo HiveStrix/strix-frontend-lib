@@ -35,7 +35,7 @@ export { default as Pill } from './Pill.svelte';
 // things that DO say something are the only things on screen with an opinion.
 export {
   Hero, Card, Panel, Well, Stack, Row, Divider, Toolbar, Sheet, Tooltip,
-  Glyph, GLYPHS, GLYPH_PATHS, IconWell, scrollbar
+  Glyph, GLYPHS, GLYPH_PATHS, IconWell, scrollbar, pop, POP_IN_MS, POP_OUT_MS
 } from './shell/index.js';
 
 // ── action · what makes something happen ─────────────────────────────────

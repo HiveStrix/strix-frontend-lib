@@ -65,6 +65,7 @@
   // it, because there is no one child that «arriving» should pick.
   import { createEventDispatcher, tick, onDestroy, onMount, flushSync } from 'svelte';
   import { supportsPopover, syncPopover } from '../shell/toplayer.js';
+  import { pop } from '../shell/pop.js';
 
   /** [{ key, label, count?, disabled?, items? }]. An item with `items` is a
       group tab: a dropdown of leaf items `[{ key, label, count?, disabled? }]`. */
@@ -177,6 +178,14 @@
 
   $: openItem = openKey ? items.find((t) => t.key === openKey) : null;
   $: subItems = openItem?.items ?? [];
+  // LO QUE SE DIBUJA MIENTRAS SE VA. El desplegable sale con `out:pop` y
+  // sigue ~110ms en pantalla después de que `openKey` vuelve a `null` — pero
+  // para entonces `subItems` ya es `[]`, y el panel se vaciaría mientras se
+  // desvanece: una caja que encoge a nada en vez de una lista que se va. Lo
+  // dibujado lee la última lista abierta; el teclado sigue leyendo
+  // `subItems`, que es la de verdad.
+  let shownSub = [];
+  $: if (openItem) shownSub = subItems;
 
   const focusableSub = (i) => !!subItems[i] && !subItems[i].disabled;
   function setSub(i) { subActive = i; subNodes[i]?.focus?.(); }
@@ -207,9 +216,10 @@
 
   function closeGroup(giveFocusBack = true) {
     if (!openKey) return;
-    // Leave the top layer in the same synchronous step as everything else hide
-    // does, before Svelte unmounts the node the `{#if}` is about to drop.
-    syncPopover(panel, false);
+    // No `hidePopover()` acá: eso dejaba el panel en `display: none` en el
+    // acto y no había salida que ver. Se va con `out:pop` (shell/pop.js) —
+    // `inert` mientras se desvanece— y al desmontarse sale de la top layer
+    // solo. Misma decisión, y mismo razonamiento, que `hide()` en Menu.
     const trg = openTrigger;
     openKey = null;
     subActive = -1;
@@ -219,7 +229,8 @@
 
   // `openKey` can also change from an external write; keep the popover state in
   // step. `panel` is still null the instant `openKey` flips, so wait a tick.
-  async function syncExternalOpen(k) { await tick(); syncPopover(panel, !!k); }
+  // Sólo al abrir: cerrar es el desmontaje que espera a `out:pop`.
+  async function syncExternalOpen(k) { await tick(); if (k) syncPopover(panel, true); }
   $: syncExternalOpen(openKey);
 
   // Below or above? `syncPopover` runs BEFORE reading offsetHeight: an unopened
@@ -441,8 +452,10 @@
       tabindex="-1"
       bind:this={panel}
       on:keydown={onPanelKey}
+      in:pop={{ up: () => up }}
+      out:pop={{ up: () => up }}
     >
-      {#each subItems as s, i (s.key)}
+      {#each shownSub as s, i (s.key)}
         <button
           class="item"
           class:off={s.disabled}
@@ -623,15 +636,14 @@
     height: auto;
     overflow-x: visible;
     /* The dropdown unfolds from its tab — a touch smaller, a few pixels back
-       toward the rail, transparent — and settles. It is created fresh on every
-       open (it lives in an {#if}), so a keyframe plays each time. */
+       toward the rail, transparent — and settles. La moción es `in:pop` /
+       `out:pop` en el marcado (shell/pop.js), no un keyframe: el panel vive en
+       un {#if}, y un keyframe no puede animar la salida de un nodo que se
+       desmonta. Acá sólo queda la esquina desde la que crece. */
     transform-origin: top left;
-    animation: sx-tabs-menu-in 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .menu.up { top: auto; bottom: calc(100% + var(--sx-s-1)); }
-  .menu.up { transform-origin: bottom left; animation-name: sx-tabs-menu-in-up; }
-  @keyframes sx-tabs-menu-in { from { opacity: 0; transform: translateY(-4px) scale(.96); } }
-  @keyframes sx-tabs-menu-in-up { from { opacity: 0; transform: translateY(4px) scale(.96); } }
+  .menu.up { transform-origin: bottom left; }
   .menu.fx {
     position: fixed;
     right: auto;
@@ -690,8 +702,8 @@
 
   @media (prefers-reduced-motion: reduce) {
     .tab, .cv, .item { transition: none; }
-    /* The ink jumps to the new tab; the menu is simply there. */
+    /* The ink jumps to the new tab; the menu fades without travelling —
+       `pop` reads this same media query. */
     .ink.travel { transition: none; }
-    .menu, .menu.up { animation: none; }
   }
 </style>

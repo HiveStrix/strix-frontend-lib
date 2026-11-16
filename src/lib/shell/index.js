@@ -37,3 +37,4 @@ export { default as InfoDot } from './InfoDot.svelte';
 export { default as Glyph, GLYPHS, GLYPH_PATHS } from './Glyph.svelte';
 export { default as IconWell } from './IconWell.svelte';
 export { scrollbar } from './scrollbar.js';
+export { pop, POP_IN_MS, POP_OUT_MS } from './pop.js';

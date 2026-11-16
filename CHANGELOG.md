@@ -4,6 +4,13 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## Sin publicar
+
+- **Los desplegables vienen y se van, no aparecen.** Menu (y con él el menú de sesión de TopBar, SplitButton y todo `<Menu>`) y el desplegable de un grupo de Tabs entran en 160 ms —un fundido que se completa al 60 % del tiempo, más 6 px de viaje y una escala de 0.96 a 1 desde la esquina que toca el disparador— y se van en 110 ms, acelerando hacia el disparador. Antes la entrada era un keyframe de 220 ms con la curva exponencial, que dejaba la opacidad en 0.6 a los 30 ms (se leía como «apareció»), y la salida no existía: el panel vivía en un `{#if}` y se iba en el mismo cuadro. Ahora es una transición de Svelte, `in:pop` / `out:pop`; mientras se va el panel queda `inert`, así que el Tab de Menu sigue saltándolo y no toma clics. Select y Combobox, cuya lista nunca se desmonta, conservan su mecánica de keyframe + `allow-discrete` pero con las mismas cifras.
+- **Moción con nombre para popovers propios.** Tokens nuevos `--sx-dur-pop-in` (160ms) y `--sx-dur-pop-out` (110ms). La transición `pop` se exporta desde `@strix/frontend-lib/shell` (y la raíz), junto con `POP_IN_MS` / `POP_OUT_MS`: `{#if abierto}<div in:pop={{ up }} out:pop={{ up }}>…</div>{/if}`. Lee las duraciones del token en el nodo y, con `prefers-reduced-motion`, se reduce a un fundido de opacidad.
+- **El chevrón de Menu ya no se recorta.** Tenía un `margin-inline-end` negativo que lo sacaba 4 px fuera del `.lb` de Button, que corta con `overflow: hidden`: se comía la punta de la flecha. El disparador ahora arma su fila en flex, los íconos son `flex: none` y sólo el texto se encoge con elipsis.
+- `scripts/contrast.mjs` exime `--sx-dur-*` de la resolución de color, como ya hacía con `--sx-ease*` y `--sx-beat`.
+
 ## v0.13.0 (2026-09-30)
 
 - **La arcilla de los módulos, más ligera.** La traza del acento en el fondo de un core baja del 50 % al 30 %. Afecta a dos cosas: el color de la sombra que rodea cada pieza —que es la que se lee como «toda la pantalla es rosa», porque un blur de 20 px pinta mucha más superficie que cualquier fondo plano— y la traza de la rampa, o sea la cabecera de una tabla (`--sx-n-100`) y todas las líneas (`--sx-n-150`). El tono y la LUZ no se tocan: `hexOfOklch` conserva la luminosidad, así que la sombra pesa igual y el volumen de la arcilla es idéntico; lo único que baja es la saturación. La identidad del módulo sigue en el acento (el pill del nombre, la fila elegida, el botón primario).

@@ -653,11 +653,15 @@
     text-align: left;
     font-size: var(--sx-t-sm); font-weight: var(--sx-w-normal); line-height: 1.45;
     transform-origin: top center;
-    animation: sx-sel-in 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
+    /* Mismas cifras que `pop` (shell/pop.js), que mueve Menu y Tabs: los
+       cuatro desplegables del sistema entran y se van al mismo paso. La
+       curva es `--sx-ease` y no `--sx-ease-out`: la exponencial dejaba la
+       opacidad en 0.6 a los 30ms y la lista se leía como «apareció». */
+    animation: sx-sel-in var(--sx-dur-pop-in, 160ms) var(--sx-ease, cubic-bezier(.2, .8, .2, 1));
   }
   .pop.up { top: auto; bottom: calc(100% + var(--sx-s-2)); transform-origin: bottom center; animation-name: sx-sel-in-up; }
-  @keyframes sx-sel-in { from { opacity: 0; transform: translateY(-4px) scale(.96); } }
-  @keyframes sx-sel-in-up { from { opacity: 0; transform: translateY(4px) scale(.96); } }
+  @keyframes sx-sel-in { from { opacity: 0; transform: translateY(-6px) scale(.96); } 66% { opacity: 1; } }
+  @keyframes sx-sel-in-up { from { opacity: 0; transform: translateY(6px) scale(.96); } 66% { opacity: 1; } }
   .pop[hidden] { display: none; }
   :global([data-sx-theme='dark']) .pop,
   :global(.sx-dark) .pop { color-scheme: dark; }
@@ -674,10 +678,10 @@
   @supports (overlay: auto) {
     .pop.fx {
       transition:
-        opacity 120ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
-        transform 120ms var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
-        overlay 120ms allow-discrete,
-        display 120ms allow-discrete;
+        opacity var(--sx-dur-pop-out, 110ms) var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+        transform var(--sx-dur-pop-out, 110ms) var(--sx-ease-in, cubic-bezier(.5, 0, .75, 0)),
+        overlay var(--sx-dur-pop-out, 110ms) allow-discrete,
+        display var(--sx-dur-pop-out, 110ms) allow-discrete;
     }
     .pop.fx:not(:popover-open) { opacity: 0; transform: translateY(-4px) scale(.97); pointer-events: none; }
     .pop.fx.up:not(:popover-open) { transform: translateY(4px) scale(.97); }

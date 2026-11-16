@@ -790,6 +790,15 @@ export const TOKENS = {
   '--sx-ease-out': 'cubic-bezier(.16, 1, .3, 1)',
   '--sx-ease-spring': 'cubic-bezier(.34, 1.56, .64, 1)',
   '--sx-ease-in': 'cubic-bezier(.5, 0, .75, 0)',
+  // Lo que cuelga de un disparador —Menu, el desplegable de Tabs, la lista de
+  // Select y de Combobox, la campana de una app— entra y se va con estas dos
+  // cifras y con nada más. Más corto que `--sx-beat` porque un desplegable
+  // se pide para usarlo YA: 160ms alcanza para ver de dónde sale, y la
+  // salida, más corta todavía, no hace esperar a quien ya eligió. La
+  // transición `pop` (shell/pop.js) las lee del nodo, así que cambiarlas acá
+  // mueve los cuatro componentes juntos.
+  '--sx-dur-pop-in': '160ms',
+  '--sx-dur-pop-out': '110ms',
 
   // The veil behind anything that took the screen. It is a ROLE and not a mix
   // of the neutral ramp, because the ramp does NOT re-bind in dark: mixing
