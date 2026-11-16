@@ -63,6 +63,7 @@
   import { createEventDispatcher, tick, onDestroy, flushSync } from 'svelte';
   import Button from './Button.svelte';
   import { supportsPopover, syncPopover } from '../shell/toplayer.js';
+  import { pop } from '../shell/pop.js';
 
   /**
    * The list. Each item:
@@ -153,11 +154,14 @@
 
   function hide(giveFocusBack = true) {
     if (!open) return;
-    // `panel` todavía apunta al nodo que está por desmontarse — este tick
-    // reactivo no parchó el DOM todavía. Salir de la top layer acá, en vez de
-    // confiar en que sacar el nodo lo haga solo, deja esa salida en el mismo
-    // paso síncrono que todo lo demás que `hide()` ya hace.
-    syncPopover(panel, false);
+    // ACÁ NO SE SALE DE LA TOP LAYER. Antes `hide()` llamaba
+    // `syncPopover(panel, false)` para que la salida quedara en este mismo
+    // paso síncrono — y con eso el panel pasaba a `display: none` en el acto,
+    // que es exactamente lo que impedía verlo irse. Ahora el panel se va con
+    // `out:pop` (ver shell/pop.js): Svelte lo retiene en el DOM ~110ms, lo
+    // marca `inert` mientras tanto (no toma clics, no toma foco, Tab lo
+    // salta) y recién entonces lo desmonta — y un popover que sale del DOM
+    // sale de la top layer solo, sin `hidePopover()`.
     open = false;
     active = -1;
     typed = '';
@@ -187,9 +191,14 @@
   // cuando `bind:this` complete la asignación — no vale la pena apostar a un
   // detalle de scheduling de Svelte que no está verificado, cuando ya hay una
   // forma probada de esperar el nodo en este mismo archivo.
+  //
+  // Sólo en la dirección de ABRIR: cerrar es desmontar, y el desmontaje
+  // espera a que termine `out:pop` (ver `hide()`). Un `hidePopover()` acá
+  // —después del `tick`, con `panel` todavía apuntando al nodo que se está
+  // yendo— cortaría la salida en seco igual que antes.
   async function syncExternalOpen(isOpen) {
     await tick();
-    syncPopover(panel, isOpen);
+    if (isOpen) syncPopover(panel, true);
   }
   $: syncExternalOpen(open);
 
@@ -267,9 +276,15 @@
     // Tab means Tab: close, then continue. `flushSync` is load-bearing — without
     // it the panel is still in the DOM when the browser computes where Tab goes,
     // so focus lands on the menu item BELOW the one it just left, and then the
-    // panel unmounts under it and drops focus on <body>. Flushing first removes
-    // the panel, leaves focus on the trigger, and lets the default Tab step to
+    // panel unmounts under it and drops focus on <body>. Flushing first starts
+    // the outro, leaves focus on the trigger, and lets the default Tab step to
     // whatever genuinely follows it.
+    //
+    // Con la salida animada el panel SIGUE en el DOM ~110ms después del
+    // `flushSync` — pero Svelte lo pone `inert` en el mismo flush en que
+    // arranca el `out:`, y un subárbol `inert` no está en el orden de
+    // tabulación. El Tab salta el panel que se va igual que saltaba el panel
+    // que ya no estaba.
     if (k === 'Tab') { hide(true); flushSync(); return; }
     if (k === 'ArrowDown') { e.preventDefault(); step(active, 1); return; }
     if (k === 'ArrowUp') { e.preventDefault(); step(active, -1); return; }
@@ -377,6 +392,10 @@
       on:click={toggle}
       on:keydown={onTriggerKey}
     >
+      <!-- Las tres piezas en una fila propia: Button envuelve lo que recibe en
+           `.lb`, que corta con `overflow: hidden` para que su elipsis funcione.
+           Ver `.tw` en el estilo. -->
+      <span class="tw">
       {#if icon}
         <svg class="lead" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{@html icon}</svg>
@@ -384,6 +403,7 @@
       <span class="tl"><slot>{label}</slot></span>
       <svg class="cv" class:on={open} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{@html CHEV}</svg>
+      </span>
     </Button>
   {/if}
 
@@ -399,6 +419,8 @@
       tabindex="-1"
       bind:this={panel}
       on:keydown={onPanelKey}
+      in:pop={{ up: () => up }}
+      out:pop={{ up: () => up }}
     >
       {#each items as it, i (it.id ?? `i${i}`)}
         {#if it.sep}
@@ -435,7 +457,17 @@
 <style>
   .sx-menu { position: relative; display: inline-flex; max-width: 100%; }
 
-  .tl { overflow: hidden; text-overflow: ellipsis; }
+  /* EL CHEVRÓN NO SE RECORTA. `.lb` de Button tiene `overflow: hidden` —es
+     lo que deja que un rótulo largo termine en «…»—, y todo lo que este
+     archivo mete en el botón vive adentro de esa caja. El chevrón tenía un
+     `margin-inline-end` negativo de `--sx-s-1` (un tirón óptico hacia el
+     borde del botón) que lo sacaba 4px FUERA de `.lb`: el recorte se comía la
+     punta de la flecha. Medido en una app: `.lb` terminaba en x 1361.3 y la
+     flecha en 1365.2. El tirón se fue —no vale una flecha mordida— y ahora
+     la fila es flex: los dos íconos son `flex: none` y lo ÚNICO que se
+     encoge y se corta es el texto de `.tl`. */
+  .tw { display: inline-flex; align-items: center; gap: var(--sx-s-1); min-width: 0; max-width: 100%; vertical-align: middle; }
+  .tl { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .lead { display: inline-block; vertical-align: middle; flex: none; width: 1.15em; height: 1.15em; }
   /* The chevron turns because the state it reports is a direction: closed points
      down at what is coming, open points up at where it came from. 120ms, and
@@ -444,7 +476,7 @@
     /* inline-block propio: en un anfitrión sin shadow DOM, `svg{display:block}`
        de base.css mandaba el chevrón a un segundo renglón. */
     display: inline-block; vertical-align: middle;
-    flex: none; width: 1em; height: 1em; margin-inline-end: calc(var(--sx-s-1) * -1);
+    flex: none; width: 1em; height: 1em;
     transition: transform var(--sx-beat) var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1));
   }
   .cv.on { transform: rotate(180deg); }
@@ -487,17 +519,16 @@
        —la de su `align`, arriba o abajo según `up`— con un poco de deriva, y
        se asienta: una lista que brota de donde se la pidió, no una caja que
        aparece. Sólo transform y opacidad: `place()` mide `offsetWidth` /
-       `offsetHeight`, que un `transform` no toca. Cierra de golpe, y así debe
-       ser: el `flushSync()` del Tab de abajo necesita que el nodo YA no esté. */
+       `offsetHeight`, que un `transform` no toca. La moción ya no es un
+       keyframe de acá: es `in:pop` / `out:pop` en el marcado (shell/pop.js),
+       porque un keyframe no puede animar la SALIDA de un nodo que el `{#if}`
+       desmonta. Este archivo sólo pone la esquina desde la que crece. */
     transform-origin: 100% 0;
-    animation: sx-menu-in 220ms var(--sx-ease-out, cubic-bezier(.16, 1, .3, 1)) backwards;
   }
   .panel.start { inset-inline-start: 0; transform-origin: 0 0; }
   .panel.end { inset-inline-end: 0; }
-  .panel.up { top: auto; bottom: calc(100% + var(--sx-s-1)); transform-origin: 100% 100%; animation-name: sx-menu-up; }
+  .panel.up { top: auto; bottom: calc(100% + var(--sx-s-1)); transform-origin: 100% 100%; }
   .panel.start.up { transform-origin: 0 100%; }
-  @keyframes sx-menu-in { from { opacity: 0; transform: translateY(-4px) scale(.95); } }
-  @keyframes sx-menu-up { from { opacity: 0; transform: translateY(4px) scale(.95); } }
 
   /* Con `popover`, `top: calc(100% + …)` deja de leer nada — no hay ancestro
      posicionado del que sea el 100%. `.fx` cambia a `position: fixed` con
@@ -593,8 +624,9 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* El panel no se apaga acá: `pop` pregunta por esta misma media query y
+       baja a un fundido de opacidad solo, sin viaje ni escala. */
     .cv, .item { transition: none; }
-    .panel { animation: none; }
   }
 
   @media (pointer: coarse) {
