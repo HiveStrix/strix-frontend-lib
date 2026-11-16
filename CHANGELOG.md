@@ -4,6 +4,10 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## v0.14.1 (2026-11-16)
+
+- **El scroll de una tabla sigue con la página al llegar al borde.** `Table` (con alto máximo) y la lista de `SearchPicker` tenían `overscroll-behavior: contain`: al llegar a la última fila, con el puntero adentro, la rueda no movía más nada y la página quedaba pegada. Ahora encadenan en vertical (`overscroll-behavior-y: auto`) y siguen conteniendo en horizontal, para que deslizar una tabla ancha no dispare el «atrás» del navegador. Las capas que flotan (Menu, Select, Combobox, Dialog, Sheet, Panel) siguen conteniendo.
+
 ## v0.14.0 (2026-11-16)
 
 - **Los desplegables vienen y se van, no aparecen.** Menu (y con él el menú de sesión de TopBar, SplitButton y todo `<Menu>`) y el desplegable de un grupo de Tabs entran en 160 ms —un fundido que se completa al 60 % del tiempo, más 6 px de viaje y una escala de 0.96 a 1 desde la esquina que toca el disparador— y se van en 110 ms, acelerando hacia el disparador. Antes la entrada era un keyframe de 220 ms con la curva exponencial, que dejaba la opacidad en 0.6 a los 30 ms (se leía como «apareció»), y la salida no existía: el panel vivía en un `{#if}` y se iba en el mismo cuadro. Ahora es una transición de Svelte, `in:pop` / `out:pop`; mientras se va el panel queda `inert`, así que el Tab de Menu sigue saltándolo y no toma clics. Select y Combobox, cuya lista nunca se desmonta, conservan su mecánica de keyframe + `allow-discrete` pero con las mismas cifras.

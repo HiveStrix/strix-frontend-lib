@@ -428,7 +428,8 @@
      parpadea a vacío en cada tecla— pero se apagan un poco: no son todavía
      las de lo que está escrito. */
   .box.dim { opacity: .6; }
-  .scroll { max-height: min(52vh, 440px); overflow: auto; overscroll-behavior: contain; }
+  /* Encadena en vertical por lo mismo que Table: la lista es contenido, no una capa. */
+  .scroll { max-height: min(52vh, 440px); overflow: auto; overscroll-behavior-x: contain; overscroll-behavior-y: auto; }
 
   table { width: 100%; border-collapse: separate; border-spacing: 0; }
   thead th {
