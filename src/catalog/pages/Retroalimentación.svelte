@@ -451,8 +451,8 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
       </div>
       <p class="tip">
         Con el diálogo abierto: <b>Tab</b> da vueltas adentro y nunca se escapa. <b>Escape</b> lo cierra y no
-        llega al Shell. Arrastrá desde adentro del texto y soltá sobre el scrim: no se cierra, porque para
-        descartar hacen falta las dos puntas afuera. Al cerrar, el foco vuelve exactamente al botón que lo abrió.
+        llega al Shell. Un clic afuera <b>no lo cierra</b>: un formulario no se pierde por un clic perdido. Se
+        sale con la ✕, con Escape o con los botones del pie. Al cerrar, el foco vuelve exactamente al botón que lo abrió.
       </p>
     </div>
 
@@ -465,7 +465,8 @@ push({ tone: 'critical', text: 'No se guardó OT-0042.', action: 'Reintentar' })
       <div><dt class="sx-id">title</dt><dd>El nombre, para el ojo y para el árbol de accesibilidad. Obligatorio.</dd></div>
       <div><dt class="sx-id">note</dt><dd>La línea de asunto: cuál máquina, cuál orden. Se vuelve la descripción.</dd></div>
       <div><dt class="sx-id">size</dt><dd><code>sm</code> · <code>md</code> · <code>lg</code>. Medidos en <code>ch</code>, porque lo que decide el ancho de un diálogo es la medida del texto.</dd></div>
-      <div><dt class="sx-id">dismissible</dt><dd><code>false</code> mientras se escribe: sin ✕, sin Escape, sin scrim. La tecla igual se traga.</dd></div>
+      <div><dt class="sx-id">dismissible</dt><dd><code>false</code> mientras se escribe: sin ✕ y sin Escape. La tecla igual se traga.</dd></div>
+      <div><dt class="sx-id">scrimDismiss</dt><dd>Apagado por defecto. Sólo para un diálogo sin nada que perder (un detalle de sólo lectura): ahí un clic en el velo lo cierra.</dd></div>
       <div><dt class="sx-id">on:close</dt><dd>Lo desmontás vos. Se monta con <code>{'{#if}'}</code>, nunca se esconde.</dd></div>
       <div><dt class="sx-id">data-sx-autofocus</dt><dd>Poneselo al campo que debe recibir el foco. Sin eso, el foco va al panel y el lector lee el título antes que un botón.</dd></div>
     </dl>
