@@ -37,10 +37,13 @@
   //      reports the host element.
   //   2. ESCAPE BELONGS TO IT. Stopped, not just handled: the Shell has its own
   //      Escape chain and letting the key through unwinds two levels at once.
-  //   3. THE SCRIM DISMISSES ONLY ON A REAL CLICK ON THE SCRIM — mousedown AND
-  //      click must both land on it. A drag that starts inside a textarea and
-  //      releases over the scrim is a person selecting text, and throwing away
-  //      what they typed for it is the rudest bug a dialog can have.
+  //   3. THE SCRIM DOES NOT DISMISS (v0.15.0). A dialog holds a form, and a
+  //      stray click outside threw away what the person had typed: «perder un
+  //      formulario por un error, fatal». The ways out are the ✕, Escape and
+  //      the footer's own buttons — all deliberate. A dialog that holds nothing
+  //      to lose (a read-only detail) may opt in with `scrimDismiss`; even
+  //      then it takes a real click ON THE SCRIM — mousedown AND click both on
+  //      it — so a text selection released outside never closes it.
   //   4. IT IS MOUNTED, NOT TOGGLED. `{#if open}<Dialog …/>{/if}` — the focus
   //      return hangs off destroy, and a hidden-but-mounted dialog keeps stale
   //      form state that the next opening then shows.
@@ -74,6 +77,11 @@
    * key is still swallowed, so it never reaches whatever is listening behind.
    */
   export let dismissible = true;
+  /**
+   * Whether a click on the scrim closes it. FALSE by default: a click outside
+   * never throws a form away. Opt in only for a dialog with nothing to lose.
+   */
+  export let scrimDismiss = false;
   export let closeLabel = 'Cerrar';
 
   const dispatch = createEventDispatcher();
@@ -161,7 +169,7 @@
   }
 
   function scrimClick(e) {
-    if (downOnScrim && e.target === e.currentTarget) close();
+    if (scrimDismiss && downOnScrim && e.target === e.currentTarget) close();
     downOnScrim = false;
   }
 </script>

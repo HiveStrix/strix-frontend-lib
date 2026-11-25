@@ -68,9 +68,13 @@
   export let side = 'right';
   /** sm | md | lg. Below its width the sheet is the whole screen. */
   export let size = 'md';
-  /** Escape, the scrim and the × all close it. Turn off for a step that must be
-   *  answered — and then give the footer a control that says what the answer is. */
+  /** Escape and the × close it. Turn off for a step that must be answered — and
+   *  then give the footer a control that says what the answer is. */
   export let dismissible = true;
+  /** Whether a click on the scrim closes it. FALSE by default (v0.15.0): a
+   *  drawer holds a form, and a stray click outside must never throw it away.
+   *  Opt in only for a drawer with nothing to lose. */
+  export let scrimDismiss = false;
 
   const dispatch = createEventDispatcher();
   const id = `sx-sheet-${++uid}`;
@@ -154,7 +158,7 @@
   }
 
   function scrimClick(e) {
-    if (downOnScrim && e.target === e.currentTarget && dismissible) close();
+    if (scrimDismiss && downOnScrim && e.target === e.currentTarget && dismissible) close();
     downOnScrim = false;
   }
 

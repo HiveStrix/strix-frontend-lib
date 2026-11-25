@@ -4,6 +4,10 @@ Las versiones se instalan por tag (`npm install …#v0.8.0`). Ver el README.
 Los releases `v0.1.0`–`v0.7.2` están en los tags de git; este archivo arranca
 en la 0.8.0.
 
+## v0.15.0 (2026-11-25)
+
+- **Un formulario no se cierra por un clic afuera.** `Dialog` y `Sheet` ya no se cierran al hacer clic en el velo: un clic perdido tiraba lo que la persona había escrito. Se sale con la ✕, con Escape o con los botones del pie, que son gestos deliberados. **Cambio de comportamiento por defecto**: quien tenga un diálogo o un cajón sin nada que perder (un detalle de sólo lectura) lo pide con `scrimDismiss`, y aun así hace falta un clic real sobre el velo. `Confirm`, `Menu`, `Select`, `Combobox` y los popovers no cambian.
+
 ## v0.14.1 (2026-11-16)
 
 - **El scroll de una tabla sigue con la página al llegar al borde.** `Table` (con alto máximo) y la lista de `SearchPicker` tenían `overscroll-behavior: contain`: al llegar a la última fila, con el puntero adentro, la rueda no movía más nada y la página quedaba pegada. Ahora encadenan en vertical (`overscroll-behavior-y: auto`) y siguen conteniendo en horizontal, para que deslizar una tabla ancha no dispare el «atrás» del navegador. Las capas que flotan (Menu, Select, Combobox, Dialog, Sheet, Panel) siguen conteniendo.
